@@ -76,15 +76,8 @@ export default async function RootLayout({
 
         {/* Favicon and App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-
-        {/* Additional favicon sizes for better compatibility */}
-        <link rel="icon" type="image/png" sizes="16x16" href="/icon.svg" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon.svg" />
-        <link rel="icon" type="image/png" sizes="48x48" href="/icon.svg" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/icon.svg" />
 
 
         {/* Apple-specific meta tags */}
@@ -116,15 +109,6 @@ export default async function RootLayout({
           src={`https://www.googletagmanager.com/gtag/js?id=G-XGFT46LL3J`}
           strategy="afterInteractive"
         />
-        <Script id="ga-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);} 
-            gtag('js', new Date());
-            gtag('config', 'G-XGFT46LL3J');
-          `}
-        </Script>
-        {/* Removed ga-checkout-return script from main layout; relocated to protected layout */}
       </head>
       <body className="font-sans antialiased public-headings">
         <ErrorBoundary>

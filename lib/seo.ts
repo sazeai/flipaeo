@@ -98,21 +98,21 @@ export function generateMetadata(props: PageSEOProps = {}): Metadata {
       images: [ogImageUrl],
     },
     ...(defaultSEO.googleSiteVerification && {
-       verification: {
-         google: defaultSEO.googleSiteVerification,
-         ...(defaultSEO.bingSiteVerification || defaultSEO.yandexVerification ? {
-           other: {
-             ...(defaultSEO.bingSiteVerification && {
-               'msvalidate.01': defaultSEO.bingSiteVerification,
-             }),
-             ...(defaultSEO.yandexVerification && {
-               'yandex-verification': defaultSEO.yandexVerification,
-             }),
-           },
-         } : {}),
-       },
-     }),
-     other: {
+      verification: {
+        google: defaultSEO.googleSiteVerification,
+        ...(defaultSEO.bingSiteVerification || defaultSEO.yandexVerification ? {
+          other: {
+            ...(defaultSEO.bingSiteVerification && {
+              'msvalidate.01': defaultSEO.bingSiteVerification,
+            }),
+            ...(defaultSEO.yandexVerification && {
+              'yandex-verification': defaultSEO.yandexVerification,
+            }),
+          },
+        } : {}),
+      },
+    }),
+    other: {
       'theme-color': '#000000',
       'color-scheme': 'light dark',
       'format-detection': 'telephone=no',
@@ -158,7 +158,7 @@ export function generateSoftwareApplicationJsonLd(): string {
  * Generate Web Application JSON-LD for home page
  */
 export function generateLandingPageWebApplicationJsonLd(slug: string): string {
-  const cfg = (pageSEO as any)?.landingPages?.[slug];
+  const cfg = (pageSEO as any)?.[slug];
   const props = cfg
     ? { title: cfg.title, description: cfg.description, urlPath: `/${slug}`, keywords: cfg.keywords }
     : { urlPath: `/${slug}` };
@@ -177,6 +177,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     "description": description,
     "url": url,
     "applicationCategory": "BusinessApplication",
+    "applicationSubCategory": "Content Marketing Software",
     "operatingSystem": "Web Browser",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
     "softwareVersion": "1.0",
@@ -189,11 +190,14 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     ],
 
     "featureList": [
-      "AI Model Training from Selfies",
-      "Multiple Style Packs (Corporate, Glamour, Dating, etc.)",
-      "High-Resolution Photo Generation",
-      "Fast Delivery (Results in 15-20 minutes)",
-      "Automatic Deletion of Uploaded Photos for Privacy"
+      "30 AI-generated articles per month",
+      "Automated content strategy based on competitor analysis",
+      "CMS integration (WordPress, Webflow, Shopify)",
+      "On-brand AI images",
+      "Smart internal linking",
+      "Real-time research with verified citations",
+      "Answer-first content structure for AI visibility",
+      "Google Search Console integration for data-driven planning"
     ],
 
     "author": {
@@ -203,118 +207,70 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Unrealshot AI",
+      "name": "FlipAEO",
       "logo": {
         "@type": "ImageObject",
         "url": `${process.env.NEXT_PUBLIC_APP_URL}/site-logo.png`
       }
     },
-   "offers": [
-    {
-      "@type": "Offer",
-      "name": "Starter Pack",
-      "price": "9.99",
-      "priceCurrency": "USD",
-      "description": "Includes 30 credits for one AI model training and 20 AI-generated photos."
-    },
-    {
-      "@type": "Offer",
-      "name": "Pro Pack",
-      "price": "17.99",
-      "priceCurrency": "USD",
-      "description": "Includes 60 credits for 80 photos with one model, or 40 photos with two separate models."
-    }
-],
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "All-in-One Plan",
+        "price": "59",
+        "priceCurrency": "USD",
+        "description": "30 AI-generated articles per month with automated content strategy, CMS integration, and priority support.",
+        "availability": "https://schema.org/InStock"
+      }
+    ],
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
+      "ratingValue": "4.9",
       "bestRating": "5",
-      "ratingCount": "312"
+      "ratingCount": "127"
     },
     "review": [
       {
         "@type": "Review",
         "author": {
           "@type": "Person",
-          "name": "Sachin Singh",
-          "jobTitle": "Influencer"
+          "name": "Cichy",
+          "jobTitle": "Founder at Launchdirectories.com"
         },
         "reviewRating": {
           "@type": "Rating",
           "ratingValue": "5",
           "bestRating": "5"
         },
-        "reviewBody": "I got my perfect Instagram profile photo in just 40 minutes. The quality is amazing!"
+        "reviewBody": "FlipAEO transformed our content strategy. We went from struggling to publish weekly to having 30 high-quality articles ready each month."
       },
       {
         "@type": "Review",
         "author": {
           "@type": "Person",
-          "name": "Mariah Edwards",
-          "jobTitle": "Marketing Director"
+          "name": "Rishabh",
+          "jobTitle": "Founder & CEO"
         },
         "reviewRating": {
           "@type": "Rating",
           "ratingValue": "5",
           "bestRating": "5"
         },
-        "reviewBody": "The transformation is unbelievable. My LinkedIn profile looks so professional now!"
+        "reviewBody": "The AI research quality is incredible. Our articles now get cited by ChatGPT and Perplexity regularly."
       },
       {
         "@type": "Review",
         "author": {
           "@type": "Person",
-          "name": "Sumesh",
-          "jobTitle": "Tech Enthusiast"
+          "name": "Ben Krich",
+          "jobTitle": "SaaS Marketer"
         },
         "reviewRating": {
           "@type": "Rating",
           "ratingValue": "5",
           "bestRating": "5"
         },
-        "reviewBody": "I've tried many AI photo tools, but Unrealshot AI gives the most natural-looking results."
-      },
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Emma Thompson",
-          "jobTitle": "Model"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "5",
-          "bestRating": "5"
-        },
-        "reviewBody": "Being a model, having standout photos is everything. After using this AI tool, my portfolio photos look more polished and professional!"
-      },
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Manoj",
-          "jobTitle": "Photographer"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "5",
-          "bestRating": "5"
-        },
-        "reviewBody": "The customer service is as impressive as the AI. They helped me choose the perfect style."
-      },
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Shrey Singh",
-          "jobTitle": "HR Manager"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "5",
-          "bestRating": "5"
-        },
-        "reviewBody": "Our entire team uses Unrealshot AI for our corporate headshots. Consistent quality every time!"
+        "reviewBody": "The competitor analysis and content gap identification is a game-changer. Worth every penny."
       }
     ]
   };
@@ -510,16 +466,17 @@ export const commonPageMetadata = {
 
   pricing: () => generateMetadata({
     title: 'Pricing Plans',
-    description: 'Choose the perfect plan for your photoshoot. Flexible credit based pricing options.',
+    description: 'Simple, transparent pricing for FlipAEO. One plan with 30 AI articles/month, automated content strategy, CMS integration. $59/month with 14-day money-back guarantee.',
     canonical: '/pricing',
-    keywords: ['pricing', 'plans', 'credits', 'photoshoot plans', 'cost'],
+    keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost'],
   }),
 
   buyCredits: () => generateMetadata({
-    title: 'Buy Credits',
-    description: 'Purchase credits to unlock premium features and expand your usage limits.',
-    canonical: '/buy-credits',
-    keywords: ['buy credits', 'purchase', 'premium features', 'upgrade'],
+    title: 'Subscribe',
+    description: 'Start your FlipAEO subscription. 30 AI articles/month with automated strategy and 1-click CMS publishing.',
+    canonical: '/subscribe',
+    keywords: ['subscribe', 'FlipAEO subscription', 'content strategy'],
+    noindex: true,
   }),
 
   account: () => generateMetadata({
@@ -530,9 +487,9 @@ export const commonPageMetadata = {
     nofollow: true,
   }),
 
-  // New: Landing page-specific metadata using config/pageSEO.landingPages
+  // Page-specific metadata using config/pageSEO
   landingPage: (slug: string) => {
-    const cfg = (pageSEO as any)?.landingPages?.[slug];
+    const cfg = (pageSEO as any)?.[slug];
     const title = cfg?.title || defaultSEO.title;
     const description = cfg?.description || defaultSEO.description;
     const keywords = cfg?.keywords || defaultSEO.keywords;
@@ -546,19 +503,4 @@ export const commonPageMetadata = {
     });
   },
 
-  profilePhotoMaker: () => {
-    const cfg = (pageSEO as any)?.landingPages?.['profile-photo-maker'];
-    const title = cfg?.title || defaultSEO.title;
-    const description = cfg?.description || defaultSEO.description;
-    const keywords = cfg?.keywords || defaultSEO.keywords;
-    return generateMetadata({
-      title,
-      description,
-      keywords,
-      canonical: '/profile-photo-maker',
-      ogType: 'website',
-    });
-  },
-
- 
 };
