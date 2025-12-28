@@ -17,21 +17,20 @@ export const CTASection: React.FC = () => {
 
         {/* Headline */}
         <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-8 uppercase tracking-tight">
-          Stop guessing<br />
-          What to Publish.
+          Start Ranking<br />
+          Stop Guessing.
         </h2>
 
         {/* Description */}
         <p className="font-sans text-black/80 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed font-medium">
-          Join 2,000+ writers who use autonomous AI to build authority,
-          not just generic content.
+          Get your brand cited in modern AI Search for your category.
         </p>
 
         {/* Action Button (Direct Conversion) */}
         <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
           <Link href="/subscribe" className="w-full sm:w-auto">
             <Button variant="secondary" size="lg" className="w-full sm:w-auto h-16 px-10 text-xl border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-white text-black">
-              Get your Brand cited
+              Get your brand cited
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>

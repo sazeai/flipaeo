@@ -423,7 +423,7 @@ const FeatureRow: React.FC<FeatureRowProps> = ({ feature, isReversed }) => {
         <h3 className="font-display font-black text-3xl md:text-4xl mb-6 uppercase leading-tight">
           {feature.title}
         </h3>
-        <p className="font-sans text-gray-600 text-lg leading-relaxed font-medium max-w-xl">
+        <p className="font-sans text-gray-600 leading-relaxed font-medium text-lg max-w-xl">
           {feature.description}
         </p>
       </div>

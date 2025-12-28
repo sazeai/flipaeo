@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
-import { Twitter, Linkedin, Mail } from 'lucide-react';
+import { Twitter, Mail } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -55,7 +55,6 @@ export const Footer: React.FC = () => {
           {/* Right: Social Icons */}
           <div className="flex items-center gap-4">
             <SocialIcon href="https://twitter.com/flipaeo" icon={<Twitter className="w-5 h-5" />} />
-            <SocialIcon href="https://linkedin.com/company/flipaeo" icon={<Linkedin className="w-5 h-5" />} />
             <SocialIcon href="mailto:support@flipaeo.com" icon={<Mail className="w-5 h-5" />} />
           </div>
 
@@ -66,14 +65,6 @@ export const Footer: React.FC = () => {
           <p className="font-sans text-sm text-gray-600">
             © {new Date().getFullYear()} FlipAEO. All rights reserved.
           </p>
-          <div className="flex items-center gap-4 text-sm">
-            <Link href="/privacy-policy" className="text-gray-600 hover:text-black transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="text-gray-600 hover:text-black transition-colors">
-              Terms
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
