@@ -1,119 +1,101 @@
 import { Metadata } from 'next'
-import PublicHeader from '@/components/Header'
-import Footer from '@/components/MainFooter'
+import { Navbar } from '@/components/landing/Navbar'
+import { Footer } from '@/components/landing/Footer'
 import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
-
-
 export const metadata: Metadata = generateMetadata({
   title: 'About Us',
   description:
-    'Learn more about the journey and team behind Unrealshot AI, the AI headshot generator helping users create professional-grade headshots worldwide.',
+    'Learn about FlipAEO—the Strategic Content Engine helping brands get cited by AI search engines through Generative Engine Optimization (GEO).',
   canonical: '/about',
 })
 
 export default function AboutUs() {
   return (
-    <div className="min-h-screen bg-white">
-      <PublicHeader />
-      <main className="pt-20 md:pt-24">
+    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+      <Navbar />
+      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b">
+        <section className="bg-white border-b w-full">
           <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">About Unrealshot AI</h1>
-            <p className="text-gray-600 mt-3">Our journey, mission, and the people behind the product.</p>
+            <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">About FlipAEO</h1>
+            <p className="text-gray-600 mt-3">The story behind the Strategic Content Engine for the post-SEO era.</p>
           </div>
         </section>
 
         {/* Content */}
-        <section className="max-w-5xl mx-auto px-4 py-12">
+        <section className="max-w-5xl mx-auto px-4 py-12 w-full">
           <div className="space-y-8 bg-white border rounded-2xl p-5">
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Our Journey</h2>
               <p className="text-gray-700">
-                We are a small team of passionate developers, self-learned, and driven by curiosity. Hailing from India,
-                our journey into the tech world started in a rather unconventional way—through blogging. Back then, we were
-                just eager to share our thoughts, tips, and insights with the world, covering everything from tech tutorials
-                to life hacks. It was our way of staying connected to the ever-evolving world of technology.
+                We are a small team of passionate developers and content strategists, self-taught and driven by curiosity. Our journey into tech started through blogging—sharing insights about digital marketing, SEO, and the evolving landscape of search. We spent years watching how algorithms changed and how businesses struggled to keep up.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Spark of AI</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Shift We Saw Coming</h2>
               <p className="text-gray-700">
-                As with any journey, we soon found ourselves intrigued by something bigger: Artificial Intelligence. AI had
-                this magical quality—it was reshaping industries, changing the way people interacted with technology, and making
-                the impossible possible. We dove into it headfirst, testing AI tools, tinkering with algorithms, and experimenting
-                with different use cases. The more we explored, the more fascinated we became.
+                Then AI search arrived. ChatGPT, Perplexity, Google AI Overviews—suddenly, the game changed completely. Users stopped clicking through search results. They started asking questions and expecting direct answers. We realized that traditional SEO was no longer enough. The future belonged to brands that could become the source AI systems cite.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Birth of Unrealshot AI</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Birth of FlipAEO</h2>
               <p className="text-gray-700">
-                One evening, after weeks of brainstorming and countless cups of coffee, it hit us—what if AI could make something
-                as personal as a headshot? What if you didn’t need an expensive photographer or a studio setup to get that
-                professional, polished look? That’s when Unrealshot AI was born.
+                That's when FlipAEO was born. We built a Strategic Content Engine designed specifically for Generative Engine Optimization (GEO). Instead of chasing keywords, we reverse-engineer how AI models think—analyzing competitors, identifying visibility gaps, and creating content that AI systems recognize as authoritative.
               </p>
               <p className="text-gray-700 mt-3">
-                We wanted to build something that made it effortless for people to present themselves in the best light, whether
-                for their LinkedIn profile, job applications, or business websites. So, we started developing an AI headshot
-                generator that could do just that—deliver high-quality, professional-grade images in just a few clicks.
+                FlipAEO doesn't just write articles. It decides what should exist, what comes next, and what actually moves authority forward. Every piece of content is researched, cited, and structured to become the answer—not just another result.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Empowering People</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Empowering Entrepreneurs</h2>
               <p className="text-gray-700">
-                This wasn’t just about the tech. It was about empowerment. We believe everyone deserves a professional-looking
-                headshot, whether you're starting your career or running a business. Our goal has always been to make AI accessible,
-                practical, and—most importantly—beneficial for people.
+                This isn't just about rankings. It's about visibility in the age of AI. We believe every entrepreneur, founder, and content marketer deserves to be found when AI answers questions in their category. FlipAEO makes that possible—automatically, strategically, and at scale.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Today and Tomorrow</h2>
               <p className="text-gray-700">
-                Today, Unrealshot AI is serving users worldwide, helping them create stunning and professional AI headshots that
-                look like they’ve been shot in a studio. From freelancers looking to stand out, to business owners crafting a
-                professional brand, we’re proud to be a part of your journey.
+                Today, FlipAEO serves ambitious entrepreneurs and content teams worldwide, helping them create 30+ strategic articles per month that build real authority. From automated content planning to 1-click CMS publishing, we handle the heavy lifting so you can focus on what matters—growing your business.
               </p>
               <p className="text-gray-700 mt-3">
-                Our story is far from over. We continue to innovate, improve, and grow with every bit of feedback we receive. But
-                at the heart of everything we do is the same passion that started it all—an unshakable belief in the power of
-                technology to make life a little easier, and a lot more creative.
+                The post-SEO era is here. We're building the tools to help you win it.
               </p>
             </div>
 
             <div className="bg-[#F7F5F3] border rounded-2xl p-5">
-              <p className="text-gray-800 font-medium">Thank you for trusting us with your image. We look forward to seeing where this adventure takes us next!</p>
-              <p className="text-gray-700 mt-4">Warm regards,<br/>The Unrealshot AI Team</p>
+              <p className="text-gray-800 font-medium">Thank you for trusting FlipAEO with your content strategy. We're excited to help you become the source AI cites.</p>
+              <p className="text-gray-700 mt-4">Warm regards,<br />The FlipAEO Team</p>
             </div>
           </div>
         </section>
 
         {/* Contact CTA */}
-        <section className="max-w-5xl mx-auto px-4 pb-12 text-center">
-          <h3 className="text-xl font-bold mb-3 font-[var(--font-inter-tight)]">Want to talk?</h3>
-          <p className="text-gray-600 mb-6">We’re happy to answer any questions.</p>
-         <Link href="mailto:support@unrealshot.com">
-              <Button
-                className="text-md sm:text-md font-semibold py-5 sm:py-6 group relative bg-[#ff6f00] hover:bg-[#ff6f00]/90 text-white rounded-md overflow-hidden cursor-pointer pr-12"
-              >
-                Contact us
-                <div className="bg-white rounded-sm p-2 sm:p-3 absolute right-1 top-1/2 -translate-y-1/2">
-                  <img
-                    src="/arrow.svg"
-                    alt="arrow-right"
-                    className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                  />
-                </div>
-              </Button>
-            </Link>
+        <section className="max-w-5xl mx-auto px-4 pb-12 text-center w-full">
+          <h3 className="text-xl font-bold mb-3 font-[var(--font-inter-tight)]">Questions?</h3>
+          <p className="text-gray-600 mb-6">We're here to help you dominate AI search.</p>
+          <Link href="mailto:support@flipaeo.com">
+            <Button
+              className="text-md sm:text-md font-semibold py-5 sm:py-6 group relative bg-[#ff6f00] hover:bg-[#ff6f00]/90 text-white rounded-md overflow-hidden cursor-pointer pr-12"
+            >
+              Contact us
+              <div className="bg-white rounded-sm p-2 sm:p-3 absolute right-1 top-1/2 -translate-y-1/2">
+                <img
+                  src="/arrow.svg"
+                  alt="arrow-right"
+                  className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                />
+              </div>
+            </Button>
+          </Link>
         </section>
       </main>
       <Footer />

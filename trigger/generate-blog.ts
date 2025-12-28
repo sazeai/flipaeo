@@ -456,13 +456,15 @@ Do not fluff the outline. Only include sections that are really necessary.
 INPUT CONTEXT:
 1. KEYWORD: "${keyword}"
 2. COMPETITOR & GAP DATA: ${JSON.stringify(competitorData)}
-${brandDetails ? `### BRAND CONTEXT (Voice Reference Only)
+${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
 - Brand: ${brandDetails.product_name}
 - Type: ${brandDetails.product_identity?.literally || 'Product/Service'}
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
 
 NOTE: Use this for VOICE consistency. The article should primarily EDUCATE, not promote.
 Plan brand mentions sparingly - only where contextually valuable (intro, comparison, CTA).
+3. Don't just list competitors - explain why YOUR approach is different/better
+4. Strategic mentions: intro (establish authority), comparison (differentiate), steps (integrate your solution), CTA (call to action)
 ` : ''}
 ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-2 MAX)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
 
@@ -487,8 +489,6 @@ Before outlining, analyze the "Keyword Intent" to determine the required depth:
 **INSTRUCTION:** Adjust your outline length to match the keyword. Do not force a 15-section outline for a 8-section topic.
 
 ## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
-
-Google rewards articles with proper nested heading hierarchy. You MUST create a rich structure:
 
 **LEVEL DEFINITIONS:**
 - **level: 2 (H2)** = Main topic sections. These are your primary content pillars.
@@ -662,7 +662,7 @@ You are an expert Blog Writer. You are NOT an AI assistant. You are a subject ma
 ${styleDNA}
 
 ### 2. STRATEGY & MINDSET
-- **Goal:** Rank #1 on Google by being more specific, helpful, and "human" than the competition.
+- **Goal:** Rank #1 on Google by being more specific, helpful, and "human" than the competition to answer the user's question.
 - **Mindset:** The user is frustrated and wants a quick answer. Do not fluff. Get to the point.
 
 ### 3. GOLDEN RULES (THE LAW)
@@ -744,6 +744,22 @@ ${linkInstruction}
 2. Read the last sentence of the Context. Ensure your first sentence flows naturally from it.
 3. **Apply the Golden Rules:** BOLD the key takeaways. Keep sentences short and varied.
 4. **Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
+
+### 5. DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
+
+**DO NOT write thin, surface-level content.** Each section must be SUBSTANTIVE:
+
+- Don't just state facts - explain why they matter to the reader
+- Include actionable steps, examples, or implementation details
+- Compare, contrast, or provide background so readers fully understand
+- Anticipate what the reader might ask next and address it
+
+**EXAMPLES:**
+❌ THIN: "Use automation to save time. It makes the process faster."
+✅ DEEP: "Automation cuts submission time from 40+ hours to 2-3 hours. Each manual submission requires filling 15-20 fields, waiting for page loads, and handling CAPTCHAs. Automation handles all of this in the background while you focus on building your product. The ROI is clear - those 37 saved hours could be spent on customer development or product iteration."
+
+❌ THIN: "Our tool helps with this."
+✅ DEEP: "We built our platform specifically to solve the directory submission problem. Other one-click tools spray your listing everywhere, we analyze each directory for relevance to your niche. This means you get higher-quality backlinks that actually improve your domain rating."
 `
 }
 

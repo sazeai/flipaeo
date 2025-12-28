@@ -1,37 +1,37 @@
 import { Metadata } from 'next'
-import PublicHeader from '@/components/Header'
-import Footer from '@/components/MainFooter'
+import { Navbar } from '@/components/landing/Navbar'
+import { Footer } from '@/components/landing/Footer'
 import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Terms of Service',
-  description: 'Review the terms and conditions for using UnrealShot AI, our AI headshot generator service.',
+  description: 'Review the terms and conditions for using FlipAEO, the Strategic Content Engine for Generative Engine Optimization.',
   canonical: '/terms',
 })
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-white">
-      <PublicHeader />
-      <main className="pt-20 md:pt-24">
+    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+      <Navbar />
+      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b">
+        <section className="bg-white border-b w-full">
           <div className="max-w-5xl mx-auto px-4 py-12 text-center">
             <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">Terms of Service</h1>
-            <p className="text-gray-600 mt-3">Review the terms and conditions for using UnrealShot AI.</p>
+            <p className="text-gray-600 mt-3">Review the terms and conditions for using FlipAEO.</p>
           </div>
         </section>
 
         {/* Content */}
-        <section className="max-w-5xl mx-auto px-4 py-12">
+        <section className="max-w-5xl mx-auto px-4 py-12 w-full">
           <div className="space-y-8 bg-white border rounded-2xl p-5">
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. Introduction</h2>
               <p>
-                Welcome to <strong>Unrealshot AI</strong> ("we," "our," "us"). By accessing or using our website at
-                <a href="https://www.unrealshot.com" className="text-indigo-600"> https://www.unrealshot.com</a>
+                Welcome to <strong>FlipAEO</strong> ("we," "our," "us"). By accessing or using our website at
+                <a href="https://flipaeo.com" className="text-indigo-600"> https://flipaeo.com</a>
                 ("Site"), you agree to comply with and be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Site.
               </p>
             </div>
@@ -39,7 +39,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. Use of Our Service</h2>
               <p>
-                <strong>Unrealshot AI</strong> is an AI-powered headshot generator that allows users to create professional images.
+                <strong>FlipAEO</strong> is a Strategic Content Engine for Generative Engine Optimization (GEO) that helps businesses create authority-building content to improve visibility in AI search results.
                 Users must adhere to all applicable laws and agree not to misuse our services. Any violations of these rules can result in the termination of access to the platform.
               </p>
             </div>
@@ -53,84 +53,80 @@ export default function TermsOfService() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Payment and Credits</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Subscription and Billing</h2>
               <p>
-                <strong>Unrealshot AI</strong> operates on a credit-based system for using our services. All purchases of credits are final and non-refundable, except as specified in our
-                <a href="https://www.unrealshot.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
-                We reserve the right to modify pricing and the terms of credits at any time.
+                <strong>FlipAEO</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated articles per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
+                <a href="https://flipaeo.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Data Retention and Deletion</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Content Ownership and License</h2>
               <p>
-                We value your privacy. Data, including photos and generated headshots, is stored for a period of 14 days, after which it is permanently deleted. Users may request the deletion of their data at any time by contacting us at
-                <a href="mailto:support@unrealshot.com" className="text-indigo-600"> support@unrealshot.com</a>.
+                All content generated through FlipAEO is owned by you upon publication. You receive a full commercial license to use, modify, and distribute the generated content for your business purposes. We retain no rights to your generated content once it is delivered to you.
+              </p>
+            </div>
+
+            <div className="">
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Data Retention and Deletion</h2>
+              <p>
+                We value your privacy. Brand profiles and content strategies are stored to improve your experience. Generated articles are retained for 30 days after creation. Users may request the deletion of their data at any time by contacting us at
+                <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
                 For more information, please review our
-                <a href="https://www.unrealshot.com/privacy-policy" className="text-indigo-600"> Privacy Policy</a>.
+                <a href="https://flipaeo.com/privacy-policy" className="text-indigo-600"> Privacy Policy</a>.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Third-Party Services</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Third-Party Services</h2>
               <p>
-                <strong>Unrealshot AI</strong> uses third-party services, including the <strong>Astria API</strong> for image generation. By using our service, you agree to be bound by the terms and policies of these third parties.
-                Please review <strong>Astria API's</strong> terms at
-                <a href="https://www.astria.ai/terms" className="text-indigo-600"> https://www.astria.ai/terms</a>.
+                <strong>FlipAEO</strong> uses third-party services for AI content generation, research, and payment processing. By using our service, you agree to be bound by the terms and policies of these third parties. Payment processing is handled securely by our payment provider.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Limitation of Liability</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Limitation of Liability</h2>
               <p>
-                To the maximum extent permitted by law, <strong>Unrealshot AI</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services.
+                To the maximum extent permitted by law, <strong>FlipAEO</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to search ranking results, traffic changes, or business outcomes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Changes to the Terms</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Changes to the Terms</h2>
               <p>
                 We reserve the right to update these Terms at any time. Any changes will be posted on this page, with the updated date. Continued use of the Site after any changes constitutes acceptance of those changes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Contact Us</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Contact Us</h2>
               <p>
                 If you have any questions about these Terms, please contact us at
-                <a href="mailto:support@unrealshot.com" className="text-indigo-600"> support@unrealshot.com</a>.
+                <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Shipping Policy</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Digital Delivery</h2>
               <p>
-                UnrealShot AI provides a fully digital service. No physical products are shipped as part of our offerings. All generated images and digital assets are delivered directly to the user's dashboard on our platform. Once a photoshoot is complete, users can download their generated images from the dashboard at any time. Since all products are digital, there are no shipping fees, and delivery is instant upon generation completion.
+                FlipAEO provides a fully digital service. All generated articles and content are delivered digitally through your dashboard or directly to your connected CMS (WordPress, Webflow, Shopify). There are no physical products or shipping involved.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Affiliate Program Disclosure</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Acceptable Use</h2>
               <p>
-                We offer an affiliate program that allows users to earn rewards by referring others to <strong>UnrealShot AI</strong>. By participating in the affiliate program, you agree to the following terms:
+                You agree not to use FlipAEO to generate content that:
               </p>
-              <ul className="list-disc list-inside pl-5">
-                <li>
-                  <strong>Referral Tracking:</strong> We may use affiliate tracking cookies to monitor referrals. When someone clicks your referral link and signs up, we track the referral to attribute the reward.
-                </li>
-                <li>
-                  <strong>Earnings & Payouts:</strong> Affiliate earnings will be credited to your account according to our program's rules. You can view your earnings and program details in your affiliate dashboard. Payment terms, minimum payout thresholds, and related conditions may apply.
-                </li>
-                <li>
-                  <strong>Prohibited Practices:</strong> You agree not to engage in deceptive, fraudulent, or unethical practices (e.g., spamming, misleading claims) to generate referrals. Any violation may result in suspension or termination of your affiliate privileges and forfeiture of any unpaid earnings.
-                </li>
-                <li>
-                  <strong>Taxes:</strong> You are responsible for complying with applicable tax laws and regulations on any income earned through the affiliate program.
-                </li>
+              <ul className="list-disc list-inside pl-5 mt-2">
+                <li>Violates any applicable laws or regulations</li>
+                <li>Infringes on intellectual property rights of others</li>
+                <li>Contains misleading or false information presented as fact</li>
+                <li>Promotes illegal activities or harmful behavior</li>
+                <li>Impersonates other individuals or organizations</li>
               </ul>
-              <p>
-                We reserve the right to modify or terminate the affiliate program at any time. Please contact us at
-                <a href="mailto:support@unrealshot.com" className="text-indigo-600"> support@unrealshot.com</a> if you have any questions about the affiliate program.
+              <p className="mt-2">
+                We reserve the right to suspend or terminate accounts that violate these guidelines.
               </p>
             </div>
           </div>

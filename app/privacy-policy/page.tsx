@@ -1,44 +1,44 @@
 import { Metadata } from 'next'
-import PublicHeader from '@/components/Header'
-import Footer from '@/components/MainFooter'
+import { Navbar } from '@/components/landing/Navbar'
+import { Footer } from '@/components/landing/Footer'
 import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Privacy Policy',
-  description: 'Learn how UnrealShot AI collects, uses, and protects your personal data.',
+  description: 'Learn how FlipAEO collects, uses, and protects your personal data.',
   canonical: '/privacy-policy',
 })
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-white">
-      <PublicHeader />
-      <main className="pt-20 md:pt-24">
+    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+      <Navbar />
+      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b">
+        <section className="bg-white border-b w-full">
           <div className="max-w-5xl mx-auto px-4 py-12 text-center">
             <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">Privacy Policy</h1>
-            <p className="text-gray-600 mt-3">Learn how UnrealShot AI collects, uses, and protects your personal data.</p>
+            <p className="text-gray-600 mt-3">Learn how FlipAEO collects, uses, and protects your personal data.</p>
           </div>
         </section>
 
         {/* Content */}
-        <section className="max-w-5xl mx-auto px-4 py-12">
-          <p className="text-gray-600 mb-6">Effective Date: [01 Jan 25]</p>
+        <section className="max-w-5xl mx-auto px-4 py-12 w-full">
+          <p className="text-gray-600 mb-6">Effective Date: January 1, 2025</p>
 
           <div className="space-y-8 bg-white border rounded-2xl p-5">
             <div className="">
               <p>
-                At <strong>Unrealshot AI</strong>, accessible from{' '}
+                At <strong>FlipAEO</strong>, accessible from{' '}
                 <a
-                  href="https://www.unrealshot.com"
+                  href="https://flipaeo.com"
                   className="text-blue-500 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  https://www.unrealshot.com
+                  https://flipaeo.com
                 </a>
                 , we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, how we process user data, and your rights under <strong>applicable privacy laws, including the General Data Protection Regulation (GDPR)</strong>. By using our services, you agree to the practices described in this Privacy Policy.
               </p>
@@ -50,7 +50,8 @@ export default function PrivacyPolicy() {
               <h3 className="text-lg font-semibold mb-2">1.1 Personal Information (Provided by You)</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li><strong>Email Address</strong> (for account creation and communication).</li>
-                <li><strong>Uploaded Images & Media</strong> (used for AI model training and image generation).</li>
+                <li><strong>Brand Information</strong> (company name, website URL, brand voice preferences for content generation).</li>
+                <li><strong>Competitor URLs</strong> (for competitive analysis and content strategy).</li>
                 <li><strong>Payment Information</strong> (processed securely via third-party payment providers).</li>
               </ul>
               <h3 className="text-lg font-semibold mb-2">1.2 Automatically Collected Data</h3>
@@ -66,11 +67,11 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. How We Use Your Information</h2>
               <p className="mb-4">We process your data for the following purposes:</p>
               <ul className="list-disc list-inside pl-5">
-                <li>✅ <strong>Service Provision:</strong> To generate AI photos, store user models for 7-14 days, and improve accuracy.</li>
+                <li>✅ <strong>Content Generation:</strong> To analyze your brand, competitors, and create strategic content.</li>
                 <li>✅ <strong>Account Management:</strong> To enable login, profile settings, and service customization.</li>
-                <li>✅ <strong>Payment Processing:</strong> To process transactions securely (via Stripe, PayPal, or others).</li>
+                <li>✅ <strong>Payment Processing:</strong> To process subscription payments securely.</li>
                 <li>✅ <strong>Customer Support:</strong> To address inquiries and technical issues.</li>
-                <li>✅ <strong>Marketing (With Consent):</strong> To send updates, promotions, or personalized ads.</li>
+                <li>✅ <strong>Service Improvement:</strong> To improve our AI models and user experience.</li>
                 <li>✅ <strong>Security & Fraud Prevention:</strong> To prevent misuse, unauthorized access, or data breaches.</li>
               </ul>
               <p className="mt-4">We <strong>do not</strong> sell or misuse your data.</p>
@@ -79,8 +80,9 @@ export default function PrivacyPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">3. Data Storage & Retention</h2>
               <ul className="list-disc list-inside pl-5">
-                <li>📌 <strong>Email Data:</strong> Stored in <strong>Supabase</strong> until account deletion.</li>
-                <li>📌 <strong>Uploaded Images:</strong> Retained for <strong>14 days</strong> before automatic deletion.</li>
+                <li>📌 <strong>Account Data:</strong> Stored in <strong>Supabase</strong> until account deletion.</li>
+                <li>📌 <strong>Brand Profiles:</strong> Retained to improve content consistency across articles.</li>
+                <li>📌 <strong>Generated Articles:</strong> Retained for <strong>30 days</strong> after creation for access and revisions.</li>
                 <li>📌 <strong>Payment Data:</strong> Not stored by us; processed by <strong>secure third-party payment providers</strong>.</li>
                 <li>📌 <strong>Logs & Analytics:</strong> Retained for performance monitoring but anonymized after 30 days.</li>
               </ul>
@@ -101,8 +103,8 @@ export default function PrivacyPolicy() {
               </ul>
               <p className="mt-4">
                 📩 <strong>To exercise your rights, contact us at:</strong>{' '}
-                <a href="mailto:support@unrealshot.com" className="text-blue-500 hover:underline">
-                  support@unrealshot.com
+                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
+                  support@flipaeo.com
                 </a>. We will respond within <strong>14 days</strong> as per GDPR guidelines.
               </p>
             </div>
@@ -111,9 +113,11 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Data Sharing & Third-Party Services</h2>
               <p className="mb-4">We <strong>do not sell</strong> your personal data. However, we may share data with:</p>
               <ul className="list-disc list-inside pl-5">
-                <li><strong>Cloud Storage & AI Processing:</strong> Vercel Blob, Astria API (for AI model training).</li>
-                <li><strong>Payment Processors:</strong> Stripe, PayPal (for secure transactions).</li>
-                <li><strong>Analytics & Performance Monitoring:</strong> Google Analytics, Hotjar (to improve user experience).</li>
+                <li><strong>AI Content Generation:</strong> AI providers for content creation and research.</li>
+                <li><strong>Cloud Storage:</strong> Supabase for secure data storage.</li>
+                <li><strong>Payment Processors:</strong> DodoPayments (for secure subscription processing).</li>
+                <li><strong>CMS Platforms:</strong> WordPress, Webflow, Shopify (for content publishing, at your request).</li>
+                <li><strong>Analytics & Performance Monitoring:</strong> To improve user experience.</li>
                 <li><strong>Legal & Compliance Reasons:</strong> If required by law or court order.</li>
               </ul>
               <p className="mt-4">Each provider follows <strong>industry-standard security measures</strong> and <strong>GDPR compliance policies</strong>.</p>
@@ -131,18 +135,18 @@ export default function PrivacyPolicy() {
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Cookies & Tracking Technologies</h2>
-              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on Unrealshot AI.</p>
+              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on FlipAEO.</p>
               <h3 className="text-lg font-semibold mb-2">7.1 What Cookies Do We Use?</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
-                <li>🔐 <strong>Authentication Cookies:</strong> Used by Supabase to keep you logged in after signing in via email or Google login. These cookies store session information securely.</li>
+                <li>🔐 <strong>Authentication Cookies:</strong> Used by Supabase to keep you logged in after signing in via email or Google login.</li>
                 <li>🍪 <strong>Necessary Cookies:</strong> Required for basic website functionality and security.</li>
-                <li>📊 <strong>Analytics Cookies:</strong> Help us analyze site usage and improve performance (Google Analytics, Hotjar).</li>
+                <li>📊 <strong>Analytics Cookies:</strong> Help us analyze site usage and improve performance.</li>
               </ul>
               <h3 className="text-lg font-semibold mb-2">7.2 Managing Cookies</h3>
               <p className="mb-4">
                 You can control or disable cookies through your browser settings. However, disabling authentication cookies may log you out or limit certain features. For any questions regarding our use of cookies, contact us at{' '}
-                <a href="mailto:support@unrealshot.com" className="text-blue-500 hover:underline">
-                  support@unrealshot.com
+                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
+                  support@flipaeo.com
                 </a>.
               </p>
             </div>
@@ -162,7 +166,7 @@ export default function PrivacyPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Changes to This Privacy Policy</h2>
               <p className="mb-4">
-                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of Unrealshot AI signifies your acceptance of the changes.
+                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of FlipAEO signifies your acceptance of the changes.
               </p>
             </div>
 
@@ -172,13 +176,13 @@ export default function PrivacyPolicy() {
                 For any questions or privacy-related concerns, contact us:
                 <br />
                 📧 <strong>Email:</strong>{' '}
-                <a href="mailto:support@unrealshot.com" className="text-blue-500 hover:underline">
-                  support@unrealshot.com
+                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
+                  support@flipaeo.com
                 </a>
                 <br />
                 🌍 <strong>Website:</strong>{' '}
-                <a href="https://www.unrealshot.com" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
-                  https://www.unrealshot.com
+                <a href="https://flipaeo.com" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
+                  https://flipaeo.com
                 </a>
               </p>
             </div>
