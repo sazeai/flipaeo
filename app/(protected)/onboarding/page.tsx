@@ -47,11 +47,9 @@ export default function OnboardingPage() {
     // Gate check: redirect if user already has a brand
     useEffect(() => {
         async function checkOnboardingAccess() {
-            // Check if this is a GSC OAuth callback flow
+            // Pass current step to allow GSC flow steps
             const urlStep = searchParams.get('step')
-            const isGscCallback = urlStep === 'gsc-success' || urlStep === 'gsc-sites' || urlStep === 'gsc-enhancing'
-
-            const { allowed, redirectTo } = await canAccessOnboarding(isGscCallback)
+            const { allowed, redirectTo } = await canAccessOnboarding(urlStep || undefined)
             if (!allowed && redirectTo) {
                 router.replace(redirectTo)
                 return

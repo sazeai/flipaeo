@@ -7,9 +7,9 @@ import { createClient } from "@/utils/supabase/server"
  * Users with BOTH a brand AND a content plan should be redirected to /content-plan.
  * Users with only a brand (no plan) should be allowed to continue onboarding.
  * 
- * @param isGscCallback - If true, allows access even if user has brand+plan (for GSC OAuth flow)
+ * @param currentStep - The current onboarding step. If in GSC flow, allows access.
  */
-export async function canAccessOnboarding(isGscCallback: boolean = false): Promise<{ allowed: boolean; redirectTo?: string }> {
+export async function canAccessOnboarding(currentStep?: string): Promise<{ allowed: boolean; redirectTo?: string }> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -17,8 +17,9 @@ export async function canAccessOnboarding(isGscCallback: boolean = false): Promi
         return { allowed: false, redirectTo: "/login" }
     }
 
-    // If this is a GSC callback, allow access so user can complete site selection
-    if (isGscCallback) {
+    // Allow access for ALL GSC-related steps (users mid-flow should not be redirected)
+    const gscFlowSteps = ['gsc-prompt', 'gsc-reassurance', 'gsc-sites', 'gsc-enhancing', 'gsc-success']
+    if (currentStep && gscFlowSteps.includes(currentStep)) {
         return { allowed: true }
     }
 

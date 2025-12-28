@@ -117,11 +117,11 @@ Classify each domain as ONE of:
 - Do NOT suggest new ideas
 - Do NOT generate keywords
 - Do NOT rewrite domain names
-- Use the EXACT domain text as the key
+- Use the EXACT domain text from the list above
 - Base judgment only on competitor content presence
 
 ## OUTPUT
-Return a JSON object with each domain as key and coverage level as value.`
+Return a JSON object with a "results" array containing each domain and its coverage level.`
 
     try {
         const response = await client.models.generateContent({
@@ -132,27 +132,40 @@ Return a JSON object with each domain as key and coverage level as value.`
                 responseSchema: {
                     type: "OBJECT",
                     properties: {
-                        coverage: {
-                            type: "OBJECT",
-                            additionalProperties: { type: "STRING" }
+                        results: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    domain: { type: "STRING" },
+                                    level: { type: "STRING" }
+                                },
+                                required: ["domain", "level"]
+                            }
                         }
                     },
-                    required: ["coverage"]
+                    required: ["results"]
                 }
             }
         })
 
         const text = response.text || "{}"
         const result = JSON.parse(text)
-        const coverage = result.coverage || {}
+        const results = result.results || []
 
-        // Validate and normalize the coverage map
+        // Convert array to map for easier lookup
+        const coverageMap: Record<string, "heavy" | "light" | "none"> = {}
+        for (const item of results) {
+            const level = item.level?.toLowerCase()
+            if (["heavy", "light", "none"].includes(level)) {
+                coverageMap[item.domain] = level as "heavy" | "light" | "none"
+            }
+        }
+
+        // Ensure all domains have a value, default to "none" if missing
         const validatedCoverage: Record<string, "heavy" | "light" | "none"> = {}
         for (const domain of ideaUniverse) {
-            const level = coverage[domain] || "none"
-            validatedCoverage[domain] = ["heavy", "light", "none"].includes(level)
-                ? level as "heavy" | "light" | "none"
-                : "none"
+            validatedCoverage[domain] = coverageMap[domain] || "none"
         }
 
         console.log("[Phase B] Validated coverage:", validatedCoverage)

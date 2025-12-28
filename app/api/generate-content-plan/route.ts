@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         // --- PHASE C: Generate Plan (existing, now enhanced) ---
         const { plan, categoryDistribution } = await generateContentPlan({
             userId: user.id,
-            brandId: brandId || "unknown",
+            brandId: brandId || null,
             brandData,
             seeds,
             ideaUniverse,

@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { authRateLimit, getClientIP, checkRateLimit } from '@/utils/rate-limit'
 import { isRateLimitingEnabled } from '@/config/security'
+import { getBrandCount } from '@/lib/brands'
 
 export async function GET(request: NextRequest) {
   // Apply rate limiting only if enabled
@@ -42,6 +43,15 @@ export async function GET(request: NextRequest) {
 
       if (data?.user) {
         // Log successful auth without user details
+
+        // Check if user has any brands setup
+        const brandCount = await getBrandCount(data.user.id)
+
+        // If no brands and not already going to onboarding/special page, redirect to onboarding
+        if (brandCount === 0 && !next.includes('onboarding')) {
+          return NextResponse.redirect(`${origin}/onboarding`)
+        }
+
         return NextResponse.redirect(`${origin}${next}`)
       } else {
         console.error('No user data returned after exchange')
@@ -67,6 +77,14 @@ export async function GET(request: NextRequest) {
       }
 
       if (data?.user) {
+        // Check if user has any brands setup
+        const brandCount = await getBrandCount(data.user.id)
+
+        // If no brands and not already going to onboarding/special page, redirect to onboarding
+        if (brandCount === 0 && !next.includes('onboarding')) {
+          return NextResponse.redirect(`${origin}/onboarding`)
+        }
+
         return NextResponse.redirect(`${origin}${next}`)
       } else {
         console.error('No user data returned after verifyOtp')

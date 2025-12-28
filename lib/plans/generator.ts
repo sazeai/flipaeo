@@ -41,7 +41,7 @@ export const ARTICLE_CATEGORIES = {
 
 interface GeneratePlanParams {
     userId: string
-    brandId: string
+    brandId: string | null
     brandData: BrandDetails
     seeds: string[]
     ideaUniverse?: string[] // Phase A: Expanded problem domains

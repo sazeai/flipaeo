@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { authRateLimit, checkRateLimit } from '@/utils/rate-limit'
 import { isRateLimitingEnabled } from '@/config/security'
 import { requireCSRFToken } from '@/utils/csrf'
+import { getBrandCount } from '@/lib/brands'
 
 type AuthState = {
   error?: string
@@ -103,13 +104,21 @@ export async function login(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const { data: authData, error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
     redirect('/error')
   }
 
   revalidatePath('/', 'layout')
+
+  if (authData.user) {
+    const brandCount = await getBrandCount(authData.user.id)
+    if (brandCount === 0) {
+      redirect('/onboarding')
+    }
+  }
+
   redirect('/content-plan')
 }
 
@@ -121,12 +130,20 @@ export async function signup(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { data: authData, error } = await supabase.auth.signUp(data)
 
   if (error) {
     redirect('/error')
   }
 
   revalidatePath('/', 'layout')
+
+  if (authData.user) {
+    const brandCount = await getBrandCount(authData.user.id)
+    if (brandCount === 0) {
+      redirect('/onboarding')
+    }
+  }
+
   redirect('/content-plan')
 }
