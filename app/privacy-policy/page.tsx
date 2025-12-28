@@ -150,8 +150,6 @@ export default function PrivacyPolicy() {
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li><strong>Search queries:</strong> Keywords that drive traffic to your website</li>
                 <li><strong>Page performance data:</strong> Clicks, impressions, CTR, and average position</li>
-                <li><strong>Sitemap information:</strong> To understand your site structure</li>
-                <li><strong>Indexing status:</strong> To identify content gaps and opportunities</li>
               </ul>
               <p className="mb-4">
                 <strong>Important:</strong> We access GSC data in <strong>read-only mode only</strong>. We cannot modify, delete, or submit any data to your Google Search Console. This data is used solely to:
