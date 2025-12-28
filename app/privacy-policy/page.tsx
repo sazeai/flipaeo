@@ -17,10 +17,13 @@ export default function PrivacyPolicy() {
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b w-full">
-          <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">Privacy Policy</h1>
-            <p className="text-gray-600 mt-3">Learn how FlipAEO collects, uses, and protects your personal data.</p>
+        <section className="w-full py-16 px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">Legal</span>
+            </div>
+            <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Privacy Policy</h1>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how FlipAEO collects, uses, and protects your personal data.</p>
           </div>
         </section>
 
@@ -124,7 +127,53 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Data Security Measures</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Google Services Integration</h2>
+              <p className="mb-4">FlipAEO integrates with the following Google services to provide our core functionality:</p>
+
+              <h3 className="text-lg font-semibold mb-2">6.1 Google Authentication (OAuth 2.0)</h3>
+              <p className="mb-4">
+                We use <strong>Google Sign-In</strong> to allow you to authenticate securely with your Google account. When you sign in with Google, we receive:
+              </p>
+              <ul className="list-disc list-inside pl-5 mb-4">
+                <li>Your <strong>email address</strong> (for account creation and communication)</li>
+                <li>Your <strong>name</strong> (for personalization)</li>
+                <li>Your <strong>profile picture</strong> (optional, for display purposes)</li>
+              </ul>
+              <p className="mb-4">
+                We do not receive or store your Google password. Google authentication is handled securely through Google's OAuth 2.0 protocol.
+              </p>
+
+              <h3 className="text-lg font-semibold mb-2">6.2 Google Search Console Integration</h3>
+              <p className="mb-4">
+                With your explicit consent, FlipAEO accesses your <strong>Google Search Console (GSC)</strong> data in <strong>read-only mode</strong> to power our content planning features. This includes:
+              </p>
+              <ul className="list-disc list-inside pl-5 mb-4">
+                <li><strong>Search queries:</strong> Keywords that drive traffic to your website</li>
+                <li><strong>Page performance data:</strong> Clicks, impressions, CTR, and average position</li>
+                <li><strong>Sitemap information:</strong> To understand your site structure</li>
+                <li><strong>Indexing status:</strong> To identify content gaps and opportunities</li>
+              </ul>
+              <p className="mb-4">
+                <strong>Important:</strong> We access GSC data in <strong>read-only mode only</strong>. We cannot modify, delete, or submit any data to your Google Search Console. This data is used solely to:
+              </p>
+              <ul className="list-disc list-inside pl-5 mb-4">
+                <li>Analyze your current search performance</li>
+                <li>Identify content gaps and opportunities</li>
+                <li>Generate personalized content strategies</li>
+                <li>Track the impact of published content over time</li>
+              </ul>
+              <p className="mb-4">
+                You can revoke FlipAEO's access to your Google Search Console at any time through your <a href="https://myaccount.google.com/permissions" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google Account Permissions</a>.
+              </p>
+
+              <h3 className="text-lg font-semibold mb-2">6.3 Google API Services User Data Policy Compliance</h3>
+              <p className="mb-4">
+                FlipAEO's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
+              </p>
+            </div>
+
+            <div className="">
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Data Security Measures</h2>
               <ul className="list-disc list-inside pl-5">
                 <li>🔒 <strong>Encryption:</strong> Data is encrypted in transit and at rest.</li>
                 <li>🔒 <strong>Access Control:</strong> Limited access to authorized personnel only.</li>
@@ -134,15 +183,15 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Cookies & Tracking Technologies</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Cookies & Tracking Technologies</h2>
               <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on FlipAEO.</p>
-              <h3 className="text-lg font-semibold mb-2">7.1 What Cookies Do We Use?</h3>
+              <h3 className="text-lg font-semibold mb-2">8.1 What Cookies Do We Use?</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li>🔐 <strong>Authentication Cookies:</strong> Used by Supabase to keep you logged in after signing in via email or Google login.</li>
                 <li>🍪 <strong>Necessary Cookies:</strong> Required for basic website functionality and security.</li>
                 <li>📊 <strong>Analytics Cookies:</strong> Help us analyze site usage and improve performance.</li>
               </ul>
-              <h3 className="text-lg font-semibold mb-2">7.2 Managing Cookies</h3>
+              <h3 className="text-lg font-semibold mb-2">8.2 Managing Cookies</h3>
               <p className="mb-4">
                 You can control or disable cookies through your browser settings. However, disabling authentication cookies may log you out or limit certain features. For any questions regarding our use of cookies, contact us at{' '}
                 <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
@@ -152,26 +201,26 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Children's Privacy</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Children's Privacy</h2>
               <p className="mb-4">We <strong>do not</strong> knowingly collect or process data from users under <strong>18 years old</strong>. If we discover such data, we will delete it immediately.</p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. International Data Transfers</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. International Data Transfers</h2>
               <p className="mb-4">
                 Since we operate globally, your data <strong>may be transferred to servers outside your country</strong> (including the US & EU). We ensure these transfers comply with <strong>GDPR, SCCs (Standard Contractual Clauses), and other international laws</strong> for secure handling.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Changes to This Privacy Policy</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Changes to This Privacy Policy</h2>
               <p className="mb-4">
                 We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of FlipAEO signifies your acceptance of the changes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Contact Information</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Contact Information</h2>
               <p>
                 For any questions or privacy-related concerns, contact us:
                 <br />

@@ -17,10 +17,13 @@ export default function TermsOfService() {
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b w-full">
-          <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">Terms of Service</h1>
-            <p className="text-gray-600 mt-3">Review the terms and conditions for using FlipAEO.</p>
+        <section className="w-full py-16 px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">Legal</span>
+            </div>
+            <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Terms of Service</h1>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Review the terms and conditions for using FlipAEO.</p>
           </div>
         </section>
 
@@ -85,21 +88,38 @@ export default function TermsOfService() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Limitation of Liability</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Google Services</h2>
+              <p className="mb-4">
+                FlipAEO integrates with Google services to enhance your experience:
+              </p>
+              <ul className="list-disc list-inside pl-5 mb-4">
+                <li><strong>Google Sign-In:</strong> We use Google OAuth for secure authentication. By signing in with Google, you agree to Google's Terms of Service and Privacy Policy.</li>
+                <li><strong>Google Search Console:</strong> With your explicit consent, we access your Google Search Console data in <strong>read-only mode</strong> to analyze your website's search performance and generate personalized content strategies. We cannot modify, delete, or submit any data to your Google Search Console.</li>
+              </ul>
+              <p className="mb-4">
+                You can revoke FlipAEO's access to your Google data at any time through your <a href="https://myaccount.google.com/permissions" className="text-indigo-600">Google Account Permissions</a>.
+              </p>
+              <p>
+                FlipAEO's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-indigo-600">Google API Services User Data Policy</a>, including the Limited Use requirements.
+              </p>
+            </div>
+
+            <div className="">
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Limitation of Liability</h2>
               <p>
                 To the maximum extent permitted by law, <strong>FlipAEO</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to search ranking results, traffic changes, or business outcomes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Changes to the Terms</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Changes to the Terms</h2>
               <p>
                 We reserve the right to update these Terms at any time. Any changes will be posted on this page, with the updated date. Continued use of the Site after any changes constitutes acceptance of those changes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Contact Us</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Contact Us</h2>
               <p>
                 If you have any questions about these Terms, please contact us at
                 <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
@@ -107,14 +127,14 @@ export default function TermsOfService() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Digital Delivery</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Digital Delivery</h2>
               <p>
                 FlipAEO provides a fully digital service. All generated articles and content are delivered digitally through your dashboard or directly to your connected CMS (WordPress, Webflow, Shopify). There are no physical products or shipping involved.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Acceptable Use</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">13. Acceptable Use</h2>
               <p>
                 You agree not to use FlipAEO to generate content that:
               </p>
