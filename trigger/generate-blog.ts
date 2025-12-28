@@ -92,14 +92,14 @@ const AUTHENTIC_WRITING_RULES = `
 **SCANNABILITY & STRUCTURE:**
 1. Assume readers will NOT read full paragraphs. The core message must be understandable at a glance.
 2. **BOLD** the important points as required for good seo practice. Use bullet points to break up concepts.
-3. Keep paragraphs under 3-4 sentences. One idea per paragraph.
-4. Every line must EARN its place. If a sentence doesn't serve a critical purpose, DELETE IT, be ruthless.
+3. Keep paragraphs to 2-4 sentences as the NORM. One idea per paragraph.
+4. Every line must EARN its place, but DON'T make every sentence stand alone - group related ideas together.
 
 **SENTENCE VARIATION (BURSTINESS) - CRITICAL FOR HUMAN FEEL:**
-5. Mix sentence lengths dramatically: some very short (7-9 words), some longer (20-30 words), dynamically use them.
+5. Mix sentence lengths: most should be medium (15-25 words), with occasional short punchy ones (7-12 words) for emphasis.
 6. Infuse genuine emotional undertones appropriate to the content using active voice.
 7. Start sentences with different elements: adverbs, prepositional phrases, dependent clauses, questions
-8. Occasional sentence fragments are OK if they add punch. "Not always. But often."
+8. Use sentence fragments SPARINGLY for impact - not in every paragraph. "Not always. But sometimes."
 
 **ACTIVE VOICE & DIRECTNESS:**
 9. USE ACTIVE VOICE. "Management canceled the meeting" NOT "The meeting was canceled by management."
@@ -122,8 +122,9 @@ const AUTHENTIC_WRITING_RULES = `
 **STRUCTURAL PATTERN DISRUPTION:**
 20. Don't always follow fixed template, sometimes start mid-thought.
 21. Include natural digressions if they add value. "(this also works for X.)"
-22. Use varied paragraph lengths. Some can be one-two sentences. Others 3-5.
+22. Use varied paragraph lengths. MOST should be 2-4 sentences. Only occasionally use single-sentence paragraphs for emphasis.
 23. Break conventional grammar rules occasionally in natural ways, make a little mistakes to avoid detection
+24. **AVOID CHOPPY WRITING:** Don't put every sentence on its own line. Group 2-4 related sentences into flowing paragraphs.
 
 **PERSPECTIVE REMINDER:**
 24. **AUTHENTIC PERSPECTIVE:** Write with authority. Avoid passive voice ("It is said that..."). Use the perspective (I/We/Brand) defined in the Narrative Rules.
@@ -755,10 +756,12 @@ You hate "Walls of Text" and "AI Clichés".
 ${draft}
 
 ### 2. STRICT FORMATTING RULES (The Law)
-1. **DESTROY WALLS OF TEXT:** If a paragraph has more than 4 sentences, BREAK IT. 
-2. **ONE IDEA PER LINE:** Use single-sentence paragraphs frequently to create rhythm (not too much).
-3. **SCANNABILITY:** Ensure key takeaways are **bolded** but in limits, do not overdo it.
-4. **NO "GLUE" WORDS:** Remove fluff transitions like "In conclusion," "Furthermore," "It is important to note.", "Here's the truth", "Here's the deal", "Here comes", "Here's the catch". Just say what you mean.
+1. **Passive Voice:** Avoid passive voice. Use active voice instead.
+2. **BREAK WALLS OF TEXT:** If a paragraph has more than 5-6 sentences, consider breaking it. But 2-4 sentence paragraphs are IDEAL.
+3. **GROUP RELATED IDEAS:** Don't make every sentence its own paragraph. Single-sentence paragraphs should be OCCASIONAL for emphasis, not the norm.
+4. **SCANNABILITY:** Ensure key takeaways are **bolded** but in limits, do not overdo it.
+5. **NO "GLUE" WORDS:** Remove fluff transitions like "In conclusion," "Furthermore," "It is important to note.", "Here's the truth", "Here's the deal", "Here comes", "Here's the catch". Just say what you mean.
+6. **AVOID CHOPPY WRITING:** If you see too many 1-sentence paragraphs in a row, COMBINE related ones into 2-3 sentence paragraphs for better flow.
 
 ### 3. BANNED "AI" PHRASES (Instant Deletion)
 If you see these patterns or anything from this vibe, rewrite the sentence immediately:
