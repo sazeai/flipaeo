@@ -360,18 +360,11 @@ export default function ContentPlanPage() {
     }
 
     if (!plan) {
+        // Auto-redirect to onboarding if there's no content plan
+        router.replace("/onboarding")
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
-                <Calendar className="w-12 h-12 text-stone-300" />
-                <h1 className="text-xl font-bold text-stone-900">
-                    No content plan yet
-                </h1>
-                <p className="text-sm text-stone-500">
-                    Complete the onboarding to generate your 30-day content plan
-                </p>
-                <Button onClick={() => router.push("/onboarding")}>
-                    Start Onboarding
-                </Button>
+            <div className="min-h-screen flex items-center justify-center">
+                <CustomSpinner className="w-10 h-10" />
             </div>
         )
     }
