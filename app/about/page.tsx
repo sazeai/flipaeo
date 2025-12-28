@@ -20,10 +20,13 @@ export default function AboutUs() {
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero */}
-        <section className="bg-white border-b w-full">
-          <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold leading-tight font-[var(--font-inter-tight)]">About FlipAEO</h1>
-            <p className="text-gray-600 mt-3">The story behind the Strategic Content Engine for the post-SEO era.</p>
+        <section className="w-full py-16 px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">About Us</span>
+            </div>
+            <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">About FlipAEO</h1>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">The story behind the Strategic Content Engine for the post-SEO era.</p>
           </div>
         </section>
 

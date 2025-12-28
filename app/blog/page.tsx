@@ -5,25 +5,26 @@ import BlogCard from "@/components/blog-card"
 import { OfflineBanner } from "@/components/network-status"
 import { getAllPosts, formatDate, calculateReadingTime, extractExcerpt, type WordPressPost } from "@/lib/wordpress"
 import { Suspense } from "react"
+import { defaultSEO } from "@/config/seo"
 
 export const dynamic = 'force-static'
 export const revalidate = 600 // 10 minutes
 
 export const metadata: Metadata = {
-  title: "The Unrealshot AI Blog",
+  title: "Blog - FlipAEO | GEO & AI Content Strategy Insights",
   description:
-    "Actionable guides and insights on AI photography. Get the latest tips for creating stunning AI headshots, professional photos for LinkedIn, and authentic, high-quality images for your social and dating profiles.",
+    "Expert insights on Generative Engine Optimization (GEO), AI search visibility, content strategy, and how to get cited by AI search engines like ChatGPT and Perplexity.",
   robots: "index, follow",
   openGraph: {
-    title: "The Unrealshot AI Blog",
-    description: "Your definitive guide to mastering your digital identity. In The Studio, we share expert tips, creative inspiration, and deep dives into the art of the perfect AI photoshoot.",
+    title: "Blog - FlipAEO | GEO & AI Content Strategy Insights",
+    description: "Expert insights on Generative Engine Optimization, AI search visibility, and content strategy. Learn how to get cited by AI search engines.",
     type: "website",
-    url: "https://www.unrealshot.com/blog",
+    url: `${defaultSEO.siteUrl}/blog`,
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Unrealshot AI Blog",
-    description: "Your definitive guide to mastering your digital identity. In The Studio, we share expert tips, creative inspiration, and deep dives into the art of the perfect AI photoshoot.",
+    title: "Blog - FlipAEO | GEO & AI Content Strategy Insights",
+    description: "Expert insights on Generative Engine Optimization, AI search visibility, and content strategy. Learn how to get cited by AI search engines.",
   },
 }
 
@@ -63,21 +64,28 @@ async function BlogContent() {
 
 function BlogPageContent({ blogPosts }: { blogPosts: any[] }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
       <Navbar />
 
-      <main className="pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Offline Banner */}
-          <OfflineBanner />
-
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-black mb-4">The Unrealshot AI Blog</h1>
-            <p className="text-gray-600 max-w-xl mx-auto">
-              Your definitive guide to mastering your digital identity. In The Studio, we share expert tips, creative inspiration, and deep dives into the art of the perfect AI photoshoot.
+      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
+        {/* Hero Section */}
+        <section className="w-full py-16 px-4">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-block bg-brand-orange text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">Blog</span>
+            </div>
+            <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">
+              GEO & Content Strategy Insights
+            </h1>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
+              Expert insights on Generative Engine Optimization, AI search visibility, and how to create authority-building content that AI search engines cite.
             </p>
           </div>
+        </section>
+
+        <div className="max-w-7xl mx-auto px-4 pb-20 w-full">
+          {/* Offline Banner */}
+          <OfflineBanner />
 
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -105,7 +113,7 @@ function BlogPageContent({ blogPosts }: { blogPosts: any[] }) {
           {/* Load More Button - Only show if more than 8 posts */}
           {blogPosts.length > 8 && (
             <div className="text-center mt-12">
-              <button className="cursor-pointer bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition-all duration-200 font-medium hover:shadow-lg">
+              <button className="cursor-pointer h-14 px-8 text-lg font-bold bg-brand-yellow text-black border-2 border-black hover:bg-brand-orange rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase">
                 Load More Posts
               </button>
             </div>
@@ -122,18 +130,23 @@ function BlogPageContent({ blogPosts }: { blogPosts: any[] }) {
 export default function BlogPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white">
+      <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
         <Navbar />
-        <main className="pt-24 pb-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Photo Restoration Blog
+        <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
+          <section className="w-full py-16 px-4">
+            <div className="max-w-5xl mx-auto text-center">
+              <div className="inline-block bg-brand-orange text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2">
+                <span className="font-display font-bold text-xs uppercase tracking-widest">Blog</span>
+              </div>
+              <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">
+                GEO & Content Strategy Insights
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
                 Loading latest articles...
               </p>
             </div>
+          </section>
+          <div className="max-w-7xl mx-auto px-4 pb-20 w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96"></div>

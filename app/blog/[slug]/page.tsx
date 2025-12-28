@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
-import Header from "@/components/Header"
-import MainFooter from "@/components/MainFooter"
+import { Navbar } from "@/components/landing/Navbar"
+import { Footer } from "@/components/landing/Footer"
 import BlogContentRenderer from "@/components/blog-content-renderer"
 import ShareButton from "@/components/share-button"
 import { Calendar, Clock, ArrowLeft, User } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { getPostBySlug, getAllPostSlugs, formatDate, calculateReadingTime, type WordPressPost } from "@/lib/wordpress"
 import { notFound, redirect } from "next/navigation"
 import Image from "next/image"
+import { defaultSEO, organizationSchema } from "@/config/seo"
 
 // Ensure static generation with ISR for crawler stability
 export const dynamic = 'force-static'
@@ -36,17 +36,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (!post) {
       return {
-        title: "Post Not Found - Unrealshot Blog",
+        title: "Post Not Found - FlipAEO Blog",
         description: "The requested blog post could not be found.",
       }
     }
 
     const seoTitle = post.title
-    const seoDescription = post.excerpt || "Read this article on Unrealshot Blog"
+    const seoDescription = post.excerpt || "Read this article on the FlipAEO Blog"
     const ogImage = post.featuredImage?.node?.sourceUrl || "/placeholder.svg"
 
     return {
-      title: `${seoTitle} - Unrealshot Blog`,
+      title: `${seoTitle} - FlipAEO Blog`,
       description: seoDescription,
       openGraph: {
         title: seoTitle,
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           height: 630,
           alt: post.featuredImage?.node?.altText || post.title,
         }],
-        url: `https://www.unrealshot.com/blog/${post.slug}`,
+        url: `${defaultSEO.siteUrl}/blog/${post.slug}`,
       },
       twitter: {
         card: "summary_large_image",
@@ -70,14 +70,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         images: [ogImage],
       },
       alternates: {
-        canonical: `https://www.unrealshot.com/blog/${post.slug}`,
+        canonical: `${defaultSEO.siteUrl}/blog/${post.slug}`,
       },
     }
   } catch (error) {
     console.error('Error generating metadata:', error)
     return {
-      title: "Blog Post - The Unrealshot AI Blog",
-      description: "Get the latest tips for creating stunning AI headshots, professional photos for LinkedIn, and authentic, high-quality images for your social and dating profiles.",
+      title: "Blog Post - FlipAEO Blog",
+      description: "Expert insights on Generative Engine Optimization (GEO), AI search visibility, and content strategy.",
     }
   }
 }
@@ -111,28 +111,28 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
   const blogPostJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    '@id': `https://www.unrealshot.com/blog/${post.slug}`,
+    '@id': `${defaultSEO.siteUrl}/blog/${post.slug}`,
     headline: post.title,
     description: post.excerpt ? post.excerpt.replace(/<[^>]*>/g, '') : post.title,
-    image: post.featuredImage?.node?.sourceUrl || 'https://www.unrealshot.com/placeholder.svg',
+    image: post.featuredImage?.node?.sourceUrl || `${defaultSEO.siteUrl}/placeholder.svg`,
     datePublished: post.date,
     dateModified: post.modified,
     author: {
       '@type': 'Organization',
-      name: 'Unrealshot Team',
-      url: 'https://www.unrealshot.com'
+      name: 'FlipAEO',
+      url: defaultSEO.siteUrl
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Unrealshot AI',
+      name: organizationSchema.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.unrealshot.com/unrealshot-logo.png'
+        url: `${defaultSEO.siteUrl}/site-logo.png`
       }
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://www.unrealshot.com/blog/${post.slug}`
+      '@id': `${defaultSEO.siteUrl}/blog/${post.slug}`
     },
     articleSection: category,
     wordCount: post.content.split(' ').length,
@@ -140,47 +140,47 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
     inLanguage: 'en-US',
     isPartOf: {
       '@type': 'Blog',
-      '@id': 'https://www.unrealshot.com/blog',
-      name: 'The Unrealshot AI Blog'
+      '@id': `${defaultSEO.siteUrl}/blog`,
+      name: 'FlipAEO Blog'
     }
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
       />
-      <Header />
-      <main className="pb-20">
-        {/* Hero Section */}
-        <div className="relative bg-[#F7F5F3] pt-24 pb-12">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+      <Navbar />
 
+      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
+        {/* Hero Section */}
+        <section className="w-full py-12 px-4 bg-[#F7F5F3]">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-8">
+              <Link href="/blog" className="inline-flex items-center text-sm font-bold uppercase tracking-wide text-black hover:text-brand-orange transition-colors">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Blog
               </Link>
             </div>
 
             <div className="space-y-6">
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">{category}</span>
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <span className="bg-brand-yellow text-black border-2 border-black px-3 py-1 font-bold uppercase">{category}</span>
+                <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4" />
                   <span>{publishedDate}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-gray-600">
                   <Clock className="w-4 h-4" />
                   <span>{readTime}</span>
                 </div>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">{post.title}</h1>
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black text-black leading-tight uppercase">{post.title}</h1>
 
               {post.excerpt && (
-                <div className="text-xl text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.excerpt }} suppressHydrationWarning />
+                <div className="text-lg text-gray-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.excerpt }} suppressHydrationWarning />
               )}
 
               <div className="flex items-center gap-4">
@@ -191,15 +191,15 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
                       alt={post.author.node.name}
                       width={40}
                       height={40}
-                      className="rounded-full"
+                      className="rounded-full border-2 border-black"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 bg-brand-yellow border-2 border-black rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-black" />
                     </div>
                   )}
                   <div>
-                    <p className="font-medium text-gray-900">{post.author.node.name}</p>
+                    <p className="font-bold text-black">{post.author.node.name}</p>
                     <p className="text-sm text-gray-600">Author</p>
                   </div>
                 </div>
@@ -207,20 +207,19 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
                 <div className="ml-auto">
                   <ShareButton
                     title={post.title}
-                    url={`https://www.unrealshot.com/blog/${post.slug}`}
+                    url={`${defaultSEO.siteUrl}/blog/${post.slug}`}
                     text={post.excerpt || `Check out this article: ${post.title}`}
                   />
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Featured Image */}
         {post.featuredImage?.node?.sourceUrl && (
-          <div className="max-w-4xl mx-auto px-4 relative mt-10 z-10">
-            <div className="bg-white rounded-lg overflow-hidden">
-
+          <div className="max-w-4xl mx-auto px-4 relative -mt-6 z-10 w-full">
+            <div className="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
               <Image
                 src={post.featuredImage.node.sourceUrl}
                 alt={post.featuredImage.node.altText || post.title}
@@ -234,17 +233,14 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
         )}
 
         {/* Article Content */}
-        <div className="max-w-4xl mx-auto px-4 mt-8">
+        <div className="max-w-4xl mx-auto px-4 mt-8 w-full pb-16">
           <div className="bg-white">
             <BlogContentRenderer content={post.content} />
           </div>
         </div>
-
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-        </div>
       </main>
-      <MainFooter />
+
+      <Footer />
     </div>
   )
 }
