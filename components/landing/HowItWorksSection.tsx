@@ -27,7 +27,7 @@ export const HowItWorksSection: React.FC = () => {
           title="WE MAP THE QUESTIONS THAT MATTER"
           content={
             <>
-              <p className="mb-4">We start by understanding your category the way AI systems and real users do. What questions already exist. What’s over-covered. What’s missing entirely. This becomes the foundation for every decision that follows.</p>
+              <p className="font-sans text-gray-600 leading-relaxed font-medium mb-4">We start by understanding your category the way AI systems and real users do. What questions already exist. What’s over-covered. What’s missing entirely. This becomes the foundation for every decision that follows.</p>
             </>
           }
           accentColor="bg-[#FAFA9D]" // Yellow
@@ -40,7 +40,7 @@ export const HowItWorksSection: React.FC = () => {
           title="WE BUILD A STRATEGY THAT COMPOUNDS"
           content={
             <>
-              <p className="mb-4">Not everything should be written now. We decide what comes first, what supports it, and what unlocks authority later. Each topic earns the right for the next one to exist.</p>
+              <p className="font-sans text-gray-600 leading-relaxed font-medium mb-4">Not everything should be written now. We decide what comes first, what supports it, and what unlocks authority later. Each topic earns the right for the next one to exist.</p>
             </>
           }
           accentColor="bg-[#FFD8A8]" // Orange
@@ -53,7 +53,7 @@ export const HowItWorksSection: React.FC = () => {
           title="WE DELIVER ANSWER-FIRST CONTENT"
           content={
             <>
-              <p className="mb-4">Once the strategy is clear, execution becomes simple. Articles are written to fully resolve the question, match your brand voice, and publish cleanly without friction.</p>
+              <p className="font-sans text-gray-600 leading-relaxed font-medium mb-4">Once the strategy is clear, execution becomes simple. Articles are written to fully resolve the question, match your brand voice, and publish cleanly without friction.</p>
             </>
           }
           accentColor="bg-[#D6F5F2]" // Teal
@@ -66,8 +66,7 @@ export const HowItWorksSection: React.FC = () => {
       <div className="w-full max-w-4xl px-4">
         <div className="bg-black text-white border-2 border-black p-8 md:p-12 shadow-[8px_8px_0px_0px_#FFD8A8] transform rotate-1 hover:rotate-0 transition-transform duration-300">
           <p className="font-display font-bold text-2xl md:text-3xl uppercase leading-snug text-center">
-            "This is not only content automation for speed.<br className="hidden md:block" />
-            It’s a system designed to earn visibility, trust, and long-term growth."
+            "This is not only content automation for speed. It’s a system designed to earn visibility, trust, and long-term growth."
           </p>
         </div>
       </div>

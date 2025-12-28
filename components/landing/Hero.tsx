@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from './Button';
 import { ArrowRight, Sparkles, Star } from 'lucide-react';
+import Link from 'next/link';
 
 export const Hero: React.FC = () => {
   return (
@@ -31,9 +32,11 @@ export const Hero: React.FC = () => {
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto px-4">
-        <Button variant="primary" size="lg" className="w-full sm:w-auto h-16 px-8 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
-          Build My Growth Strategy
-        </Button>
+        <Link href="/login">
+          <Button variant="primary" size="lg" className="w-full sm:w-auto h-16 px-8 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
+            Build My Growth Strategy
+          </Button>
+        </Link>
         <a href="#how-it-works" className="w-full sm:w-auto flex items-center justify-center gap-2 h-16 px-6 font-mono font-bold text-lg hover:bg-gray-50 rounded-lg transition-colors border-2 border-transparent">
           See the engine
           <ArrowRight className="w-5 h-5" />

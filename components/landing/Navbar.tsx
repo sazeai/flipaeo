@@ -45,7 +45,7 @@ export const Navbar: React.FC = () => {
       <div className="hidden md:block">
         <Link href="/login">
           <Button variant="primary" size="sm" className="cursor-pointer text-sm font-bold px-5 py-2.5">
-            Start for free
+            Start Ranking
           </Button>
         </Link>
       </div>
@@ -89,8 +89,8 @@ export const Navbar: React.FC = () => {
           {/* Footer Button */}
           <div className="p-8 pb-12 w-full max-w-md mx-auto">
             <Link href="/login">
-              <Button variant="primary" size="lg" fullWidth onClick={() => setIsMobileMenuOpen(false)} className="py-6 text-xl uppercase tracking-widest">
-                Start for free
+              <Button variant="primary" size="lg" fullWidth onClick={() => setIsMobileMenuOpen(false)} className="cursor-pointer py-6 text-xl uppercase tracking-widest">
+                Start Ranking
               </Button>
             </Link>
           </div>

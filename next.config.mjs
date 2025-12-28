@@ -6,15 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "blog.unrealshot.com" },
+      { protocol: "https", hostname: "blog.flipseo.com" },
       { protocol: "http", hostname: "localhost" },
-      { protocol: "https", hostname: "astria.ai" },
-      { protocol: "https", hostname: "api.astria.ai" },
-      { protocol: "https", hostname: "sdbooth2-production.s3.amazonaws.com" },
-      { protocol: "https", hostname: "xdka2sdembhhqc3o.public.blob.vercel-storage.com" },
-      { protocol: "https", hostname: "norpsr0wtvuo7qpe.public.blob.vercel-storage.com" },
-      { protocol: "https", hostname: "replicate.delivery" },
-      { protocol: "https", hostname: "replicate.com" },
       { protocol: "https", hostname: "fal.ai" },
       { protocol: "https", hostname: "fal.media" },
       { protocol: "https", hostname: "v3.fal.media" },
@@ -37,15 +30,6 @@ const nextConfig = {
               "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
           },
         ],
-      },
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: "/ai-influencer-generator/",
-        destination: "/ai-influencer-generator",
-        permanent: true,
       },
     ];
   },

@@ -25,7 +25,7 @@ export const BenefitsSection: React.FC = () => {
         <div className="md:col-span-2 bg-[#FAFA9D] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden group hover:shadow-neo-hover transition-all duration-200">
           <div className="flex-1 z-10">
             <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">CLEAR VISIBILITY INTO WHERE YOU NEED TO WIN</h3>
-            <p className="font-sans font-medium text-black/80 leading-relaxed text-lg">
+            <p className="font-sans text-gray-600 leading-relaxed font-medium">
               We analyze how AI search engines answer questions in your category and build the strategy to fill the gaps where your brand is missing from those answers.
             </p>
           </div>
@@ -59,7 +59,7 @@ export const BenefitsSection: React.FC = () => {
             <Target className="w-6 h-6 text-black" />
           </div>
           <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Competitor Gap Domination</h3>
-          <p className="font-sans text-gray-600 leading-relaxed text-sm font-medium">
+          <p className="font-sans text-gray-600 leading-relaxed font-medium">
             Your competitors aren’t winning by publishing more. They’re winning by answering better questions. We analyze what they cover, what they miss, where authority is still unclaimed and we exploit it.
           </p>
         </div>
@@ -70,7 +70,7 @@ export const BenefitsSection: React.FC = () => {
             <FileText className="w-6 h-6 text-black" />
           </div>
           <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Authority-Building Content Strategy</h3>
-          <p className="font-sans text-gray-600 leading-relaxed text-sm font-medium">
+          <p className="font-sans text-gray-600 leading-relaxed font-medium">
             Every article is part of a connected system. Topics are ordered intentionally to compound trust, coverage, and credibility over time. Nothing random. Nothing isolated.        </p>
         </div>
 
@@ -78,7 +78,7 @@ export const BenefitsSection: React.FC = () => {
         <div className="md:col-span-2 bg-[#D6F5F2] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center gap-8 hover:shadow-neo-hover transition-all duration-200">
           <div className="flex-1">
             <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">ARTICLES THAT ACTUALLY ANSWER QUESTIONS</h3>
-            <p className="font-sans font-medium text-black/80 leading-relaxed text-lg">
+            <p className="font-sans text-gray-600 leading-relaxed font-medium">
               Most AI content reads like a Wikipedia summary. Ours explains. Each article is built to fully resolve a real user question with clarity humans trust and AI systems recognize as authority.
             </p>
           </div>
@@ -104,7 +104,7 @@ export const BenefitsSection: React.FC = () => {
         <div className="md:col-span-2 bg-[#FFD8A8] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden group hover:shadow-neo-hover transition-all duration-200">
           <div className="flex-1 z-10">
             <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">Turning near-rankings into real traffic</h3>
-            <p className="font-sans font-medium text-black/80 leading-relaxed text-lg">
+            <p className="font-sans text-gray-600 leading-relaxed font-medium">
               Ranking without clicks is a dead end. We focus on intent clarity, structure, and depth so impressions turn into engagement and growth.
             </p>
           </div>
@@ -130,7 +130,7 @@ export const BenefitsSection: React.FC = () => {
             <Zap className="w-6 h-6 text-black fill-black" />
           </div>
           <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Content That Doesn’t Slow You Down</h3>
-          <p className="font-sans text-gray-600 leading-relaxed text-sm font-medium">
+          <p className="font-sans text-gray-600 leading-relaxed font-medium">
             Writing, formatting, publishing — it all becomes friction. We remove the overhead so content stops being a task and starts being leverage.
           </p>
         </div>
