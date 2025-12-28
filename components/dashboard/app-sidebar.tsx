@@ -128,7 +128,7 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <Image src="/site-logo.png" alt="Unrealshot AI" width={30} height={30} className="rounded-sm" />
+                <Image src="/site-logo.png" alt="FlipAEO AI" width={30} height={30} className="rounded-sm" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">FlipAEO</span>
                   <span className="truncate text-xs">AI SEO Writer</span>

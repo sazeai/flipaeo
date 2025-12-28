@@ -155,7 +155,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
 
       <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
         {/* Hero Section */}
-        <section className="w-full py-12 px-4 bg-[#F7F5F3]">
+        <section className="w-full py-12 px-4 ">
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
               <Link href="/blog" className="inline-flex items-center text-sm font-bold uppercase tracking-wide text-black hover:text-brand-orange transition-colors">
@@ -234,9 +234,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
 
         {/* Article Content */}
         <div className="max-w-4xl mx-auto px-4 mt-8 w-full pb-16">
-          <div className="bg-white">
-            <BlogContentRenderer content={post.content} />
-          </div>
+          <BlogContentRenderer content={post.content} />
         </div>
       </main>
 
