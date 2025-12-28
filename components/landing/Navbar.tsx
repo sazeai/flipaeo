@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Logo } from './Logo';
 import { Button } from './Button';
 import { Menu, X } from 'lucide-react';
+import Link from 'next/link';
 
 interface NavLink {
   label: string;
@@ -11,10 +12,10 @@ interface NavLink {
 }
 
 const links: NavLink[] = [
-  { label: 'Benefits', href: '#' },
-  { label: 'How it work', href: '#' },
-  { label: 'Testimonials', href: '#' },
-  { label: 'Pricing', href: '#' },
+  { label: 'Benefits', href: '#benefits' },
+  { label: 'How it work', href: '#how-it-works' },
+  { label: 'The Process', href: '#features' },
+  { label: 'Pricing', href: '#pricing' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -42,9 +43,11 @@ export const Navbar: React.FC = () => {
 
       {/* CTA Button Desktop */}
       <div className="hidden md:block">
-        <Button variant="primary" size="sm" className="text-sm font-bold px-5 py-2.5">
-          Start for free
-        </Button>
+        <Link href="/login">
+          <Button variant="primary" size="sm" className="cursor-pointer text-sm font-bold px-5 py-2.5">
+            Start for free
+          </Button>
+        </Link>
       </div>
 
       {/* Mobile Menu Toggle */}
@@ -85,9 +88,11 @@ export const Navbar: React.FC = () => {
 
           {/* Footer Button */}
           <div className="p-8 pb-12 w-full max-w-md mx-auto">
-            <Button variant="primary" size="lg" fullWidth onClick={() => setIsMobileMenuOpen(false)} className="py-6 text-xl uppercase tracking-widest">
-              Start for free
-            </Button>
+            <Link href="/login">
+              <Button variant="primary" size="lg" fullWidth onClick={() => setIsMobileMenuOpen(false)} className="py-6 text-xl uppercase tracking-widest">
+                Start for free
+              </Button>
+            </Link>
           </div>
         </div>
       )}

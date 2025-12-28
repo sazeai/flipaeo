@@ -90,7 +90,7 @@ export default async function RootLayout({
         {/* Apple-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="DodoStarter" />
+        <meta name="apple-mobile-web-app-title" content="FlipAEO" />
 
         {/* Microsoft tiles */}
         <meta name="msapplication-TileColor" content="#000000" />

@@ -367,7 +367,7 @@ export const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
+    <section id="features" className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
 
 
       {/* Header */}

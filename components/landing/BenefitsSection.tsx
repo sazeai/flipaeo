@@ -4,7 +4,7 @@ import { Zap, Target, FileText, TrendingUp } from 'lucide-react';
 
 export const BenefitsSection: React.FC = () => {
   return (
-    <section className="w-full py-24 px-4 flex flex-col items-center">
+    <section id="benefits" className="w-full py-24 px-4 flex flex-col items-center">
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-16 max-w-3xl">
         <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform -rotate-1 hover:rotate-0 transition-transform">

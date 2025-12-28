@@ -43,13 +43,13 @@ export const Hero: React.FC = () => {
       {/* SOCIAL PROOF / TRUST SIGNALS */}
       <div className="flex flex-col items-center gap-4 animate-fade-in-up">
 
-        {/* Trust Badge - Neo-Brutalist Style */}
-        <div className="flex items-center gap-4 bg-white border-2 border-black px-5 py-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform -rotate-1 hover:rotate-0 transition-all duration-300">
+        {/* Avatar Stack + Rating - Minimal Layout */}
+        <div className="flex items-center gap-4">
 
           {/* Avatar Stack */}
-          <div className="flex -space-x-2.5">
+          <div className="flex -space-x-2">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="w-9 h-9 rounded-full border-2 border-black bg-[#D6F5F2] flex items-center justify-center overflow-hidden shadow-sm">
+              <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-white overflow-hidden hover:-translate-y-0.5 transition-transform">
                 <img
                   src={`https://api.dicebear.com/7.x/notionists/svg?seed=${i + 42}`}
                   alt="User"
@@ -59,33 +59,23 @@ export const Hero: React.FC = () => {
             ))}
           </div>
 
-          {/* Divider */}
-          <div className="w-[2px] h-10 bg-black"></div>
-
-          {/* Rating & Text */}
-          <div className="flex flex-col gap-1">
+          {/* Rating & Count */}
+          <div className="flex flex-col items-start">
             <div className="flex gap-0.5">
               {[1, 2, 3, 4, 5].map(s => (
                 <Star key={s} className="w-4 h-4 text-brand-orange fill-brand-orange" />
               ))}
             </div>
-            <span className="font-display font-bold text-xs uppercase tracking-wider text-black">
-              2,000+ Writers Trust Us
+            <span className="font-display font-bold text-sm uppercase tracking-wide text-black">
+              90+ Articles created
             </span>
           </div>
         </div>
 
-        {/* Micro-Copy as Tags */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {['No credit card', 'Cancel anytime', '14-day guarantee'].map((text, idx) => (
-            <span
-              key={idx}
-              className="bg-[#FAFA9D] border-2 border-black px-3 py-1 font-mono font-bold text-xs uppercase tracking-wide shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-            >
-              {text}
-            </span>
-          ))}
-        </div>
+        {/* Micro-Copy - Simple Text */}
+        <p className="font-mono text-xs text-gray-500 tracking-wide">
+          Cancel anytime <span className="text-black mx-1">·</span> 14-day guarantee
+        </p>
 
       </div>
 

@@ -34,7 +34,7 @@ import { createClient } from "@/utils/supabase/client"
 const navSecondary = [
   {
     title: "Support",
-    url: "mailto:support@drawgle.com",
+    url: "mailto:support@flipaeo.com",
     icon: Send,
   },
 ]

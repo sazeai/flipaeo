@@ -4,7 +4,7 @@ import { ScanSearch, BrickWall, FileCheck } from 'lucide-react';
 
 export const HowItWorksSection: React.FC = () => {
   return (
-    <section className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
+    <section id="how-it-works" className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
 
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-16 max-w-4xl mx-auto z-10 relative">

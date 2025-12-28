@@ -6,7 +6,7 @@ import { Bot, Zap, Globe, Image as ImageIcon, Link as LinkIcon, Sparkles } from 
 
 export const PricingSection: React.FC = () => {
     return (
-        <section className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden" id="pricing">
+        <section id="pricing" className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
 
             {/* Background Decorative Elements */}
             <div className="absolute top-1/2 -left-12 w-64 h-64 bg-brand-yellow rounded-full border-2 border-black opacity-10 blur-3xl pointer-events-none"></div>
