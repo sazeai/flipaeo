@@ -24,25 +24,41 @@ export async function syncSitemapToInternalLinksAction(
             return { success: false, titles: [], count: 0, error: "Not authenticated" }
         }
 
-        // Build sitemap URL
+        // Build sitemap URLs to try
         const baseUrl = websiteUrl.replace(/\/$/, '')
-        const sitemapUrl = `${baseUrl}/sitemap.xml`
+        const sitemapPaths = ['/sitemap.xml', '/sitemap_index.xml', '/wp-sitemap.xml']
 
-        console.log(`[Sync Internal Links] Starting sync for ${sitemapUrl}`)
+        let sitemapUrls: string[] = []
+        let usedSitemapUrl = ""
 
-        // Fetch sitemap URLs
-        const sitemapper = new Sitemapper({
-            url: sitemapUrl,
-            timeout: 15000,
-        })
+        console.log(`[Sync Internal Links] Starting sync checks for ${baseUrl}`)
 
-        const { sites } = await sitemapper.fetch()
-        const sitemapUrls = Array.from(new Set(sites as string[]))
+        // Try paths sequentially until we find one with URLs
+        for (const path of sitemapPaths) {
+            const currentUrl = `${baseUrl}${path}`
+            console.log(`[Sync Internal Links] Trying sitemap: ${currentUrl}`)
 
-        console.log(`[Sync Internal Links] Found ${sitemapUrls.length} URLs`)
+            try {
+                const sitemapper = new Sitemapper({
+                    url: currentUrl,
+                    timeout: 15000,
+                })
+
+                const { sites } = await sitemapper.fetch()
+                if (sites && sites.length > 0) {
+                    sitemapUrls = Array.from(new Set(sites as string[])) // Deduplicate
+                    usedSitemapUrl = currentUrl
+                    console.log(`[Sync Internal Links] Found ${sitemapUrls.length} URLs at ${currentUrl}`)
+                    break // Stop if we found a working sitemap
+                }
+            } catch (e) {
+                console.log(`[Sync Internal Links] Failed to fetch ${currentUrl}:`, e)
+            }
+        }
 
         if (sitemapUrls.length === 0) {
-            return { success: true, titles: [], count: 0 }
+            console.warn(`[Sync Internal Links] No URLs found in any sitemap for ${baseUrl}`)
+            return { success: true, titles: [], count: 0, error: "No sitemap found" }
         }
 
         // Get existing URLs to avoid duplicates
