@@ -180,7 +180,7 @@ export const ProblemSection: React.FC = () => {
       </h2>
 
       {/* Subtext */}
-      <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed">
+      <p className="font-sans text-gray-500 text-lg md:text-xl text-center leading-relaxed mb-8">
         You’re publishing more than ever, yet traffic stays flat. Modern search engines can tell the difference between real answers and mass-produced content.
       </p>
 
