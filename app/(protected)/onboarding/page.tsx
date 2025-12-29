@@ -489,6 +489,7 @@ export default function OnboardingPage() {
                     brandData: brandData,
                     competitorSeeds: competitorSeeds,
                     brandName: brandData?.product_name || "",
+                    existingPlan: contentPlan, // Pass the existing plan as blueprint
                 }),
             })
 

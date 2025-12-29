@@ -207,70 +207,57 @@ function clusterQueries(queries: ProcessedQuery[], maxImpressions: number): Keyw
 function generatePlanPrompt(
     clusters: KeywordCluster[],
     brandData: any,
-    competitorSeeds: string[]
+    competitorSeeds: string[],
+    existingPlan: any[]
 ): string {
     const now = new Date()
     const currentDate = `${now.toLocaleDateString('en-US', { month: 'long' })} ${now.getFullYear()}`
 
-    return `You are an expert SEO strategist. [Current Date: ${currentDate}] Your goal is to select the highest-value topics from the GSC keyword clusters below and create a 30-day content plan to dominate the SERP and modern AI Search Engines.
+    return `You are an expert SEO strategist. [Current Date: ${currentDate}] 
+    
+## GOAL
+Upgrade the "Blueprint Content Plan" below using real GSC data. 
+Your unique value is merging the **Strategic Structure** of the Blueprint (Categories, Intent) with the **Real-World Metrics** of GSC (Impressions, Opportunity).
 
-## Website Brand DNA
-${brandData ? JSON.stringify(brandData, null, 2) : "No brand data available - use general best practices"}
+## INPUT 1: THE BLUEPRINT (Strategic Structure)
+This plan has the perfect category balance (12 Core, 8 Supporting, 6 Conversion, 4 Authority).
+${existingPlan && existingPlan.length > 0 ? JSON.stringify(existingPlan.map(p => ({
+        title: p.title,
+        category: p.article_category || p.category || "Core Answers", // Fallback
+        keywords: [p.main_keyword, ...(p.supporting_keywords || [])]
+    })), null, 2) : "No blueprint available, generate fresh structure."}
 
-## Competitor Topics & Focus Areas
-${competitorSeeds?.length > 0 ? competitorSeeds.join(", ") : "No competitor data available"}
-
-## GSC Keyword Clusters (Real Search Data)
+## INPUT 2: GSC KEYWORD CLUSTERS (Real Data)
 ${JSON.stringify(clusters, null, 2)}
 
----
+## CRITICAL RULES (MUST FOLLOW):
 
-## CRITICAL CONSTRAINTS (MUST FOLLOW):
+1. **RESPECT THE BLUEPRINT STRUCTURE**: 
+   - You MUST output exactly 30 articles.
+   - You MUST match the Blueprint's category distribution:
+     - **12 Core Answers** (Foundational)
+     - **8 Supporting Articles** (How-tos, niche)
+     - **6 Conversion Pages** (Commercial, best-of)
+     - **4 Authority Plays** (Thought leadership)
 
-1. **USE EXACT GSC QUERIES**: The \`gsc_query\` field MUST be copied EXACTLY from the \`primary_keyword\` of the clusters above. 
-   - DO NOT modify, expand, or create new keywords.
-   - If the cluster says "restore old photos", you MUST use "restore old photos" — not "how to restore old photos" or "best way to restore old photos".
+2. **INTELLIGENT MERGING (NO DUPLICATES)**:
+   - **Crucial**: If GSC has "ai christmas photoshoot" and "christmas photoshoot ai", treat them as ONE topic. Do NOT creating two articles. Pick the one with higher volume as primary.
+   - If a GSC cluster matches a Blueprint topic (semantically), MERGE THEM. Use the Blueprint's category but the GSC intent/keywords.
+   - If a Blueprint topic is weak/generic, REPLACE it with a high-opportunity GSC topic that fits the *same category*.
 
-2. **SUPPORTING KEYWORDS COME FROM CLUSTERS**: The \`supporting_keywords\` array should be taken from the cluster's \`supporting_keywords\` array (these are real GSC queries with similar intent).
+3. **FIELD REQUIREMENTS**:
+   - \`article_category\`: MUST be one of the 4 exact categories above.
+   - \`gsc_query\`: EXACT \`primary_keyword\` from the GSC cluster (copy exactly for data mapping).
+   - \`badge\`: Use "quick_win", "high_impact", "low_ctr", or "new_opportunity".
 
-3. **TARGET KEYWORD IS OPTIONAL**: If you want to suggest a more specific long-tail keyword for the article title, use the \`target_keyword\` field. This is the keyword the article will actually target for SEO.
+4. **TITLE OPTIMIZATION**:
+   - Write human-first, click-worthy titles. 
+   - No robotic "Ultimate Guide to..." prefixes.
 
----
-
-## YOUR TASK:
-
-### 1. Select 30 highest-value topics from the clusters
-Use this strategic breakdown:
-- **10 Quick Wins**: position 7-20, high impressions, low CTR (easiest to rank page 1)
-- **10 High Potential Topics**: high impressions, position 20-40 (mid-term SEO value)
-- **5 Strategic Cluster Builders**: strengthen topical authority
-- **5 New Opportunity Topics**: rising queries with future growth potential
-
-### 2. For each topic, provide:
-- **gsc_query**: EXACT \`primary_keyword\` from the cluster (COPY IT EXACTLY)
-- **target_keyword**: (Optional) A more specific long-tail variant for article targeting
-- **title**: A compelling, human-like article title which rewards human-like behavior and fulfil seo needs.
-- **article_type**: MUST be one of: informational, commercial, howto
-- **supporting_keywords**: Array from the cluster's supporting_keywords
-- **cluster**: Topic category/cluster name
-- **opportunity_score**: Number from 0-100 (use the cluster's score)
-- **badge**: quick_win, high_impact, low_ctr, or new_opportunity
-- **reason**: 1 sentence explaining why this topic matters
-- **impact**: Low, Medium, or High expected traffic impact
-
-### 3. TITLE RULES:
-1. Create curiosity, not clickbait
-2. Use numbers when possible
-3. Attack a pain point
-4. Keep title under 60 characters
-5. Remove weak words (very, really, extremely)
-6. NO robotic phrases: "ultimate guide", "comprehensive", "everything you need to know"
-7. Speak like a human, not a corporation, be converstional
-8. Aim for 6-15 words or 30-60 characters title length for clarity and SEO (especially around 55 characters for search engines like Google), while focusing on being descriptive, using key terms, and creating a strong hook for readers to click, balancing brevity with informative content for better engagement. 
-
-### 4. Output Format (strict JSON array):
+## OUTPUT FORMAT (Strict JSON Array):
 [
   {
+    "article_category": "Core Answers|Supporting Articles|Conversion Pages|Authority Plays",
     "gsc_query": "exact query from cluster",
     "target_keyword": "optional long-tail variant",
     "title": "string",
@@ -278,12 +265,11 @@ Use this strategic breakdown:
     "supporting_keywords": ["from cluster"],
     "cluster": "string",
     "opportunity_score": number,
-    "badge": "quick_win|high_impact|low_ctr|new_opportunity",
+    "badge": "string",
     "reason": "string",
     "impact": "Low|Medium|High"
   }
 ]
-
 Return ONLY the JSON array. No explanations.`
 }
 
@@ -297,7 +283,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        const { brandData, competitorSeeds, brandName } = await req.json()
+        const { brandData, competitorSeeds, brandName, existingPlan } = await req.json()
 
         // Get GSC connection
         const { data: connection } = await supabase
@@ -350,13 +336,15 @@ export async function POST(req: NextRequest) {
                 body: JSON.stringify({
                     ...dateRange,
                     dimensions: ["query"],
-                    rowLimit: 100,
+                    rowLimit: 500,
                 }),
             }
         )
 
         if (!queriesResponse.ok) {
             console.error("GSC queries fetch failed:", await queriesResponse.text())
+            // Fallback: If GSC fails, verify if we can just return existing plan enriched? 
+            // For now, return error to prompt user to retry or skip.
             return NextResponse.json({ error: "Failed to fetch GSC data" }, { status: 500 })
         }
 
@@ -369,6 +357,8 @@ export async function POST(req: NextRequest) {
         const filteredQueries = filterGarbageQueries(rawQueries, brandName)
         console.log("After filtering:", filteredQueries.length)
 
+        // If no GSC data found, we should ideally handle this gracefully.
+        // But the user is specifically here for GSC enhancement.
         if (filteredQueries.length === 0) {
             return NextResponse.json({ error: "No valid queries found after filtering. Your site may need more search data." }, { status: 400 })
         }
@@ -400,26 +390,19 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        console.log("Processed queries:", processedQueries.length)
-        console.log("Top 5:", processedQueries.slice(0, 5).map(q => ({ query: q.query, score: q.opportunity_score })))
-
         // STEP 4: Cluster similar queries
         const clusters = clusterQueries(processedQueries, maxImpressions)
         console.log("Clusters created:", clusters.length)
-        console.log("Top 5 clusters:", clusters.slice(0, 5).map(c => ({
-            primary: c.primary_keyword,
-            supporting: c.supporting_keywords.length,
-            category: c.category
-        })))
 
-        // STEP 5: Generate 30-day plan using LLM
+        // STEP 5: Generate 30-day plan using LLM with Blueprint
         const genAI = getGeminiClient()
-        const prompt = generatePlanPrompt(clusters, brandData, competitorSeeds)
+        // Pass existingPlan to the prompt generator
+        const prompt = generatePlanPrompt(clusters, brandData, competitorSeeds, existingPlan)
 
         console.log("=== Calling Gemini 2.5 Pro for strategic plan ===")
 
         const response = await genAI.models.generateContent({
-            model: "gemini-2.5-pro",
+            model: "gemini-2.0-flash", // Using Flash for speed/cost, works well for structured tasks
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             config: {
                 responseMimeType: "application/json",
@@ -475,9 +458,9 @@ export async function POST(req: NextRequest) {
 
             // Fallback 2: Substring match (if LLM modified query slightly)
             if (!matchingCluster) {
+                // Be tighter with substring matching to avoid bad associations
                 matchingCluster = clusters.find(c =>
-                    item.gsc_query.toLowerCase().includes(c.primary_keyword.toLowerCase()) ||
-                    c.primary_keyword.toLowerCase().includes(item.gsc_query.toLowerCase())
+                    item.gsc_query.toLowerCase().includes(c.primary_keyword.toLowerCase()) && c.primary_keyword.length > 5
                 )
             }
 
@@ -490,12 +473,11 @@ export async function POST(req: NextRequest) {
                 main_keyword: mainKeyword,
                 gsc_query: item.gsc_query, // Original GSC query for reference
                 supporting_keywords: item.supporting_keywords || matchingCluster?.supporting_keywords || [],
-                // LLM outputs one of: informational, commercial, howto
-                // Fallback to informational if invalid
                 article_type: ["informational", "commercial", "howto"].includes(item.article_type)
                     ? item.article_type
                     : "informational",
-                intent: item.article_type, // Same as article_type now
+                intent: item.article_type,
+                article_category: item.article_category || "Core Answers", // Ensure category exists
                 cluster: item.cluster,
                 scheduled_date: scheduledDate.toISOString().split("T")[0],
                 status: "pending",
@@ -505,7 +487,6 @@ export async function POST(req: NextRequest) {
                 gsc_impressions: matchingCluster?.impressions || 0,
                 gsc_position: matchingCluster?.position || 0,
                 gsc_ctr: matchingCluster?.ctr || 0,
-                // Extra strategic info
                 reason: item.reason,
                 impact: item.impact,
             }
@@ -514,7 +495,7 @@ export async function POST(req: NextRequest) {
 
         console.log("=== GSC PLAN GENERATED ===")
         console.log("Total items:", contentPlan.length)
-        console.log("Sample titles:", contentPlan.slice(0, 3).map((p: any) => p.title))
+        console.log("Categories:", contentPlan.map((p: any) => p.article_category).reduce((acc: any, c: string) => ({ ...acc, [c]: (acc[c] || 0) + 1 }), {}))
 
         return NextResponse.json({ plan: contentPlan })
 
