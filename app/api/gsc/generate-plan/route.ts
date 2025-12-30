@@ -213,60 +213,144 @@ function generatePlanPrompt(
     const now = new Date()
     const currentDate = `${now.toLocaleDateString('en-US', { month: 'long' })} ${now.getFullYear()}`
 
-    return `You are an expert SEO strategist. [Current Date: ${currentDate}] 
-    
-## GOAL
-Upgrade the "Blueprint Content Plan" below using real GSC data. 
-Your unique value is merging the **Strategic Structure** of the Blueprint (Categories, Intent) with the **Real-World Metrics** of GSC (Impressions, Opportunity).
+    return `You are an elite SEO strategist enhancing a content plan with real search data. [Current Date: ${currentDate}]
 
-## INPUT 1: THE BLUEPRINT (Strategic Structure)
-This plan has the perfect category balance (12 Core, 8 Supporting, 6 Conversion, 4 Authority).
+---
+
+## STRATEGIC PRIORITY (READ FIRST — THIS DEFINES YOUR MINDSET)
+
+You are ENHANCING an existing strategic plan, NOT replacing it with keywords.
+
+The Blueprint below represents STRATEGIC THINKING:
+- Carefully chosen categories (12-8-6-4 distribution)
+- Intentional topic sequencing
+- Decision-stage content designed for AI citation
+
+GSC data represents MARKET VALIDATION:
+- Real search demand signals
+- Opportunity scores
+- Ranking potential
+
+YOUR ROLE:
+1. KEEP the Blueprint's STRATEGIC STRUCTURE as the foundation
+2. Use GSC to VALIDATE and ENRICH (not replace) topics
+3. If a Blueprint topic has GSC support → Keep and add metrics
+4. If a Blueprint topic has NO GSC match → KEEP IT ANYWAY (strategic value trumps search volume)
+5. If GSC shows high-opportunity topic not in Blueprint → Add ONLY if it fills a genuine category gap
+
+DO NOT let GSC pull the plan into "keyword + scenario + year" patterns.
+The goal is STRATEGIC DEPTH, not keyword optimization.
+
+---
+
+## DECISION-STAGE CONTENT (AI CITATION PRIORITY)
+
+AI systems cite content that answers DECISION questions, not curiosity questions.
+
+PRIORITIZE these patterns based on brand category:
+- "Should I use X?" / "When should I NOT use X?"
+- "What can go wrong with X?"
+- "X vs Y - which is better for Z?"
+- "Is X worth it for [specific situation]?"
+
+DEPRIORITIZE these patterns based on brand category:
+- "What is X?" (Only 1-2 if foundational)
+- "Why X is amazing" (Low citation value)
+- "The future of X" (Speculative)
+
+---
+
+## INPUT 1: THE BLUEPRINT (STRATEGIC STRUCTURE — THIS LEADS)
+
+This plan has the strategic category balance. Respect its intent.
+
 ${existingPlan && existingPlan.length > 0 ? JSON.stringify(existingPlan.map(p => ({
         title: p.title,
-        category: p.article_category || p.category || "Core Answers", // Fallback
-        keywords: [p.main_keyword, ...(p.supporting_keywords || [])]
-    })), null, 2) : "No blueprint available, generate fresh structure."}
+        category: p.article_category || p.category || "Core Answers",
+        intent: p.intent_role || p.intent || "informational",
+        keywords: [p.main_keyword, ...(p.supporting_keywords || [])].slice(0, 3)
+    })), null, 2) : "No blueprint available — generate fresh strategic structure."}
 
-## INPUT 2: GSC KEYWORD CLUSTERS (Real Data)
-${JSON.stringify(clusters, null, 2)}
+---
 
-## CRITICAL RULES (MUST FOLLOW):
+## INPUT 2: GSC KEYWORD CLUSTERS (VALIDATION & ENRICHMENT — THIS SUPPORTS)
 
-1. **RESPECT THE BLUEPRINT STRUCTURE**: 
-   - You MUST output exactly 30 articles.
-   - You MUST match the Blueprint's category distribution:
-     - **12 Core Answers** (Foundational)
-     - **8 Supporting Articles** (How-tos, niche)
-     - **6 Conversion Pages** (Commercial, best-of)
-     - **4 Authority Plays** (Thought leadership)
+Use this data to:
+- Confirm which Blueprint topics have real demand
+- Add opportunity_score, impressions, position metrics
+- Identify 2-3 high-opportunity additions that fit category gaps
+
+DO NOT use this to:
+- Replace strategic topics with keyword-driven ones
+- Create duplicate articles for similar keywords
+- Override the Blueprint's category distribution
+
+${JSON.stringify(clusters.slice(0, 30), null, 2)}
+
+---
+
+## FEATURE LIMIT (MANDATORY CONSTRAINT)
+
+AT MOST 4 feature-led articles in the entire plan.
+
+Feature-led = title mentions proprietary feature name, or primary purpose is explaining how a specific feature works.
+
+Market-led topics (no limit) = address user questions that exist regardless of this specific product.
+
+---
+
+## BRAND VOICE (USE FOR TONE, NOT TOPICS)
+
+Apply this voice when WRITING titles, not when CHOOSING topics.
+
+- Product: ${brandData?.product_name || "Unknown Product"}
+- Core Features: ${brandData?.core_features?.join(", ") || "Not specified"}
+- Audience: ${brandData?.audience?.primary || "General audience"}
+- What it is: ${brandData?.product_identity?.literally || "Not specified"}
+
+---
+
+## COMPETITOR CONTEXT (VALIDATION)
+
+These are topics competitors cover. Use for validation, NOT as primary source.
+
+${competitorSeeds?.length > 0 ? competitorSeeds.join(", ") : "No competitor data available"}
+
+---
+
+## CRITICAL RULES: You MUST output exactly 30 articles plan.
+
+1. **MAINTAIN 12-8-6-4 DISTRIBUTION**:
+   - 12 Core Answers (Foundational)
+   - 8 Supporting Articles (How-tos, niche)
+   - 6 Conversion Pages (Commercial, comparison)
+   - 4 Authority Plays (Thought leadership)
 
 2. **INTELLIGENT MERGING (NO DUPLICATES)**:
-   - **Crucial**: If GSC has "ai christmas photoshoot" and "christmas photoshoot ai", treat them as ONE topic. Do NOT creating two articles. Pick the one with higher volume as primary.
-   - If a GSC cluster matches a Blueprint topic (semantically), MERGE THEM. Use the Blueprint's category but the GSC intent/keywords.
-   - If a Blueprint topic is weak/generic, REPLACE it with a high-opportunity GSC topic that fits the *same category*.
+   - If GSC has "ai christmas photoshoot" and "christmas photoshoot ai", treat as ONE topic
+   - Pick the higher-volume variant as primary keyword
 
-3. **FIELD REQUIREMENTS**:
-   - \`article_category\`: MUST be one of the 4 exact categories above.
-   - \`gsc_query\`: EXACT \`primary_keyword\` from the GSC cluster (copy exactly for data mapping).
-   - \`badge\`: Use "quick_win", "high_impact", "low_ctr", or "new_opportunity".
+3. **GSC FIELD MAPPING**:
+   - \`gsc_query\`: EXACT \`primary_keyword\` from cluster (for data mapping)
+   - \`badge\`: "quick_win", "high_impact", "low_ctr", or "new_opportunity"
 
 4. **TITLE OPTIMIZATION**:
-   - Write human-first, click-worthy titles. 
-   - No robotic "Ultimate Guide to..." prefixes.
+   - Human-first, decision-focused titles
+   - No "Ultimate Guide to..." or "Everything About..."
 
 ## OUTPUT FORMAT (Strict JSON Array):
 [
   {
     "article_category": "Core Answers|Supporting Articles|Conversion Pages|Authority Plays",
-    "gsc_query": "exact query from cluster",
-    "target_keyword": "optional long-tail variant",
+    "gsc_query": "exact query from cluster or null if Blueprint-only",
+    "target_keyword": "primary keyword for SEO",
     "title": "string",
     "article_type": "informational|commercial|howto",
-    "supporting_keywords": ["from cluster"],
-    "cluster": "string",
+    "supporting_keywords": ["array"],
+    "cluster": "topic cluster name",
     "opportunity_score": number,
-    "badge": "string",
-    "reason": "string",
+    "badge": "quick_win|high_impact|low_ctr|new_opportunity|strategic",
+    "reason": "1-sentence strategic rationale",
     "impact": "Low|Medium|High"
   }
 ]

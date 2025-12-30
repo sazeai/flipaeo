@@ -147,34 +147,92 @@ ${formatIdeaUniverseWithCoverage(ideaUniverse, ideaCoverageMap)}
     const prompt = `
 You are an elite SEO strategist building a STRATEGIC content plan. [Current Date: ${currentDate}]
 
-${strategySection}
+---
 
-## BRAND CONTEXT
-- Product: ${brandData.product_name}
-- What it is: ${brandData.product_identity.literally}
-- Core Features/Products: ${brandData.core_features?.join(", ") || "Not specified"}
-- Target Audience: ${brandData.audience.primary}
-- Unique Value: ${brandData.uvp.join(", ")}
-- Voice/Style: ${brandData.style_dna || "Professional and informative"}
+## STRATEGIC PRIORITY (READ FIRST — THIS DEFINES YOUR MINDSET)
+
+You are NOT here to explain product features.
+You are here to CAPTURE MARKET DEMAND and EXPAND TOPICAL AUTHORITY.
+
+Your job:
+1. Enter conversations where the audience ALREADY exists
+2. Answer questions the audience is ALREADY asking
+3. Fill gaps that competitors have NOT covered
+
+Brand features should ONLY appear when they naturally support existing demand.
+Do NOT create articles just to explain features unless explicit demand exists.
+
+THINK LIKE A STRATEGIST:
+- What must exist on this site BEFORE other articles make sense?
+- What questions MUST be answered for the audience to trust this brand?
+- What will AI systems cite as the CANONICAL answer?
+
+---
+
+## DECISION-STAGE CONTENT (AI CITATION PRIORITY)
+
+AI systems cite content that answers DECISION questions, not curiosity questions.
+
+PRIORITIZE these question patterns:
+- "Should I use X?" (Decision)
+- "When should I NOT use X?" (Risk awareness)
+- "What can go wrong with X?" (Objection handling)
+- "X vs Y - which is better for Z?" (Comparison)
+- "How much does X cost?" (Practical)
+- "Is X worth it for [specific situation]?" (Contextual decision)
+
+DEPRIORITIZE these patterns:
+- "What is X?" (Only 1-2 if truly foundational)
+- "Why X is cool/amazing" (Low citation value)
+- "5 ways X can help you" (List fluff)
+- "The future of X" (Speculative, not actionable)
+
+---
+
+${strategySection}
 
 ${ideaUniverseSection}
 
-## FEATURE COVERAGE REQUIREMENT
-
-${brandData.core_features && brandData.core_features.length > 1 ? `
-This brand has MULTIPLE distinct features/products:
-${brandData.core_features.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n")}
-
-Distribute articles across ALL features proportionally.
-` : "Focus deeply on the core product offering."}
-
-## SEED KEYWORDS (SECONDARY INPUT)
-Use these ONLY to validate demand and phrasing.
-Do NOT let them restrict idea selection — the IDEA UNIVERSE above is your primary creative source.
-
-${seeds.join("\n")}
-
 ${coverageSection}
+
+## SEED KEYWORDS (VALIDATION ONLY)
+Use these to confirm demand exists, NOT to drive topic selection.
+The IDEA UNIVERSE above is your primary strategic source.
+
+${seeds.join("\\n")}
+
+---
+
+## BRAND VOICE (USE FOR TONE, NOT TOPICS)
+
+Apply this voice when WRITING titles, not when CHOOSING topics.
+Topics come from MARKET DEMAND (above). Brand voice shapes HOW you write.
+
+- Product: ${brandData.product_name}
+- Core Features: ${brandData.core_features?.join(", ") || "Not specified"}
+- Audience: ${brandData.audience.primary}
+- What it is: ${brandData.product_identity.literally}
+
+---
+
+## FEATURE LIMIT (MANDATORY CONSTRAINT)
+
+You may create AT MOST 4 feature-led articles in the entire 30-day plan.
+
+A "feature-led article" is one where:
+- The title mentions a proprietary feature name (e.g., "Identity-Lock™")
+- The primary purpose is explaining how a specific feature works
+- The topic wouldn't exist without this specific product
+
+Examples of feature-led (COUNT TOWARD LIMIT):
+- "What is AI Identity-Lock™ Protocol"
+- "How Multi-Ratio Formatting Works"
+
+Examples of market-led (DO NOT COUNT):
+- "AI Headshots vs Professional Photography: Cost Breakdown"
+- "Why Your LinkedIn Photo Isn't Getting Responses"
+
+If you create more than 4 feature-led articles, the plan is INVALID.
 
 ---
 
