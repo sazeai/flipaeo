@@ -87,118 +87,108 @@ Make sure all required fields are present and have the correct types.
 // --- Prompts & Rules from Blueprint ---
 
 const AUTHENTIC_WRITING_RULES = `
-### CORE FORMATTING & STYLE (STRICT ENFORCEMENT)
+### CORE STRUCTURE: ASYMMETRICAL FLOW (ANTI-DETECTION)
 
-**SCANNABILITY & STRUCTURE:**
-1. Assume readers will NOT read full paragraphs. The core message must be understandable at a glance.
-2. **BOLD** the important points as required for good seo practice. Use bullet points to break up concepts.
-3. Keep paragraphs to 2-4 sentences as the NORM. One idea per paragraph.
-4. Every line must EARN its place, but DON'T make every sentence stand alone - group related ideas together.
+1. **VARY PARAGRAPH DENSITY:** Do NOT make every paragraph the same length. Use the "1-3-2" rhythm: One punchy sentence, followed by a 3-sentence explanatory block, followed by a 2-sentence observation.
+2. **GROUP RELATED THOUGHTS:** Avoid the "Every sentence is a new line" style. It is a massive AI trigger. Group 2-4 sentences into cohesive blocks that develop a single technical or strategic point.
+3. **BOLD FOR EMPHASIS, NOT SCANNING:** Bold only the "Core Truth" or the "Result" (e.g., **30% lift in CTR**). Do not bold generic marketing fluff.
+4. **BREAK SYMMETRY:** If you have a list of three points, make the second point significantly longer than the first and third. AI loves "perfectly balanced" lists; humans are messier.
 
-**SENTENCE VARIATION (BURSTINESS) - CRITICAL FOR HUMAN FEEL:**
-5. Mix sentence lengths: most should be medium (15-25 words), with occasional short punchy ones (7-12 words) for emphasis.
-6. Infuse genuine emotional undertones appropriate to the content using active voice.
-7. Start sentences with different elements: adverbs, prepositional phrases, dependent clauses, questions
-8. Use sentence fragments SPARINGLY for impact - not in every paragraph. "Not always. But sometimes."
+### RHYTHM & VOICE (BURSTINESS)
 
-**ACTIVE VOICE & DIRECTNESS:**
-9. USE ACTIVE VOICE. "Management canceled the meeting" NOT "The meeting was canceled by management."
-10. Be direct strictly. "Call me at 3pm." NOT "I was wondering if you might be available for a call."
-11. Use certainty when you ARE certain. "This approach improves results." NOT "This approach might improve results."
-12. Add personal opinions, hesitations, or qualifiers ("I believe," "perhaps," "it seems")
-13. Use contractions and colloquialisms when appropriate
+5. **THE HUMAN PULSE:** Mix short, declarative statements with "winding" complex sentences. 
+   - *Example:* "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server since Tuesday, which essentially invalidated our entire report."
+6. **USE "INTERNAL LOGIC" TRANSITIONS:** Ban "Furthermore," "Moreover," and "Additionally." Replace them with transitions that show a human brain is working:
+   - "The next logical step is..."
+   - "Crucially, this leads to a secondary problem..."
+   - "But here is where most teams actually fail..."
+   - "If you look closer, you'll see..."
+7. **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
 
-**NO AI-FILLER PHRASES (CRITICAL):**
-12. **BANNED STARTERS:** "Let's dive in", "Let's be honest", "here's the truth", "Let's explore", "In today's digital age", "You know that gut-wrenching feeling", "In this article we will", "It goes without saying", "As we navigate"
-14. **BANNED PHRASES:** "cutting-edge", "leverage", "streamline", "take your X to the next level", "unparalleled", "revolutionize"
-15. **BANNED WORDS:** "delve", "unleash", "landscape", "tapestry", "game-changer", "realm", "bustling", "elevate", "harness", "robust"
-16. Instead of: "Let's explore this fascinating opportunity" → Say: "This opporunity is fascinating."
+### THE "AUTHORITY" DICTION (BANNED LIST)
 
-**SPECIFICITY & AUTHENTICITY:**
-17. Use SPECIFIC, CONCRETE details. "Saves 2 hours per week" NOT "saves time."
-18. Avoid generic statements. "The project failed because the API timed out" NOT "The project had issues."
-19. If something has problems, SAY IT. "This approach has problems." Be real.
+8. **BANNED STARTERS (AI HALLMARKS):** 
+   - "In today's digital landscape/age"
+   - "Let's dive in" / "Let's explore" / "Let's be honest"
+   - "Imagine a world where"
+   - "Whether you're a X or a Y"
+   - "In this comprehensive guide"
+9. **BANNED ADJECTIVES (THE "FLUFF" LIST):** 
+   - "Seamless," "Cutting-edge," "Revolutionary," "Robust," "Tapestry," "Realm," "Empower," "Unlock," "Harness," "Game-changer," "Literal/Literally," "Unparalleled."
+10. **REPLACE CORPORATE METAPHORS:** 
+    - Instead of: "It’s like a digital butler for your data."
+    - Use: "It’s essentially a 24/7 ping-machine that screams at you when the server drops."
+    - *Rule:* Use visceral, specific, or slightly "gritty" analogies.
 
-**STRUCTURAL PATTERN DISRUPTION:**
-20. Don't always follow fixed template, sometimes start mid-thought.
-21. Include natural digressions if they add value. "(this also works for X.)"
-22. Use varied paragraph lengths. MOST should be 2-4 sentences. Only occasionally use single-sentence paragraphs for emphasis.
-23. Break conventional grammar rules occasionally in natural ways, make a little mistakes to avoid detection
-24. **AVOID CHOPPY WRITING:** Don't put every sentence on its own line. Group 2-4 related sentences into flowing paragraphs.
+### SPECIFICITY & "THE HARD TRUTH"
 
-**PERSPECTIVE REMINDER:**
-24. **AUTHENTIC PERSPECTIVE:** Write with authority. Avoid passive voice ("It is said that..."). Use the perspective (I/We/Brand) defined in the Narrative Rules.
+11. **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" sounds more human than "saves a lot of time."
+12. **ADMIT LIMITATIONS:** Every SaaS or strategy has a "catch." Mention it. "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." This builds massive E-E-A-T.
+13. **USE SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests."
+14. **THE "NEXT STEP" CLOSING:** AI always summarizes. **Humans give orders.** Don't summarize what you just said; tell the reader exactly what to do next or give them a "Hard Truth" to think about.
+
+### PERSPECTIVE & PERSONA
+
+15. **OWN THE PERSPECTIVE:** If writing as a Founder, use "I" and "My team." If writing as an Agency, use "We" and "Our clients."
+16. **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend..."
+17. **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
 `
 
 // Type-specific intro templates
+// Type-specific intro templates (V3: The "Pattern-Breaker" Edition)
 const INTRO_TEMPLATES: Record<string, string> = {
   informational: `
-GOAL: Write an "Authority-Backed Answer" intro. 
-You must satisfy the user's intent within the first 2 sentences (AI Snippet Optimized) while immediately establishing Trust (EEAT).
+GOAL: Write an "Observation-Led" opening. 
+Avoid the "The old way is dead" drama. Instead, start with a boring but critical technical detail or a specific "I noticed" moment.
 
-**THE INGREDIENTS (You must mix these dynamically):**
-1. **The Direct Answer (BLUF):** Define the concept, answer the question, or state the core reality immediately. No fluff.
-2.  **The Trust Anchor:** Cite *why* this answer is true. Use phrases like "Based on 2024 analysis...", "Contrary to popular belief...", "In our experience testing X...".
-3. **The Value Proposition:** What specific problem will this guide solve?
-
-**DYNAMIC RULES (Do NOT use the same formula every time):**
-- **Option A (The Expert Correction):** Start with a common misconception, then immediately correct it with facts.
-  *Example:* "Many believe X is Y. However, our data shows X is actually Z. This guide explains why."
-- **Option B (The Direct Definition):** Start with the answer, then back it up with context.
-  *Example:* "X is the process of Y. While simple in theory, 90% of failures happen at stage Z."
-- **Option C (The Data Hook):** Start with a startling statistic or fact that anchors the article.
+**DYNAMIC STARTING STYLES (Pick ONE randomly):**
+- **The "Data Anomaly" Start:** Start with a specific, non-rounded number or a weird trend you noticed in a dashboard.
+  *Example:* "I was looking at a client's crawl logs last Tuesday and noticed that 42% of their new pages weren't even being touched by the Bing bot. It wasn't a sitemap error; it was something else entirely."
+- **The "Boring Technical" Start:** Start with a specific setting, a line of code, or a mundane requirement that people miss.
+  *Example:* "Most [Topic] configurations fail because of a single checkbox in the [Specific Menu]. It’s a tiny detail, but if it’s off, none of the high-level strategy matters."
+- **The "Middle of the Meeting" Start:** Start as if you are answering a question someone just asked you.
+  *Example:* "People keep asking if [Topic] is still worth the effort in 2025. The answer isn't a simple yes or no—it depends entirely on how you're handling [Specific Sub-task]."
 
 **NEGATIVE CONSTRAINTS:**
-- NO "In this article" or "Let's dive in".
-- NO dictionary definitions ("Webster defines...").
-- NO rhetorical questions ("Have you ever wondered?").
+- NO "The rules have changed."
+- NO "In the world of [Topic]."
+- NO "Many people think X, but Y." (This is the most common AI pattern).
 `,
 
   commercial: `
-GOAL: Write a "Verdict with Proof" intro. 
-Commercial intent users want to know the *best* choice immediately. Do not bury the lead.
+GOAL: Write a "Contextual Trade-off" opening. 
+Skip the "We tested 50 tools" (everyone says this). Instead, start with the *type of person* who should NOT buy the top-rated tool.
 
-**THE INGREDIENTS (You must mix these dynamically):**
-1. **The Verdict:** If there is a clear winner, NAME IT immediately. If it's a tie, name the top 2.
-2. **The Trust Anchor:** You MUST establish that you have actually tested/analyzed these tools.
-   *Required Phrase Vibe:* "We tested 15 tools...", "After analyzing the top 5...", "Our benchmark revealed..."
-3. **The User Filter:** Who is this for? (e.g. "Best for enterprise, but overkill for startups").
-
-**DYNAMIC RULES (Do NOT use the same formula every time):**
-- **Option A (The Hard Verdict):** Name the winner instantly.
-  *Example:* "Slack is the best team chat app for large orgs, period. But for small teams, Discord might be better."
-- **Option B (The Testing Story):** Start with the *scale* of your research.
-  *Example:* "We spent 40 hours testing every major AI writer. Only 3 passed our hallucination check."
-- **Option C (The 'One Thing' Filter):** Start with the single most important buying factor.
-  *Example:* "If you need X, you only have two real options: A and B. Everything else is a compromise."
+**DYNAMIC STARTING STYLES (Pick ONE randomly):**
+- **The "Anti-Persona" Hook:** Identify who the 'best' tool will actually frustrate.
+  *Example:* "If you have a team of 50+, do not buy [Top Tool]. You'll spend more time managing the permissions than actually using the software. For that scale, you need something that handles [Specific Enterprise Feature] differently."
+- **The "Budget Realist" Hook:** Start with the price-to-value gap.
+  *Example:* "There is no reason to pay $200/month for [Tool A] if you only need it for [Specific Small Task]. I’ve found that [Tool B] does that one thing just as well for a fraction of the cost."
+- **The "Specific Glitch" Hook:** Start with a frustration you found during a deep-dive test.
+  *Example:* "I tried to run a [Specific Workflow] through [Tool A] and it crashed three times in a row. It’s a great tool for [Other Task], but it’s clearly not built for [This Task] yet."
 
 **NEGATIVE CONSTRAINTS:**
-- NO "Choosing the right tool is hard".
-- NO "There are many options on the market".
-- NO generic summaries. Be specific.
+- NO "Choosing the right tool is a journey."
+- NO "Top 10 Best [Topic] in 2025."
+- NO "Our expert team has evaluated..."
 `,
 
   howto: `
-GOAL: Write an "Efficiency Promise" intro.
-The user wants to do the task *fast* and without *errors*.
+GOAL: Write an "In-the-Trenches" opening.
+Start at the moment of peak frustration—the point where most people give up.
 
-**THE INGREDIENTS (You must mix these dynamically):**
-1. **The Efficiency Mechanism:** What is the "secret sauce" or specific method? (e.g. "Using the XYZ shortcut").
-2. **The Result/Benefit:** "This saves 2 hours" or "This prevents the common crash error".
-3. **The Ease of Access:** "You don't need expert skills, just..."
-
-**DYNAMIC RULES (Do NOT use the same formula every time):**
-- **Option A (The Shortcut):** Start with the trick that makes it easy.
-  *Example:* "You don't need Photoshop to remove backgrounds. The fastest way is actually using..."
-- **Option B (The 'Stop Doing It Wrong' Angle):** Warn against the slow/bad way first.
-  *Example:* "Stop using the manual export function. It degrades quality. Instead, use the..."
-- **Option C (The Outcome First):** Describe the perfect end state.
-  *Example:* "To get a perfect standard deviation calculation, you need to set up your formula like this..."
+**DYNAMIC STARTING STYLES (Pick ONE randomly):**
+- **The "Specific Error" Hook:** Start with the exact error message or "stuck" point.
+  *Example:* "If you’re staring at a '[Specific Error Message]' or your [Tool] is just spinning, you’ve likely hit the [Specific Technical Limit]. Here is exactly how to bypass it without resetting everything."
+- **The "I Finally Figured It Out" Hook:** Start with the 'Aha' moment after a long period of failure.
+  *Example:* "I spent three hours trying to get [Action A] to sync with [Action B] before I realized I was looking at the wrong [Specific Setting]. Save yourself the time—here is the correct sequence."
+- **The "Zero-Fluff" Direct Start:** No intro. Just the first warning.
+  *Example:* "Before you even open [Software], make sure your [Specific Requirement] is set to [Value]. If you miss this, the rest of the steps won't work."
 
 **NEGATIVE CONSTRAINTS:**
-- NO "In this tutorial we will show you".
-- NO "Have you ever wanted to...".
-- NO false empathy ("We know it's frustrating").
+- NO "Have you ever wanted to learn how to..."
+- NO "In this guide, we will walk you through..."
+- NO "Getting started with [Topic] is easy."
 `
 }
 
@@ -262,7 +252,7 @@ I will provide you with TWO sets of research data:
 2. DEEP DIVE DATA - Specific gap-filling information we hunted down
 
 YOUR GOAL:
-Combine these into ONE comprehensive "Research Brief" that allows us to write a better article than all competitors combined.
+Combine these into ONE comprehensive "Research Brief" that allows us to write a better article than all competitors combined to dominate modern ai search for answer first intent.
 
 **KEYWORD: "${keyword}"**
 **ARTICLE TYPE: ${articleType.toUpperCase()}**
@@ -281,7 +271,7 @@ OUTPUT REQUIREMENTS (Return strict JSON):
 4. "step_sequence": (ONLY for how-to/tutorial articles) Extract step-by-step sequence.
 5. "prerequisites": (ONLY for how-to/tutorial articles) What the reader needs.
 6. "sources_summary": All sources used.
-7. "authority_links": Extract 3-5 HIGH-QUALITY, non-competitor URLs suitable for citation (e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news). These will be used as external links in the article.
+7. "authority_links": Extract 3-5 HIGH-QUALITY, non-competitor URLs suitable for citation (e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news, top tier publications website, and any informational blog site from the product niche). These will be used as external links in the article.
 
 JSON SCHEMA:
 {
@@ -765,21 +755,23 @@ ${linkInstruction}
 
 const generatePolishEditorPrompt = (draft: string, styleDNA: string, brandDetails: any = null) => `
 You are a Ruthless Direct-Response Copyeditor. 
-Your goal is to maximize **Readability** following strict EEAT principles.
+Your goal is to maximize **Readability** following EEAT principles.
 You hate "Walls of Text" and "AI Clichés".
 
 ### 1. THE DRAFT TO EDIT
 ${draft}
+### 2. THE "DO NO HARM" RULE (CRITICAL)
+If a paragraph or section already sounds human, variable, and authoritative, **LEAVE IT ALONE.** 
+Do not rewrite for the sake of rewriting. Only intervene if you see "Bot-Smoothing" (paragraphs that are all the same length) or "Fluff."
 
-### 2. STRICT FORMATTING RULES (The Law)
-1. **Passive Voice:** Avoid passive voice. Use active voice instead.
-2. **BREAK WALLS OF TEXT:** If a paragraph has more than 5-6 sentences, consider breaking it. But 2-4 sentence paragraphs are IDEAL.
-3. **GROUP RELATED IDEAS:** Don't make every sentence its own paragraph. Single-sentence paragraphs should be OCCASIONAL for emphasis, not the norm.
-4. **SCANNABILITY:** Ensure key takeaways are **bolded** but in limits, do not overdo it.
-5. **NO "GLUE" WORDS:** Remove fluff transitions like "In conclusion," "Furthermore," "It is important to note.", "Here's the truth", "Here's the deal", "Here comes", "Here's the catch". Just say what you mean.
-6. **AVOID CHOPPY WRITING:** If you see too many 1-sentence paragraphs in a row, COMBINE related ones into 2-3 sentence paragraphs for better flow.
+### 3. SURGICAL EDITING RULES
+1. **ASYSMMETRY CHECK:** Humans don't write 2-4 sentence paragraphs every time. Ensure there is a mix of 1-sentence punches, 4-sentence technical blocks, and 2-sentence observations. If it looks too "even," break the pattern.
+2. **ACTIVE VOICE:** Convert passive "It was found that..." to "I/We found that..."
+3. **LOGIC GAPS:** AI is too smooth. If a transition is too "perfect" (e.g., "Now that we've covered X, let's look at Y"), replace it with a direct jump or a technical bridge (e.g., "This leads directly to the problem of [Y]").
+4. **NO "GLUE" WORDS:** Delete: "In conclusion," "Furthermore," "Crucially," "It's important to note," "Think of it as," "Essentially."
+5. **THE SO-WHAT TEST:** Read every sentence. If it doesn't provide a specific fact, a technical detail, or a strong opinion, **DELETE IT.**
 
-### 3. BANNED "AI" PHRASES (Instant Deletion)
+### 4. BANNED "AI" PHRASES (Instant Deletion)
 If you see these patterns or anything from this vibe, rewrite the sentence immediately:
 - ❌ "That's where [X] comes in..."
 - ❌ "Whether you are [X] or [Y]..."
@@ -789,47 +781,23 @@ If you see these patterns or anything from this vibe, rewrite the sentence immed
 - ❌ "Let's dive in..."
 - ❌ "Magic happens..." / "Game-changer..."
 
-### 4. THE VOICE (Do NOT Violate)
-The brand's writing style:
-${styleDNA}.
+### 5. THE VOICE (Do NOT Violate), keep it consistent and unmodified as it is already following the brand voice.
 
 **CRITICAL:** Do NOT make it sound generic or "AI-generated". Preserve the unique flair, idioms, and formatting quirks.
 
 ${brandDetails ? `
-### 5. BRAND FREQUENCY AUDIT (MANDATORY - READ THE FULL ARTICLE)
+**STEP 1: THE BRAND SPAM TEST**
+- Max 4-5 mentions of "${brandDetails.product_name}" total. 
+- If the count is higher, replace with "the platform," "the system," or "our approach."
+- **NEVER** mention the brand in back-to-back paragraphs.
 
-**Brand Name:** ${brandDetails.product_name}
-
-**STEP 1: COUNT** - How many times does "${brandDetails.product_name}" appear in the draft?
-
-**STEP 2: EVALUATE**
-- **0-4 mentions:** Acceptable IF each is contextually justified (intro, comparison, CTA)
-- **5-7 mentions:** REVIEW each - keep only the most impactful ones
-- **8+ mentions:** CRITICAL - This reads like a sales pitch. REDUCE to 4-5 max.
-
-**STEP 3: REDUCE (if needed)**
-1. Keep the FIRST mention (intro/authority)
-2. Keep ONE mention in comparison/feature section (if exists)
-3. Keep the CTA mention at the end (if exists)
-4. Replace ALL others with "we/our tool/our platform/our approach"
-
-**STEP 4: CONSECUTIVE CHECK**
-If brand appears in back-to-back paragraphs or sections, REMOVE one occurrence.
-
-**THE SALES PITCH TEST:**
-Read the article aloud. Does it sound like an informative piece or a marketing brochure?
-If brochure → Reduce brand mentions. Add more educational value.
-
-### 6. BRAND PERSPECTIVE FIX
-- **When discussing Competitors:** It is OK to say "I tested X" or "Users report...".
-- **When discussing ${brandDetails.product_name} (Our Product):**
-  - **BAD:** "I tested ${brandDetails.product_name} and it was fast." (Sounds fake/cringe).
-  - **GOOD:** "We built ${brandDetails.product_name} to be fast." or "Our tool excels at..."
-  - **FIX:** Change any "I tested [Our Product]" to "We designed [Our Product]" or "Our tool".
+**STEP 2: PERSPECTIVE AUDIT**
+- **NEVER** say "I tested ${brandDetails.product_name}" or "${brandDetails.product_name} surprised me." (This sounds like a fake review).
+- **ALWAYS** use Founder/Builder perspective: "We designed ${brandDetails.product_name} to..." or "Our goal with ${brandDetails.product_name} was to solve..."
 ` : ""}
 
-### 7. OUTPUT
-Return the polished content in **Raw Markdown**. Do NOT use code blocks.
+### 6. OUTPUT
+Return the polished content in **Raw Markdown**. Do NOT use code blocks. No "Here is the edited version." No preamble. Just the content.
 `
 
 export const generateBlogPost = task({
@@ -1097,7 +1065,7 @@ export const generateBlogPost = task({
       phase = "polish"
 
       const polishPrompt = generatePolishEditorPrompt(currentDraft, styleDNA, brandDetails)
-      // Blueprint asks for Gemini 2.5 Pro (Advanced Reasoning).
+      // Blueprint asks for Gemini 3 flash preview (Advanced Reasoning).
       const polishConfig = {}
       const polishContents = [
         {
