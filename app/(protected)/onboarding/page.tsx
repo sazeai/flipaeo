@@ -305,8 +305,8 @@ export default function OnboardingPage() {
 
             // Proceed directly to competitor analysis
             setStep("competitors")
-            // Auto-start competitor analysis
-            handleAnalyzeCompetitors()
+            // Auto-start competitor analysis - pass brandId directly since state hasn't updated yet
+            handleAnalyzeCompetitors(res.brandId)
         } catch (e: any) {
             setError(e.message || "Failed to save brand details")
         } finally {
@@ -315,7 +315,7 @@ export default function OnboardingPage() {
     }
 
     // Competitor Analysis handler
-    const handleAnalyzeCompetitors = async () => {
+    const handleAnalyzeCompetitors = async (currentBrandId?: string) => {
         // URL is optional - we use brandContext for category-based competitor search
         if (!brandData) return
         setAnalyzingCompetitors(true)
@@ -339,9 +339,9 @@ export default function OnboardingPage() {
             localStorage.setItem(STORAGE_KEYS.COMPETITORS, JSON.stringify(data.competitors || []))
             localStorage.setItem(STORAGE_KEYS.COMPETITOR_SEEDS, JSON.stringify(data.seeds || []))
 
-            // Auto-proceed to plan generation
+            // Auto-proceed to plan generation - pass brandId directly
             setStep("plan")
-            handleGeneratePlan(data.seeds)
+            handleGeneratePlan(data.seeds, currentBrandId || brandId)
         } catch (e: any) {
             setError(e.message || "Failed to analyze competitors")
         } finally {
@@ -350,21 +350,24 @@ export default function OnboardingPage() {
     }
 
     // Content Plan Generation handler
-    const handleGeneratePlan = async (seeds: string[]) => {
+    const handleGeneratePlan = async (seeds: string[], currentBrandId?: string | null) => {
         if (!brandData || seeds.length === 0) return
         setGeneratingPlan(true)
         setError("")
+
+        // Use passed brandId or fall back to state
+        const effectiveBrandId = currentBrandId || brandId
         try {
             // Step 1: Sync sitemap to internal_links table (SYNCHRONOUS)
             // This waits for completion before proceeding to plan generation
             let existingContent: string[] = []
-            if (url && brandId) {
+            if (url && effectiveBrandId) {
                 try {
-                    console.log(`[Onboarding] Syncing sitemap to internal_links...`)
+                    console.log(`[Onboarding] Syncing sitemap to internal_links for brand: ${effectiveBrandId}...`)
 
                     // Import and call the synchronous server action
                     const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
-                    const syncResult = await syncSitemapToInternalLinksAction(url, brandId)
+                    const syncResult = await syncSitemapToInternalLinksAction(url, effectiveBrandId)
 
                     if (syncResult.success) {
                         existingContent = syncResult.titles
@@ -382,7 +385,7 @@ export default function OnboardingPage() {
             const res = await fetch("/api/generate-content-plan", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ seeds, brandData, brandId, existingContent }),
+                body: JSON.stringify({ seeds, brandData, brandId: effectiveBrandId, existingContent }),
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Failed to generate plan")
@@ -636,9 +639,8 @@ export default function OnboardingPage() {
         <div className="min-h-[80vh] flex flex-col items-center justify-center py-12 font-sans">
             {/* Show loading while checking access */}
             {isCheckingAccess ? (
-                <div className="flex items-center gap-2 text-stone-500">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Checking access...</span>
+                <div className="flex flex-col items-center gap-3 text-stone-500">
+                    <CustomSpinner className="w-10 h-10" />
                 </div>
             ) : (
                 <>
@@ -724,7 +726,7 @@ export default function OnboardingPage() {
                                                 <div className="flex items-center justify-between">
                                                     <div>
                                                         <h2 className={`text-lg font-bold text-stone-900`}>Review Brand Details</h2>
-                                                        <p className={`text-xs text-stone-500`}>Verify extracted information</p>
+                                                        <p className={`text-xs text-stone-500`}>We recommend adding more detailed brand data to get better and accurate articles later</p>
                                                     </div>
 
                                                 </div>
@@ -1154,7 +1156,7 @@ export default function OnboardingPage() {
                                                             <button
                                                                 key={site.siteUrl}
                                                                 onClick={() => setSelectedSite(site.siteUrl)}
-                                                                className={`w-full p-3 flex items-center gap-3 text-left transition-all ${selectedSite === site.siteUrl
+                                                                className={`cursor-pointer w-full p-3 flex items-center gap-3 text-left transition-all ${selectedSite === site.siteUrl
                                                                     ? 'bg-stone-200'
                                                                     : 'hover:bg-stone-100'
                                                                     }`}

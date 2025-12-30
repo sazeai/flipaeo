@@ -11,13 +11,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
+        // Use maybeSingle() to gracefully handle users with no brand
         const { data: brand } = await supabase
             .from("brand_details")
             .select("id")
             .eq("user_id", user.id)
+            .is("deleted_at", null)
             .order("created_at", { ascending: false })
             .limit(1)
-            .single()
+            .maybeSingle()
 
         return NextResponse.json({
             brandId: brand?.id || null,

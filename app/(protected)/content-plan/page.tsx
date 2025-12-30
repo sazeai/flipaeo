@@ -137,6 +137,13 @@ export default function ContentPlanPage() {
         fetchPlan()
     }, [])
 
+    // Handle redirect when no plan exists (must be in useEffect, not render)
+    useEffect(() => {
+        if (!loading && !plan) {
+            router.replace("/onboarding")
+        }
+    }, [loading, plan, router])
+
     const fetchPlan = async () => {
         try {
             const res = await fetch("/api/content-plan")
@@ -359,9 +366,9 @@ export default function ContentPlanPage() {
         )
     }
 
+
     if (!plan) {
-        // Auto-redirect to onboarding if there's no content plan
-        router.replace("/onboarding")
+        // Redirect is handled by useEffect above, show spinner while redirecting
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <CustomSpinner className="w-10 h-10" />

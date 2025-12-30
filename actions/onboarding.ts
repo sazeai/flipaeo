@@ -72,14 +72,14 @@ export async function getExistingBrandForResume(): Promise<{
         return { hasBrand: false }
     }
 
-    // Get the user's brand (if any)
+    // Get the user's brand (if any) - use maybeSingle to gracefully handle no brand
     const { data: brand } = await supabase
         .from("brand_details")
         .select("id, website_url, brand_data")
         .eq("user_id", user.id)
         .is("deleted_at", null)
         .limit(1)
-        .single()
+        .maybeSingle()
 
     if (!brand) {
         return { hasBrand: false }

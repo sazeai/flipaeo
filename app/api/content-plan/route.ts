@@ -12,16 +12,24 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
+        // Use maybeSingle() to gracefully handle "no rows" case
+        // .single() throws an error when no rows exist, .maybeSingle() returns null
         const { data: plan, error } = await supabase
             .from("content_plans")
             .select("*")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
             .limit(1)
-            .single()
+            .maybeSingle()
 
-        if (error && error.code !== "PGSQL_NO_ROWS_RETURNED") {
+        if (error) {
+            console.error("[content-plan] Error fetching plan:", error)
             return NextResponse.json({ error: error.message }, { status: 500 })
+        }
+
+        // No plan exists - return null with 200 status (not an error)
+        if (!plan) {
+            return NextResponse.json(null)
         }
 
         // --- STATUS RECONCILIATION LOGIC ---

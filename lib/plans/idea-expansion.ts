@@ -13,9 +13,7 @@ import { BrandDetails } from "@/lib/schemas/brand"
 export async function expandIdeaUniverse(brandData: BrandDetails): Promise<string[]> {
     const client = getGeminiClient()
 
-    const prompt = `You are NOT creating a content plan.
-
-Your job is to expand the IDEA UNIVERSE for this product.
+    const prompt = `You are expanding the IDEA UNIVERSE for this product in terms of USE CASES.
 
 ## PRODUCT CONTEXT
 Product: ${brandData.product_name}
@@ -24,27 +22,31 @@ Target audience: ${brandData.audience.primary}
 Core problem solved: ${brandData.product_identity.emotionally}
 
 ## TASK
-List the broader problems, life situations, goals, and contexts where this audience exists —
-even if the product is NOT the direct solution.
+List the use cases/idea universes where this audience exists AND where this product can NATURALLY help.
+## WHAT IS A USE CASE?
+A use case = [PRODUCT OUTPUT] for [SPECIFIC USER/PLATFORM/PURPOSE]
+Pattern categories:
+- Platform-specific: "[Output] for LinkedIn/Instagram/Tinder/Website"
+- User-specific: "[Output] for job seekers/freelancers/business owners"
+- Purpose-specific: "[Output] for resumes/portfolios/marketing/dating"
 
 Think in terms of:
-- What happens in their life BEFORE they need this product?
-- What happens AFTER they've used it successfully?
-- Life moments and emotional drivers
-- Adjacent goals and workflows
-- Long-term outcomes they care about
-- Situations before and after the product is needed
+- When would someone NEED what this product provides?
+- What life moments trigger the need for this product?
+- What goals is this product a stepping stone toward?
+- What happens BEFORE and AFTER they use this product?
+
+## CRITICAL RULE (MANDATORY)
+EVERY domain you list must have a NATURAL connection to what the product ACTUALLY does.
 
 ## RULES
-- Do NOT output keywords
-- Do NOT output article titles
-- Do NOT think about SEO
-- Do NOT limit yourself to the product features
-- Each item must be conceptually distinct
+- Each domain must pass the test: "Would someone in this situation/niche/domain realistically search for THIS product?"
+- Do NOT output keywords or article titles
 - Short, clear phrases only (3-8 words each)
+- 10-12 domains maximum (quality over quantity)
 
 ## OUTPUT
-Return a simple list of 12-15 distinct problem domains.`
+Return a simple list of 10-12 distinct, PRODUCT-RELEVANT use-cases/domain.`
 
     try {
         const response = await client.models.generateContent({

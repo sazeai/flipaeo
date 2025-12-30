@@ -533,23 +533,24 @@ export async function POST(req: NextRequest) {
             scheduledDate.setDate(today.getDate() + index)
 
             // Find the matching cluster using the exact GSC query
-            let matchingCluster = clusters.find(c => c.primary_keyword === item.gsc_query)
+            const gscQuery = item.gsc_query || ""
+            let matchingCluster = clusters.find(c => c.primary_keyword === gscQuery)
 
             // Fallback 1: Case-insensitive match
-            if (!matchingCluster) {
-                matchingCluster = clusters.find(c => c.primary_keyword.toLowerCase().trim() === item.gsc_query.toLowerCase().trim())
+            if (!matchingCluster && gscQuery) {
+                matchingCluster = clusters.find(c => c.primary_keyword.toLowerCase().trim() === gscQuery.toLowerCase().trim())
             }
 
             // Fallback 2: Substring match (if LLM modified query slightly)
-            if (!matchingCluster) {
+            if (!matchingCluster && gscQuery) {
                 // Be tighter with substring matching to avoid bad associations
                 matchingCluster = clusters.find(c =>
-                    item.gsc_query.toLowerCase().includes(c.primary_keyword.toLowerCase()) && c.primary_keyword.length > 5
+                    gscQuery.toLowerCase().includes(c.primary_keyword.toLowerCase()) && c.primary_keyword.length > 5
                 )
             }
 
             // Use target_keyword if provided, otherwise fall back to gsc_query
-            const mainKeyword = item.target_keyword || item.gsc_query
+            const mainKeyword = item.target_keyword || gscQuery || item.title
 
             return {
                 id: `gsc-plan-${Date.now()}-${index}`,

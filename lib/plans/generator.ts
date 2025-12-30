@@ -126,21 +126,37 @@ Focus: ${config.prompt}`
     // Format idea universe with coverage if available
     const ideaUniverseSection = ideaUniverse.length > 0
         ? `
-## IDEA UNIVERSE WITH COMPETITOR VALIDATION (READ FIRST - CRITICAL)
+## AUDIENCE COVERAGE CONTEXT (WHERE YOUR USERS LIVE)
 
-These represent the broader problem spaces the audience lives in.
-Competitor coverage indicates saturation level:
-- 🟢 [NONE] = Untapped opportunity, PRIORITIZE these
-- 🟡 [LIGHT] = Partial coverage, good opportunity
-- 🔴 [HEAVY] = Crowded, only for comparisons/edge cases
+These are BROAD LIFE SITUATIONS where your target audience exists.
+They are NOT keywords. They are NOT article titles. They are CONTEXT for your creative ideation.
 
+YOUR JOB: For each coverage area, THINK:
+"What would a REAL PERSON in this situation ACTUALLY TYPE into Google?"
+
+Coverage Areas (with competitor saturation):
 ${formatIdeaUniverseWithCoverage(ideaUniverse, ideaCoverageMap)}
 
-**RULES:**
-- PRIORITIZE domains marked NONE or LIGHT
-- AVOID creating core articles in HEAVY domains
-- Heavy domains allowed ONLY for: comparisons, edge cases, contrarian angles, expansions
-- Think BEYOND the product — what else does this audience care about?
+CRITICAL RULES:
+- 🟢 [NONE] = Untapped opportunity, PRIORITIZE these
+- 🟡 [LIGHT] = Partial coverage, good opportunity  
+- 🔴 [HEAVY] = Crowded, only for comparisons/edge cases
+
+DO NOT create articles titled after these domains directly.
+DO create articles that answer REAL QUESTIONS people in these domains would search.
+
+SKIP RULE (MANDATORY):
+If a coverage area does NOT naturally connect to the product, SKIP IT entirely.
+Do NOT force irrelevant connections. Not every domain needs to be covered.
+
+Example: If product is "AI Headshot Generator":
+- "Starting a new business venture" → SKIP (logos are not headshots)
+- "Creating marketing materials" → SKIP (not relevant to headshots)
+- "Job search and career advancement" → COVER ("Should I use AI headshot for LinkedIn?")
+
+WRONG (Forced irrelevant coverage):
+- "Should Your New Business Logo Use AI?" ← Product makes headshots, NOT logos!
+- "AI Marketing Photo License Guide" ← Random, not connected
 `
         : ""
 
@@ -184,7 +200,6 @@ PRIORITIZE these question patterns:
 DEPRIORITIZE these patterns:
 - "What is X?" (Only 1-2 if truly foundational)
 - "Why X is cool/amazing" (Low citation value)
-- "5 ways X can help you" (List fluff)
 - "The future of X" (Speculative, not actionable)
 
 ---
