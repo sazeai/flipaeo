@@ -855,9 +855,18 @@ export const generateBlogPost = task({
       let internalLinks: any[] = []
 
       if (userId) {
-        console.log(`🔗 Searching for internal links for user ${userId} and brand ${brandId}...`)
+        console.log(`🔗 [DEBUG] Searching for internal links...`)
+        console.log(`🔗 [DEBUG] userId: ${userId}, brandId: ${brandId}`)
+        console.log(`🔗 [DEBUG] Search query: "${title || keyword}"`)
         internalLinks = await getRelevantInternalLinks(title || keyword, keyword, userId, brandId)
-        console.log(`🔗 Found ${internalLinks.length} relevant internal links.`)
+        console.log(`🔗 [DEBUG] Found ${internalLinks.length} relevant internal links`)
+        if (internalLinks.length > 0) {
+          console.log(`🔗 [DEBUG] Internal links:`, JSON.stringify(internalLinks.slice(0, 3)))
+        } else {
+          console.log(`🔗 [DEBUG] No internal links found - check if internal_links table has data with embeddings for this brand`)
+        }
+      } else {
+        console.log(`🔗 [DEBUG] No userId found for article ${articleId} - skipping internal links`)
       }
 
       // --- PHASE 2: RESEARCH (Deep Research - 2-Phase Tavily + Critic) ---
@@ -905,6 +914,14 @@ export const generateBlogPost = task({
         authority_links: filterAuthorityLinks(competitorData.authority_links || [])
       }
 
+      console.log(`🔗 [DEBUG] External authority links BEFORE filter: ${competitorData.authority_links?.length || 0}`)
+      console.log(`🔗 [DEBUG] External authority links AFTER filter: ${cleanedCompetitorData.authority_links?.length || 0}`)
+      if (cleanedCompetitorData.authority_links?.length > 0) {
+        console.log(`🔗 [DEBUG] Authority links passed to outline:`, JSON.stringify(cleanedCompetitorData.authority_links.slice(0, 3)))
+      } else {
+        console.log(`🔗 [DEBUG] No external authority links available for outline`)
+      }
+
       const outlinePrompt = generateOutlineSystemPrompt(keyword, styleDNA, cleanedCompetitorData, articleType, brandDetails, title, internalLinks)
       const outlineConfig = {}
       const outlineContents = [
@@ -927,6 +944,16 @@ export const generateBlogPost = task({
 
       // Use self-correcting parser for Zod validation with retry
       const outline = await cleanParseAndValidate(outlineText, ArticleOutlineSchema, genAI)
+
+      // DEBUG: Check if LLM assigned external links to sections
+      const sectionsWithExternalLinks = outline.sections.filter((s: any) => s.external_link)
+      console.log(`🔗 [DEBUG] Outline parsed - ${outline.sections.length} sections`)
+      console.log(`🔗 [DEBUG] Sections with external_link assigned: ${sectionsWithExternalLinks.length}`)
+      if (sectionsWithExternalLinks.length > 0) {
+        console.log(`🔗 [DEBUG] External links in outline:`, JSON.stringify(sectionsWithExternalLinks.map((s: any) => ({ heading: s.heading, external_link: s.external_link }))))
+      } else {
+        console.log(`🔗 [DEBUG] LLM did NOT assign any external_link to sections - prompt may need adjustment`)
+      }
 
       // Use user's chosen title if provided, otherwise use AI-generated title
       const finalTitle = title || outline.title
