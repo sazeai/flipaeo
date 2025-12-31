@@ -12,7 +12,6 @@ import { randomUUID } from "crypto"
 import { jsonrepair } from "jsonrepair"
 import { ArticleType } from "@/lib/prompts/article-types"
 import { getArticleStrategy } from "@/lib/prompts/strategies"
-import { getFormalityDefinition, getPerspectiveDefinition } from "@/lib/prompts/voice-definitions"
 import { getCurrentDateContext } from "@/lib/utils/date-context"
 import { getRelevantInternalLinks } from "@/lib/internal-linking"
 import { saveTopicMemory } from "@/lib/topic-memory"
@@ -134,7 +133,6 @@ const AUTHENTIC_WRITING_RULES = `
 17. **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
 `
 
-// Type-specific intro templates
 // Type-specific intro templates (V3: The "Pattern-Breaker" Edition)
 const INTRO_TEMPLATES: Record<string, string> = {
   informational: `
@@ -252,7 +250,7 @@ I will provide you with TWO sets of research data:
 2. DEEP DIVE DATA - Specific gap-filling information we hunted down
 
 YOUR GOAL:
-Combine these into ONE comprehensive "Research Brief" that allows us to write a better article than all competitors combined to dominate modern ai search for answer first intent.
+Combine these into ONE comprehensive "Detailed Research Brief" that allows us to write a better article than all competitors combined to dominate modern ai search for answer first intent.
 
 **KEYWORD: "${keyword}"**
 **ARTICLE TYPE: ${articleType.toUpperCase()}**
@@ -438,9 +436,6 @@ const generateOutlineSystemPrompt = (keyword: string, styleDNA: any, competitorD
 You are an expert Content Architect and SEO Strategist.
 Your goal is to outline a high-ranking blog post that beats the competition by filling their "Content Gaps".
 
-**CRITICAL RULE: RELEVANCE OVER LENGTH.**
-Do not fluff the outline. Only include sections that are really necessary.
-
 **ARTICLE TYPE: ${articleType.toUpperCase()}**
 
 INPUT CONTEXT:
@@ -450,11 +445,12 @@ ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
 - Brand: ${brandDetails.product_name}
 - Type: ${brandDetails.product_identity?.literally || 'Product/Service'}
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
+- Features: ${brandDetails.features?.join(', ') || 'N/A'}
 
-NOTE: Use this for VOICE consistency. The article should primarily EDUCATE, not promote.
-Plan brand mentions sparingly - only where contextually valuable (intro, comparison, CTA).
+NOTE: UAe this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question in best way possible.
+Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors.
 3. Don't just list competitors - explain why YOUR approach is different/better
-4. Strategic mentions: intro (establish authority), comparison (differentiate), steps (integrate your solution), CTA (call to action)
+4. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, it must earn its place naturally and strategically, nothim is random here, evrything needs to be planned.
 ` : ''}
 ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-2 MAX)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
 
