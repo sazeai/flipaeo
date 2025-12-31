@@ -52,7 +52,7 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.1",
     "@tavily/core": "^0.5.13",
-    "@trigger.dev/sdk": "4.3.0",
+    "@trigger.dev/sdk": "^4.3.1",
     "@upstash/qstash": "^2.8.3",
     "@upstash/ratelimit": "^2.0.6",
     "@upstash/redis": "^1.35.3",
@@ -102,7 +102,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
-    "@trigger.dev/build": "4.3.0",
+    "@trigger.dev/build": "^4.3.1",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
