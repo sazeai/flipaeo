@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, useCallback } from "react"
+import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import { createClient } from "@/utils/supabase/client"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -31,7 +31,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { marked } from "marked"
-import { ChevronDown, FileText as FileTextIcon, Type } from "lucide-react"
+import { ChevronDown, FileText as FileTextIcon, Type, Highlighter } from "lucide-react"
+import Mark from "mark.js"
 
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false })
@@ -50,6 +51,7 @@ type Article = {
     meta_description?: string | null
     slug?: string | null
     featured_image_url?: string | null
+    supporting_keywords?: string[] | null
 }
 
 /**
@@ -84,6 +86,8 @@ export default function ArticleDetailPage() {
     const [activeTab, setActiveTab] = useState<string>("editor")
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
     const [isCopied, setIsCopied] = useState(false)
+    const [highlightKeywords, setHighlightKeywords] = useState(false)
+    const editorContainerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!id) return
@@ -400,6 +404,50 @@ export default function ArticleDetailPage() {
         }
     }, [editorData, article?.raw_content, article?.keyword, countSyllables, extractPlainText])
 
+    // Keyword highlighting with Mark.js (debounced for performance)
+    useEffect(() => {
+        if (!editorContainerRef.current || !article?.keyword) return
+
+        const markInstance = new Mark(editorContainerRef.current)
+
+        // Debounce to prevent excessive reflows during typing
+        const timeoutId = setTimeout(() => {
+            // Always unmark first
+            markInstance.unmark({
+                done: () => {
+                    if (highlightKeywords) {
+                        console.log('[Highlight] Main keyword:', article.keyword)
+                        console.log('[Highlight] Supporting keywords:', article.supporting_keywords)
+
+                        // 1. Mark MAIN keyword - Yellow (using 'partially' for better matching)
+                        markInstance.mark(article.keyword, {
+                            className: 'keyword-highlight-main',
+                            separateWordSearch: true,
+                            caseSensitive: false
+                        })
+
+                        // 2. Mark SUPPORTING keywords - Blue
+                        const supportingKeywords = article.supporting_keywords || []
+
+                        supportingKeywords.forEach((kw) => {
+                            // Skip if it's the same as main keyword
+                            if (kw.toLowerCase() === article.keyword.toLowerCase()) return
+
+                            markInstance.mark(kw, {
+                                className: 'keyword-highlight-supporting',
+                                separateWordSearch: false,
+                                caseSensitive: false,
+                                accuracy: 'partially'
+                            })
+                        })
+                    }
+                }
+            })
+        }, 300)
+
+        return () => clearTimeout(timeoutId)
+    }, [highlightKeywords, editorData, article?.keyword, article?.supporting_keywords])
+
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -432,27 +480,7 @@ export default function ArticleDetailPage() {
             </div>
             <ScrollArea className="flex-1">
                 <div className="p-4 space-y-6">
-                    {/* Status Card */}
-                    <div className="space-y-3">
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</p>
-                        <div className="flex items-center gap-2">
-                            {article.status === 'completed' ? (
-                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
-                                    <CheckCircle2 className="w-3 h-3" /> Completed
-                                </Badge>
-                            ) : article.status === 'failed' ? (
-                                <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
-                                    <AlertCircle className="w-3 h-3" /> Failed
-                                </Badge>
-                            ) : (
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1">
-                                    <Loader2 className="w-3 h-3 animate-spin" /> {article.status}
-                                </Badge>
-                            )}
-                        </div>
-                    </div>
 
-                    <Separator />
 
                     {/* Stats Grid */}
                     <div className="space-y-3">
@@ -479,8 +507,8 @@ export default function ArticleDetailPage() {
                                 <Badge
                                     variant="outline"
                                     className={`text-xs ${stats.readabilityScore >= 50 ? 'bg-green-50 text-green-700 border-green-200' :
-                                            stats.readabilityScore >= 30 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                                'bg-red-50 text-red-700 border-red-200'
+                                        stats.readabilityScore >= 30 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                            'bg-red-50 text-red-700 border-red-200'
                                         }`}
                                 >
                                     {stats.readabilityLabel}
@@ -493,8 +521,8 @@ export default function ArticleDetailPage() {
                             <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                 <div
                                     className={`h-full rounded-full transition-all ${stats.readabilityScore >= 50 ? 'bg-green-500' :
-                                            stats.readabilityScore >= 30 ? 'bg-yellow-500' :
-                                                'bg-red-500'
+                                        stats.readabilityScore >= 30 ? 'bg-yellow-500' :
+                                            'bg-red-500'
                                         }`}
                                     style={{ width: `${stats.readabilityScore}%` }}
                                 />
@@ -522,6 +550,25 @@ export default function ArticleDetailPage() {
                                 <span className="text-xs text-gray-400 mb-0.5">of content</span>
                             </div>
                         </div>
+
+                        {/* Keyword Highlighting Toggle */}
+                        <button
+                            onClick={() => setHighlightKeywords(!highlightKeywords)}
+                            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${highlightKeywords
+                                ? 'bg-yellow-50 border-yellow-300 text-yellow-800'
+                                : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Highlighter className={`w-4 h-4 ${highlightKeywords ? 'text-yellow-600' : 'text-gray-400'}`} />
+                                <span className="text-xs font-medium">Highlight Keywords</span>
+                            </div>
+                            <div className={`w-8 h-4 rounded-full transition-all ${highlightKeywords ? 'bg-yellow-400' : 'bg-gray-300'
+                                }`}>
+                                <div className={`w-3 h-3 bg-white rounded-full shadow-sm transition-all transform mt-0.5 ${highlightKeywords ? 'translate-x-4' : 'translate-x-0.5'
+                                    }`} />
+                            </div>
+                        </button>
                     </div>
 
                     <Separator />
@@ -744,11 +791,13 @@ export default function ArticleDetailPage() {
                                                 </div>
                                             )}
 
-                                            <Editor
-                                                markdown={article.raw_content || ""}
-                                                readOnly={false}
-                                                onChange={handleEditorChange}
-                                            />
+                                            <div ref={editorContainerRef}>
+                                                <Editor
+                                                    markdown={article.raw_content || ""}
+                                                    readOnly={false}
+                                                    onChange={handleEditorChange}
+                                                />
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-8 py-12">

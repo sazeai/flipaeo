@@ -93,7 +93,7 @@ export function AppSidebar({
 
   const navItems = React.useMemo(() => [
     {
-      title: "Dashboard",
+      title: "Content Plan",
       url: "/content-plan",
       icon: NotebookPen,
       isActive: true,
@@ -113,11 +113,7 @@ export function AppSidebar({
       url: "/integrations",
       icon: DatabaseZap,
     },
-    {
-      title: "Content Plan",
-      url: "/content-plan",
-      icon: Brain,
-    },
+
 
   ], [])
 

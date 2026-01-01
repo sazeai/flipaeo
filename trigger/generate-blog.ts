@@ -120,7 +120,7 @@ const AUTHENTIC_WRITING_RULES = `
 
 - **ENTITY DENSITY:** Prioritize specific Named Entities over general nouns.
 - *Bad:* "Use a fast Javascript framework." -> *Good:* "Use **Next.js 14** or **Astro**."
-- **THE "UNIQUE DATA" INJECTION:** Every section must cite a specific number, benchmark, or law. If proprietary data isn't available, cite an industry benchmark.
+- **THE "UNIQUE DATA" INJECTION:** Every section must cite a specific number, benchmark, or law. If proprietary data isn't available.
 - **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" is better than "saves time."
 - **DEFINITION OWNERSHIP:** When defining a term, use this syntax: *"[Term] is [Definition] that helps [Audience] achieve [Outcome]."*
 - **ADMIT LIMITATIONS (THE "HARD TRUTH"):** Every SaaS/Strategy has a catch. Mention it.
@@ -862,7 +862,7 @@ export const generateBlogPost = task({
       }
 
       // --- PHASE 2: RESEARCH (Deep Research - 2-Phase Tavily + Critic) ---
-      await supabase.from("articles").update({ status: "researching" }).eq("id", articleId)
+      await supabase.from("articles").update({ status: "researching", supporting_keywords: supportingKeywords }).eq("id", articleId)
       phase = "research"
 
       // Use the 2-phase deep research: Broad Search → Critic Gap Analysis → Sniper Search → Synthesis
