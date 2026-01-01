@@ -515,7 +515,7 @@ export default function ContentPlanPage() {
 
                             <button
                                 onClick={() => handleStartEdit(item)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-stone-100 rounded-md text-stone-400 hover:text-stone-600"
+                                className="opacity-100 group-hover:opacity-80 transition-opacity p-1.5 hover:bg-stone-100 rounded-md text-stone-400 hover:text-stone-600"
                             >
                                 <Edit2 className="w-3.5 h-3.5" />
                             </button>

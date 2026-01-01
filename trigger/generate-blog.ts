@@ -772,52 +772,7 @@ ${linkInstruction}
 `
 }
 
-const generatePolishEditorPrompt = (draft: string, styleDNA: string, brandDetails: any = null) => `
-You are a Ruthless Direct-Response Copyeditor. 
-Your goal is to maximize **Readability** following EEAT principles.
-You hate "Walls of Text" and "AI Clichés".
 
-### 1. THE DRAFT TO EDIT
-${draft}
-### 2. THE "DO NO HARM" RULE (CRITICAL)
-If a paragraph or section already sounds human, variable, and authoritative, **LEAVE IT ALONE.** 
-Do not rewrite for the sake of rewriting. Only intervene if you see "Bot-Smoothing" (paragraphs that are all the same length) or "Fluff."
-
-### 3. SURGICAL EDITING RULES
-1. **ASYSMMETRY CHECK:** Humans don't write 2-4 sentence paragraphs every time. Ensure there is a mix of 1-sentence punches, 4-sentence technical blocks, and 2-sentence observations. If it looks too "even," break the pattern.
-2. **ACTIVE VOICE:** Convert passive "It was found that..." to "I/We found that..."
-3. **LOGIC GAPS:** AI is too smooth. If a transition is too "perfect" (e.g., "Now that we've covered X, let's look at Y"), replace it with a direct jump or a technical bridge (e.g., "This leads directly to the problem of [Y]").
-4. **NO "GLUE" WORDS:** Delete: "In conclusion," "Furthermore," "Crucially," "It's important to note," "Think of it as," "Essentially."
-5. **THE SO-WHAT TEST:** Read every sentence. If it doesn't provide a specific fact, a technical detail, or a strong opinion, **DELETE IT.**
-
-### 4. BANNED "AI" PHRASES (Instant Deletion)
-If you see these patterns or anything from this vibe, rewrite the sentence immediately:
-- ❌ "That's where [X] comes in..."
-- ❌ "Whether you are [X] or [Y]..."
-- ❌ "In this digital landscape..."
-- ❌ "Unlock / Unleash / Elevate..."
-- ❌ "It sounds counterintuitive, but..."
-- ❌ "Let's dive in..."
-- ❌ "Magic happens..." / "Game-changer..."
-
-### 5. THE VOICE (Do NOT Violate), keep it consistent and unmodified as it is already following the brand voice.
-
-**CRITICAL:** Do NOT make it sound generic or "AI-generated". Preserve the unique flair, idioms, and formatting quirks.
-
-${brandDetails ? `
-**STEP 1: THE BRAND SPAM TEST**
-- Max 4-5 mentions of "${brandDetails.product_name}" total. 
-- If the count is higher, replace with "the platform," "the system," or "our approach."
-- **NEVER** mention the brand in back-to-back paragraphs.
-
-**STEP 2: PERSPECTIVE AUDIT**
-- **NEVER** say "I tested ${brandDetails.product_name}" or "${brandDetails.product_name} surprised me." (This sounds like a fake review).
-- **ALWAYS** use Founder/Builder perspective: "We designed ${brandDetails.product_name} to..." or "Our goal with ${brandDetails.product_name} was to solve..."
-` : ""}
-
-### 6. OUTPUT
-Return the polished content in **Raw Markdown**. Do NOT use code blocks. No "Here is the edited version." No preamble. Just the content.
-`
 
 export const generateBlogPost = task({
   id: "generate-blog-post",
@@ -1116,35 +1071,16 @@ CRITICAL EXECUTION RULES:
         await new Promise(r => setTimeout(r, 500))
       }
 
-      // --- PHASE 5: POLISH (The "Humanizer") ---
-      await supabase.from("articles").update({ status: "polishing" }).eq("id", articleId)
-      phase = "polish"
 
-      const polishPrompt = generatePolishEditorPrompt(currentDraft, styleDNA, brandDetails)
-      // Blueprint asks for Gemini 3 flash preview (Advanced Reasoning).
-      const polishConfig = {}
-      const polishContents = [
-        {
-          role: "user",
-          parts: [{ text: polishPrompt }],
-        },
-      ]
+      // --- PHASE 5: FINALIZE (Direct HTML Conversion - No AI Polish) ---
+      // NOTE: We skip the AI polish step to prevent "regression to the mean" where
+      // the polish agent normalizes unique writing style, undoing the burstiness
+      // from Phase 4. Also prevents hallucination risk from large context edits.
 
-      const polishStream = await genAI.models.generateContentStream({
-        model: "gemini-3-flash-preview",
-        config: polishConfig,
-        contents: polishContents
-      })
+      // Use currentDraft directly - it's already clean Markdown from Phase 4
+      const finalMarkdown = currentDraft
 
-      let polishText = ""
-      for await (const c of polishStream) {
-        polishText += (c as any).text || ""
-      }
-
-      const finalMarkdown = polishText.replace(/```markdown/g, "").replace(/```/g, "")
-
-      // We used to store final_html here, but we are moving to client-side rendering/on-the-fly rendering
-      // However, keeping it for now as a cache for the public blog view.
+      // Convert Markdown to HTML for public blog view cache
       const finalHtml = await marked.parse(finalMarkdown)
 
       // --- PHASE 6: SEO META GENERATION ---
