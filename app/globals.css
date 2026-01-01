@@ -1183,7 +1183,7 @@ input[type="range"].slider::-moz-range-thumb {
 
 /* Main keyword - Yellow */
 mark.keyword-highlight-main {
-  background: rgba(220, 213, 133, 0.524);
+  background: rgba(238, 230, 144, 0.669);
   padding: 0.05em 0.15em;
   border-radius: 2px;
   color: inherit;

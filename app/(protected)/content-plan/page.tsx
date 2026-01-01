@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
@@ -394,16 +394,15 @@ export default function ContentPlanPage() {
             >
                 {/* --- Edit Mode --- */}
                 {isEditing ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                         <div>
                             <label className="text-[10px] text-stone-400 font-medium uppercase mb-1 block">Title</label>
                             <input
                                 type="text"
-                                value={editForm.title || ""}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                                defaultValue={editForm.title || ""}
+                                onBlur={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
                                 className="w-full px-3 py-2 text-sm font-medium bg-transparent border rounded-md focus:outline-none focus:ring-2 focus:ring-stone-900/10"
                                 placeholder="Article Title"
-                                autoFocus
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
@@ -411,8 +410,8 @@ export default function ContentPlanPage() {
                                 <label className="text-[10px] text-stone-400 font-medium uppercase mb-1 block">Target Keyword</label>
                                 <input
                                     type="text"
-                                    value={editForm.main_keyword || ""}
-                                    onChange={(e) => setEditForm(prev => ({ ...prev, main_keyword: e.target.value }))}
+                                    defaultValue={editForm.main_keyword || ""}
+                                    onBlur={(e) => setEditForm(prev => ({ ...prev, main_keyword: e.target.value }))}
                                     className="w-full px-3 py-2 text-xs bg-transparent border rounded-md"
                                     placeholder="Target Keyword"
                                 />
@@ -420,7 +419,7 @@ export default function ContentPlanPage() {
                             <div>
                                 <label className="text-[10px] text-stone-400 font-medium uppercase mb-1 block">Article Type</label>
                                 <select
-                                    value={editForm.article_type || "informational"}
+                                    defaultValue={editForm.article_type || "informational"}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, article_type: e.target.value as any }))}
                                     className="w-full px-3 py-2 text-xs bg-transparent border rounded-md"
                                 >
@@ -433,8 +432,8 @@ export default function ContentPlanPage() {
                         <div>
                             <label className="text-[10px] text-stone-400 font-medium uppercase mb-1 block">Supporting Keywords</label>
                             <textarea
-                                value={(editForm.supporting_keywords || []).join(", ")}
-                                onChange={(e) => setEditForm(prev => ({
+                                defaultValue={(editForm.supporting_keywords || []).join(", ")}
+                                onBlur={(e) => setEditForm(prev => ({
                                     ...prev,
                                     supporting_keywords: e.target.value.split(",").map(k => k.trim()).filter(k => k.length > 0)
                                 }))}

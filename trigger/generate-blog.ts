@@ -103,7 +103,7 @@ const AUTHENTIC_WRITING_RULES = `
 
 - **THE "ANSWER-FIRST" PROTOCOL:** The FIRST sentence under every H2 header must be a direct, standalone answer to the header's premise. (e.g., If H2 is "What is CAC?", Sentence 1 must be "CAC is...").
 - **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
-- **BOLDING FREQUENCY:** You MUST bold exactly **one high-impact phrase** per section. Never bold an entire sentence.
+- **BOLDING FREQUENCY (MANDATORY):** You MUST bold at least **one key phrase per section** using **double asterisks**. Bold: statistics (e.g., **47% faster**), key terms (e.g., **token limits**), or warnings (e.g., **do not skip this step**). Never bold an entire sentence.
 
 ### 3. RHYTHM & VOICE (THE HUMAN PULSE)
 *These rules break the "robotic" cadence of AI generation.*
@@ -758,7 +758,7 @@ ${linkInstruction}
 **Before generating, verify:**
 1. **VISUALS:** Will I include a Bullet List or a 1-sentence paragraph? (Required).
 2. **NO FLUFF:** Am I starting with a direct fact/opinion? (No "Let's explore").
-3. **BOLDING:** Will I bold the key insight?
+3. **BOLDING (MANDATORY):** You MUST bold at least ONE key phrase per section using **double asterisks**. Example: "This reduces load time by **47%**" or "The real issue is **token limits**".
 4. **ASYMMETRY:** Am I mixing short (5 words) and long (25 words) sentences?
 
 ### DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)

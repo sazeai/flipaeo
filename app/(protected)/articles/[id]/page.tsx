@@ -475,10 +475,10 @@ export default function ArticleDetailPage() {
 
     const SidebarContent = () => (
         <div className="h-full flex flex-col">
-            <div className="p-4 border-b">
+            <div className="p-4 border-b shrink-0">
                 <h3 className="font-semibold text-sm text-gray-900">Article Details</h3>
             </div>
-            <ScrollArea className="flex-1">
+            <div className="flex-1 overflow-y-auto">
                 <div className="p-4 space-y-6">
 
 
@@ -554,7 +554,7 @@ export default function ArticleDetailPage() {
                         {/* Keyword Highlighting Toggle */}
                         <button
                             onClick={() => setHighlightKeywords(!highlightKeywords)}
-                            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${highlightKeywords
+                            className={`cursor-pointer w-full flex items-center justify-between p-3 rounded-lg border transition-all ${highlightKeywords
                                 ? 'bg-yellow-50 border-yellow-300 text-yellow-800'
                                 : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                                 }`}
@@ -587,7 +587,7 @@ export default function ArticleDetailPage() {
                         </div>
 
                         <div className="space-y-1">
-                            <p className="text-xs text-gray-500">Title</p>
+                            <p className="text-xs text-gray-500">Meta Title</p>
                             <p className="text-sm font-medium text-gray-900 leading-snug">
                                 {article.outline?.title || "Untitled Article"}
                             </p>
@@ -618,7 +618,7 @@ export default function ArticleDetailPage() {
 
                     </div>
                 </div>
-            </ScrollArea>
+            </div>
         </div>
     )
 
@@ -852,7 +852,7 @@ export default function ArticleDetailPage() {
                 </div>
 
                 {/* Desktop Sidebar */}
-                <div className={`hidden lg:block border-l bg-white transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-[320px]' : 'w-0 overflow-hidden'}`}>
+                <div className={`hidden lg:block border-l bg-white transition-all duration-300 ease-in-out h-full ${isSidebarOpen ? 'w-[320px]' : 'w-0 overflow-hidden'}`}>
                     <SidebarContent />
                 </div>
             </div>
