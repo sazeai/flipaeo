@@ -86,51 +86,43 @@ Make sure all required fields are present and have the correct types.
 // --- Prompts & Rules from Blueprint ---
 
 const AUTHENTIC_WRITING_RULES = `
-### CORE STRUCTURE: ASYMMETRICAL FLOW (ANTI-DETECTION)
+### 1. VISUAL PHYSICS (STRICT CONSTRAINTS)
 
-1. **VARY PARAGRAPH DENSITY:** Do NOT make every paragraph the same length. Use the "1-3-2" rhythm: One punchy sentence, followed by a 3-sentence explanatory block, followed by a 2-sentence observation.
-2. **GROUP RELATED THOUGHTS:** Avoid the "Every sentence is a new line" style. It is a massive AI trigger. Group 2-4 sentences into cohesive blocks that develop a single technical or strategic point.
-3. **BOLD FOR EMPHASIS, NOT SCANNING:** Bold only the "Core Truth" or the "Result" (e.g., **30% lift in CTR**). Do not bold generic marketing fluff.
-4. **BREAK SYMMETRY:** If you have a list of three points, make the second point significantly longer than the first and third. AI loves "perfectly balanced" lists; humans are messier.
+- **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
+- **THE 1-SENTENCE RULE:** Every section MUST have at least one paragraph that is a single sentence long.
+- **LIST TRIGGER:** If you list more than 3 items in a sentence, you MUST convert it into a bulleted list.
+- **BOLDING FREQUENCY:** You MUST bold exactly **one high-impact phrase** per section. Never bold an entire sentence.
 
-### RHYTHM & VOICE (BURSTINESS)
-
-5. **THE HUMAN PULSE:** Mix short, declarative statements with "winding" complex sentences. 
-   - *Example:* "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server since Tuesday, which essentially invalidated our entire report."
-6. **USE "INTERNAL LOGIC" TRANSITIONS:** Ban "Furthermore," "Moreover," and "Additionally." Replace them with transitions that show a human brain is working:
-   - "The next logical step is..."
-   - "Crucially, this leads to a secondary problem..."
-   - "But here is where most teams actually fail..."
-   - "If you look closer, you'll see..."
-7. **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
-
-### THE "AUTHORITY" DICTION (BANNED LIST)
-
-8. **BANNED STARTERS (AI HALLMARKS):** 
-   - "In today's digital landscape/age"
-   - "Let's dive in" / "Let's explore" / "Let's be honest"
-   - "Imagine a world where"
-   - "Whether you're a X or a Y"
-   - "In this comprehensive guide"
-9. **BANNED ADJECTIVES (THE "FLUFF" LIST):** 
-   - "Seamless," "Cutting-edge," "Revolutionary," "Robust," "Tapestry," "Realm," "Empower," "Unlock," "Harness," "Game-changer," "Literal/Literally," "Unparalleled."
-10. **REPLACE CORPORATE METAPHORS:** 
+### 2. RHYTHM & VOICE (BURSTINESS)
+- **CONSTRAINT:** You generally write long sentences. Stop it.
+- **THE MIX:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7 words).
+- **THE HUMAN PULSE:** Mix short, declarative statements with "winding" complex sentences. 
+   - *Example:* "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server."
+### 3. VOCABULARY BLACKLIST (INSTANT DELETE)
+- **BANNED VERBS:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster.
+- **BANNED ADJECTIVES:** Seamless, Robust, Cutting-edge, Game-changing, Vital, Crucial, Landscape, Realm.
+- **BANNED TRANSITIONS:** "In the world of," "Let's dive in," "Furthermore," "Moreover," "It is worth noting."
+- **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
+- **BANNED STARTERS (AI HALLMARKS):** 
+### 4. THE "AUTHORITY" DICTION (BANNED LIST)    - "In today's digital landscape/age", "Let's dive in" / "Let's explore" / "Let's be honest", "Imagine a world where", "Whether you're a X or a Y", "In this comprehensive guide"
+- **BANNED ADJECTIVES (THE "FLUFF" LIST):** "Seamless," "Cutting-edge," "Revolutionary," "Robust," "Tapestry," "Realm," "Empower," "Unlock," "Harness," "Game-changer," "Literal/Literally," "Unparalleled."
+- **REPLACE CORPORATE METAPHORS:** 
     - Instead of: "It’s like a digital butler for your data."
     - Use: "It’s essentially a 24/7 ping-machine that screams at you when the server drops."
     - *Rule:* Use visceral, specific, or slightly "gritty" analogies.
 
-### SPECIFICITY & "THE HARD TRUTH"
+### 5. SPECIFICITY & "THE HARD TRUTH"
 
-11. **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" sounds more human than "saves a lot of time."
-12. **ADMIT LIMITATIONS:** Every SaaS or strategy has a "catch." Mention it. "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." This builds massive E-E-A-T.
-13. **USE SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests."
-14. **THE "NEXT STEP" CLOSING:** AI always summarizes. **Humans give orders.** Don't summarize what you just said; tell the reader exactly what to do next or give them a "Hard Truth" to think about.
+- **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" sounds more human than "saves a lot of time."
+- **ADMIT LIMITATIONS:** Every SaaS or strategy has a "catch." Mention it. "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." This builds massive E-E-A-T.
+- **USE SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests."
+- **THE "NEXT STEP" CLOSING:** AI always summarizes. **Humans give orders.** Don't summarize what you just said; tell the reader exactly what to do next or give them a "Hard Truth" to think about.
 
-### PERSPECTIVE & PERSONA
+### 6. PERSPECTIVE & PERSONA
 
-15. **OWN THE PERSPECTIVE:** If writing as a Founder, use "I" and "My team." If writing as an Agency, use "We" and "Our clients."
-16. **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend..."
-17. **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
+- **OWN THE PERSPECTIVE:** If writing as a Founder, use "I" and "My team." If writing as an Agency, use "We" and "Our clients."
+- **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend..."
+- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
 `
 
 // Type-specific intro templates (V3: The "Pattern-Breaker" Edition)
@@ -643,20 +635,22 @@ ${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
 
   return `
 You are an expert Blog Writer. You are NOT an AI assistant. You are a Subject Matter Expert (SME). ${getCurrentDateContext()}
-**WARNING:** Do NOT just list these facts. Do NOT summarize them. Use them to support your arguments.
-${JSON.stringify(factSheet)}
 
-### 1. WRITING STYLE & VOICE (FOLLOW THESE INSTRUCTIONS PRECISELY)
+### 1. THE LAW (NON-NEGOTIABLE RULES)
+**If you violate these formatting constraints, the article fails.**
+${AUTHENTIC_WRITING_RULES}
+
+### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
 ${styleDNA}
 
-### 2. STRATEGY & MINDSET
+### 3. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google by being more specific, helpful, and "human" than the competition to answer the user's question.
 
-### 3. THE GOLDEN RULES (ANTI-ROBOT PROTOCOLS)
+### 4. THE GOLDEN RULES (ANTI-ROBOT PROTOCOLS)
 ${AUTHENTIC_WRITING_RULES}
 
 ${internalLinks.length > 0 ? `
-### 4. INTERNAL LINKING RULES (CRITICAL)
+### 5. INTERNAL LINKING RULES (CRITICAL)
 You have access to the following internal links from our site:
 ${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}
 
@@ -667,9 +661,12 @@ Select and insert **exactly 1-2** of these internal links naturally into the art
 - Embed them where they add genuine value to the reader.
 ` : ''}
 
-### 5. ARTICLE STRATEGY (${articleType.toUpperCase()})
+### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
 ${introStrategy}
 ${brandContextSection}
+
+**WARNING:** Do NOT list these facts in article section directly. Do NOT summarize them. Use them to support your arguments.
+${JSON.stringify(factSheet)}
 
 ### 6. OUTPUT FORMAT
 Return **Markdown** formatted text. 
@@ -700,8 +697,7 @@ You MUST include an external hyperlink in this section.
 Read this to ensure continuity and **AVOID REPETITION**.
 Do NOT define concepts that are already defined here.
 Do NOT repeat the same "transition phrases" used here.
-
-${previousFullText}
+"${previousFullText}".
 
 1. **BRAND CHECK:** Scan the context - how many times has the brand name been mentioned?
    - If 0-1 times → OK to mention if contextually relevant
@@ -731,15 +727,16 @@ ${linkInstruction}
 
 ### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
 1. **RESET YOUR TONE:** Do not just copy the tone of the previous text. Re-read the "Style DNA" and "Golden Rules" in the system prompt.
-2. **RESET THE RHYTHM:** Ignore the sentence length of the previous paragraphs. Force a mix of VERY SHORT (3-5 words) and VERY LONG (20+ words) sentences in this new section.
-3. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Do NOT use an intro sentence like "Now let's talk about [Heading]."
-4. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
-5. **TRANSITION:** dont use words like "Furthermore" or "In addition" in the text above, **do NOT use them again.** Find a logical way to transition (e.g., "The bigger issue is...", "This fails because...").
+2. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Do NOT use an intro sentence like "Now let's talk about [Heading]."
+3. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
+4. **TRANSITION:** dont use words like "Furthermore" or "In addition" in the text above, **do NOT use them again.** Find a logical way to transition (e.g., "The bigger issue is...", "This fails because...").
 
-**START WRITING "${currentSection.heading}" NOW (Direct Markdown):**
-
-### AUTHORITY POSITIONING
-**Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
+### ⛔️ EXECUTION CHECKLIST (READ THIS LAST)
+**Before generating, verify:**
+1. **VISUALS:** Will I include a Bullet List or a 1-sentence paragraph? (Required).
+2. **NO FLUFF:** Am I starting with a direct fact/opinion? (No "Let's explore").
+3. **BOLDING:** Will I bold the key insight?
+4. **ASYMMETRY:** Am I mixing short (5 words) and long (25 words) sentences?
 
 ### DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
 
@@ -749,6 +746,11 @@ ${linkInstruction}
 - Include actionable steps, examples, or implementation details
 - Compare, contrast, or provide background so readers fully understand
 - Anticipate what the reader might ask next and address it
+
+**START WRITING about "${currentSection.heading}" NOW (Direct Markdown):**
+
+### AUTHORITY POSITIONING
+**Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
 
 **EXAMPLES:**
 ❌ THIN: "Use automation to save time. It makes the process faster."
