@@ -252,18 +252,57 @@ export default function ArticleDetailPage() {
         }
     }
 
+    // Helper function to count syllables in a word (approximation)
+    const countSyllables = useCallback((word: string): number => {
+        word = word.toLowerCase().replace(/[^a-z]/g, '')
+        if (word.length <= 3) return 1
+
+        // Count vowel groups
+        const vowels = word.match(/[aeiouy]+/g)
+        let count = vowels ? vowels.length : 1
+
+        // Adjust for common patterns
+        if (word.endsWith('e')) count--
+        if (word.endsWith('le') && word.length > 2 && !/[aeiouy]/.test(word[word.length - 3])) count++
+        if (word.endsWith('es') || word.endsWith('ed')) count--
+
+        return Math.max(1, count)
+    }, [])
+
+    // Helper to extract plain text from HTML/markdown
+    const extractPlainText = useCallback((content: string): string => {
+        return content
+            .replace(/<[^>]*>/g, ' ')  // Remove HTML tags
+            .replace(/[#*_~`\[\]()]/g, ' ')  // Remove markdown syntax
+            .replace(/\s+/g, ' ')
+            .trim()
+    }, [])
+
     const stats = useMemo(() => {
-        if (!editorData && !article?.raw_content) return { words: 0, images: 0, links: 0 }
+        const defaultStats = {
+            words: 0,
+            images: 0,
+            links: 0,
+            readingTime: 0,
+            readabilityScore: 0,
+            readabilityLabel: 'N/A',
+            keywordDensity: 0
+        }
+
+        if (!editorData && !article?.raw_content) return defaultStats
+
+        let fullText = ''
+        let words = 0
+        let images = 0
+        let links = 0
 
         if (editorData) {
-            let words = 0
-            let images = 0
-            let links = 0
-
             editorData.blocks.forEach(block => {
                 if (block.type === 'paragraph' || block.type === 'header' || block.type === 'quote' || block.type === 'list') {
                     const text = block.data.text || ""
-                    words += text.replace(/<[^>]*>?/gm, '').split(/\s+/).filter((w: string) => w.length > 0).length
+                    const plainText = extractPlainText(text)
+                    fullText += plainText + ' '
+                    words += plainText.split(/\s+/).filter((w: string) => w.length > 0).length
                     const linkMatches = text.match(/<a\s/g)
                     if (linkMatches) links += linkMatches.length
                 }
@@ -271,23 +310,18 @@ export default function ArticleDetailPage() {
                     images++
                 }
             })
-            return { words, images, links }
-        }
-
-        if (article?.raw_content) {
+        } else if (article?.raw_content) {
             const content = article.raw_content.trim()
             if (content.startsWith("{") && content.endsWith("}")) {
                 try {
                     const data = JSON.parse(content)
                     if (data.blocks) {
-                        let words = 0
-                        let images = 0
-                        let links = 0
-
                         data.blocks.forEach((block: any) => {
                             if (block.type === 'paragraph' || block.type === 'header' || block.type === 'quote' || block.type === 'list') {
                                 const text = block.data.text || ""
-                                words += text.replace(/<[^>]*>?/gm, '').split(/\s+/).filter((w: any) => w.length > 0).length
+                                const plainText = extractPlainText(text)
+                                fullText += plainText + ' '
+                                words += plainText.split(/\s+/).filter((w: any) => w.length > 0).length
                                 const linkMatches = text.match(/<a\s/g)
                                 if (linkMatches) links += linkMatches.length
                             }
@@ -295,20 +329,76 @@ export default function ArticleDetailPage() {
                                 images++
                             }
                         })
-                        return { words, images, links }
                     }
-                } catch (e) { }
+                } catch (e) {
+                    // Fall through to markdown parsing
+                }
             }
 
-            const words = content.split(/\s+/).filter(w => w.length > 0).length
-            const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
-            // Use negative lookbehind to exclude image links (![...](url))
-            const links = (content.match(/(?<!!)\[.*?\]\(.*?\)/g) || []).length
-            return { words, images, links }
+            if (!fullText) {
+                fullText = extractPlainText(content)
+                words = fullText.split(/\s+/).filter(w => w.length > 0).length
+                images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
+                links = (content.match(/(?<!!)\[.*?\]\(.*?\)/g) || []).length
+            }
         }
 
-        return { words: 0, images: 0, links: 0 }
-    }, [editorData, article?.raw_content])
+        // Reading Time (200 words per minute average)
+        const readingTime = Math.ceil(words / 200)
+
+        // Flesch-Kincaid Readability Score
+        const sentences = fullText.split(/[.!?]+/).filter(s => s.trim().length > 0)
+        const wordsArray = fullText.split(/\s+/).filter(w => w.length > 0)
+        const totalSyllables = wordsArray.reduce((acc, word) => acc + countSyllables(word), 0)
+
+        const avgSentenceLength = sentences.length > 0 ? wordsArray.length / sentences.length : 0
+        const avgSyllablesPerWord = wordsArray.length > 0 ? totalSyllables / wordsArray.length : 0
+
+        // Flesch Reading Ease formula
+        const fleschScore = Math.round(206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord))
+        const readabilityScore = Math.max(0, Math.min(100, fleschScore))
+
+        // Readability label - user-friendly labels (50-70 is ideal for B2B/professional content)
+        let readabilityLabel = 'N/A'
+        if (readabilityScore >= 70) readabilityLabel = 'Easy Read'
+        else if (readabilityScore >= 50) readabilityLabel = 'Professional'  // Ideal for B2B, SaaS, expert content
+        else if (readabilityScore >= 30) readabilityLabel = 'Advanced'
+        else readabilityLabel = 'Expert Level'
+
+        // Keyword Density - count individual terms for multi-word keywords
+        let keywordDensity = 0
+        if (article?.keyword && words > 0) {
+            const keyword = article.keyword.toLowerCase().trim()
+            const textLower = fullText.toLowerCase()
+
+            // Split keyword into individual terms and count each
+            const keywordTerms = keyword.split(/\s+/).filter(t => t.length > 2) // Ignore short words like "a", "to"
+            let totalMatches = 0
+
+            // Count exact phrase matches (worth more)
+            const exactMatches = (textLower.match(new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
+            totalMatches += exactMatches * keywordTerms.length  // Full phrase counts as all terms
+
+            // Also count individual term appearances (excluding those in exact matches)
+            const textWithoutExact = textLower.replace(new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '')
+            keywordTerms.forEach(term => {
+                const termMatches = (textWithoutExact.match(new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g')) || []).length
+                totalMatches += termMatches
+            })
+
+            keywordDensity = parseFloat(((totalMatches / words) * 100).toFixed(1))
+        }
+
+        return {
+            words,
+            images,
+            links,
+            readingTime,
+            readabilityScore,
+            readabilityLabel,
+            keywordDensity
+        }
+    }, [editorData, article?.raw_content, article?.keyword, countSyllables, extractPlainText])
 
     if (loading) {
         return (
@@ -370,15 +460,66 @@ export default function ArticleDetailPage() {
                         <div className="grid grid-cols-3 gap-2">
                             <div className="bg-gray-50 p-2 rounded-lg border text-center">
                                 <p className="text-xs text-gray-500 mb-1">Words</p>
-                                <p className="font-semibold text-gray-900">{stats.words}</p>
+                                <p className="font-semibold text-gray-900">{stats.words.toLocaleString()}</p>
                             </div>
                             <div className="bg-gray-50 p-2 rounded-lg border text-center">
-                                <p className="text-xs text-gray-500 mb-1">Images</p>
-                                <p className="font-semibold text-gray-900">{stats.images}</p>
+                                <p className="text-xs text-gray-500 mb-1">Reading</p>
+                                <p className="font-semibold text-gray-900">{stats.readingTime} min</p>
                             </div>
                             <div className="bg-gray-50 p-2 rounded-lg border text-center">
                                 <p className="text-xs text-gray-500 mb-1">Links</p>
                                 <p className="font-semibold text-gray-900">{stats.links}</p>
+                            </div>
+                        </div>
+
+                        {/* Readability Score */}
+                        <div className="bg-gray-50 p-3 rounded-lg border">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs text-gray-500">Readability Score</p>
+                                <Badge
+                                    variant="outline"
+                                    className={`text-xs ${stats.readabilityScore >= 50 ? 'bg-green-50 text-green-700 border-green-200' :
+                                            stats.readabilityScore >= 30 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                'bg-red-50 text-red-700 border-red-200'
+                                        }`}
+                                >
+                                    {stats.readabilityLabel}
+                                </Badge>
+                            </div>
+                            <div className="flex items-end gap-2">
+                                <span className="text-2xl font-bold text-gray-900">{stats.readabilityScore}</span>
+                                <span className="text-xs text-gray-400 mb-1">/ 100</span>
+                            </div>
+                            <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full rounded-full transition-all ${stats.readabilityScore >= 50 ? 'bg-green-500' :
+                                            stats.readabilityScore >= 30 ? 'bg-yellow-500' :
+                                                'bg-red-500'
+                                        }`}
+                                    style={{ width: `${stats.readabilityScore}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Keyword Density */}
+                        <div className="bg-gray-50 p-3 rounded-lg border">
+                            <div className="flex items-center justify-between">
+                                <p className="text-xs text-gray-500">Keyword Density</p>
+                                <Badge
+                                    variant="outline"
+                                    className={`text-xs ${stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'bg-green-50 text-green-700 border-green-200' :
+                                        stats.keywordDensity > 0 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                            'bg-gray-100 text-gray-500 border-gray-200'
+                                        }`}
+                                >
+                                    {stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'Optimal' :
+                                        stats.keywordDensity > 2.5 ? 'High' :
+                                            stats.keywordDensity > 0 ? 'Low' : 'N/A'}
+                                </Badge>
+                            </div>
+                            <div className="flex items-end gap-1 mt-1">
+                                <span className="text-xl font-bold text-gray-900">{stats.keywordDensity}%</span>
+                                <span className="text-xs text-gray-400 mb-0.5">of content</span>
                             </div>
                         </div>
                     </div>
@@ -570,7 +711,7 @@ export default function ArticleDetailPage() {
                                                     <img
                                                         src={getProxiedImageUrl(article.featured_image_url) || ''}
                                                         alt="Featured"
-                                                        className="w-full max-h-[400px] object-cover"
+                                                        className="w-full max-h-[420px] object-cover"
                                                     />
                                                     <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button
