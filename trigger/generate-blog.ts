@@ -736,7 +736,7 @@ Do NOT repeat the same "transition phrases" used here.
 
 ---
 
-### ⚡️ ACTIVE TASK: WRITE SECTION "${currentSection.heading}"
+### YOUR TASK: WRITE SECTION "${currentSection.heading}"
 **GOAL:** specific, high-burstiness content.
 
 **CONTENT REQUIREMENTS:**
