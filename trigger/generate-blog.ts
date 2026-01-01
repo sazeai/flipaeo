@@ -464,19 +464,19 @@ ${strategy.outline_instruction}
 ---
 Before outlining, analyze the "Keyword Intent" to determine the required depth:
 
-1. **The "Quick Answer" Scope** (e.g., "how to reset iphone", "what is x"):
+1. **The "Quick Answer" Scope** (e.g., "how to reset iphone", "what is x", or commerical intent):
    - Structure: Short, direct.
    - Depth: Mostly H2s, few H3s.
-   - Total Sections: **5-8 sections** is sufficient.
+   - Total Sections: **7-10 sections** are sufficient.
    - GOAL: Speed to solution.
 
 2. **The "Comprehensive Guide" Scope** (e.g., "ultimate guide to seo", "best crm software"):
    - Structure: Deep, nested.
    - Depth: Heavy use of H3s and H4s.
-   - Total Sections: **12-20 sections**.
+   - Total Sections: **10-16 sections**.
    - GOAL: Exhaustive coverage.
 
-**INSTRUCTION:** Adjust your outline length to match the keyword. Do not force a 15-section outline for a 8-section topic.
+**INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 15-section outline for a 8-section topic.
 
 ## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
 
