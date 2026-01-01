@@ -642,21 +642,21 @@ ${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
 `
 
   return `
-You are an expert Blog Writer. You are NOT an AI assistant. You are a subject matter expert. ${getCurrentDateContext()}
+You are an expert Blog Writer. You are NOT an AI assistant. You are a Subject Matter Expert (SME). ${getCurrentDateContext()}
+**WARNING:** Do NOT just list these facts. Do NOT summarize them. Use them to support your arguments.
+${JSON.stringify(factSheet)}
 
 ### 1. WRITING STYLE & VOICE (FOLLOW THESE INSTRUCTIONS PRECISELY)
 ${styleDNA}
 
 ### 2. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google by being more specific, helpful, and "human" than the competition to answer the user's question.
-- **Mindset:** The user is frustrated and wants a quick answer. Do not fluff. Get to the point.
 
-### 3. GOLDEN RULES (THE LAW)
+### 3. THE GOLDEN RULES (ANTI-ROBOT PROTOCOLS)
 ${AUTHENTIC_WRITING_RULES}
-${brandContextSection}
-${introStrategy}
+
 ${internalLinks.length > 0 ? `
-### 7. INTERNAL LINKING RULES (CRITICAL)
+### 4. INTERNAL LINKING RULES (CRITICAL)
 You have access to the following internal links from our site:
 ${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}
 
@@ -667,10 +667,11 @@ Select and insert **exactly 1-2** of these internal links naturally into the art
 - Embed them where they add genuine value to the reader.
 ` : ''}
 
-### 8. KNOWLEDGE BASE (Facts to use)
-${JSON.stringify(factSheet)}
+### 5. ARTICLE STRATEGY (${articleType.toUpperCase()})
+${introStrategy}
+${brandContextSection}
 
-### 9. OUTPUT FORMAT
+### 6. OUTPUT FORMAT
 Return **Markdown** formatted text. 
 - Make use of proper H2, H3, and H4 headers for SEO appropriately.
 - Do NOT include the main H2 Section Heading (system adds it).
@@ -687,7 +688,7 @@ const generateWritingUserPrompt = (previousFullText: string, currentSection: any
 You MUST include an external hyperlink in this section.
 - **URL:** ${currentSection.external_link.url}
 - **Context:** Used to verify "${currentSection.external_link.anchor_context}"
-- **Instruction:** Embed this link naturally on relevant anchor text. Do NOT say "Click here" or "Read more". Link the relevant keywords or phrase.
+- **Instruction:** Embed this link naturally on relevant anchor text. 
 - **Format:** Use markdown link syntax: [anchor text](url)
 `
   }
@@ -695,7 +696,9 @@ You MUST include an external hyperlink in this section.
   return `
 ### BEFORE YOU WRITE - CHECK THE CONTEXT
 
-Read the CONTEXT section below carefully. Before writing this section:
+### CONTEXT (PREVIOUSLY WRITTEN)
+${previousFullText.slice(-2000)} 
+*(Note: Only the last 2000 chars are shown for context continuity)*
 
 1. **BRAND CHECK:** Scan the context - how many times has the brand name been mentioned?
    - If 0-1 times → OK to mention if contextually relevant
@@ -711,27 +714,27 @@ Read the CONTEXT section below carefully. Before writing this section:
 
 ---
 
-### CONTEXT (What you have written so far)
-${previousFullText}
+### ⚡️ ACTIVE TASK: WRITE SECTION "${currentSection.heading}"
+**GOAL:** specific, high-burstiness content.
 
-### YOUR CURRENT TASK
-**Write Section:** "${currentSection.heading}"
-
-**CONTENT FOCUS (What to cover):**
+**CONTENT REQUIREMENTS:**
 ${currentSection.instruction_note}
 
-**SEO KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
+**KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
 ${linkInstruction}
-### INSTRUCTIONS
-1. **DO NOT repeat or rephrase the heading.** The heading "${currentSection.heading}" is already added by the system. Start DIRECTLY with the substantive content.
-   - ❌ WRONG: "So, what exactly is ${currentSection.heading.toLowerCase().replace(/\?/g, '')}?"
-   - ❌ WRONG: "Let's talk about ${currentSection.heading.toLowerCase()}..."
-   - ✅ RIGHT: Jump straight into the answer, fact, or point.
-2. Read the last sentence of the Context. Ensure your first sentence flows naturally from it.
-3. **Apply the Golden Rules:** BOLD the key takeaways. Keep sentences short and varied.
-4. **Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
 
-### 5. DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
+### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
+1. **RESET YOUR TONE:** Do not just copy the tone of the previous text. Re-read the "Style DNA" and "Golden Rules" in the system prompt.
+2. **BURSTINESS CHECK:** Ensure this section has a mix of short (5-word) and long (25-word) sentences.
+3. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Do NOT use an intro sentence like "Now let's talk about [Heading]."
+4. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
+
+**START WRITING "${currentSection.heading}" NOW (Direct Markdown):**
+
+### AUTHORITY POSITIONING
+**Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
+
+### DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
 
 **DO NOT write thin, surface-level content.** Each section must be SUBSTANTIVE:
 
@@ -1001,8 +1004,8 @@ export const generateBlogPost = task({
         const systemPrompt = generateWritingSystemPrompt(styleDNA, factSheet, brandDetails, internalLinks, articleType)
         const introTemplate = getIntroTemplate(articleType)
         const userPrompt = generateWritingUserPrompt(currentDraft, {
-          heading: "Introduction / Hook", // Context only
-          instruction_note: outline.intro.instruction_note + "\n\nIMPORTANT: Write the introduction/hook only. Do NOT add any headings. Start directly with the text.\n\nAPPLY THESE INTRO RULES:\n" + introTemplate,
+          heading: "Introduction / Hook (COLD OPEN)",
+          instruction_note: outline.intro.instruction_note + "\n\nCRITICAL: Start in the middle of the action. Do NOT say 'Welcome to this guide'. Do NOT summarize what is coming. Start with a specific problem, data point, or contrarian opinion.",
           keywords_to_include: outline.intro.keywords_to_include
         })
 

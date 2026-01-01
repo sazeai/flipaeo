@@ -100,7 +100,7 @@ export default function BlogError({
 
           {/* Right Side: Graphic */}
           <div className="order-1 md:order-2 flex justify-center transform hover:scale-105 transition-transform duration-500">
-            <ErrorGraphic mode={!isOnline ? 'offline' : 'error'} errorCode={error.digest || 'ERR_BLOG_LOAD'} />
+            <ErrorGraphic mode={!isOnline ? 'offline' : 'error'} />
           </div>
 
         </div>
