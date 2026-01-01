@@ -758,7 +758,9 @@ ${linkInstruction}
 - Compare, contrast, or provide background so readers fully understand
 - Anticipate what the reader might ask next and address it
 
-**START WRITING about "${currentSection.heading}" NOW (Direct Markdown):**
+**START WRITING the body content for "${currentSection.heading}" NOW (Direct Markdown):**
+
+⚠️ **DO NOT include the section heading (e.g., "## ${currentSection.heading}") - the system adds it automatically. Start directly with the first paragraph of content.**
 
 ### AUTHORITY POSITIONING
 **Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
@@ -1057,9 +1059,11 @@ CRITICAL EXECUTION RULES:
           writeText += (c as any).text || ""
         }
 
-        // Append to Snowball
+        // Append to Snowball - Strip any duplicate heading the LLM might have added
         const headingHash = "#".repeat(section.level || 2)
-        currentDraft += `${headingHash} ${section.heading} \n\n${writeText} \n\n`
+        const headingPattern = new RegExp(`^\\s*#{1,4}\\s*${section.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i')
+        const cleanedWriteText = writeText.replace(headingPattern, '').trim()
+        currentDraft += `${headingHash} ${section.heading} \n\n${cleanedWriteText} \n\n`
 
         // Real-time Save
         await supabase

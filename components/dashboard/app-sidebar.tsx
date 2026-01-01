@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   Send,
   Brain,
-  Coins,
+  Feather,
   Sparkles,
   Image as ImageIcon,
   DatabaseZap,
@@ -60,7 +60,7 @@ function CreditsCard({ userId }: { userId?: string }) {
       <CardContent className="gap-1 flex flex-col px-3">
         <div className="text-sm font-medium mb-1">Plan Usage</div>
         <div className="text-xs text-muted-foreground mb-3 flex justify-between">
-          <span className="flex items-center gap-2"><Coins className="h-3 w-3" />Credits</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
+          <span className="flex items-center gap-2"><Feather className="h-3 w-3" />Articles</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
         </div>
         <Button size="sm" className="w-full bg-black hover:bg-black/90 text-white border-0" asChild>
           <Link href="/subscribe">

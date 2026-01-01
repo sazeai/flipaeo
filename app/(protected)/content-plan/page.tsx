@@ -12,7 +12,7 @@ import {
     Target,
     Lock,
     PenTool,
-    Edit2,
+    SquarePen,
     CheckCircle2,
     Loader2,
     FileText,
@@ -21,7 +21,7 @@ import {
     BarChart3,
     MousePointerClick,
     Search,
-    Info,
+    Feather,
     Lightbulb,
     Gauge,
     Tag,
@@ -515,9 +515,9 @@ export default function ContentPlanPage() {
 
                             <button
                                 onClick={() => handleStartEdit(item)}
-                                className="opacity-100 group-hover:opacity-80 transition-opacity p-1.5 hover:bg-stone-100 rounded-md text-stone-400 hover:text-stone-600"
+                                className="cursor-pointer opacity-100 group-hover:opacity-80 transition-opacity p-1.5 hover:bg-stone-100 rounded-md text-stone-400 hover:text-stone-600"
                             >
-                                <Edit2 className="w-3.5 h-3.5" />
+                                <SquarePen className="w-3.5 h-3.5" />
                             </button>
                         </div>
 
@@ -657,6 +657,7 @@ export default function ContentPlanPage() {
                                                         : "bg-stone-900 text-white hover:bg-stone-800"
                                                 )}
                                             >
+                                                <Feather className="w-3 h-3" />
                                                 Write Article
                                             </Button>
                                         </span>
@@ -686,7 +687,7 @@ export default function ContentPlanPage() {
                             <h1 className="text-lg font-bold text-stone-900 tracking-tight flex items-center gap-2 flex-wrap">
                                 {plan?.gsc_enhanced ? (
                                     <>
-                                        <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500/10 flex-shrink-0" />
+                                        <Lightbulb className="w-4 h-4 text-amber-500 fill-amber-500/10 flex-shrink-0" />
                                         <span>Data-Driven Strategy</span>
                                     </>
                                 ) : (
@@ -701,7 +702,7 @@ export default function ContentPlanPage() {
                         </div>
                         {plan && (
                             <p className="text-[10px] font-medium text-stone-400 pl-0.5">
-                                Generated {new Date().toLocaleDateString()} • 30 Day Roadmap
+                                Generated {new Date().toLocaleDateString()} • 30 Day Strategic Roadmap
                             </p>
                         )}
                     </div>
@@ -750,15 +751,15 @@ export default function ContentPlanPage() {
                         )}
 
                         {plan && (
-                            <div className="flex bg-stone-100/50 border border-stone-200 rounded-lg p-1 shadow-sm self-start md:self-center overflow-x-auto max-w-full">
+                            <div className="flex bg-stone-100/50 border border-stone-200 rounded-lg p-1 self-start md:self-center overflow-x-auto max-w-full">
                                 {Object.entries(STATUS_CONFIG).map(([key, config]) => (
                                     <button
                                         key={key}
                                         onClick={() => setFilter(key as any)}
                                         className={cn(
-                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap",
+                                            "cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap",
                                             filter === key
-                                                ? "bg-white text-stone-900 shadow-sm border border-stone-200/50"
+                                                ? "bg-white text-stone-900 shadow-xs border border-stone-200/50"
                                                 : "text-stone-500 hover:text-stone-700 hover:bg-stone-200/50"
                                         )}
                                     >
@@ -778,9 +779,9 @@ export default function ContentPlanPage() {
                                 <button
                                     onClick={() => setFilter("all")}
                                     className={cn(
-                                        "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ml-1",
+                                        "cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap ml-1",
                                         filter === "all"
-                                            ? "bg-white text-stone-900 shadow-sm border border-stone-200/50"
+                                            ? "bg-white text-stone-900 shadow-xs border border-stone-200/50"
                                             : "text-stone-500 hover:text-stone-700 hover:bg-stone-200/50"
                                     )}
                                 >
