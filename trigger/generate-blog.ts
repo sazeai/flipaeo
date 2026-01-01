@@ -86,43 +86,55 @@ Make sure all required fields are present and have the correct types.
 // --- Prompts & Rules from Blueprint ---
 
 const AUTHENTIC_WRITING_RULES = `
-### 1. VISUAL PHYSICS (STRICT CONSTRAINTS)
+### 1. CRITICAL: NEGATIVE CONSTRAINTS (THE "ANTI-AI" FILTER)
+*Violation of these rules results in immediate failure.*
 
+- **VOCABULARY BLACKLIST:**
+  - **Verbs:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster, Delve.
+  - **Adjectives:** Seamless, Robust, Cutting-edge, Game-changing, Revolutionary, Vital, Crucial, Unparalleled, Tapestry, Realm, Literal/Literally.
+- **BANNED STARTERS (NO FLUFF):** - Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
+  - **Rule:** Never start a section with "In this section, we will..." Start immediately with the core insight.
+- **CORPORATE METAPHOR BAN:**
+  - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that screams when the server drops."
+  - **Rule:** Use visceral, specific, or slightly "gritty" analogies.
+
+### 2. STRUCTURAL ARCHITECTURE (VISUAL PHYSICS)
+*These rules ensure the content is scannable and citation-ready.*
+
+- **THE "ANSWER-FIRST" PROTOCOL:** The FIRST sentence under every H2 header must be a direct, standalone answer to the header's premise. (e.g., If H2 is "What is CAC?", Sentence 1 must be "CAC is...").
 - **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
-- **THE 1-SENTENCE RULE:** Every section MUST have at least one paragraph that is a single sentence long.
-- **LIST TRIGGER:** If you list more than 3 items in a sentence, you MUST convert it into a bulleted list.
 - **BOLDING FREQUENCY:** You MUST bold exactly **one high-impact phrase** per section. Never bold an entire sentence.
 
-### 2. RHYTHM & VOICE (BURSTINESS)
-- **CONSTRAINT:** You generally write long sentences. Stop it.
-- **THE MIX:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7 words).
-- **THE HUMAN PULSE:** Mix short, declarative statements with "winding" complex sentences. 
-   - *Example:* "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server."
-### 3. VOCABULARY BLACKLIST (INSTANT DELETE)
-- **BANNED VERBS:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster.
-- **BANNED ADJECTIVES:** Seamless, Robust, Cutting-edge, Game-changing, Vital, Crucial, Landscape, Realm.
-- **BANNED TRANSITIONS:** "In the world of," "Let's dive in," "Furthermore," "Moreover," "It is worth noting."
+### 3. RHYTHM & VOICE (THE HUMAN PULSE)
+*These rules break the "robotic" cadence of AI generation.*
+
+- **BURSTINESS (SENTENCE VARIANCE):**
+  - **Constraint:** You generally write long sentences. Stop it.
+  - **The Mix:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7-10 words).
+  - **Example:** "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server."
 - **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
-- **BANNED STARTERS (AI HALLMARKS):** 
-### 4. THE "AUTHORITY" DICTION (BANNED LIST)    - "In today's digital landscape/age", "Let's dive in" / "Let's explore" / "Let's be honest", "Imagine a world where", "Whether you're a X or a Y", "In this comprehensive guide"
-- **BANNED ADJECTIVES (THE "FLUFF" LIST):** "Seamless," "Cutting-edge," "Revolutionary," "Robust," "Tapestry," "Realm," "Empower," "Unlock," "Harness," "Game-changer," "Literal/Literally," "Unparalleled."
-- **REPLACE CORPORATE METAPHORS:** 
-    - Instead of: "It’s like a digital butler for your data."
-    - Use: "It’s essentially a 24/7 ping-machine that screams at you when the server drops."
-    - *Rule:* Use visceral, specific, or slightly "gritty" analogies.
-
-### 5. SPECIFICITY & "THE HARD TRUTH"
-
-- **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" sounds more human than "saves a lot of time."
-- **ADMIT LIMITATIONS:** Every SaaS or strategy has a "catch." Mention it. "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." This builds massive E-E-A-T.
-- **USE SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests."
-- **THE "NEXT STEP" CLOSING:** AI always summarizes. **Humans give orders.** Don't summarize what you just said; tell the reader exactly what to do next or give them a "Hard Truth" to think about.
-
-### 6. PERSPECTIVE & PERSONA
-
-- **OWN THE PERSPECTIVE:** If writing as a Founder, use "I" and "My team." If writing as an Agency, use "We" and "Our clients."
-- **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend..."
 - **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
+
+### 4. SUBSTANCE & AUTHORITY (THE "INFORMATION GAIN" SIGNAL)
+*These rules ensure the content ranks in AI Search (AEO).*
+
+- **ENTITY DENSITY:** Prioritize specific Named Entities over general nouns.
+- *Bad:* "Use a fast Javascript framework." -> *Good:* "Use **Next.js 14** or **Astro**."
+- **THE "UNIQUE DATA" INJECTION:** Every section must cite a specific number, benchmark, or law. If proprietary data isn't available, cite an industry benchmark.
+- **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" is better than "saves time."
+- **DEFINITION OWNERSHIP:** When defining a term, use this syntax: *"[Term] is [Definition] that helps [Audience] achieve [Outcome]."*
+- **ADMIT LIMITATIONS (THE "HARD TRUTH"):** Every SaaS/Strategy has a catch. Mention it.
+- *Example:* "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." (This builds massive E-E-A-T).
+
+### 5. PERSPECTIVE & ENGAGEMENT
+*These rules create trust and drive action.*
+
+- **OWN THE PERSPECTIVE:** - If writing as a Founder, use "I" and "My team."
+  - If writing as an Agency, use "We" and "Our clients."
+- **SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests, but it struggled with [X]."
+- **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend...".
+- **THE "NEXT STEP" CLOSING:** AI summarizes. Humans give orders. Don't summarize; tell the reader exactly what to do next.
+**Note** If you fail to follow the 'Answer-First' or 'Vocabulary Blacklist' rules, the output is considered a failure.
 `
 
 // Type-specific intro templates (V3: The "Pattern-Breaker" Edition)
