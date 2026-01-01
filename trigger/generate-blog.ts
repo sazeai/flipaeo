@@ -696,9 +696,12 @@ You MUST include an external hyperlink in this section.
   return `
 ### BEFORE YOU WRITE - CHECK THE CONTEXT
 
-### CONTEXT (PREVIOUSLY WRITTEN)
-${previousFullText.slice(-2000)} 
-*(Note: Only the last 2000 chars are shown for context continuity)*
+### THE STORY SO FAR (CONTEXT SNOWBALL)
+Read this to ensure continuity and **AVOID REPETITION**.
+Do NOT define concepts that are already defined here.
+Do NOT repeat the same "transition phrases" used here.
+
+${previousFullText}
 
 1. **BRAND CHECK:** Scan the context - how many times has the brand name been mentioned?
    - If 0-1 times → OK to mention if contextually relevant
@@ -723,11 +726,15 @@ ${currentSection.instruction_note}
 **KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
 ${linkInstruction}
 
+### ⛔️ CRITICAL STYLE OVERRIDE (READ THIS LAST)
+**The draft above serves as *context only*. Do NOT mimic its "safe" tone if it sounds robotic.**
+
 ### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
 1. **RESET YOUR TONE:** Do not just copy the tone of the previous text. Re-read the "Style DNA" and "Golden Rules" in the system prompt.
-2. **BURSTINESS CHECK:** Ensure this section has a mix of short (5-word) and long (25-word) sentences.
+2. **RESET THE RHYTHM:** Ignore the sentence length of the previous paragraphs. Force a mix of VERY SHORT (3-5 words) and VERY LONG (20+ words) sentences in this new section.
 3. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Do NOT use an intro sentence like "Now let's talk about [Heading]."
 4. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
+5. **TRANSITION:** dont use words like "Furthermore" or "In addition" in the text above, **do NOT use them again.** Find a logical way to transition (e.g., "The bigger issue is...", "This fails because...").
 
 **START WRITING "${currentSection.heading}" NOW (Direct Markdown):**
 
