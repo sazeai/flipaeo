@@ -229,8 +229,13 @@ export default function Editor({ data, markdown, onChange, readOnly, holderId = 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       logLevel: "ERROR" as any,
       data: initialData,
-      onReady: () => {
+      onReady: async () => {
         ejInstance.current = editor
+        // Emit initial data so parent components can calculate stats immediately
+        if (onChange) {
+          const content = await editor.save()
+          onChange(content)
+        }
       },
       onChange: async () => {
         const content = await editor.save()

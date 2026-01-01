@@ -24,6 +24,14 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { marked } from "marked"
+import { ChevronDown, FileText as FileTextIcon, Type } from "lucide-react"
 
 
 const Editor = dynamic(() => import("@/components/editor"), { ssr: false })
@@ -146,7 +154,7 @@ export default function ArticleDetailPage() {
         return ""
     }, [editorData, article?.raw_content])
 
-    const handleCopy = async () => {
+    const handleCopyMarkdown = async () => {
         const markdown = getMarkdownContent()
         if (!markdown) {
             toast.error("No content to copy")
@@ -156,10 +164,35 @@ export default function ArticleDetailPage() {
         try {
             await navigator.clipboard.writeText(markdown)
             setIsCopied(true)
-            toast.success("Copied to clipboard")
+            toast.success("Copied as Markdown")
             setTimeout(() => setIsCopied(false), 2000)
         } catch (err) {
             toast.error("Failed to copy")
+        }
+    }
+
+    const handleCopyRichText = async () => {
+        const markdown = getMarkdownContent()
+        if (!markdown) {
+            toast.error("No content to copy")
+            return
+        }
+
+        try {
+            const html = await marked.parse(markdown)
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    'text/html': new Blob([html], { type: 'text/html' }),
+                    'text/plain': new Blob([markdown], { type: 'text/plain' })
+                })
+            ])
+            setIsCopied(true)
+            toast.success("Copied as Rich Text")
+            setTimeout(() => setIsCopied(false), 2000)
+        } catch (err) {
+            // Fallback for browsers that don't support ClipboardItem
+            await navigator.clipboard.writeText(markdown)
+            toast.success("Copied as Markdown (Rich text not supported)")
         }
     }
 
@@ -269,7 +302,8 @@ export default function ArticleDetailPage() {
 
             const words = content.split(/\s+/).filter(w => w.length > 0).length
             const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
-            const links = (content.match(/\[.*?\]\(.*?\)/g) || []).length
+            // Use negative lookbehind to exclude image links (![...](url))
+            const links = (content.match(/(?<!!)\[.*?\]\(.*?\)/g) || []).length
             return { words, images, links }
         }
 
@@ -393,13 +427,7 @@ export default function ArticleDetailPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-1">
-                            <p className="text-xs text-gray-500">Last Saved</p>
-                            <div className="flex items-center gap-1.5 text-sm text-gray-700">
-                                <Clock className="w-3.5 h-3.5 text-gray-400" />
-                                {lastSaved ? lastSaved.toLocaleTimeString() : "Never"}
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </ScrollArea>
@@ -437,15 +465,28 @@ export default function ArticleDetailPage() {
                     </div>
 
                     <div className="flex items-center gap-1 mr-2 border-r pr-2 border-gray-200">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleCopy}
-                            className="h-8 w-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                            title="Copy as Markdown"
-                        >
-                            {isCopied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 px-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 gap-1"
+                                >
+                                    {isCopied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                                    <ChevronDown className="w-3 h-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                                <DropdownMenuItem onClick={handleCopyMarkdown} className="cursor-pointer gap-2">
+                                    <FileTextIcon className="w-4 h-4" />
+                                    Copy as Markdown
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleCopyRichText} className="cursor-pointer gap-2">
+                                    <Type className="w-4 h-4" />
+                                    Copy as Rich Text
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         <Button
                             variant="ghost"
                             size="icon"
@@ -503,13 +544,13 @@ export default function ArticleDetailPage() {
                             <TabsList className="bg-gray-100/80 p-1 rounded-full border border-gray-200/50">
                                 <TabsTrigger
                                     value="editor"
-                                    className="rounded-full px-6 py-1.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
+                                    className="cursor-pointer rounded-full px-6 py-1.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
                                 >
                                     Editor
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="outline"
-                                    className="rounded-full px-6 py-1.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
+                                    className="cursor-pointer rounded-full px-6 py-1.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
                                 >
                                     Outline
                                 </TabsTrigger>
