@@ -665,7 +665,15 @@ Select and insert **exactly 1-2** of these internal links naturally into the art
 ${introStrategy}
 ${brandContextSection}
 
-**WARNING:** Do NOT list these facts in article section directly. Do NOT summarize them. Use them to support your arguments.
+### 6. DATA & EVIDENCE STRATEGY (CRITICAL)
+we have aalyzed the web for fresh data for this article, i am giving you the fact-sheet below. 
+**MANDATORY RULE:** If a fact below is relevant to this section you are writing, you MUST use those facts in best possible way to make the section ready to answer.
+- Use a **Markdown Table** if comparing features.
+- Use a **Bullet List** if listing specs.
+- **Bold** any specific numbers or percentages.
+- **Do NOT bury** numbers in the middle of long paragraphs. Make them "scannable."
+- If comparing [Competitor] vs [Brand], ALWAYS use a "Comparison Table".
+
 ${JSON.stringify(factSheet)}
 
 ### 6. OUTPUT FORMAT
@@ -685,8 +693,11 @@ const generateWritingUserPrompt = (previousFullText: string, currentSection: any
 You MUST include an external hyperlink in this section.
 - **URL:** ${currentSection.external_link.url}
 - **Context:** Used to verify "${currentSection.external_link.anchor_context}"
-- **Instruction:** Embed this link naturally on relevant anchor text. 
 - **Format:** Use markdown link syntax: [anchor text](url)
+- **CONSTRAINT:** The anchor text MUST be natural conversation part of a running sentence, NOT a forceful spammy keyword.
+   - ❌ BAD: "Check out our [best ai photo restoration tool]."
+   - ✅ GOOD: "We designed [our restoration engine] to handle this specific texture."
+   - ✅ GOOD: "According to [this 2025 study], pixel degradation..."
 `
   }
 
@@ -1014,7 +1025,17 @@ export const generateBlogPost = task({
         const introTemplate = getIntroTemplate(articleType)
         const userPrompt = generateWritingUserPrompt(currentDraft, {
           heading: "Introduction / Hook (COLD OPEN)",
-          instruction_note: outline.intro.instruction_note + "\n\nCRITICAL: Start in the middle of the action. Do NOT say 'Welcome to this guide'. Do NOT summarize what is coming. Start with a specific problem, data point, or contrarian opinion.",
+          instruction_note: `
+*** STRICT STRUCTURE REQUIREMENT ***
+You MUST follow this specific intro template structure:
+${introTemplate}
+
+CRITICAL EXECUTION RULES:
+1. Do NOT write a generic "Welcome" or "In this guide". Start in the middle of the action.
+2. Start IMMEDIATELY with the Hook data point, or contrarian opinion.
+3. Make the reader feel the problem before you offer the solution.
+4. ${outline.intro.instruction_note}
+`,
           keywords_to_include: outline.intro.keywords_to_include
         })
 
