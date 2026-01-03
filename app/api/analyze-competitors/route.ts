@@ -6,6 +6,86 @@ import { jsonrepair } from "jsonrepair"
 
 export const maxDuration = 300 // 5 minute timeout
 
+/**
+ * Extracts competitor brand names from search results.
+ * Uses DOMAIN-BASED extraction only - no title parsing (too unreliable).
+ */
+function extractCompetitorBrands(
+    results: any[],
+    ownDomain: string
+): Array<{ name: string; url: string; domain: string }> {
+    const brands: Array<{ name: string; url: string; domain: string }> = []
+    const seenDomains = new Set<string>()
+
+    // Domains to skip (not competitors - content aggregators, etc.)
+    const SKIP_DOMAINS = new Set([
+        // Social/content sites
+        'medium.com', 'linkedin.com', 'twitter.com', 'facebook.com', 'youtube.com',
+        'reddit.com', 'quora.com', 'stackoverflow.com', 'github.com',
+        // Reference sites
+        'wikipedia.org', 'forbes.com', 'techcrunch.com', 'wired.com',
+        // Review aggregators
+        'g2.com', 'capterra.com', 'trustpilot.com', 'producthunt.com',
+        // Generic blogs
+        'hubspot.com', 'zapier.com', 'neil patel.com', 'searchenginejournal.com',
+        'moz.com', 'ahrefs.com', 'semrush.com', // These are SEO tools, not direct competitors for most niches
+    ])
+
+    for (const result of results) {
+        try {
+            const urlObj = new URL(result.url)
+            const domain = urlObj.hostname.replace("www.", "")
+
+            // Skip own domain
+            if (domain === ownDomain || seenDomains.has(domain)) continue
+
+            // Skip content aggregators
+            if (SKIP_DOMAINS.has(domain)) continue
+            const skipAsSuffix = Array.from(SKIP_DOMAINS).some(skip => domain.endsWith('.' + skip))
+            if (skipAsSuffix) continue
+
+            seenDomains.add(domain)
+
+            // Extract brand name from domain ONLY (titles are unreliable garbage)
+            const domainParts = domain.split('.')
+            let baseName: string
+
+            // Handle subdomains: "analytics.google.com" → use parent domain
+            if (domainParts.length > 2) {
+                baseName = domainParts[domainParts.length - 2]
+            } else {
+                baseName = domainParts[0]
+            }
+
+            // Skip generic subdomains
+            if (['www', 'blog', 'docs', 'help', 'support', 'app', 'cdn', 'api'].includes(baseName)) {
+                continue
+            }
+
+            // Skip if too short
+            if (baseName.length < 3) continue
+
+            // Capitalize first letter
+            const brandName = baseName.charAt(0).toUpperCase() + baseName.slice(1)
+
+            // Skip generic words that sneaked in
+            const SKIP_WORDS = new Set(['The', 'How', 'What', 'Top', 'Best', 'Guide', 'Complete', 'Tested', 'Lead', 'Free'])
+            if (SKIP_WORDS.has(brandName)) continue
+
+            brands.push({
+                name: brandName,
+                url: result.url,
+                domain
+            })
+        } catch {
+            // Skip invalid URLs
+        }
+    }
+
+    return brands.slice(0, 7) // Return top 7 competitors
+}
+
+
 export async function POST(req: NextRequest) {
     try {
         const supabase = await createClient()
@@ -41,27 +121,35 @@ export async function POST(req: NextRequest) {
         const tvly = tavily({ apiKey })
         const client = getGeminiClient()
 
-        // STEP 1: Use AI to extract ALL product features and generate queries for each
-        // This ensures multi-feature products get comprehensive coverage
+        // STEP 1: Use AI to identify PRIMARY CATEGORY and generate competitor-finding queries
         const categoryPrompt = `
-Given this brand description, extract ALL distinct product features and generate search queries.
+Given this brand description, identify the PRIMARY PRODUCT CATEGORY and generate search queries to find DIRECT COMPETITORS.
 
 Brand Context: ${brandContext || "A software business"}
 
-CRITICAL: Many products have MULTIPLE features (e.g., a photo tool might do restoration, animation, AND portrait generation).
-You MUST identify ALL distinct features, not just the primary one.
+CRITICAL RULES:
+1. Focus on the MAIN PRODUCT CATEGORY first (e.g., "web analytics", "email marketing", "CRM")
+2. Secondary features are NOT the category (e.g., "attribution" is a feature of analytics, not a separate category)
+3. Generate queries that would find DIRECT COMPETITORS to this product
+4. Include "[category] alternatives", "best [category] tools", "[main competitor] alternatives"
+
+EXAMPLES:
+- Brand: "A web analytics tool with attribution features" 
+  → Category: "web analytics"
+  → Queries: ["best web analytics tools", "Google Analytics alternatives", "privacy web analytics", "simple web analytics software"]
+
+- Brand: "An AI photo restoration and animation tool"
+  → Category: "AI photo editing"
+  → Queries: ["AI photo restoration software", "photo animation tools", "AI photo enhancer"]
 
 Return a JSON object with:
-1. category: The overall product category
-2. distinctFeatures: Array of ALL distinct features/products this brand offers (e.g., ["photo restoration", "photo animation", "family portrait generation", "hug video creation"])
-3. searchQueries: Array of 6-9 search queries covering ALL features. Generate 2-3 queries per distinct feature.
-   Example for a multi-feature product:
-   - "best AI photo restoration tools"
-   - "AI photo animation software"
-   - "family portrait generator AI"
-   - "nostalgic hug video maker"
-
-Be exhaustive. Miss nothing.
+1. category: The PRIMARY product category (e.g., "web analytics", "CRM", "email marketing", "photo restoration", "photoshoot generator")
+2. distinctFeatures: Array of 3-5 key features (but these are NOT the category)
+3. searchQueries: Array of 6-9 search queries focused on finding DIRECT COMPETITORS
+   - ALWAYS include: "best [category] tools", "[main competitor name] alternatives"
+   - Include comparison-style queries: "[category] software comparison"
+   
+Focus on finding similar products, not niche features.
 `
 
         const categoryResponse = await client.models.generateContent({
@@ -154,19 +242,38 @@ ${r.rawContent || r.content || ''}
 `).join("\n").slice(0, 30000)
 
         const extractPrompt = `
-Analyze this competitor content and extract valuable SEO data for a brand.
+Analyze this content from search results for "${categoryData.category || "software"}".
+Extract valuable SEO data and IDENTIFY REAL COMPETITORS.
 
 Brand Context: ${brandContext || "A SaaS business"}
 
-Competitor Content:
+Search Results Content:
 ${combinedContent}
 
-Extract the following as JSON:
-1. headings: Main headings and subheadings from the content (array of strings)
-2. keywords: Important keywords and phrases, 2-3 words each (array of strings, max 30)
-3. topics: Blog topic ideas that could compete with this content (array of strings, max 20)
+TASK:
+1. Identify DIRECT COMPETITORS to the brand described in Brand Context.
+2. Filter out:
+   - "Top X" listicle publishers (e.g., if Zapier writes "Best CRM", Zapier is NOT the competitor, the tools listed are)
+   - News sites, Wikipedia, social media
+   - The user's own brand
+3. Extract keywords and blog topics.
 
-Focus on actionable, specific topics relevant to the brand context. Be specific, not generic.
+Extract the following as JSON:
+1. headings: Main headings and subheadings (array of strings)
+2. keywords: Important keywords and phrases (array of strings, max 30)
+3. topics: Blog topic ideas that could compete with this content (array of strings, max 20)
+4. competitorBrands: Array of objects with ACTUAL COMPTIORS found in the content.
+   - name: Brand name
+   - url: URL (homepage if known, otherwise leave empty)
+   - reason: Why is this a competitor?
+
+Examples:
+- If content is "Best Web Analytics by SeedProd", and it lists "Google Analytics", "Mixpanel".
+  -> Competitors: [{name: "Google Analytics"}, {name: "Mixpanel"}]
+  -> SeedProd is GHOSTED (it's a blog article or page builder, not analytics)
+
+- If content is the homepage of "Fathom Analytics".
+  -> Competitors: [{name: "Fathom Analytics", url: "usefathom.com"}]
 `
 
         const response = await client.models.generateContent({
@@ -188,9 +295,20 @@ Focus on actionable, specific topics relevant to the brand context. Be specific,
                         topics: {
                             type: "ARRAY",
                             items: { type: "STRING" }
+                        },
+                        competitorBrands: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    name: { type: "STRING" },
+                                    url: { type: "STRING" },
+                                    reason: { type: "STRING" }
+                                }
+                            }
                         }
                     },
-                    required: ["headings", "keywords", "topics"]
+                    required: ["headings", "keywords", "topics", "competitorBrands"]
                 }
             }
         })
@@ -200,7 +318,7 @@ Focus on actionable, specific topics relevant to the brand context. Be specific,
         try {
             extracted = JSON.parse(text)
         } catch (e) {
-            console.warn("Extraction JSON parse failed, trying repair:", e)
+            console.warn("Extracted data JSON parse failed:", e)
             try {
                 extracted = JSON.parse(jsonrepair(text))
             } catch (e2) {
@@ -223,9 +341,21 @@ Focus on actionable, specific topics relevant to the brand context. Be specific,
             ...(extracted.keywords?.slice(0, 10) || [])
         ].filter((s, i, arr) => arr.indexOf(s) === i) // Dedupe
 
+        // NEW: Use LLM-extracted competitor brands (filtered by intelligence)
+        // This replaces the dumb domain-based extraction
+        let competitorBrands = extracted.competitorBrands || []
+
+        // Sanitize LLM output
+        competitorBrands = competitorBrands
+            .filter((c: any) => c && c.name && c.name.length < 30)
+            .slice(0, 10)
+
+        console.log(`[Analyze Competitors] Extracted ${competitorBrands.length} competitor brands: ${competitorBrands.map((c: any) => c.name).join(', ')}`)
+
         return NextResponse.json({
             competitors,
             seeds: seeds.slice(0, 30),
+            competitorBrands, // NEW: For vs-articles
         })
     } catch (error: any) {
         console.error("Competitor analysis error:", error)

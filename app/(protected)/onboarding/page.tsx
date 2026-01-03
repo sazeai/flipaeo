@@ -70,6 +70,7 @@ export default function OnboardingPage() {
     const [analyzingCompetitors, setAnalyzingCompetitors] = useState(false)
     const [competitors, setCompetitors] = useState<CompetitorData[]>([])
     const [competitorSeeds, setCompetitorSeeds] = useState<string[]>([])
+    const [competitorBrands, setCompetitorBrands] = useState<Array<{ name: string; url?: string }>>([])
 
     // Content Plan State
     const [generatingPlan, setGeneratingPlan] = useState(false)
@@ -334,14 +335,15 @@ export default function OnboardingPage() {
 
             setCompetitors(data.competitors || [])
             setCompetitorSeeds(data.seeds || [])
+            setCompetitorBrands(data.competitorBrands || [])
 
             // Persist to localStorage
             localStorage.setItem(STORAGE_KEYS.COMPETITORS, JSON.stringify(data.competitors || []))
             localStorage.setItem(STORAGE_KEYS.COMPETITOR_SEEDS, JSON.stringify(data.seeds || []))
 
-            // Auto-proceed to plan generation - pass brandId directly
+            // Auto-proceed to plan generation - pass brandId and competitorBrands directly
             setStep("plan")
-            handleGeneratePlan(data.seeds, currentBrandId || brandId)
+            handleGeneratePlan(data.seeds, currentBrandId || brandId, data.competitorBrands || [])
         } catch (e: any) {
             setError(e.message || "Failed to analyze competitors")
         } finally {
@@ -350,13 +352,14 @@ export default function OnboardingPage() {
     }
 
     // Content Plan Generation handler
-    const handleGeneratePlan = async (seeds: string[], currentBrandId?: string | null) => {
+    const handleGeneratePlan = async (seeds: string[], currentBrandId?: string | null, passedCompetitorBrands?: Array<{ name: string; url?: string }>) => {
         if (!brandData || seeds.length === 0) return
         setGeneratingPlan(true)
         setError("")
 
         // Use passed brandId or fall back to state
         const effectiveBrandId = currentBrandId || brandId
+        const effectiveCompetitorBrands = passedCompetitorBrands || competitorBrands
         try {
             // Step 1: Sync sitemap to internal_links table (SYNCHRONOUS)
             // This waits for completion before proceeding to plan generation
@@ -385,7 +388,13 @@ export default function OnboardingPage() {
             const res = await fetch("/api/generate-content-plan", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ seeds, brandData, brandId: effectiveBrandId, existingContent }),
+                body: JSON.stringify({
+                    seeds,
+                    brandData,
+                    brandId: effectiveBrandId,
+                    existingContent,
+                    competitorBrands: effectiveCompetitorBrands, // NEW: Pass competitor brands
+                }),
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Failed to generate plan")
@@ -776,9 +785,24 @@ export default function OnboardingPage() {
                                                     </div>
                                                 </div>
 
-                                                {/* 4. Enemy */}
+                                                {/* 4. Strategic Positioning */}
+                                                <div className="space-y-3">
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>4. Strategic Positioning</h3>
+                                                    <div>
+                                                        <label className={`block text-xs font-medium mb-1 text-stone-600`}>Category</label>
+                                                        <Input
+                                                            value={brandData.category || ''}
+                                                            onChange={e => updateField('category', e.target.value)}
+                                                            className="text-sm"
+                                                            placeholder="e.g., Privacy-First Web Analytics, AI Photo Restoration"
+                                                        />
+                                                        <p className={`text-[10px] text-stone-400 mt-1`}>How would you describe your product category?</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* 5. Enemy */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>4. Enemy (What you fight against)</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>5. Enemy (What you fight against)</h3>
                                                     <Textarea
                                                         value={brandData.enemy.join('\n')}
                                                         onChange={e => updateArray('enemy', e.target.value)}
@@ -788,9 +812,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
 
-                                                {/* 5. Voice & Tone */}
+                                                {/* 6. Voice & Tone */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>5. Brand Voice & Tone</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>6. Brand Voice & Tone</h3>
                                                     <Textarea
                                                         value={brandData.style_dna}
                                                         onChange={e => updateArray('style_dna', e.target.value)}
@@ -800,9 +824,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>Comprehensive writing style guide</p>
                                                 </div>
 
-                                                {/* 6. Unique Value Proposition */}
+                                                {/* 7. Unique Value Proposition */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>6. Unique Value Proposition</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>7. Unique Value Proposition</h3>
                                                     <Textarea
                                                         value={brandData.uvp.join('\n')}
                                                         onChange={e => updateArray('uvp', e.target.value)}
@@ -812,9 +836,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
 
-                                                {/* 7. Core Features */}
+                                                {/* 8. Core Features */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>7. Core Features</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>8. Core Features</h3>
                                                     <Textarea
                                                         value={brandData.core_features.join('\n')}
                                                         onChange={e => updateArray('core_features', e.target.value)}
@@ -824,9 +848,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
 
-                                                {/* 8. Pricing */}
+                                                {/* 9. Pricing */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>8. Pricing</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>9. Pricing</h3>
                                                     <Textarea
                                                         value={brandData.pricing?.join('\n') || ''}
                                                         onChange={e => updateArray('pricing', e.target.value)}
@@ -836,9 +860,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>One line e.g. "Pro Plan: $29/mo"</p>
                                                 </div>
 
-                                                {/* 9. How it Works */}
+                                                {/* 10. How it Works */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>9. How it Works</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>10. How it Works</h3>
                                                     <Textarea
                                                         value={brandData.how_it_works?.join('\n') || ''}
                                                         onChange={e => updateArray('how_it_works', e.target.value)}
@@ -848,9 +872,9 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>One step per line</p>
                                                 </div>
 
-                                                {/* 10. Featured Image Style */}
+                                                {/* 11. Featured Image Style */}
                                                 <div className="space-y-2">
-                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>10. Featured Image Style</h3>
+                                                    <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>11. Featured Image Style</h3>
                                                     <label className={`block text-xs font-medium mb-1 text-stone-600`}>Style Preference</label>
                                                     <select
                                                         className={`w-full h-10 rounded-md border px-3 text-sm bg-white border-stone-200 text-stone-900`}

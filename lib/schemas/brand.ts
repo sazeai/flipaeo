@@ -13,6 +13,7 @@ export const BrandDetailsSchema = z.object({
     psychology: z.string(),
   }),
   enemy: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
+  category: z.string().optional().default(""),  // e.g., "Privacy-First Web Analytics"
   uvp: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   core_features: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   pricing: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),

@@ -127,6 +127,7 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                             mission: "",
                             audience: { primary: "", psychology: "" },
                             enemy: [],
+                            category: "",
                             uvp: [],
                             core_features: [],
                             pricing: [],
@@ -194,6 +195,21 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                                 className="bg-stone-50 border-stone-200"
                             />
                         </div>
+                    </div>
+                </div>
+
+                {/* 2. Category (Strategic Positioning) */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">2. Strategic Positioning</h3>
+                    <div>
+                        <label className="block text-xs font-medium mb-1 text-stone-600">Category</label>
+                        <Input
+                            value={brandData.category || ""}
+                            onChange={e => updateField('category', e.target.value)}
+                            placeholder="e.g., Privacy-First Web Analytics, AI Photo Restoration"
+                            className="bg-stone-50 border-stone-200"
+                        />
+                        <p className="text-[10px] text-stone-400 mt-1">How would you describe your product category?</p>
                     </div>
                 </div>
 

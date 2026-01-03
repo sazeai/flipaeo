@@ -67,14 +67,15 @@ ${page.rawContent || page.markdown || page.content || ''}
       
       Extract the brand details into the following JSON structure:
       1. Product Identity (Name, What it is literally, What it is emotionally, What it is NOT)
-      2. Mission (The "Why")
-      3. Audience (Primary, Psychology)
-      4. Enemy (What they fight against)
-      5. Unique Value Proposition (How they win)
-      6. Core Features (Framed as "Fixes")
-      7. Pricing (Key plans, models, or costs - keep it simple)
-      8. How it Works (Steps or process flow)
-      9. Style DNA (CRITICAL - This is the COMPLETE WRITING VOICE as a SINGLE PARAGRAPH)
+      2. Category (e.g., "Privacy-First Web Analytics", "AI Video Generator", "CRM for Plumbers")
+      3. Mission (The "Why")
+      4. Audience (Primary, Psychology)
+      5. Enemy (What they fight against)
+      6. Unique Value Proposition (How they win - detailed selling points)
+      7. Core Features (Framed as "Fixes")
+      8. Pricing (Key plans, models, or costs - keep it simple)
+      9. How it Works (Steps or process flow)
+      10. Style DNA (CRITICAL - This is the COMPLETE WRITING VOICE as a SINGLE PARAGRAPH)
       
       For the Style DNA paragraph, analyze the website's actual writing and create a comprehensive guide covering:
       - Perspective: Do they use "I", "We", "You", or third-person? How do they refer to themselves vs their product?
@@ -122,9 +123,14 @@ ${page.rawContent || page.markdown || page.content || ''}
               type: "ARRAY",
               items: { type: "STRING" }
             },
+            category: {
+              type: "STRING",
+              description: "Product category, e.g., 'Privacy-First Web Analytics'"
+            },
             uvp: {
               type: "ARRAY",
-              items: { type: "STRING" }
+              items: { type: "STRING" },
+              description: "Unique Value Propositions - detailed selling points"
             },
             core_features: {
               type: "ARRAY",
@@ -143,7 +149,7 @@ ${page.rawContent || page.markdown || page.content || ''}
               description: "Complete writing voice and style guide as a single paragraph covering perspective, tone, sentence style, formality, patterns, and words to avoid"
             }
           },
-          required: ["product_name", "product_identity", "mission", "audience", "enemy", "uvp", "core_features", "pricing", "how_it_works", "style_dna"]
+          required: ["product_name", "product_identity", "mission", "audience", "enemy", "category", "uvp", "core_features", "pricing", "how_it_works", "style_dna"]
         }
       }
     })

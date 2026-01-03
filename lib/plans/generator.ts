@@ -4,8 +4,9 @@ import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { checkTopicDuplication } from "@/lib/topic-memory"
 import { getCoverageContext, summarizeCoverage } from "@/lib/coverage/analyzer"
-import { formatIdeaUniverseWithCoverage } from "@/lib/plans/idea-expansion"
 import { detectContentStage, getStrategyPrompt } from "@/lib/plans/strategy-detector"
+import { scheduleByCluster, consolidateClusters } from "@/lib/plans/cluster-scheduler"
+import { TopicHierarchy } from "@/lib/plans/topic-hierarchy"
 
 // Strategic Article Category Distribution (30 = 12 + 8 + 6 + 4)
 export const ARTICLE_CATEGORIES = {
@@ -44,9 +45,14 @@ interface GeneratePlanParams {
     brandId: string | null
     brandData: BrandDetails
     seeds: string[]
-    ideaUniverse?: string[] // Phase A: Expanded problem domains
-    ideaCoverageMap?: Record<string, "heavy" | "light" | "none"> // Phase B: Competitor coverage
-    existingContent?: string[] // Parent questions from sitemap
+    competitorBrands?: Array<{ name: string; url?: string }>
+    gapAnalysis?: {
+        blueOceanTopics?: string[]
+        saturatedTopics?: string[]
+        competitorWeaknesses?: string[]
+    }
+    topicHierarchy?: TopicHierarchy
+    existingContent?: string[]
 }
 
 interface GeneratePlanResult {
@@ -63,8 +69,9 @@ export async function generateContentPlan({
     brandId,
     brandData,
     seeds,
-    ideaUniverse = [],
-    ideaCoverageMap = {},
+    competitorBrands = [],
+    gapAnalysis = {},
+    topicHierarchy,
     existingContent = []
 }: GeneratePlanParams): Promise<GeneratePlanResult> {
     const today = new Date()
@@ -123,40 +130,40 @@ Intent Roles: ${config.intentRoles.join(", ")}
 Focus: ${config.prompt}`
     }).join('\n\n')
 
-    // Format idea universe with coverage if available
-    const ideaUniverseSection = ideaUniverse.length > 0
+    // Format competitor brands section
+    const competitorSection = competitorBrands.length > 0
         ? `
-## AUDIENCE COVERAGE CONTEXT (WHERE YOUR USERS LIVE)
+## COMPETITOR BRANDS (FOR VS-ARTICLES - USE EXACT NAMES)
 
-These are BROAD LIFE SITUATIONS where your target audience exists.
-They are NOT keywords. They are NOT article titles. They are CONTEXT for your creative ideation.
+These are REAL competitors identified from search results:
+${competitorBrands.map(c => `- ${c.name}${c.url ? ` (${c.url})` : ''}`).join('\n')}
 
-YOUR JOB: For each coverage area, THINK:
-"What would a REAL PERSON in this situation ACTUALLY TYPE into Google?"
+RULES:
+- Use EXACT competitor names in comparison articles (e.g., "${brandData.product_name} vs ${competitorBrands[0]?.name || 'Competitor'}")
+- DO NOT use placeholders like "[Generic Competitor Tool]"
+- Create at least 2-3 comparison articles against these competitors
+`
+        : ""
 
-Coverage Areas (with competitor saturation):
-${formatIdeaUniverseWithCoverage(ideaUniverse, ideaCoverageMap)}
+    // Format gap analysis section
+    const gapSection = (gapAnalysis.blueOceanTopics?.length || gapAnalysis.competitorWeaknesses?.length)
+        ? `
+## GAP ANALYSIS (STRATEGIC INTELLIGENCE)
 
-CRITICAL RULES:
-- 🟢 [NONE] = Untapped opportunity, PRIORITIZE these
-- 🟡 [LIGHT] = Partial coverage, good opportunity  
-- 🔴 [HEAVY] = Crowded, only for comparisons/edge cases
+${gapAnalysis.blueOceanTopics?.length ? `**BLUE OCEAN OPPORTUNITIES (PRIORITIZE THESE):**
+Topics with low/no competitor coverage - easy wins:
+${gapAnalysis.blueOceanTopics.slice(0, 10).map(t => `- ${t}`).join('\n')}
+` : ''}
 
-DO NOT create articles titled after these domains directly.
-DO create articles that answer REAL QUESTIONS people in these domains would search.
+${gapAnalysis.competitorWeaknesses?.length ? `**COMPETITOR WEAKNESSES (ATTACK THESE):**
+Topics where competitors are weak - opportunity for better content:
+${gapAnalysis.competitorWeaknesses.slice(0, 5).map(t => `- ${t}`).join('\n')}
+` : ''}
 
-SKIP RULE (MANDATORY):
-If a coverage area does NOT naturally connect to the product, SKIP IT entirely.
-Do NOT force irrelevant connections. Not every domain needs to be covered.
-
-Example: If product is "AI Headshot Generator":
-- "Starting a new business venture" → SKIP (logos are not headshots)
-- "Creating marketing materials" → SKIP (not relevant to headshots)
-- "Job search and career advancement" → COVER ("Should I use AI headshot for LinkedIn?")
-
-WRONG (Forced irrelevant coverage):
-- "Should Your New Business Logo Use AI?" ← Product makes headshots, NOT logos!
-- "AI Marketing Photo License Guide" ← Random, not connected
+${gapAnalysis.saturatedTopics?.length ? `**SATURATED TOPICS (AVOID OR DO 10X BETTER):**
+Heavy competition - only target if you have unique angle:
+${gapAnalysis.saturatedTopics.slice(0, 5).map(t => `- ${t}`).join('\n')}
+` : ''}
 `
         : ""
 
@@ -206,13 +213,28 @@ DEPRIORITIZE these patterns:
 
 ${strategySection}
 
-${ideaUniverseSection}
+${competitorSection}
+
+${gapSection}
 
 ${coverageSection}
 
+${topicHierarchy ? `
+## THE BLUEPRINT: TOPIC HIERARCHY (MANDATORY)
+Follow this hierarchy EXACTLY. For each topic provided, generate the necessary SEO metadata.
+
+**TOPICS TO GENERATE:**
+${topicHierarchy.nodes.map((n: any) => `- Topic: "${n.topic}" (Type: ${n.type}, Intent: ${n.intentRole}, Priority: ${n.priority})`).join('\n')}
+
+**RULES:**
+1. You MUST generate exactly one article for each Topic in the list above.
+2. DO NOT invent new topics if the hierarchy has 30 topics.
+3. The "cluster" for each article should group related topics logically (e.g., all topics about "Privacy" go into a "Privacy" cluster).
+` : ''}
+
 ## SEED KEYWORDS (VALIDATION ONLY)
 Use these to confirm demand exists, NOT to drive topic selection.
-The IDEA UNIVERSE above is your primary strategic source.
+The GAP ANALYSIS above is your primary strategic source.
 
 ${seeds.join("\\n")}
 
@@ -229,6 +251,22 @@ Topics come from MARKET DEMAND (above). Brand voice shapes HOW you write.
 - What it is: ${brandData.product_identity.literally}
 
 ---
+
+
+
+
+## THE GROUNDING PRINCIPLE (MANDATORY)
+
+You are strictly forbidden from inventing features, capabilities, or claims about this brand.
+Every article topic and claim must be directly supported by the brand data provided.
+
+1. **STRICT GROUNDING:** Do not assume the product has any feature, tool, or integration not explicitly mentioned in the "Core Features" or "What it is" sections.
+2. **NO INVENTED STANDARDS:** Do not write about legal, technical, or industry standards (e.g. HIPAA, ISO, specialized certifications) unless the brand explicitly claims them.
+3. **NO GUESSWORK:** If you aren't 100% sure the brand does something, don't include it in the plan.
+4. **BRAND HONESTY:** It is better to have a shorter, more focused plan than one filled with "creative" guesses that are factually incorrect.
+
+If an article title or keyword implies a capability the brand does not clearly have, the plan is invalid.
+
 
 ## FEATURE LIMIT (MANDATORY CONSTRAINT)
 
@@ -525,11 +563,8 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
 
     console.log(`[Content Plan] Final Category Distribution:`, categoryDistribution)
 
-    // Add IDs, dates, and categories to each post
-    const planItems: ContentPlanItem[] = validPosts.map((post: any, index: number) => {
-        const scheduledDate = new Date(today)
-        scheduledDate.setDate(today.getDate() + index)
-
+    // Add metadata and IDs
+    const rawItems = validPosts.map((post: any, index: number) => {
         // Validate article_type
         const validTypes = ["informational", "commercial", "howto"]
         const articleType = validTypes.includes(post.article_type) ? post.article_type : "informational"
@@ -547,12 +582,19 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
             supporting_keywords: post.supporting_keywords || [],
             article_type: articleType as "informational" | "commercial" | "howto",
             cluster: post.cluster || "General",
-            scheduled_date: scheduledDate.toISOString().split("T")[0],
-            status: "pending" as const,
             intent_role: post.intent_role || "Core Answer",
             article_category: articleCategory as "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays"
         }
     })
 
-    return { plan: planItems, categoryDistribution }
+    // --- STEP 6: STRATEGIC SCHEDULING (NEW) ---
+    console.log("[Content Plan] Applying Cluster-first scheduling...")
+
+    // First, consolidate small clusters for better authority
+    const consolidated = consolidateClusters(rawItems, 3, 8)
+
+    // Then schedule by cluster
+    const scheduledPlan = scheduleByCluster(consolidated, today)
+
+    return { plan: scheduledPlan as ContentPlanItem[], categoryDistribution }
 }
