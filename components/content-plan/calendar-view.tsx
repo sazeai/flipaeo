@@ -95,7 +95,6 @@ export function CalendarView({ items, onItemClick }: CalendarViewProps) {
                 ))}
             </div>
 
-            {/* Legend */}
             <div className="mt-6 flex flex-wrap items-center gap-6 px-4 py-3 bg-stone-50 rounded-lg border border-stone-100">
                 <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
