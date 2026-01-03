@@ -1130,7 +1130,7 @@ export default function OnboardingPage() {
                                         {/* Skip Option */}
                                         <button
                                             onClick={handleSkipGSC}
-                                            className={`w-full text-center text-xs underline underline-offset-2 text-stone-500 hover:text-stone-400`}
+                                            className={`cursor-pointer w-full text-center text-xs underline underline-offset-2 text-stone-500 hover:text-stone-400`}
                                         >
                                             Continue without Search Console
                                         </button>
@@ -1167,7 +1167,7 @@ export default function OnboardingPage() {
                                                 <p className="text-sm">No sites found in your Search Console account.</p>
                                                 <button
                                                     onClick={handleSkipGSC}
-                                                    className="mt-4 text-sm underline"
+                                                    className="cursor-pointer mt-4 text-sm underline"
                                                 >
                                                     Continue without GSC data
                                                 </button>

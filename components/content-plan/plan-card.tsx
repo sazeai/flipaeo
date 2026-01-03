@@ -169,14 +169,15 @@ export const PlanCard = memo(function PlanCard({
     const BadgeIcon = item.badge ? BADGE_CONFIG[item.badge]?.icon : null
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+        <div
             className={cn(
-                "group relative p-5 rounded-xl border transition-all duration-200 flex flex-col h-full bg-white",
+                "relative p-4 rounded-xl border border-l-4 transition-colors flex flex-col h-full bg-white",
                 isUrgent
-                    ? "border-stone-300 shadow-sm"
-                    : "border-stone-200 hover:border-stone-300 hover:shadow-sm"
+                    ? "border-stone-400 shadow-sm ring-1 ring-stone-900/5"
+                    : "border-stone-200 hover:border-stone-300",
+                item.status === 'published' ? "border-l-emerald-500 bg-emerald-50/5" :
+                    item.status === 'writing' ? "border-l-blue-500 bg-blue-50/5" :
+                        "border-l-stone-200"
             )}
         >
             {isEditing ? (
@@ -190,56 +191,46 @@ export const PlanCard = memo(function PlanCard({
                 <div className="flex flex-col h-full gap-3">
                     {/* Header: Badges, Score & Edit */}
                     <div className="flex items-start justify-between">
-                        <div className="flex flex-wrap items-center gap-2">
-                            {item.badge && BADGE_CONFIG[item.badge] && (
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {/* Status Indicator */}
+                            <span className={cn(
+                                "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border",
+                                item.status === 'published' ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                                    item.status === 'writing' ? "bg-blue-50 text-blue-700 border-blue-100" :
+                                        "bg-stone-50 text-stone-500 border-stone-200"
+                            )}>
                                 <span className={cn(
-                                    "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold border",
-                                    BADGE_CONFIG[item.badge].className
-                                )}>
-                                    <BadgeIcon className="w-3 h-3" />
+                                    "w-1 h-1 rounded-full",
+                                    item.status === 'published' ? "bg-emerald-500" :
+                                        item.status === 'writing' ? "bg-blue-500" :
+                                            "bg-stone-400"
+                                )} />
+                                {item.status === 'writing' ? 'Drafting' : item.status === 'published' ? 'Live' : 'Planned'}
+                            </span>
+
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[8px] font-bold text-stone-400 border border-stone-100 bg-stone-50/50 uppercase tracking-tight">
+                                {typeConfig.label}
+                            </span>
+
+                            {item.badge && item.badge !== 'new_opportunity' && BADGE_CONFIG[item.badge] && (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider border border-stone-200 bg-white text-stone-500">
+                                    <BadgeIcon className="w-2.5 h-2.5" />
                                     {BADGE_CONFIG[item.badge].label}
                                 </span>
                             )}
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium text-stone-500 border border-stone-100 bg-stone-50">
-                                <typeConfig.icon className="w-3 h-3" />
-                                {typeConfig.label}
-                            </span>
-                            {/* Opportunity Score with Tooltip */}
-                            {item.opportunity_score !== undefined && item.opportunity_score > 0 && (
+
+                            {/* Opportunity Score - Only show if we have real GSC data */}
+                            {(item.gsc_impressions ?? 0) > 0 && (item.opportunity_score ?? 0) > 0 && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-stone-700 bg-stone-100 border border-stone-200 cursor-help">
-                                            <Gauge className="w-3 h-3" />
+                                        <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8px] font-black text-amber-700 bg-amber-50 border border-amber-100 cursor-help">
+                                            <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
                                             {item.opportunity_score}
-                                        </span>
+                                        </div>
                                     </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-[220px]">
-                                        <p className="font-semibold">Opportunity Score</p>
-                                        <p className="text-[11px] opacity-90">Calculated from impressions, position, CTR gap, and keyword specificity. Higher = more valuable topic.</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                            {/* Impact Badge with Tooltip */}
-                            {item.impact && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className={cn(
-                                            "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium cursor-help border",
-                                            item.impact === "High" && "text-emerald-700 bg-emerald-50 border-emerald-200",
-                                            item.impact === "Medium" && "text-amber-700 bg-amber-50 border-amber-200",
-                                            item.impact === "Low" && "text-stone-500 bg-stone-50 border-stone-200"
-                                        )}>
-                                            <TrendingUp className="w-3 h-3" />
-                                            {item.impact}
-                                        </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-[200px]">
-                                        <p className="font-semibold">Expected Traffic Impact</p>
-                                        <p className="text-[11px] opacity-90">
-                                            {item.impact === "High" && "This topic can drive significant organic traffic."}
-                                            {item.impact === "Medium" && "This topic has moderate traffic potential."}
-                                            {item.impact === "Low" && "Smaller traffic potential, but good for authority."}
-                                        </p>
+                                    <TooltipContent side="top" className="max-w-[200px] text-[10px]">
+                                        <p className="font-bold">Score: {item.opportunity_score}</p>
+                                        <p className="opacity-90">Calculated from market demand and search position.</p>
                                     </TooltipContent>
                                 </Tooltip>
                             )}
@@ -247,130 +238,84 @@ export const PlanCard = memo(function PlanCard({
 
                         <button
                             onClick={onStartEdit}
-                            className="cursor-pointer opacity-100 group-hover:opacity-80 transition-opacity p-1.5 hover:bg-stone-100 rounded-md text-stone-400 hover:text-stone-600"
+                            className="cursor-pointer opacity-100 group-hover:opacity-100 transition-all p-2 hover:bg-stone-100 rounded-xl text-stone-400 hover:text-stone-900 border border-transparent hover:border-stone-100"
                         >
-                            <SquarePen className="w-3.5 h-3.5" />
+                            <SquarePen className="w-4 h-4" />
                         </button>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="font-semibold text-stone-900 text-[15px] leading-snug group-hover:text-stone-700 transition-colors line-clamp-2">
-                        {item.title}
-                    </h3>
-
-                    {/* AI Strategic Reason */}
-                    {item.reason && (
-                        <p className="text-[11px] text-stone-500 leading-relaxed italic">
-                            <Lightbulb className="w-3 h-3 inline mr-1 opacity-70" />
-                            {item.reason}
-                        </p>
-                    )}
-
-                    {/* GSC Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-y-1.5 gap-x-4 text-xs">
-                        {/* Main Keyword with Tooltip */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex items-center gap-2 text-stone-500 truncate cursor-help col-span-2">
-                                    <Search className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate font-medium">{item.main_keyword}</span>
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" className="max-w-[250px]">
-                                <p className="font-semibold">Target Keyword</p>
-                                <p className="text-[11px] opacity-90">The primary keyword this article will target for SEO rankings.</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* GSC Impressions */}
-                        {item.gsc_impressions && item.gsc_impressions > 0 ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-2 text-stone-500 cursor-help">
-                                        <TrendingUp className="w-3 h-3 flex-shrink-0" />
-                                        <span>{item.gsc_impressions.toLocaleString()} <span className="text-[10px] opacity-70">imps</span></span>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[200px] text-center">
-                                    <p className="font-semibold">Monthly Impressions</p>
-                                    <p className="text-[11px] opacity-90">How many times your site appeared in search results for this keyword.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : null}
-
-                        {/* CTR */}
-                        {item.gsc_ctr !== undefined && item.gsc_ctr > 0 ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex gap-2 text-stone-500 cursor-help">
-                                        <MousePointerClick className="w-3 h-3 flex-shrink-0" />
-                                        <span>{item.gsc_ctr.toFixed(1)}% <span className="text-[10px] opacity-70">CTR</span></span>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[200px]">
-                                    <p className="font-semibold">Click-Through Rate</p>
-                                    <p className="text-[11px] opacity-90">Percentage of impressions that resulted in clicks. Low CTR = opportunity to target the keyword.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : null}
-
-                        {/* Position */}
-                        {item.gsc_position && item.gsc_position > 0 ? (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex gap-2 text-stone-500 cursor-help">
-                                        <Target className="w-3 h-3 flex-shrink-0" />
-                                        <span>Pos {item.gsc_position.toFixed(1)}</span>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" className="max-w-[220px] ">
-                                    <p className="font-semibold">Average Position</p>
-                                    <p className="text-[11px] opacity-90">Your current ranking in Google. Position 1-10 = Page 1, 11-20 = Page 2, etc.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : null}
+                    {/* Title & Reason */}
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-stone-900 text-[15px] leading-tight line-clamp-2 tracking-tight">
+                            {item.title}
+                        </h3>
+                        {item.reason && (
+                            <p className="text-[11px] text-stone-500 leading-normal bg-stone-50 p-2 rounded-lg border border-stone-100">
+                                <span className="font-bold text-stone-900 mr-1.5 underline decoration-amber-500/30">Why:</span>
+                                {item.reason}
+                            </p>
+                        )}
                     </div>
 
-                    {/* Supporting Keywords */}
-                    {item.supporting_keywords && item.supporting_keywords.length > 0 && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex items-center gap-1.5 text-[10px] text-stone-400 cursor-help">
-                                    <Tag className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate">
-                                        +{item.supporting_keywords.length} related keywords
-                                    </span>
+                    {/* SEO Metrics Bar */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[11px] text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
+                            <span className="font-bold uppercase text-[9px] text-stone-400">Target:</span>
+                            <span className="font-bold tracking-tight text-stone-900">{item.main_keyword}</span>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            {(item.gsc_impressions ?? 0) > 0 && (
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-bold text-stone-400 uppercase">Demand</span>
+                                    <span className="text-[11px] font-bold text-stone-900">{item.gsc_impressions?.toLocaleString()}</span>
                                 </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" className="max-w-[280px]">
-                                <p className="font-semibold mb-1">Supporting Keywords</p>
-                                <p className="text-[11px] opacity-90 leading-relaxed">
-                                    {item.supporting_keywords.slice(0, 5).join(", ")}
-                                    {item.supporting_keywords.length > 5 && ` +${item.supporting_keywords.length - 5} more`}
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
+                            )}
+
+                            {(item.gsc_position ?? 0) > 0 && (
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] font-bold text-stone-400 uppercase">Current</span>
+                                    <span className="text-[11px] font-bold text-stone-900">#{item.gsc_position?.toFixed(1)}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Simple Keywords */}
+                    {item.supporting_keywords && item.supporting_keywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                            {item.supporting_keywords.slice(0, 3).map(kw => (
+                                <span key={kw} className="px-2 py-0.5 rounded bg-stone-100 text-[10px] font-medium text-stone-600">
+                                    {kw}
+                                </span>
+                            ))}
+                            {item.supporting_keywords.length > 3 && (
+                                <span className="px-2 py-0.5 text-[10px] font-medium text-stone-400">
+                                    +{item.supporting_keywords.length - 3}
+                                </span>
+                            )}
+                        </div>
                     )}
 
                     {/* Footer: Date & Action */}
-                    <div className="mt-auto pt-3 flex items-end justify-between border-t border-stone-100">
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-[10px] text-stone-400 font-medium">SCHEDULED</span>
-                            <span className="text-xs font-medium text-stone-700">
+                    <div className="mt-auto pt-3 flex items-center justify-between border-t border-stone-100/60">
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-stone-500">
+                                <Calendar className="w-3 h-3" />
                                 {new Date(item.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </span>
+                            </div>
                         </div>
 
                         {item.status === 'writing' ? (
                             <Link
                                 href="/articles"
-                                className="flex items-center gap-1.5 text-xs font-semibold text-stone-900 bg-stone-100 px-3 py-1.5 rounded-lg hover:bg-stone-200 transition-colors"
+                                className="flex items-center gap-2 text-xs font-black text-blue-700 bg-blue-50 border border-blue-100 px-4 py-2 rounded-xl hover:bg-blue-100 transition-all shadow-sm"
                             >
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                Writing...
+                                Generating...
                             </Link>
                         ) : item.status === 'published' ? (
-                            <span className="flex items-center gap-1.5 text-xs font-semibold text-stone-900 bg-stone-100 px-3 py-1.5 rounded-lg border border-stone-200">
+                            <span className="flex items-center gap-2 text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-xl shadow-sm">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Published
                             </span>
@@ -383,14 +328,14 @@ export const PlanCard = memo(function PlanCard({
                                             size="sm"
                                             disabled={!hasCredits}
                                             className={cn(
-                                                "h-8 text-xs font-semibold shadow-sm rounded-lg",
+                                                "h-9 px-4 text-xs font-bold rounded-lg transition-all active:scale-95",
                                                 !hasCredits
-                                                    ? "bg-stone-100 text-stone-400 cursor-not-allowed hover:bg-stone-100"
+                                                    ? "bg-stone-100 text-stone-400 cursor-not-allowed hover:bg-stone-100 border border-stone-200"
                                                     : "bg-stone-900 text-white hover:bg-stone-800"
                                             )}
                                         >
-                                            <Feather className="w-3 h-3" />
-                                            Write Article
+                                            <Feather className="w-3.5 h-3.5 mr-1" />
+                                            Write Now
                                         </Button>
                                     </span>
                                 </TooltipTrigger>
@@ -404,6 +349,6 @@ export const PlanCard = memo(function PlanCard({
                     </div>
                 </div>
             )}
-        </motion.div>
+        </div>
     )
 })

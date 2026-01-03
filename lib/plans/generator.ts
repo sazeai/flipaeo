@@ -380,6 +380,9 @@ For each article provide:
 7. article_category: One of "Core Answers", "Supporting Articles", "Conversion Pages", "Authority Plays"
 8. parent_question: The ONE fundamental user question this article answers
 9. gsc_query: EXACT primary keyword from GscClusters or null if no match
+10. reason: A 1-sentence strategic rationale (WHY this content matters for THIS brand)
+11. impact: "High" | "Medium" | "Low" (Strategic importance)
+12. priority_score: 0-100 (Based on keyword relevance and business value)
 
 ## CRITICAL REQUIREMENTS:
 1. Each article's parent_question must be UNIQUE across the plan.
@@ -411,9 +414,12 @@ For each article provide:
                                 intent_role: { type: "STRING" },
                                 article_category: { type: "STRING" },
                                 parent_question: { type: "STRING" },
-                                gsc_query: { type: "STRING" }
+                                gsc_query: { type: "STRING" },
+                                reason: { type: "STRING" },
+                                impact: { type: "STRING" },
+                                priority_score: { type: "NUMBER" }
                             },
-                            required: ["title", "main_keyword", "supporting_keywords", "article_type", "cluster", "intent_role", "article_category", "parent_question"]
+                            required: ["title", "main_keyword", "supporting_keywords", "article_type", "cluster", "intent_role", "article_category", "parent_question", "reason", "impact", "priority_score"]
                         }
                     }
                 },
@@ -525,7 +531,7 @@ ${existingTitles}
 
 ## YOUR TASK
 Generate EXACTLY ${totalNeeded} unique articles following the category requirements above.
-Each article needs: title, main_keyword, supporting_keywords, article_type, cluster, intent_role, article_category, parent_question
+Each article needs: title, main_keyword, supporting_keywords, article_type, cluster, intent_role, article_category, parent_question, reason (1-sentence rationale), impact (High | Medium | Low), priority_score (0-100)
 `
 
         try {
@@ -549,9 +555,12 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
                                         cluster: { type: "STRING" },
                                         intent_role: { type: "STRING" },
                                         article_category: { type: "STRING" },
-                                        parent_question: { type: "STRING" }
+                                        parent_question: { type: "STRING" },
+                                        reason: { type: "STRING" },
+                                        impact: { type: "STRING" },
+                                        priority_score: { type: "NUMBER" }
                                     },
-                                    required: ["title", "main_keyword", "article_type", "article_category"]
+                                    required: ["title", "main_keyword", "article_type", "article_category", "reason", "impact", "priority_score"]
                                 }
                             }
                         },
@@ -608,18 +617,25 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
             cluster: post.cluster || "General",
             intent_role: post.intent_role || "Core Answer",
             article_category: articleCategory as "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays",
+            reason: post.reason || "Strategic foundational content to establish topical authority.",
+            impact: post.impact || "Medium",
             // Map GSC Metrics
             gsc_query: post.gsc_query || null,
             ...(post.gsc_query ? (() => {
                 const cluster = gscClusters.find(c => c.primary_keyword === post.gsc_query);
                 return {
-                    opportunity_score: cluster?.opportunity_score || 0,
+                    opportunity_score: cluster?.opportunity_score || post.priority_score || 0,
                     gsc_impressions: cluster?.impressions || 0,
                     gsc_position: cluster?.position || 0,
                     gsc_ctr: cluster?.ctr || 0,
                     badge: cluster?.category || "strategic"
                 };
-            })() : {})
+            })() : {
+                opportunity_score: 0,
+                gsc_impressions: 0,
+                gsc_position: 0,
+                gsc_ctr: 0
+            })
         }
     })
 
