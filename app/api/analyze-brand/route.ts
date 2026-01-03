@@ -58,38 +58,40 @@ ${page.rawContent || page.markdown || page.content || ''}
     const client = getGeminiClient()
 
     const prompt = `
-      You are an expert brand strategist and writing style analyst. Analyze the following website content and extract the brand identity AND comprehensive writing style.
+      You are an expert brand strategist and linguistic analyst. Analyze the following website content to extract a strategic brand identity and a robust writing style guide.
       
       Target Website: ${url}
       
       Website Content Samples:
-      ${combinedContent.slice(0, 50000)} -- Limit context to avoid overload
+      ${combinedContent.slice(0, 50000)}
       
-      Extract the brand details into the following JSON structure:
-      1. Product Identity (Name, What it is literally, What it is emotionally, What it is NOT)
-      2. Category (e.g., "Privacy-First Web Analytics", "AI Video Generator", "CRM for Plumbers")
-      3. Mission (The "Why")
-      4. Audience (Primary, Psychology)
-      5. Enemy (What they fight against)
-      6. Unique Value Proposition (How they win - detailed selling points)
-      7. Core Features (Framed as "Fixes")
-      8. Pricing (Key plans, models, or costs - keep it simple)
-      9. How it Works (Steps or process flow)
-      10. Style DNA (CRITICAL - This is the COMPLETE WRITING VOICE as a SINGLE PARAGRAPH)
+      ## CRITICAL: NOISE FILTERING RULES
+      Before analyzing, you MUST filter out the following "noise" frequently found on websites:
+      1. **Personal Footers:** Ignore phrases like "Made with ☕️ by...", "Built by...", or personal thank-you notes.
+      2. **Transient Social Proof:** Ignore specific numbers that change (e.g., "Loved by 10,000+ users", "Joined by 500 people today"). Focus on the *fact* that they use social proof, not the numbers.
+      3. **Boilerplate:** Ignore standard footer links, copyright notices, and "Something missing? Suggest features" type of transient UI text.
       
-      For the Style DNA paragraph, analyze the website's actual writing and create a comprehensive guide covering:
-      - Perspective: Do they use "I", "We", "You", or third-person? How do they refer to themselves vs their product?
-      - Tone: Professional, casual, formal, playful, authoritative, friendly, data-driven?
-      - Sentence style: Short and punchy? Long and detailed? Varied rhythm?
-      - Formality level: Academic, corporate, conversational?
-      - Specific patterns: Do they use questions? Bullet points? Data/statistics? Analogies?
-      - Words to avoid: Any jargon or corporate speak they seem to avoid?
-      - Unique quirks: Any distinctive writing patterns or voice characteristics?
+      ## EXTRACTION GUIDE:
+      1. **Product Identity:** What is it literally (tool category), emotionally (the feeling), and what is it NOT (distinction).
+      2. **Category:** A professional industry category (e.g., "SaaS for X", "E-commerce for Y").
+      3. **Mission:** The core "Why".
+      4. **Audience:** Not just "users", but the specific psychology and role (e.g., "Overwhelmed small business owners looking for speed").
+      5. **Enemy:** What philosophical or practical problem is this product fighting (e.g., "Complexity", "Slow data", "High costs").
+      6. **Unique Value Proposition:** 3-5 distinct, permanent selling points.
+      7. **Core Features (The "Fixes"):** List permanent product capabilities, not transient UI features.
+      8. **Pricing:** High-level model (Subscription, One-time, Free tier).
+      9. **Style DNA (ROBUST LINGUISTIC GUIDE):** 
+         Create a SINGLE paragraph that defines the LINGUISTIC STYLE. 
+         - **Perspective:** (e.g., Second-person addressing user, first-person plural for brand).
+         - **Rhetorical Patterns:** (e.g., Do they lead with benefits? Use rhetorical questions? Use active/command verbs?).
+         - **Vocabulary:** Describe the "vibe" of their words (e.g., "Outcome-oriented, minimalist, devoid of abstract fluff").
+         - **Formality:** Conversational vs Corporate vs Technical.
+         - **STRICT RULE:** DO NOT copy-paste specific strings from the website (like "Made with coffee"). Instead, define the *pattern* (e.g., "Uses personal, approachable touches in non-core areas").
       
-      Example style_dna output:
-      "Write in a conversational yet authoritative tone. Use first-person plural ('we', 'our') when referring to the brand, and address the reader as 'you'. Keep sentences varied—mix short punchy statements with longer explanatory ones. Ask rhetorical questions to engage readers. Avoid corporate jargon like 'synergy', 'leverage', or 'paradigm'. Be direct and specific; prefer '3x faster' over 'much faster'. Use active voice. Include specific examples and data when possible. End sections with actionable takeaways."
-      
-      Be specific, raw, and honest. Avoid marketing fluff. Use the brand's own language where possible.
+      Example style_dna:
+      "The voice is direct, minimalist, and outcome-oriented. It adopts a conversational yet confident tone, using a second-person perspective ('you') to drive action while referring to the brand as 'we'. Sentences are punchy and start with command verbs. It avoids all corporate 'fluff' and abstract mission-speak, favoring instead clear, benefit-driven headlines and data-backed claims. The writing uses personal, approachable micro-copy to build community trust without losing professional authority."
+
+      Extract into JSON format.
     `
 
     const response = await client.models.generateContent({

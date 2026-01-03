@@ -7,6 +7,7 @@ import { getCoverageContext, summarizeCoverage } from "@/lib/coverage/analyzer"
 import { detectContentStage, getStrategyPrompt } from "@/lib/plans/strategy-detector"
 import { scheduleByCluster, consolidateClusters } from "@/lib/plans/cluster-scheduler"
 import { TopicHierarchy } from "@/lib/plans/topic-hierarchy"
+import { KeywordCluster } from "@/lib/plans/gsc-processor"
 
 // Strategic Article Category Distribution (30 = 12 + 8 + 6 + 4)
 export const ARTICLE_CATEGORIES = {
@@ -53,6 +54,7 @@ interface GeneratePlanParams {
     }
     topicHierarchy?: TopicHierarchy
     existingContent?: string[]
+    gscClusters?: KeywordCluster[]
 }
 
 interface GeneratePlanResult {
@@ -72,7 +74,8 @@ export async function generateContentPlan({
     competitorBrands = [],
     gapAnalysis = {},
     topicHierarchy,
-    existingContent = []
+    existingContent = [],
+    gscClusters = []
 }: GeneratePlanParams): Promise<GeneratePlanResult> {
     const today = new Date()
     const client = getGeminiClient()
@@ -167,6 +170,23 @@ ${gapAnalysis.saturatedTopics.slice(0, 5).map(t => `- ${t}`).join('\n')}
 `
         : ""
 
+    // Format GSC validation section
+    const gscSection = gscClusters.length > 0
+        ? `
+## MARKET VALIDATION: GSC PERFORMANCE DATA (ENRICHMENT)
+
+Use this real search data to VALIDATE and AUGMENT your plan.
+
+**HIGH-OPPORTUNITY CLUSTERS:**
+${gscClusters.slice(0, 20).map(c => `- "${c.primary_keyword}" (Imps: ${c.impressions}, Pos: ${c.position}, Score: ${c.opportunity_score}/100)`).join('\n')}
+
+**AUGMENTATION RULES:**
+1. **Validate Strategy:** If a topic in the BLUEPRINT matches a GSC cluster, mark it as validated by setting the \`gsc_query\` field to the EXACT primary keyword from that cluster.
+2. **Smart Swapping:** If GSC shows a High Opportunity Score (>70) topic that is NOT in the blueprint, you may SWAP the least relevant blueprint topic for this search-proven one, provided it fits the category.
+3. **Data Enriching:** For any article linked to GSC, ensure the title and keywords align with the real intent discovered in search console.
+`
+        : ""
+
     const prompt = `
 You are an elite SEO strategist building a STRATEGIC content plan. [Current Date: ${currentDate}]
 
@@ -214,6 +234,8 @@ DEPRIORITIZE these patterns:
 ${strategySection}
 
 ${competitorSection}
+
+${gscSection}
 
 ${gapSection}
 
@@ -357,6 +379,7 @@ For each article provide:
 6. intent_role: The specific intent ("Core Answer", "Problem-Specific", "Comparison", "Decision", "Emotional/Story", "Authority/Edge")
 7. article_category: One of "Core Answers", "Supporting Articles", "Conversion Pages", "Authority Plays"
 8. parent_question: The ONE fundamental user question this article answers
+9. gsc_query: EXACT primary keyword from GscClusters or null if no match
 
 ## CRITICAL REQUIREMENTS:
 1. Each article's parent_question must be UNIQUE across the plan.
@@ -387,7 +410,8 @@ For each article provide:
                                 cluster: { type: "STRING" },
                                 intent_role: { type: "STRING" },
                                 article_category: { type: "STRING" },
-                                parent_question: { type: "STRING" }
+                                parent_question: { type: "STRING" },
+                                gsc_query: { type: "STRING" }
                             },
                             required: ["title", "main_keyword", "supporting_keywords", "article_type", "cluster", "intent_role", "article_category", "parent_question"]
                         }
@@ -583,7 +607,19 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
             article_type: articleType as "informational" | "commercial" | "howto",
             cluster: post.cluster || "General",
             intent_role: post.intent_role || "Core Answer",
-            article_category: articleCategory as "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays"
+            article_category: articleCategory as "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays",
+            // Map GSC Metrics
+            gsc_query: post.gsc_query || null,
+            ...(post.gsc_query ? (() => {
+                const cluster = gscClusters.find(c => c.primary_keyword === post.gsc_query);
+                return {
+                    opportunity_score: cluster?.opportunity_score || 0,
+                    gsc_impressions: cluster?.impressions || 0,
+                    gsc_position: cluster?.position || 0,
+                    gsc_ctr: cluster?.ctr || 0,
+                    badge: cluster?.category || "strategic"
+                };
+            })() : {})
         }
     })
 
