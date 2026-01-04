@@ -104,6 +104,11 @@ export function AppSidebar({
       icon: SparklesIcon,
     },
     {
+      title: "SEO Health",
+      url: "/seo-health",
+      icon: Brain,
+    },
+    {
       title: "Settings",
       url: "/settings",
       icon: Settings,
