@@ -78,7 +78,29 @@ export async function POST(req: NextRequest) {
         // 4. Build Strategy (Topic Hierarchy)
         // We pass the existingPlan (Blueprint) or seeds to the hierarchy builder
         const hierarchySeeds = seeds && seeds.length > 0 ? seeds : (existingPlan?.map((p: any) => p.title) || [])
-        const hierarchy = await buildTopicHierarchy(hierarchySeeds, brandData)
+
+        // Note: buildTopicHierarchy expects GapAnalysis object, but for GSC flow we may not have full gap analysis
+        // Create a minimal gap analysis object from GSC clusters
+        const gapAnalysis = {
+            blueOceanTopics: gscClusters.filter(c => c.category === "new_opportunity").map(c => c.primary_keyword),
+            saturatedTopics: [] as string[],
+            competitorWeaknesses: gscClusters.filter(c => c.category === "quick_win").map(c => c.primary_keyword),
+            prioritizedOpportunities: gscClusters.slice(0, 20).map(c => ({
+                topic: c.primary_keyword,
+                priority: c.category === "quick_win" ? "high" : c.category === "high_potential" ? "medium" : "low",
+                reason: `${c.category.replace("_", " ")} - ${c.impressions} impressions, position ${c.position.toFixed(1)}`
+            }))
+        }
+
+        // Only build hierarchy if we have meaningful data
+        let hierarchy = undefined
+        if (gapAnalysis.prioritizedOpportunities.length > 0) {
+            try {
+                hierarchy = await buildTopicHierarchy(gapAnalysis as any, brandData, competitorBrands?.map((c: any) => c.name) || [])
+            } catch (hierarchyError) {
+                console.warn("[GSC Plan] Topic hierarchy failed, continuing without:", hierarchyError)
+            }
+        }
 
         // 5. Generate Unified Plan
         const result = await generateContentPlan({
