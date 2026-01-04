@@ -181,39 +181,95 @@ function MetricCard({ title, value, label, icon: Icon, colorClass = "text-stone-
 
 function ScoreRing({ score, label }: { score: number | null, label: string }) {
     const actualScore = score || 0
-    const radius = 30
+    const radius = 40
+    const strokeWidth = 8
+    const size = 100
+    const center = size / 2
     const circumference = 2 * Math.PI * radius
     const strokeDashoffset = circumference - (actualScore / 100) * circumference
 
-    let color = "text-red-500"
-    let strokeColor = "stroke-red-500"
-    if (actualScore >= 90) { color = "text-emerald-500"; strokeColor = "stroke-emerald-500"; }
-    else if (actualScore >= 50) { color = "text-amber-500"; strokeColor = "stroke-amber-500"; }
+    // Determine color scheme
+    let gradientId = "redGradient"
+    let shadowColor = "rgba(239, 68, 68, 0.2)"
+    let textColor = "text-red-600"
+
+    if (actualScore >= 90) {
+        gradientId = "greenGradient"
+        shadowColor = "rgba(34, 197, 94, 0.2)"
+        textColor = "text-emerald-600"
+    } else if (actualScore >= 50) {
+        gradientId = "amberGradient"
+        shadowColor = "rgba(245, 158, 11, 0.2)"
+        textColor = "text-amber-600"
+    }
 
     if (!score) {
-        color = "text-stone-300"
-        strokeColor = "stroke-stone-200"
+        gradientId = "grayGradient"
+        shadowColor = "rgba(120, 113, 108, 0.1)"
+        textColor = "text-stone-400"
     }
 
     return (
-        <div className="flex flex-col items-center gap-3">
-            <div className="relative w-24 h-24 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="48" cy="48" r={radius} className="stroke-stone-100" strokeWidth="6" fill="transparent" />
+        <div className="flex flex-col items-center gap-4 group cursor-default">
+            <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                {/* Glow Effect Background */}
+                <div
+                    className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: `radial-gradient(circle at center, ${shadowColor} 0%, transparent 70%)` }}
+                />
+
+                <svg width={size} height={size} className="transform -rotate-90 relative z-10 overflow-visible">
+                    <defs>
+                        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#22c55e" />
+                            <stop offset="100%" stopColor="#86efac" />
+                        </linearGradient>
+                        <linearGradient id="amberGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#f59e0b" />
+                            <stop offset="100%" stopColor="#fcd34d" />
+                        </linearGradient>
+                        <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#ef4444" />
+                            <stop offset="100%" stopColor="#fca5a5" />
+                        </linearGradient>
+                        <linearGradient id="grayGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#e7e5e4" />
+                            <stop offset="100%" stopColor="#d6d3d1" />
+                        </linearGradient>
+                    </defs>
+
+                    {/* Background Ring */}
                     <circle
-                        cx="48" cy="48" r={radius}
-                        className={`${strokeColor} transition-all duration-1000 ease-out`}
-                        strokeWidth="6" fill="transparent"
+                        cx={center} cy={center} r={radius}
+                        className="stroke-stone-100"
+                        strokeWidth={strokeWidth}
+                        fill="transparent"
+                    />
+
+                    {/* Progress Ring with Gradient & Shadow */}
+                    <circle
+                        cx={center} cy={center} r={radius}
+                        stroke={`url(#${gradientId})`}
+                        strokeWidth={strokeWidth}
+                        fill="transparent"
                         strokeDasharray={circumference}
                         strokeDashoffset={strokeDashoffset}
                         strokeLinecap="round"
+                        className="transition-all duration-1000 ease-out"
+                        style={{ filter: `drop-shadow(0px 2px 4px ${shadowColor})` }}
                     />
                 </svg>
-                <span className={`absolute text-2xl font-bold ${color}`}>
-                    {score ?? "-"}
-                </span>
+
+                {/* Center Score */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className={`text-3xl font-bold tracking-tighter ${textColor}`}>
+                        {score ?? "-"}
+                    </span>
+                </div>
             </div>
-            <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider">{label}</span>
+
+            {/* Label */}
+            <span className="text-xs font-bold text-stone-500 uppercase tracking-widest">{label}</span>
         </div>
     )
 }
@@ -436,7 +492,7 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-stone-100">
                 <div className="flex items-center gap-5">
-                    <div className="h-16 w-16 rounded-[20px] bg-white border border-stone-200 shadow-sm flex items-center justify-center overflow-hidden">
+                    <div className="h-16 w-16 rounded-xl bg-white border border-stone-200 shadow-xs flex items-center justify-center overflow-hidden">
                         <img
                             src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
                             alt={domain}
@@ -516,15 +572,15 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
                                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
                             </button>
                         </div>
-                        <div className="bg-stone-50 p-1.5 rounded-xl border border-stone-100 flex items-center gap-1">
+                        <div className="bg-stone-50 p-1 rounded-xl border border-stone-100 flex items-center gap-1">
                             <button
-                                className={`cursor-pointer w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'mobile' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
+                                className={`cursor-pointer w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'mobile' ? 'bg-white text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
                                 onClick={() => setDevice('mobile')}
                             >
                                 <Smartphone className="w-3 h-3" /> Mobile
                             </button>
                             <button
-                                className={`cursor-pointer w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'desktop' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
+                                className={`cursor-pointer w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'desktop' ? 'bg-white text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
                                 onClick={() => setDevice('desktop')}
                             >
                                 <Monitor className="w-3 h-3" /> Desktop
@@ -586,9 +642,7 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
                                             </div>
                                             <p className="text-xs text-stone-500 pl-1 leading-relaxed max-w-2xl">{rec.description?.replace(/\[.*?\]\(.*?\)/g, '').substring(0, 140)}...</p>
                                         </div>
-                                        <div className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white border border-stone-100 text-stone-300 group-hover:text-stone-500 group-hover:border-stone-300 transition-all">
-                                            <ChevronRight className="w-4 h-4" />
-                                        </div>
+
                                     </div>
                                 </div>
                             ))}
