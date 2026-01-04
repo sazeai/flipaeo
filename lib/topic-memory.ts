@@ -23,19 +23,18 @@ export async function checkTopicDuplication(topic: string, userId: string, brand
             return { isDuplicate: false, similarArticle: null }
         }
 
-        // 2. Search for similar articles (brand-isolated if brandId provided)
+        // 2. Search for similar articles (brand-isolated)
         const supabase = await createClient()
 
-        // Use brand-aware matching if brandId is provided
+        // Brand-aware matching: pass brandId to RPC for isolation
         const rpcParams: any = {
             query_embedding: embedding,
             match_threshold: 0.85, // 85% similarity threshold (strict)
             match_count: 1,
-            p_user_id: userId
+            p_user_id: userId,
+            p_brand_id: brandId || null  // Brand isolation - only match within same brand
         }
 
-        // Note: The RPC function would need to be updated to support brand_id filtering
-        // For now, we do the filtering in post-processing if needed
         const { data: similarArticles, error } = await supabase.rpc("match_articles_topic", rpcParams)
 
         if (error) {
@@ -44,6 +43,7 @@ export async function checkTopicDuplication(topic: string, userId: string, brand
         }
 
         if (similarArticles && similarArticles.length > 0) {
+            console.log(`[Topic Memory] Duplicate found for "${topic}" -> "${similarArticles[0].keyword}" (brand: ${brandId})`)
             return {
                 isDuplicate: true,
                 similarArticle: similarArticles[0].keyword

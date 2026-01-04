@@ -79,7 +79,6 @@ export async function POST(req: NextRequest) {
                     page_authority: existingMetrics.page_authority,
                     linking_root_domains: existingMetrics.linking_root_domains,
                     external_links: existingMetrics.external_links,
-                    spam_score: existingMetrics.spam_score
                 }
                 console.log("[SEO Metrics] Using cached Moz data (< 30 days)")
             }
@@ -115,7 +114,6 @@ export async function POST(req: NextRequest) {
             page_authority: finalMozData?.page_authority ?? existingMetrics?.page_authority ?? null,
             linking_root_domains: finalMozData?.linking_root_domains ?? existingMetrics?.linking_root_domains ?? null,
             external_links: finalMozData?.external_links ?? existingMetrics?.external_links ?? null,
-            spam_score: finalMozData?.spam_score ?? existingMetrics?.spam_score ?? null,
 
             // Desktop PageSpeed
             performance_desktop: desktopData?.performance_score ?? existingMetrics?.performance_desktop ?? null,

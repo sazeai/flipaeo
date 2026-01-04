@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BarChart3, Globe, Link2, Shield, TrendingUp, AlertTriangle, Zap, ChevronRight, RefreshCw, Smartphone, Monitor } from "lucide-react"
+import { BarChart3, Globe, Link2, Shield, TrendingUp, AlertTriangle, Zap, ChevronRight, RefreshCw, Smartphone, Monitor, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { GlobalCard } from "@/components/ui/global-card"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
@@ -12,7 +13,6 @@ interface SEOMetrics {
     id: string
     domain_authority: number
     page_authority: number
-    spam_score: number
     external_links: number
     linking_root_domains: number
     // Desktop PageSpeed
@@ -351,42 +351,81 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
 
     if (loading) return <LoadingSkeleton />
 
-    // EMPTY STATE
+    // EMPTY STATE - Modern Card Design
     if (!metrics) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center max-w-xl mx-auto">
-                <div className="w-20 h-20 rounded-[24px] bg-stone-900 shadow-xl shadow-stone-900/10 flex items-center justify-center mb-8">
-                    <BarChart3 className="h-10 w-10 text-white" />
-                </div>
-
-                <h2 className="text-3xl font-bold text-stone-900 mb-3 tracking-tight">Analyze {domain}</h2>
-                <p className="text-stone-500 text-base leading-relaxed mb-10 max-w-sm mx-auto">
-                    Get a comprehensive SEO report including Moz Domain Authority, backlink profile, and Core Web Vitals for both mobile and desktop.
-                </p>
-
-                {error && (
-                    <div className="mb-8 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4" />
-                        {error}
+            <div className="flex flex-col items-center justify-center py-12">
+                <GlobalCard className="w-full max-w-2xl bg-stone-100 rounded-lg">
+                    {/* Header with gradient */}
+                    <div className="bg-gradient-to-br from-stone-50 to-stone-100 px-8 py-10 text-center border-b border-stone-200 rounded-t-lg">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-stone-900 mb-5">
+                            <BarChart3 className="h-7 w-7 text-white" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-stone-900 mb-2">SEO Health Check</h2>
+                        <p className="text-stone-500 text-sm max-w-sm mx-auto">
+                            Get a comprehensive SEO report for <span className="font-medium text-stone-700">{domain}</span>
+                        </p>
                     </div>
-                )}
 
-                <Button
-                    onClick={handleAnalyze}
-                    disabled={analyzing}
-                    className="h-14 px-10 text-base bg-stone-900 hover:bg-stone-800 text-white font-medium rounded-2xl shadow-lg shadow-stone-900/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                    {analyzing ? (
-                        <><Loader2 className="h-5 w-5 mr-3 animate-spin" /> Analyzing...</>
-                    ) : (
-                        <>Start Analysis</>
+                    {/* Features Grid */}
+                    <div className="grid grid-cols-2 divide-x divide-stone-100">
+                        <div className="p-6 text-center">
+                            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 mb-3 border border-stone-200">
+                                <TrendingUp className="h-5 w-5 text-stone-600" />
+                            </div>
+                            <h4 className="font-semibold text-stone-900 text-sm mb-1">Domain Authority</h4>
+                            <p className="text-xs text-stone-400">Moz DA & PA scores</p>
+                        </div>
+                        <div className="p-6 text-center">
+                            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 mb-3 border border-stone-200">
+                                <Link2 className="h-5 w-5 text-stone-600" />
+                            </div>
+                            <h4 className="font-semibold text-stone-900 text-sm mb-1">Backlink Profile</h4>
+                            <p className="text-xs text-stone-400">Links & ref domains</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 divide-x divide-stone-100 border-t border-stone-100">
+                        <div className="p-6 text-center">
+                            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 mb-3 border border-stone-200">
+                                <Zap className="h-5 w-5 text-stone-600" />
+                            </div>
+                            <h4 className="font-semibold text-stone-900 text-sm mb-1">Core Web Vitals</h4>
+                            <p className="text-xs text-stone-400">LCP, CLS, TBT, FCP</p>
+                        </div>
+                        <div className="p-6 text-center">
+                            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-stone-100 mb-3 border border-stone-200">
+                                <Monitor className="h-5 w-5 text-stone-600" />
+                            </div>
+                            <h4 className="font-semibold text-stone-900 text-sm mb-1">Mobile & Desktop</h4>
+                            <p className="text-xs text-stone-400">Both strategies tested</p>
+                        </div>
+                    </div>
+
+                    {/* Error Display */}
+                    {error && (
+                        <div className="mx-6 mt-6 p-4 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                            {error}
+                        </div>
                     )}
-                </Button>
 
-                <div className="flex items-center gap-2 mt-8 text-[11px] font-bold text-stone-400 uppercase tracking-widest">
-                    <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span>~45s (Fetches Mobile + Desktop)</span>
-                </div>
+                    {/* Action Button */}
+                    <div className="p-6 bg-stone-50/50">
+                        <Button
+                            onClick={handleAnalyze}
+                            disabled={analyzing}
+                            className="w-full py-6 text-base bg-stone-900 hover:bg-stone-800 text-white font-medium rounded-lg transition-all"
+                        >
+                            {analyzing ? (
+                                <><Loader2 className="h-5 w-5 mr-3 animate-spin" /> Analyzing...</>
+                            ) : (
+                                <>Start Analysis</>
+                            )}
+                        </Button>
+
+                    </div>
+                </GlobalCard>
             </div>
         )
     }
@@ -471,7 +510,7 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
                             <button
                                 onClick={() => handleRefresh(device)}
                                 disabled={refreshing}
-                                className="ml-2 p-1.5 rounded-full hover:bg-stone-200 text-stone-400 hover:text-stone-600 transition-colors disabled:opacity-50"
+                                className="cursor-pointer ml-2 p-1.5 rounded-full hover:bg-stone-200 text-stone-400 hover:text-stone-600 transition-colors disabled:opacity-50"
                                 title={`Refresh ${device} data`}
                             >
                                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
@@ -479,13 +518,13 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
                         </div>
                         <div className="bg-stone-50 p-1.5 rounded-xl border border-stone-100 flex items-center gap-1">
                             <button
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'mobile' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
+                                className={`cursor-pointer w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'mobile' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
                                 onClick={() => setDevice('mobile')}
                             >
                                 <Smartphone className="w-3 h-3" /> Mobile
                             </button>
                             <button
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'desktop' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
+                                className={`cursor-pointer w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${device === 'desktop' ? 'bg-white shadow-sm text-stone-900 border border-stone-200' : 'text-stone-500 hover:text-stone-700 hover:bg-stone-100'}`}
                                 onClick={() => setDevice('desktop')}
                             >
                                 <Monitor className="w-3 h-3" /> Desktop
@@ -504,7 +543,7 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
                     {/* Core Web Vitals */}
                     <div className="pt-8 border-t border-stone-100/60">
                         <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-6">Core Web Vitals</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <CWVCard label="Largest Contentful Paint" value={`${getPerf('lcp') ?? '-'}`} unit="s" status={getCWVStatus(getPerf('lcp'), 2.5, 4.0)} />
                             <CWVCard label="Cumulative Layout Shift" value={`${getPerf('cls') ?? '-'}`} unit="" status={getCWVStatus(getPerf('cls'), 0.1, 0.25)} />
                             <CWVCard label="Total Blocking Time" value={`${getPerf('tbt') ?? '-'}`} unit="ms" status={getCWVStatus(getPerf('tbt'), 200, 600)} />
