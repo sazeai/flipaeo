@@ -21,6 +21,8 @@ export interface ProcessedQuery {
     opportunity_score: number
     word_count: number
     expected_ctr: number
+    top_url?: string
+    is_cannibalization_risk: boolean
 }
 
 export interface KeywordCluster {
@@ -32,7 +34,8 @@ export interface KeywordCluster {
     position: number
     ctr: number
     expected_ctr: number
-    category: "quick_win" | "high_potential" | "strategic" | "new_opportunity"
+    category: "quick_win" | "high_potential" | "strategic" | "new_opportunity" | "supporting_intent"
+    top_url?: string
 }
 
 // Expected CTR curve (industry standard)
@@ -155,6 +158,11 @@ export function clusterQueries(queries: ProcessedQuery[], maxImpressions: number
             category = "strategic"
         }
 
+        // RECONCILIATION: If we have a URL but it wasn't excluded (so it's weak/leak), treat as supporting
+        if (query.top_url && category !== "quick_win") {
+            category = "supporting_intent"
+        }
+
         clusters.push({
             primary_keyword: query.query,
             supporting_keywords: similar.map(s => s.query),
@@ -165,16 +173,68 @@ export function clusterQueries(queries: ProcessedQuery[], maxImpressions: number
             ctr: query.ctr,
             expected_ctr: query.expected_ctr,
             category,
+            top_url: query.top_url
         })
     }
 
     return clusters
 }
 
-export function processGSCData(rawRows: GSCQueryRow[], brandName?: string): KeywordCluster[] {
+export function processGSCData(rawRows: GSCQueryRow[], brandName?: string, existingUrls: string[] = []): KeywordCluster[] {
     if (!rawRows || rawRows.length === 0) return []
 
-    const filtered = filterGarbageQueries(rawRows, brandName)
+    // 1. Group by Query to find Top URL for each query
+    // Since we now fetch dimensions: ['query', 'page'], we get multiple rows per query
+    const queryGroups = new Map<string, {
+        impressions: number,
+        clicks: number,
+        ctr: number,
+        position: number,
+        urls: Map<string, { clicks: number, impressions: number }>,
+        keys: string[]
+    }>()
+
+    rawRows.forEach(row => {
+        const query = row.keys[0]
+        const url = row.keys[1] // URL is now second key
+
+        if (!queryGroups.has(query)) {
+            queryGroups.set(query, {
+                impressions: 0,
+                clicks: 0,
+                ctr: 0, // Weighted average later
+                position: 0, // Weighted average later
+                urls: new Map(),
+                keys: row.keys
+            })
+        }
+
+        const group = queryGroups.get(query)!
+        group.impressions += row.impressions
+        group.clicks += row.clicks
+
+        // Track per-URL stats to find dominant page
+        if (url) {
+            if (!group.urls.has(url)) group.urls.set(url, { clicks: 0, impressions: 0 })
+            const urlStats = group.urls.get(url)!
+            urlStats.clicks += row.clicks
+            urlStats.impressions += row.impressions
+        }
+
+        // Weighted sum for position (approximate)
+        group.position = (group.position * (group.impressions - row.impressions) + row.position * row.impressions) / group.impressions
+    })
+
+    // Flatten groups back to "rows" for filtering
+    const consolidatedRows: GSCQueryRow[] = Array.from(queryGroups.values()).map(g => ({
+        keys: g.keys, // Note: this keeps JUST the first URL found in keys, but we use the Map for logic
+        clicks: g.clicks,
+        impressions: g.impressions,
+        ctr: g.impressions > 0 ? g.clicks / g.impressions : 0,
+        position: g.position
+    }))
+
+    const filtered = filterGarbageQueries(consolidatedRows, brandName)
     if (filtered.length === 0) return []
 
     const maxImpressions = Math.max(...filtered.map(q => q.impressions))
@@ -182,6 +242,49 @@ export function processGSCData(rawRows: GSCQueryRow[], brandName?: string): Keyw
     const processed: ProcessedQuery[] = filtered.map(q => {
         const query = q.keys[0]
         const wordCount = query.split(/\s+/).length
+
+        // Identify dominant URL
+        const group = queryGroups.get(query)
+        let topUrl = ""
+        let maxUrlClicks = -1
+
+        if (group) {
+            group.urls.forEach((stats, url) => {
+                if (stats.clicks > maxUrlClicks) {
+                    maxUrlClicks = stats.clicks
+                    topUrl = url
+                } else if (stats.clicks === maxUrlClicks && stats.impressions > (group.urls.get(topUrl)?.impressions || 0)) {
+                    topUrl = url // Break ties with impressions
+                }
+            })
+        }
+
+        const expectedCtr = getExpectedCTR(q.position)
+
+        // --- QUERY-TO-URL RECONCILIATION LOGIC ---
+        let isCannibalizationRisk = false
+
+        // Check if Top URL is a content page (not homepage/root)
+        const isContentPage = topUrl && topUrl.length > 15 && (
+            topUrl.includes('/blog') ||
+            topUrl.includes('/article') ||
+            topUrl.includes('/post') ||
+            // Heuristic: URL slug matches query words
+            query.split(' ').filter(w => w.length > 3 && topUrl.includes(w)).length >= 2
+        )
+
+        // Also check if explicitly in known existing content URLs
+        const isKnownContent = existingUrls.some(existing => existing.includes(topUrl) || topUrl.includes(existing))
+
+        if ((isContentPage || isKnownContent) && q.impressions > 50 && q.position < 20) {
+            // CONDITION 1: Strong page exists -> Mark as risk (EXCLUDE later)
+            isCannibalizationRisk = true
+        }
+
+        // Exception: If CTR is terrible (Intent Leak), we might want a Supporting Article
+        // But if it's purely a duplicate intent, we still flag risk.
+        // The clusterer will decide if it becomes "Supporting" or "Excluded" based on this flag.
+
         return {
             query,
             impressions: q.impressions,
@@ -190,10 +293,15 @@ export function processGSCData(rawRows: GSCQueryRow[], brandName?: string): Keyw
             position: q.position,
             intent: tagIntent(query),
             word_count: wordCount,
-            expected_ctr: getExpectedCTR(q.position),
-            opportunity_score: computeOpportunityScore(q.impressions, q.position, q.ctr, wordCount, maxImpressions)
+            expected_ctr: expectedCtr,
+            opportunity_score: computeOpportunityScore(q.impressions, q.position, q.ctr, wordCount, maxImpressions),
+            top_url: topUrl,
+            is_cannibalization_risk: isCannibalizationRisk
         }
     })
 
-    return clusterQueries(processed, maxImpressions)
+    // Filter out simple cannibalization risks immediately
+    const reconciled = processed.filter(p => !p.is_cannibalization_risk)
+
+    return clusterQueries(reconciled, maxImpressions)
 }

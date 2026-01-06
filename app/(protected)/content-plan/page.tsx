@@ -557,8 +557,8 @@ export default function ContentPlanPage() {
                                         </>
                                     ) : (
                                         <>
-                                            <Play className="w-3.5 h-3.5 mr-2" />
-                                            Auto-Refill
+                                            <Play className="w-3.5 h-3.5" />
+                                            Enable Automation
                                         </>
                                     )}
                                 </Button>

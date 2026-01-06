@@ -335,30 +335,33 @@ Examples of DIFFERENT parent questions (GOOD):
 
 ---
 
-## TITLE RULES (MODERN SEO - 2025)
+## NATURAL LANGUAGE PROTOCOL (STRICT MANDATE)
 
-Create titles that DOMINATE in modern AI-powered search:
+You are absolutely FORBIDDEN from using the robotic "Keyword: Subtitle" title format.
+Any title that looks like "AI Glamour Shots: Creating Stunning Portraits" is an FAIL.
 
-1. Use SPECIFIC numbers: "7 Ways..." not "Ways..."
-2. Include YEAR when relevant: "...in 2025"
-3. Attack a PAIN POINT: "Why Your [X] Keeps Failing"
-4. Use POWER WORDS: "Proven", "Exact", "Secret", "Without", "Actually"
-5. Keep under 60 characters
+INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTENT.
 
-FORMAT PATTERNS (use variety):
-- How-To: "How to [X] Without [Pain Point]"
-- List: "[Number] [Adjective] Ways to [Benefit]"
-- Comparison: "[X] vs [Y]: Which [Benefit] Better?"
-- Question: "Is [X] Worth It? (Real Data Inside)"
-- Problem: "Why [Common Approach] Doesn't Work (And What Does)"
-- Contrarian: "[X] is Dead—Here's What Actually Works"
+### 🛑 BANNED PATTERNS (DO NOT USE):
+- ❌ "[Keyword]: [Subtitle]" (e.g., "AI Photoshoot: A Complete Guide") -> DISQUALIFIED
+- ❌ "[Keyword] - [Subtitle]" (e.g., "AI Photoshoot - The Future of Photography") -> DISQUALIFIED
+- ❌ "The Ultimate Guide to [Keyword]" -> DISQUALIFIED
+- ❌ "Everything You Need to Know About [Keyword]" -> DISQUALIFIED
+- ❌ "Unlocking the Power of [Keyword]" -> DISQUALIFIED
 
-BANNED PATTERNS (NEVER USE):
-- "What is X? (Explained)" - Too generic, boring
-- "Ultimate Guide to X" - Overused, ignored by searchers
-- "Everything You Need to Know About X" - Vague, no hook
-- "A Comprehensive Look at X" - Academic, not engaging
-- "The Complete Guide to X" - Same as ultimate guide
+### ✅ REQUIRED PATTERNS (MIX THESE):
+1. **The "How-To" Specific:** "How to Generate AI Family Portraits Without a Studio"
+2. **The "Best" List:** "7 Best AI Glamour Shot Generators for LinkedIn (2025)"
+3. **The "Vs" Decision:** "AI Photoshoot vs Professional Photographer: Cost Breakdown"
+4. **The "Outcome" Promise:** "Get Professional Headshots from Selfies (Free & Paid Methods)"
+5. **The "For" Audience:** "AI Family Portraits for Parents, Grandparents, and Memories"
+6. **The "Problem" Solver:** "Why Your AI Photos Look Fake (And How to Fix It)"
+7. **The "Question" Hook:** "Can AI Restore Old Photos? We Tested 5 Tools"
+
+### STYLE GUIDE:
+- **Be Conversational:** Write titles you'd click on Reddit or YouTube.
+- **Be Specific:** "Creating Stunning Portraits" is bad. "For LinkedIn Profiles" is good.
+- **Length:** 40-60 characters is sweet spot. Never over 70.
 
 ---
 

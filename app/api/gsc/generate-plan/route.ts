@@ -60,18 +60,27 @@ export async function POST(req: NextRequest) {
                 body: JSON.stringify({
                     startDate: startDate.toISOString().split("T")[0],
                     endDate: endDate.toISOString().split("T")[0],
-                    dimensions: ["query"],
-                    rowLimit: 500,
+                    dimensions: ["query", "page"],
+                    rowLimit: 1000,
                 }),
             }
         )
+
+        // 3.5. Fetch Existing Content (Sitemap Context)
+        const { data: existingLinks } = await supabase
+            .from("internal_links")
+            .select("url, title")
+            .eq("brand_id", connection.brand_id)
+
+        const existingContentItems = existingLinks?.map(l => l.title || "") || []
+        const existingUrls = existingLinks?.map(l => l.url) || []
 
         if (!gscResponse.ok) {
             return NextResponse.json({ error: "Failed to fetch GSC data" }, { status: 500 })
         }
 
         const gscData = await gscResponse.json()
-        const gscClusters = processGSCData(gscData.rows || [], brandName)
+        const gscClusters = processGSCData(gscData.rows || [], brandName, existingUrls)
 
         console.log(`[GSC Plan] Processed ${gscClusters.length} clusters from search data`)
 
@@ -111,7 +120,7 @@ export async function POST(req: NextRequest) {
             competitorBrands,
             topicHierarchy: hierarchy,
             gscClusters,
-            existingContent: [] // Could be populated from sitemap if needed
+            existingContent: existingContentItems
         })
 
         console.log(`[GSC Plan] Unified generation complete: ${result.plan.length} articles`)
