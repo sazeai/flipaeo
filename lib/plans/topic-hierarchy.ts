@@ -63,20 +63,20 @@ ${gapAnalysis.prioritizedOpportunities.slice(0, 10).map(p => `- ${p.topic} (${p.
 Build a strategic topic hierarchy with 30 topics organized into 4 levels:
 
 ### LEVEL 1: FOUNDATION (12 topics)
-- "What is X?" questions that establish authority
-- Core definitions and explanations
-- MUST come FIRST to unlock other content
+- **Specific User Questions** ("Is X safe?", "Does X work for Y?")
+- **NO Generic Definitions** ("What is X?" -> STOP using this)
+- **NO "The Importance of..."**
 - Intent: Core Answer, Definition
 
 ### LEVEL 2: SUPPORTING (8 topics)
-- "How to" guides and tutorials
-- Problem-specific solutions
+- **"How to" Queries** ("How to do X with Y")
+- **Troubleshooting** ("Why is my X blurry?")
 - DEPENDS ON foundation topics existing
 - Intent: How-To, Problem-Specific
 
 ### LEVEL 3: ADVANCED (4 topics)
-- Deep expertise and edge cases
-- Thought leadership content
+- **Specific Edge Cases** ("Can I use AI headshots for passport?")
+- **Deep Dives** ("How nano-texture engines work")
 - DEPENDS ON supporting topics
 - Intent: Authority/Edge, Emotional/Story
 
@@ -87,16 +87,24 @@ Build a strategic topic hierarchy with 30 topics organized into 4 levels:
 - Intent: Comparison, Decision
 
 ## RULES
-1. Each topic must have clear dependencies
-2. Use REAL competitor names for comparison articles: ${competitorBrands.slice(0, 3).join(", ") || "Generic competitors"}
-3. Prioritize BLUE OCEAN topics
-4. NO placeholders like "[Generic Tool]"
+1. **TOPIC FORMAT (CRITICAL):** Topics must be written as **RAW SEARCH QUERIES** or **USER QUESTIONS**.
+   - ❌ BAD: "The Future of AI Headshots" (Marketing fluff)
+   - ❌ BAD: "Understanding Privacy" (Abstract concept)
+   - ❌ BAD: "Beyond Photos: Understanding Hyper-Realistic AI Image Creation" (Marketing fluff)
+   - ✅ GOOD: "Is AI generated art copyright free?"
+   - ✅ GOOD: "How to make professional headshots at home"
+   - ✅ GOOD: "Best free AI headshot generator 2026"
+   
+2. NO "Marketing Speak" or Colons in topics (e.g. "AI Headshot Generators: The Smart Way to Get Professional Photos" -> FAIL).
+3. Use REAL competitor names for comparison articles: ${competitorBrands.slice(0, 3).join(", ") || "Generic competitors"}
+4. Prioritize BLUE OCEAN topics
+5. NO placeholders like "[Generic Tool]"
 
 OUTPUT (JSON):
 {
     "nodes": [
         {
-            "topic": "What is Privacy-First Analytics?",
+            "topic": "AI Family Portrait From Individual Photos Online Without Studio Shoot",
             "type": "foundation",
             "intentRole": "Core Answer",
             "dependsOn": [],
@@ -104,10 +112,10 @@ OUTPUT (JSON):
             "reason": "Establishes topical authority"
         },
         {
-            "topic": "GA4 vs Datafa.st: Privacy Comparison",
+            "topic": "Best AI Family Portrait Generator From Individual Photos Compared",
             "type": "conversion",
             "intentRole": "Comparison",
-            "dependsOn": ["What is Privacy-First Analytics?"],
+            "dependsOn": ["AI Family Portrait From Individual Photos Online Without Studio shoot"],
             "priority": 15,
             "reason": "Converts users researching alternatives"
         }
@@ -117,7 +125,7 @@ OUTPUT (JSON):
 
     try {
         const response = await genAI.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             config: { responseMimeType: "application/json" }
         })

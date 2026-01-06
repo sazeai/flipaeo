@@ -250,7 +250,10 @@ ${topicHierarchy.nodes.map((n: any) => `- Topic: "${n.topic}" (Type: ${n.type}, 
 
 **RULES:**
 1. You MUST generate exactly one article for each Topic in the list above.
-2. DO NOT invent new topics if the hierarchy has 30 topics.
+2. **TITLE FREEDOM:** The "Topic" string above is just the *subject*. You MUST rewrite it into a **High-CTR Title** using the "NATURAL LANGUAGE PROTOCOL" below.
+   - Blueprint: "Best AI Family Portrait Generator"
+   - Your Title: "Best AI Family Portrait Generator From Individual Photos Compared" (Better)
+3. DO NOT invent new topics if the hierarchy has 30 topics.
 3. The "cluster" for each article should group related topics logically (e.g., all topics about "Privacy" go into a "Privacy" cluster).
 ` : ''}
 
