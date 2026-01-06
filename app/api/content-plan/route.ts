@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
                 .from("articles")
                 .select("keyword, status, slug")
                 .eq("user_id", user.id)
+                .eq("brand_id", plan.brand_id) // FIX: Scope to the plan's brand
 
             if (articles && articles.length > 0) {
                 // 2. Create a lookup map: normalized keyword -> article status
