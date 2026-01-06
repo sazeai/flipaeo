@@ -478,6 +478,29 @@ Before outlining, analyze the "Keyword Intent" to determine the required depth:
 
 **INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 15-section outline for a 8-section topic.
 
+## HEADING STYLE PROTOCOL (MANDATORY - READ CAREFULLY)
+
+You must write headers that look like they were written by a HUMAN expert, not an AI.
+
+🚫 **BANNED HEADER PATTERNS (INSTANT FAIL):**
+- NO Colons: "The Evolution: From X to Y" -> FAIL
+- NO Parentheses: "Understanding Authority (The Real Metrics)" -> FAIL
+- NO Metaphors: "Unlocking the Power of..." -> FAIL
+- NO "The Art of..." or "The Future of..."
+- NO "Demystifying X" or "Navigating the Landscape"
+
+✅ **REQUIRED HEADER PATTERNS (USE THESE):**
+- **Direct Questions:** "What is a high authority backlink?"
+- **Direct Statements:** "Why 'authority' is more than a DR number"
+- **Vs/Comparison:** "Dofollow vs Nofollow: The real difference"
+- **Action-Oriented:** "How to judge a backlink's authority"
+- **Listicles:** "Quick checks that founders skip"
+- **Outcome-Based:** "What results look like in the first 30 days"
+
+**THE LITMUS TEST:**
+If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
+If it sounds like a Google Search Query, keep it.
+
 ## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
 
 **LEVEL DEFINITIONS:**
