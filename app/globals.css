@@ -1178,23 +1178,3 @@ input[type="range"].slider::-moz-range-thumb {
 .border-brand-orange {
   border-color: var(--brand-orange);
 }
-
-/* Keyword Highlighting Styles (Mark.js) - Two-color system */
-
-/* Main keyword - Yellow */
-mark.keyword-highlight-main {
-  background: rgba(238, 230, 144, 0.669);
-  padding: 0.05em 0.15em;
-  border-radius: 2px;
-  color: inherit;
-  font-weight: inherit;
-}
-
-/* Supporting keywords - Light Blue/Cyan */
-mark.keyword-highlight-supporting {
-  background: rgba(165, 215, 255, 0.55);
-  padding: 0.05em 0.15em;
-  border-radius: 2px;
-  color: inherit;
-  font-weight: inherit;
-}
