@@ -42,8 +42,25 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
         }
     }
 
+    // Validate that required fields are filled
+    const isValidBrand = (data: BrandDetails): boolean => {
+        if (!data.product_name?.trim()) return false
+        if (!data.product_identity?.literally?.trim()) return false
+        if (!data.mission?.trim()) return false
+        if (!data.audience?.primary?.trim()) return false
+        if (!data.category?.trim()) return false
+        return true
+    }
+
     const handleSave = async () => {
         if (!brandData) return
+
+        // Validate required fields
+        if (!isValidBrand(brandData)) {
+            setError("Please fill in all required fields: Product Name, Product Identity, Category, Mission, and Primary Audience")
+            return
+        }
+
         setSaving(true)
         setError("")
         try {
@@ -152,9 +169,9 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                     <h2 className="text-xl font-bold text-stone-900">Review Brand Details</h2>
                     <p className="text-sm text-stone-500">Verify extracted information before saving</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setBrandData(null)} className="w-full sm:w-auto border-stone-200">
-                    <RotateCcw className="w-3.5 h-3.5 mr-2" />
-                    Re-Analyze
+                <Button variant="outline" size="sm" onClick={onCancel} className="w-full sm:w-auto border-stone-200">
+                    <ArrowLeft className="w-3.5 h-3.5 mr-2" />
+                    Back
                 </Button>
             </div>
 

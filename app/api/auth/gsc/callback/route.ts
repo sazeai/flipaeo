@@ -18,13 +18,13 @@ export async function GET(req: NextRequest) {
     if (error) {
         console.error("GSC OAuth error:", error)
         return NextResponse.redirect(
-            new URL(`/onboarding?step=gsc&error=${encodeURIComponent(error)}`, req.url)
+            new URL(`/settings?gsc_error=${encodeURIComponent(error)}`, req.url)
         )
     }
 
     if (!code || !state) {
         return NextResponse.redirect(
-            new URL("/onboarding?step=gsc&error=invalid_response", req.url)
+            new URL("/settings?gsc_error=invalid_response", req.url)
         )
     }
 
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     const storedState = req.cookies.get("gsc_oauth_state")?.value
     if (!storedState || storedState !== state) {
         return NextResponse.redirect(
-            new URL("/onboarding?step=gsc&error=invalid_state", req.url)
+            new URL("/settings?gsc_error=invalid_state", req.url)
         )
     }
 
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
             const errorData = await tokenResponse.json()
             console.error("Token exchange failed:", errorData)
             return NextResponse.redirect(
-                new URL("/onboarding?step=gsc&error=token_exchange_failed", req.url)
+                new URL("/settings?gsc_error=token_exchange_failed", req.url)
             )
         }
 
@@ -97,13 +97,13 @@ export async function GET(req: NextRequest) {
         if (dbError) {
             console.error("Failed to save GSC connection:", dbError)
             return NextResponse.redirect(
-                new URL("/onboarding?step=gsc&error=save_failed", req.url)
+                new URL("/settings?gsc_error=save_failed", req.url)
             )
         }
 
-        // Clear state cookie and redirect to success
+        // Clear state cookie and redirect to settings with success
         const response = NextResponse.redirect(
-            new URL("/onboarding?step=gsc-success", req.url)
+            new URL("/settings?gsc=connected", req.url)
         )
         response.cookies.delete("gsc_oauth_state")
 
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
     } catch (error) {
         console.error("GSC callback error:", error)
         return NextResponse.redirect(
-            new URL("/onboarding?step=gsc&error=unknown", req.url)
+            new URL("/settings?gsc_error=unknown", req.url)
         )
     }
 }

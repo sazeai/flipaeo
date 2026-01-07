@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getUserBrandStatus, deleteBrandAction } from "@/actions/brand"
+import { useSearchParams, useRouter } from "next/navigation"
+import { getUserBrandStatus } from "@/actions/brand"
 import { getUserDefaults, setDefaultBrand } from "@/actions/preferences"
 import { createClient } from "@/utils/supabase/client"
 import { getBrandLinkCountAction } from "@/actions/internal-linking"
-import { Check, Globe, Trash2, Plus, Edit, Settings2, Loader2, Link2, RefreshCcw, ExternalLink } from "lucide-react"
+import { Check, Globe, Plus, Edit, Settings2, Loader2, Link2, RefreshCcw, ExternalLink, Search, Sparkles, ChevronDown, Key, AlertCircle } from "lucide-react"
 import BrandOnboarding from "@/components/brand-onboarding"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -14,9 +15,12 @@ import { GlobalCard } from "@/components/ui/global-card"
 import { CustomSpinner } from "@/components/CustomSpinner"
 
 type BrandInfo = { id: string; website_url: string; created_at: string; brand_data: BrandDetails }
+type GSCSite = { siteUrl: string; permissionLevel: string }
 
 export default function SettingsPage() {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [brands, setBrands] = useState<BrandInfo[]>([])
   const [defaultBrandId, setDefaultBrandId] = useState<string | null>(null)
@@ -28,6 +32,14 @@ export default function SettingsPage() {
   const [editingBrand, setEditingBrand] = useState<BrandInfo | null>(null)
   const [syncingId, setSyncingId] = useState<string | null>(null)
   const [linkCounts, setLinkCounts] = useState<Record<string, number>>({})
+
+  // GSC State
+  const [gscConnected, setGscConnected] = useState(false)
+  const [gscSiteUrl, setGscSiteUrl] = useState<string | null>(null)
+  const [gscSites, setGscSites] = useState<GSCSite[]>([])
+  const [loadingGsc, setLoadingGsc] = useState(false)
+  const [enhancingBrandId, setEnhancingBrandId] = useState<string | null>(null)
+  const [showSiteSelector, setShowSiteSelector] = useState(false)
 
   // Dark mode detection
 
@@ -46,12 +58,18 @@ export default function SettingsPage() {
         // @ts-ignore
         setBrandCount(status.count)
         setDefaultBrandId((defaults as any).default_brand_id)
+
+        // Redirect to onboarding if no brands
+        if (!status.brands || (status.brands as BrandInfo[]).length === 0) {
+          router.push("/onboarding")
+          return
+        }
       } finally {
         setLoading(false)
       }
     }
     init()
-  }, [supabase])
+  }, [supabase, router])
 
   const fetchLinkCounts = async (brandsList: BrandInfo[]) => {
     const counts: Record<string, number> = {}
@@ -103,6 +121,130 @@ export default function SettingsPage() {
     }
   }
 
+  // Check GSC connection status on mount
+  useEffect(() => {
+    async function checkGscConnection() {
+      try {
+        const res = await fetch("/api/gsc/sites")
+        if (res.ok) {
+          const data = await res.json()
+          setGscConnected(true)
+          setGscSites(data.sites || [])
+          // Get saved site URL from connection
+          const { data: connection } = await supabase
+            .from("gsc_connections")
+            .select("site_url")
+            .single()
+          if (connection?.site_url) {
+            setGscSiteUrl(connection.site_url)
+          }
+        } else {
+          setGscConnected(false)
+        }
+      } catch {
+        setGscConnected(false)
+      }
+    }
+    checkGscConnection()
+  }, [supabase])
+
+  // Handle GSC connection callback
+  useEffect(() => {
+    const gscParam = searchParams.get("gsc")
+    const gscError = searchParams.get("gsc_error")
+
+    if (gscParam === "connected") {
+      toast.success("Google Search Console connected!")
+      setGscConnected(true)
+      // Fetch sites
+      fetch("/api/gsc/sites")
+        .then(res => res.json())
+        .then(data => {
+          setGscSites(data.sites || [])
+          if (data.sites?.length === 1) {
+            setGscSiteUrl(data.sites[0].siteUrl)
+            handleSelectSite(data.sites[0].siteUrl)
+          } else if (data.sites?.length > 1) {
+            setShowSiteSelector(true)
+          }
+        })
+        .catch(() => { })
+      // Clear URL params
+      window.history.replaceState({}, "", "/settings")
+    }
+
+    if (gscError) {
+      toast.error(`GSC connection failed: ${gscError}`)
+      window.history.replaceState({}, "", "/settings")
+    }
+  }, [searchParams])
+
+  // Handle site selection
+  const handleSelectSite = async (siteUrl: string) => {
+    try {
+      await fetch("/api/gsc/sites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteUrl })
+      })
+      setGscSiteUrl(siteUrl)
+      setShowSiteSelector(false)
+      toast.success("Site selected!")
+    } catch {
+      toast.error("Failed to save site selection")
+    }
+  }
+
+  // Enhance plan with GSC data
+  const handleEnhancePlan = async (brand: BrandInfo) => {
+    setEnhancingBrandId(brand.id)
+    try {
+      // First, get the current plan for this brand
+      const planRes = await fetch("/api/content-plan")
+      if (!planRes.ok) throw new Error("No content plan found")
+
+      const currentPlan = await planRes.json()
+
+      // Generate enhanced plan from GSC data
+      const enhanceRes = await fetch("/api/gsc/generate-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandData: brand.brand_data,
+          brandName: brand.brand_data?.product_name || "",
+          existingPlan: currentPlan.plan_data || [],
+          competitorSeeds: currentPlan.competitor_seeds || []
+        })
+      })
+
+      if (!enhanceRes.ok) {
+        const error = await enhanceRes.json()
+        throw new Error(error.error || "Failed to enhance plan")
+      }
+
+      const { plan: enhancedPlan } = await enhanceRes.json()
+
+      // Update the plan in database
+      const updateRes = await fetch("/api/content-plan", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId: currentPlan.id,
+          planData: enhancedPlan,
+          gscEnhanced: true
+        })
+      })
+
+      if (!updateRes.ok) throw new Error("Failed to save enhanced plan")
+
+      toast.success(`Plan enhanced with ${enhancedPlan.length} GSC-optimized articles!`)
+    } catch (error: any) {
+      toast.error(error.message || "Failed to enhance plan")
+    } finally {
+      setEnhancingBrandId(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center font-sans">
@@ -137,27 +279,7 @@ export default function SettingsPage() {
         <div className="p-4 md:p-6">
           {/* Brand Settings */}
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <div className="flex items-center justify-between gap-3 flex-wrap px-1">
-              <div className="text-xs font-medium text-stone-500 uppercase tracking-wider">
-                Your Brands ({brandCount} / {brandLimit})
-              </div>
-              {!editingBrand && !isCreatingBrand && (
-                <button
-                  onClick={() => setIsCreatingBrand(true)}
-                  disabled={brandCount >= brandLimit}
-                  className={`
-                    flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-white transition-all
-                    active:scale-[0.98] cursor-pointer
-                    bg-stone-900 hover:bg-stone-800
-                    shadow-sm border border-stone-800
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Brand</span>
-                </button>
-              )}
-            </div>
+
 
             {isCreatingBrand || editingBrand ? (
               <div className="p-4 border border-stone-200  rounded-xl bg-stone-50/50 /50">
@@ -232,20 +354,6 @@ export default function SettingsPage() {
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-400 hover:text-stone-700" onClick={() => setEditingBrand(b)}>
                             <Edit className="w-3.5 h-3.5" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-400 hover:text-red-600" onClick={async () => {
-                            if (!confirm("Are you sure you want to delete this brand?")) return;
-                            setSaving(true)
-                            try {
-                              const res = await deleteBrandAction(b.id)
-                              if (res.success) {
-                                await refreshBrands()
-                              }
-                            } finally {
-                              setSaving(false)
-                            }
-                          }}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
                         </div>
                       </div>
 
@@ -278,6 +386,84 @@ export default function SettingsPage() {
                             )}
                             {syncingId === b.id ? 'SYNCING...' : 'SYNC SITE'}
                           </Button>
+                        </div>
+                      </div>
+
+                      {/* Google Search Console Section */}
+                      <div className="px-4 pb-4">
+                        <div className="p-3 bg-white rounded-lg border border-stone-100 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="p-1.5 bg-green-50 rounded-md border border-green-100">
+                                <Search className="w-3.5 h-3.5 text-green-600" />
+                              </div>
+                              <div>
+                                <div className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">Search Console</div>
+                                <div className="text-[11px] text-stone-600 font-medium leading-tight">
+                                  {gscConnected
+                                    ? (gscSiteUrl ? `Connected: ${gscSiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}` : 'Select a site')
+                                    : 'Enhance plan with real search data'}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {!gscConnected ? (
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-green-50 hover:bg-green-100 text-green-700 border-none"
+                                  onClick={() => window.location.href = "/api/auth/gsc"}
+                                >
+                                  <Key className="w-3 h-3" />
+                                  CONNECT GSC
+                                </Button>
+                              ) : showSiteSelector && gscSites.length > 1 ? (
+                                <select
+                                  className="h-8 text-[10px] px-2 rounded-md border border-stone-200 bg-white"
+                                  value={gscSiteUrl || ""}
+                                  onChange={(e) => handleSelectSite(e.target.value)}
+                                >
+                                  <option value="">Select site...</option>
+                                  {gscSites.map(site => (
+                                    <option key={site.siteUrl} value={site.siteUrl}>
+                                      {site.siteUrl.replace(/^https?:\/\//, '')}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : gscSiteUrl ? (
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white border-none"
+                                  onClick={() => handleEnhancePlan(b)}
+                                  disabled={enhancingBrandId === b.id}
+                                >
+                                  {enhancingBrandId === b.id ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                      ENHANCING...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Sparkles className="w-3 h-3" />
+                                      ENHANCE PLAN
+                                    </>
+                                  )}
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-stone-100 hover:bg-stone-200 text-stone-900 border-none"
+                                  onClick={() => setShowSiteSelector(true)}
+                                >
+                                  <ChevronDown className="w-3 h-3" />
+                                  SELECT SITE
+                                </Button>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

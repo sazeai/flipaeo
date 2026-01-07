@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 
 export type ContentStage = "foundation" | "growth" | "maturity"
 
@@ -18,9 +18,11 @@ export interface StageDetectionResult {
  * - Foundation: < 1,000 impressions (or no GSC)
  * - Growth: 1,000 - 50,000 impressions
  * - Maturity: > 50,000 impressions
+ * 
+ * Note: Uses admin client to work in background jobs (trigger.dev) that don't have request context.
  */
 export async function detectContentStage(userId: string): Promise<StageDetectionResult> {
-    const supabase = await createClient()
+    const supabase = createAdminClient() as any // Cast to any for tables not in generated types
 
     // Check if user has GSC connected
     const { data: gscConnection } = await supabase
@@ -59,7 +61,7 @@ export async function detectContentStage(userId: string): Promise<StageDetection
 
     // Calculate total impressions from plan items
     const planData = plan.plan_data as any[]
-    const totalImpressions = planData.reduce((sum, item) => {
+    const totalImpressions = planData.reduce((sum: number, item: any) => {
         return sum + (item.gsc_impressions || 0)
     }, 0)
 
