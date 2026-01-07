@@ -1,50 +1,36 @@
 "use client"
 
-import Image from "next/image"
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
-import { Loader2, ChevronUp, ArrowRight, Globe, BadgeCheck, Calendar, TrendingUp, ExternalLink, Shield, CheckCircle2, Users, Sparkles, Zap, Target, Lock, Ban, Trash2 } from "lucide-react"
-import { createClient } from "@/utils/supabase/client"
+import { Loader2, ChevronUp, ArrowRight } from "lucide-react"
 import { saveBrandAction } from "@/actions/brand"
 import { canAccessOnboarding } from "@/actions/onboarding"
 import { BrandDetails } from "@/lib/schemas/brand"
-import { ContentPlanItem, CompetitorData } from "@/lib/schemas/content-plan"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { CustomSpinner } from "@/components/CustomSpinner"
 
-// localStorage keys for persistence
 const STORAGE_KEYS = {
     STEP: 'onboarding_step',
     BRAND_URL: 'onboarding_brand_url',
     BRAND_DATA: 'onboarding_brand_data',
     BRAND_ID: 'onboarding_brand_id',
-    COMPETITORS: 'onboarding_competitors',
-    COMPETITOR_SEEDS: 'onboarding_competitor_seeds',
-    CONTENT_PLAN: 'onboarding_content_plan',
-    PLAN_ID: 'onboarding_plan_id',
 } as const
 
-// Simplified flow: brand → competitors (auto-redirects to /content-plan)
-type Step = "brand" | "competitors"
-
-// GSC integration moved to settings page
+type Step = "brand"
 
 export default function OnboardingPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const supabase = createClient()
 
     const [isHydrated, setIsHydrated] = useState(false)
     const [isCheckingAccess, setIsCheckingAccess] = useState(true)
     const [step, setStep] = useState<Step>("brand")
 
-    // Gate check: redirect if user already has a brand
     useEffect(() => {
         async function checkOnboardingAccess() {
-            // Pass current step to allow GSC flow steps
             const urlStep = searchParams.get('step')
             const { allowed, redirectTo } = await canAccessOnboarding(urlStep || undefined)
             if (!allowed && redirectTo) {
@@ -56,68 +42,46 @@ export default function OnboardingPage() {
         checkOnboardingAccess()
     }, [router, searchParams])
 
-    // Brand DNA State
     const [url, setUrl] = useState("")
     const [analyzing, setAnalyzing] = useState(false)
     const [brandData, setBrandData] = useState<BrandDetails | null>(null)
     const [savingBrand, setSavingBrand] = useState(false)
     const [brandId, setBrandId] = useState<string | null>(null)
 
-    // Competitor Analysis State
-    const [analyzingCompetitors, setAnalyzingCompetitors] = useState(false)
-    const [competitors, setCompetitors] = useState<CompetitorData[]>([])
-    const [competitorSeeds, setCompetitorSeeds] = useState<string[]>([])
-    const [competitorBrands, setCompetitorBrands] = useState<Array<{ name: string; url?: string }>>([])
-
-    // NOTE: Content plan is now generated in background via Trigger.dev
-    // User is redirected to /content-plan immediately after competitor analysis
 
     const [error, setError] = useState("")
 
-    // Clear all onboarding data from localStorage
     const clearOnboardingStorage = useCallback(() => {
         Object.values(STORAGE_KEYS).forEach(key => {
             localStorage.removeItem(key)
         })
     }, [])
 
-    // Restore state from localStorage on mount
     useEffect(() => {
         if (typeof window === 'undefined') return
 
-        // Check URL params first for step and brandId
         const urlStep = searchParams.get('step') // Keep as string for gsc-success handling
         const urlBrandId = searchParams.get('brandId')
 
-        // FRESH ENTRY CHECK: User visited /onboarding with NO query params
-        // This means they want to start a new onboarding flow, not resume
         if (!urlStep && !urlBrandId) {
             const savedBrandId = localStorage.getItem(STORAGE_KEYS.BRAND_ID)
             if (savedBrandId) {
-                // Clear stale data from previous incomplete session
                 clearOnboardingStorage()
+                setBrandId(null)
+                setUrl("")
+                setBrandData(null)
+                setStep("brand")
+                setIsHydrated(true)
+                return // Exit early, don't restore anything
             }
-            // Ensure we start at the brand step with clean state
-            setBrandId(null)
-            setUrl("")
-            setBrandData(null)
-            setStep("brand")
-            setIsHydrated(true)
-            return // Exit early, don't restore anything
         }
 
-        // Restore step (only brand and competitors steps now)
         const savedStep = urlStep || localStorage.getItem(STORAGE_KEYS.STEP)
-        const validSteps: Step[] = ["brand", "competitors"]
-        if (savedStep && validSteps.includes(savedStep as Step)) {
-            setStep(savedStep as Step)
-        }
+        setStep("brand")
 
-        // Restore brand URL
         const savedUrl = localStorage.getItem(STORAGE_KEYS.BRAND_URL)
         if (savedUrl) setUrl(savedUrl)
 
-        // Restore brand data
         const savedBrandData = localStorage.getItem(STORAGE_KEYS.BRAND_DATA)
         if (savedBrandData) {
             try {
@@ -125,38 +89,20 @@ export default function OnboardingPage() {
             } catch { }
         }
 
-        // Restore brand ID
         const savedBrandId = urlBrandId || localStorage.getItem(STORAGE_KEYS.BRAND_ID)
         if (savedBrandId) {
             setBrandId(savedBrandId)
-            // If we have a brandId but no specific step, proceed to competitors
-            if (!urlStep && !savedStep) setStep('competitors')
         }
 
-        // Restore competitor data
-        const savedCompetitors = localStorage.getItem(STORAGE_KEYS.COMPETITORS)
-        if (savedCompetitors) {
-            try {
-                setCompetitors(JSON.parse(savedCompetitors))
-            } catch { }
-        }
 
-        const savedSeeds = localStorage.getItem(STORAGE_KEYS.COMPETITOR_SEEDS)
-        if (savedSeeds) {
-            try {
-                setCompetitorSeeds(JSON.parse(savedSeeds))
-            } catch { }
-        }
+
 
         setIsHydrated(true)
     }, [searchParams])
 
-    // Persist step to localStorage and URL
     useEffect(() => {
         if (!isHydrated) return
         localStorage.setItem(STORAGE_KEYS.STEP, step)
-
-        // Update URL with current step and brandId
         const params = new URLSearchParams()
         params.set('step', step)
         if (brandId) params.set('brandId', brandId)
@@ -266,77 +212,7 @@ export default function OnboardingPage() {
         }
     }
 
-    // Competitor Analysis handler
-    const handleAnalyzeCompetitors = async (currentBrandId?: string) => {
-        // URL is optional - we use brandContext for category-based competitor search
-        if (!brandData) return
-        setAnalyzingCompetitors(true)
-        setError("")
-        try {
-            const res = await fetch("/api/analyze-competitors", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    url: url || `https://${brandData.product_name.toLowerCase().replace(/\s+/g, '')}.com`, // Fallback URL for exclusion
-                    brandContext: `${brandData.product_name} - ${brandData.product_identity.literally}. Target: ${brandData.audience.primary}`,
-                }),
-            })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || "Failed to analyze competitors")
-
-            const seeds = data.seeds || []
-            const competitorBrandsList = data.competitorBrands || []
-
-            // Persist to localStorage
-            localStorage.setItem(STORAGE_KEYS.COMPETITORS, JSON.stringify(data.competitors || []))
-            localStorage.setItem(STORAGE_KEYS.COMPETITOR_SEEDS, JSON.stringify(seeds))
-
-            // === NEW: Background Plan Generation ===
-            // 1. Sync sitemap (quick)
-            let existingContent: string[] = []
-            const effectiveBrandId = currentBrandId || brandId
-            if (url && effectiveBrandId) {
-                try {
-                    const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
-                    const syncResult = await syncSitemapToInternalLinksAction(url, effectiveBrandId)
-                    if (syncResult.success) {
-                        existingContent = syncResult.titles
-                    }
-                } catch (e) {
-                    console.warn("[Onboarding] Sitemap sync failed:", e)
-                }
-            }
-
-            // 2. Trigger background plan generation
-            const bgRes = await fetch("/api/content-plan/start-background", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    brandId: effectiveBrandId,
-                    brandData,
-                    seeds,
-                    competitorBrands: competitorBrandsList,
-                    existingContent
-                }),
-            })
-
-            if (!bgRes.ok) {
-                const bgError = await bgRes.json()
-                throw new Error(bgError.error || "Failed to start plan generation")
-            }
-
-            // 3. Clear onboarding storage and redirect immediately
-            clearOnboardingStorage()
-            router.push("/content-plan")
-
-        } catch (e: any) {
-            setError(e.message || "Failed to analyze competitors")
-        } finally {
-            setAnalyzingCompetitors(false)
-        }
-    }
-
-    // NOTE: Plan generation and GSC enhancement are now handled on /content-plan page
+    // NOTE: Plan generation is now fully handled in Trigger.dev
 
     // Helper to update nested brand state
     const updateField = (path: string, value: any) => {
@@ -358,33 +234,6 @@ export default function OnboardingPage() {
         setBrandData(prev => prev ? ({ ...prev, [field]: arr }) : null)
     }
 
-    // Progress indicator - simplified to 2-step flow
-    const isStepComplete = (checkStep: Step) => {
-        if (checkStep === "brand" && step === "competitors") return true
-        return false
-    }
-
-    const isStepActive = (checkStep: Step) => {
-        return step === checkStep
-    }
-
-    const ProgressIndicator = () => (
-        <div className="flex items-center justify-center gap-2 mb-6">
-            {/* Step 1: Brand DNA */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${step === "brand" ? 'bg-stone-900 text-white' : 'bg-stone-800 text-stone-300'}`}>
-                <Globe className="w-3.5 h-3.5" />
-                <span>Brand</span>
-                {step === "competitors" && <BadgeCheck className="w-3 h-3 text-green-500" />}
-            </div>
-            <div className={`w-4 h-px bg-stone-200`} />
-
-            {/* Step 2: Strategy (auto-redirects) */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${step === "competitors" ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-500'}`}>
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Strategy</span>
-            </div>
-        </div>
-    )
 
     return (
         <div className="min-h-[80vh] flex flex-col items-center justify-center py-12 font-sans">
@@ -395,7 +244,11 @@ export default function OnboardingPage() {
                 </div>
             ) : (
                 <>
-                    <ProgressIndicator />
+                    {/* Page Header */}
+                    <div className="text-center mb-6">
+                        <h1 className="text-2xl font-bold text-stone-900">Onboarding</h1>
+                        <p className="text-sm text-stone-500">Let's set up your brand profile</p>
+                    </div>
 
                     {/* Island Container */}
                     <motion.div
@@ -664,37 +517,6 @@ export default function OnboardingPage() {
 
 
                             </AnimatePresence>
-
-                            {/* Competitors/Strategy Step - Loading State */}
-                            {step === "competitors" && (
-                                <motion.div
-                                    key="competitors-step"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="p-8 flex flex-col items-center justify-center min-h-[300px]"
-                                >
-                                    <div className="flex flex-col items-center gap-4 text-center">
-                                        <div className="relative">
-                                            <CustomSpinner className="w-12 h-12" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h2 className="text-lg font-bold text-stone-900">
-                                                Building Your Content Strategy
-                                            </h2>
-                                            <p className="text-sm text-stone-500 max-w-sm">
-                                                {analyzingCompetitors
-                                                    ? "Analyzing your competitors and market landscape..."
-                                                    : "Generating your personalized content plan..."
-                                                }
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-xs text-stone-400 mt-2">
-                                            <Target className="w-3.5 h-3.5" />
-                                            <span>This usually takes 30-60 seconds</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
                         </div>
                     </motion.div>
 
