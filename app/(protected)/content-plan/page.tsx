@@ -136,7 +136,15 @@ const ARTICLE_CATEGORY_CONFIG: Record<string, {
 export default function ContentPlanPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
-    const [plan, setPlan] = useState<{ id: string; plan_data: ContentPlanItem[]; gsc_enhanced: boolean; automation_status?: string } | null>(null)
+    const [plan, setPlan] = useState<{
+        id: string;
+        plan_data: ContentPlanItem[];
+        gsc_enhanced: boolean;
+        automation_status?: string;
+        generation_status?: string; // 'pending' | 'generating' | 'complete' | 'failed'
+        generation_phase?: string; // 'serp' | 'gap' | 'hierarchy' | 'plan'
+        generation_error?: string;
+    } | null>(null)
     const [filter, setFilter] = useState<"all" | "pending" | "writing" | "published">("all")
     const [error, setError] = useState("")
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -160,6 +168,32 @@ export default function ContentPlanPage() {
             router.replace("/onboarding")
         }
     }, [loading, plan, router])
+
+    // Poll for updates when plan is still generating
+    useEffect(() => {
+        if (!plan || plan.generation_status === 'complete' || plan.generation_status === 'failed') {
+            return
+        }
+
+        // Poll every 3 seconds while generating
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("/api/content-plan")
+                const data = await res.json()
+                if (res.ok && data) {
+                    setPlan(data)
+                    // Stop polling when complete
+                    if (data.generation_status === 'complete' || data.generation_status === 'failed') {
+                        clearInterval(interval)
+                    }
+                }
+            } catch (e) {
+                console.error("Poll error:", e)
+            }
+        }, 3000)
+
+        return () => clearInterval(interval)
+    }, [plan?.id, plan?.generation_status])
 
     const fetchPlan = async () => {
         try {
@@ -419,6 +453,81 @@ export default function ContentPlanPage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <CustomSpinner className="w-10 h-10" />
+            </div>
+        )
+    }
+
+    // Show generating state while background job runs
+    if (plan.generation_status === 'pending' || plan.generation_status === 'generating') {
+        const phaseLabels: Record<string, { title: string; description: string }> = {
+            serp: { title: "Analyzing Market Landscape", description: "Scanning competitors and SERP patterns..." },
+            gap: { title: "Finding Blue Ocean Opportunities", description: "Identifying content gaps your competitors missed..." },
+            hierarchy: { title: "Building Topic Hierarchy", description: "Organizing topics by strategic importance..." },
+            plan: { title: "Generating Your 30-Day Plan", description: "Creating your personalized content roadmap..." }
+        }
+        const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] : phaseLabels.serp
+
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <GlobalCard className="p-8 text-center space-y-6">
+                        <div className="flex justify-center">
+                            <CustomSpinner className="w-12 h-12" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-lg font-bold text-stone-900">
+                                {currentPhase.title}
+                            </h2>
+                            <p className="text-sm text-stone-500">
+                                {currentPhase.description}
+                            </p>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                            {['serp', 'gap', 'hierarchy', 'plan'].map((phase, i) => (
+                                <div
+                                    key={phase}
+                                    className={cn(
+                                        "w-2 h-2 rounded-full transition-all",
+                                        plan.generation_phase === phase
+                                            ? "bg-stone-900 w-6"
+                                            : i < ['serp', 'gap', 'hierarchy', 'plan'].indexOf(plan.generation_phase || 'serp')
+                                                ? "bg-stone-400"
+                                                : "bg-stone-200"
+                                    )}
+                                />
+                            ))}
+                        </div>
+                        <p className="text-xs text-stone-400">
+                            This usually takes 3-5 minutes. You can keep this page open.
+                        </p>
+                    </GlobalCard>
+                </div>
+            </div>
+        )
+    }
+
+    // Show error state if generation failed
+    if (plan.generation_status === 'failed') {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <GlobalCard className="p-8 text-center space-y-6">
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+                            <Zap className="w-6 h-6 text-red-500" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-lg font-bold text-stone-900">
+                                Generation Failed
+                            </h2>
+                            <p className="text-sm text-stone-500">
+                                {plan.generation_error || "Something went wrong. Please try again."}
+                            </p>
+                        </div>
+                        <Button onClick={() => router.push("/onboarding")} className="w-full">
+                            Try Again
+                        </Button>
+                    </GlobalCard>
+                </div>
             </div>
         )
     }

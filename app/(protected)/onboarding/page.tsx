@@ -333,17 +333,51 @@ export default function OnboardingPage() {
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Failed to analyze competitors")
 
-            setCompetitors(data.competitors || [])
-            setCompetitorSeeds(data.seeds || [])
-            setCompetitorBrands(data.competitorBrands || [])
+            const seeds = data.seeds || []
+            const competitorBrandsList = data.competitorBrands || []
 
             // Persist to localStorage
             localStorage.setItem(STORAGE_KEYS.COMPETITORS, JSON.stringify(data.competitors || []))
-            localStorage.setItem(STORAGE_KEYS.COMPETITOR_SEEDS, JSON.stringify(data.seeds || []))
+            localStorage.setItem(STORAGE_KEYS.COMPETITOR_SEEDS, JSON.stringify(seeds))
 
-            // Auto-proceed to plan generation - pass brandId and competitorBrands directly
-            setStep("plan")
-            handleGeneratePlan(data.seeds, currentBrandId || brandId, data.competitorBrands || [])
+            // === NEW: Background Plan Generation ===
+            // 1. Sync sitemap (quick)
+            let existingContent: string[] = []
+            const effectiveBrandId = currentBrandId || brandId
+            if (url && effectiveBrandId) {
+                try {
+                    const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
+                    const syncResult = await syncSitemapToInternalLinksAction(url, effectiveBrandId)
+                    if (syncResult.success) {
+                        existingContent = syncResult.titles
+                    }
+                } catch (e) {
+                    console.warn("[Onboarding] Sitemap sync failed:", e)
+                }
+            }
+
+            // 2. Trigger background plan generation
+            const bgRes = await fetch("/api/content-plan/start-background", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    brandId: effectiveBrandId,
+                    brandData,
+                    seeds,
+                    competitorBrands: competitorBrandsList,
+                    existingContent
+                }),
+            })
+
+            if (!bgRes.ok) {
+                const bgError = await bgRes.json()
+                throw new Error(bgError.error || "Failed to start plan generation")
+            }
+
+            // 3. Clear onboarding storage and redirect immediately
+            clearOnboardingStorage()
+            router.push("/content-plan")
+
         } catch (e: any) {
             setError(e.message || "Failed to analyze competitors")
         } finally {
