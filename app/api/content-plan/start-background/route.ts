@@ -12,6 +12,8 @@ export const maxDuration = 30 // Quick response, actual work is in background
  * Called after user saves brand during onboarding.
  * Creates a pending plan and triggers Trigger.dev task.
  * Returns immediately so user can proceed to /content-plan.
+ * 
+ * Seeds are now optional - the background task will generate them from brand data if not provided.
  */
 export async function POST(req: NextRequest) {
     try {
@@ -25,13 +27,11 @@ export async function POST(req: NextRequest) {
         const {
             brandId,
             brandData,
-            seeds,
             competitorBrands,
             existingContent
         } = await req.json() as {
             brandId: string
             brandData: BrandDetails
-            seeds: string[]
             competitorBrands?: Array<{ name: string; url?: string }>
             existingContent?: string[]
         }
@@ -40,9 +40,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Brand ID and data required" }, { status: 400 })
         }
 
-        if (!seeds || !Array.isArray(seeds) || seeds.length === 0) {
-            return NextResponse.json({ error: "Seeds are required" }, { status: 400 })
-        }
+        // Seeds are generated in the trigger task from brandData
 
         // Delete any existing plans for this user
         await supabase
@@ -57,10 +55,10 @@ export async function POST(req: NextRequest) {
                 user_id: user.id,
                 brand_id: brandId,
                 plan_data: [], // Empty, will be filled by background task
-                competitor_seeds: seeds,
+                competitor_seeds: [], // Will be populated by trigger task
                 gsc_enhanced: false,
                 generation_status: "pending",
-                generation_phase: "serp" // Starting phase
+                generation_phase: "seeds" // First phase: generate seeds
             })
             .select()
             .single()
@@ -81,7 +79,6 @@ export async function POST(req: NextRequest) {
                     userId: user.id,
                     brandId,
                     brandData,
-                    seeds,
                     competitorBrands,
                     existingContent
                 }

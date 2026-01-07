@@ -221,15 +221,44 @@ export default function OnboardingPage() {
             if (!res.brandId) {
                 throw new Error("Failed to save brand - no brandId returned")
             }
-            setBrandId(res.brandId)
+            const savedBrandId = res.brandId
+            setBrandId(savedBrandId)
 
-            // No longer creating separate brand_voices entry
-            // style_dna is saved as part of brand_details
+            // Quick sitemap sync (optional, non-blocking)
+            let existingContent: string[] = []
+            if (url) {
+                try {
+                    const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
+                    const syncResult = await syncSitemapToInternalLinksAction(url, savedBrandId)
+                    if (syncResult.success) {
+                        existingContent = syncResult.titles
+                    }
+                } catch (e) {
+                    console.warn("[Onboarding] Sitemap sync failed:", e)
+                }
+            }
 
-            // Proceed directly to competitor analysis
-            setStep("competitors")
-            // Auto-start competitor analysis - pass brandId directly since state hasn't updated yet
-            handleAnalyzeCompetitors(res.brandId)
+            // Trigger background plan generation (seeds will be generated in the task)
+            const bgRes = await fetch("/api/content-plan/start-background", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    brandId: savedBrandId,
+                    brandData,
+                    // seeds are now optional - trigger task generates them
+                    existingContent
+                }),
+            })
+
+            if (!bgRes.ok) {
+                const bgError = await bgRes.json()
+                throw new Error(bgError.error || "Failed to start plan generation")
+            }
+
+            // Clear onboarding storage and redirect immediately
+            clearOnboardingStorage()
+            router.push("/content-plan")
+
         } catch (e: any) {
             setError(e.message || "Failed to save brand details")
         } finally {
@@ -635,6 +664,37 @@ export default function OnboardingPage() {
 
 
                             </AnimatePresence>
+
+                            {/* Competitors/Strategy Step - Loading State */}
+                            {step === "competitors" && (
+                                <motion.div
+                                    key="competitors-step"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="p-8 flex flex-col items-center justify-center min-h-[300px]"
+                                >
+                                    <div className="flex flex-col items-center gap-4 text-center">
+                                        <div className="relative">
+                                            <CustomSpinner className="w-12 h-12" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h2 className="text-lg font-bold text-stone-900">
+                                                Building Your Content Strategy
+                                            </h2>
+                                            <p className="text-sm text-stone-500 max-w-sm">
+                                                {analyzingCompetitors
+                                                    ? "Analyzing your competitors and market landscape..."
+                                                    : "Generating your personalized content plan..."
+                                                }
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs text-stone-400 mt-2">
+                                            <Target className="w-3.5 h-3.5" />
+                                            <span>This usually takes 30-60 seconds</span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
                         </div>
                     </motion.div>
 
