@@ -27,13 +27,10 @@ const STORAGE_KEYS = {
     PLAN_ID: 'onboarding_plan_id',
 } as const
 
-// Voice step removed - style_dna is now part of brand extraction
-type Step = "brand" | "competitors" | "plan" | "gsc-prompt" | "gsc-reassurance" | "gsc-sites" | "gsc-enhancing" | "complete"
+// Simplified flow: brand → competitors (auto-redirects to /content-plan)
+type Step = "brand" | "competitors"
 
-interface GSCSite {
-    siteUrl: string
-    permissionLevel: string
-}
+// GSC integration moved to settings page
 
 export default function OnboardingPage() {
     const router = useRouter()
@@ -72,41 +69,8 @@ export default function OnboardingPage() {
     const [competitorSeeds, setCompetitorSeeds] = useState<string[]>([])
     const [competitorBrands, setCompetitorBrands] = useState<Array<{ name: string; url?: string }>>([])
 
-    // Content Plan State
-    const [generatingPlan, setGeneratingPlan] = useState(false)
-    const [contentPlan, setContentPlan] = useState<ContentPlanItem[]>([])
-    const [planId, setPlanId] = useState<string | null>(null)
-    const [savingPlan, setSavingPlan] = useState(false)
-    const [planLoadingMessage, setPlanLoadingMessage] = useState(0)
-
-    // Rotating trust-building messages during plan generation
-    const planLoadingMessages = [
-        { title: "Discovering your content opportunities...", subtitle: "Finding topics your audience is actively searching for" },
-        { title: "Analyzing what competitors miss...", subtitle: "Identifying gaps where your brand can dominate" },
-        { title: "Building your strategic advantage...", subtitle: "Crafting topics that position you as the authority" },
-        { title: "Creating your content roadmap...", subtitle: "30 days of high-impact articles tailored to your brand" },
-        { title: "Optimizing for AI search visibility...", subtitle: "Topics designed to get you featured in AI answers" },
-        { title: "Ensuring topic diversity...", subtitle: "A balanced mix of foundational and conversion content" },
-    ]
-
-    // Rotate loading messages every 4 seconds during plan generation
-    useEffect(() => {
-        if (!generatingPlan) {
-            setPlanLoadingMessage(0)
-            return
-        }
-        const interval = setInterval(() => {
-            setPlanLoadingMessage(prev => (prev + 1) % planLoadingMessages.length)
-        }, 4000)
-        return () => clearInterval(interval)
-    }, [generatingPlan, planLoadingMessages.length])
-
-    // GSC State
-    const [hasGSC, setHasGSC] = useState(false)
-    const [enhancingWithGSC, setEnhancingWithGSC] = useState(false)
-    const [gscSites, setGscSites] = useState<GSCSite[]>([])
-    const [selectedSite, setSelectedSite] = useState<string>("")
-    const [loadingGscSites, setLoadingGscSites] = useState(false)
+    // NOTE: Content plan is now generated in background via Trigger.dev
+    // User is redirected to /content-plan immediately after competitor analysis
 
     const [error, setError] = useState("")
 
@@ -142,41 +106,9 @@ export default function OnboardingPage() {
             return // Exit early, don't restore anything
         }
 
-        // Handle GSC callback success - this is critical!
-        if (urlStep === 'gsc-success') {
-            // GSC connected successfully - now show site selection
-            const savedPlanId = localStorage.getItem(STORAGE_KEYS.PLAN_ID)
-            const savedContentPlan = localStorage.getItem(STORAGE_KEYS.CONTENT_PLAN)
-
-            if (savedContentPlan) {
-                try {
-                    setContentPlan(JSON.parse(savedContentPlan))
-                } catch { }
-            }
-            if (savedPlanId) setPlanId(savedPlanId)
-
-            // Restore brand data for context
-            const savedBrandData = localStorage.getItem(STORAGE_KEYS.BRAND_DATA)
-            if (savedBrandData) {
-                try {
-                    setBrandData(JSON.parse(savedBrandData))
-                } catch { }
-            }
-
-            // Set GSC connected flag and go to site selection
-            setHasGSC(true)
-            setStep("gsc-sites")
-
-            // Fetch available GSC sites
-            fetchGscSites()
-
-            setIsHydrated(true)
-            return
-        }
-
-        // Restore step (handle all valid steps - voice step removed)
+        // Restore step (only brand and competitors steps now)
         const savedStep = urlStep || localStorage.getItem(STORAGE_KEYS.STEP)
-        const validSteps: Step[] = ["brand", "competitors", "plan", "gsc-prompt", "gsc-reassurance", "gsc-sites", "gsc-enhancing", "complete"]
+        const validSteps: Step[] = ["brand", "competitors"]
         if (savedStep && validSteps.includes(savedStep as Step)) {
             setStep(savedStep as Step)
         }
@@ -201,7 +133,7 @@ export default function OnboardingPage() {
             if (!urlStep && !savedStep) setStep('competitors')
         }
 
-        // Restore competitor and content plan data
+        // Restore competitor data
         const savedCompetitors = localStorage.getItem(STORAGE_KEYS.COMPETITORS)
         if (savedCompetitors) {
             try {
@@ -215,16 +147,6 @@ export default function OnboardingPage() {
                 setCompetitorSeeds(JSON.parse(savedSeeds))
             } catch { }
         }
-
-        const savedContentPlan = localStorage.getItem(STORAGE_KEYS.CONTENT_PLAN)
-        if (savedContentPlan) {
-            try {
-                setContentPlan(JSON.parse(savedContentPlan))
-            } catch { }
-        }
-
-        const savedPlanId = localStorage.getItem(STORAGE_KEYS.PLAN_ID)
-        if (savedPlanId) setPlanId(savedPlanId)
 
         setIsHydrated(true)
     }, [searchParams])
@@ -385,237 +307,7 @@ export default function OnboardingPage() {
         }
     }
 
-    // Content Plan Generation handler
-    const handleGeneratePlan = async (seeds: string[], currentBrandId?: string | null, passedCompetitorBrands?: Array<{ name: string; url?: string }>) => {
-        if (!brandData || seeds.length === 0) return
-        setGeneratingPlan(true)
-        setError("")
-
-        // Use passed brandId or fall back to state
-        const effectiveBrandId = currentBrandId || brandId
-        const effectiveCompetitorBrands = passedCompetitorBrands || competitorBrands
-        try {
-            // Step 1: Sync sitemap to internal_links table (SYNCHRONOUS)
-            // This waits for completion before proceeding to plan generation
-            let existingContent: string[] = []
-            if (url && effectiveBrandId) {
-                try {
-                    console.log(`[Onboarding] Syncing sitemap to internal_links for brand: ${effectiveBrandId}...`)
-
-                    // Import and call the synchronous server action
-                    const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
-                    const syncResult = await syncSitemapToInternalLinksAction(url, effectiveBrandId)
-
-                    if (syncResult.success) {
-                        existingContent = syncResult.titles
-                        console.log(`[Onboarding] Synced ${syncResult.count} links, found ${syncResult.titles.length} existing articles`)
-                    } else {
-                        console.warn(`[Onboarding] Sitemap sync failed: ${syncResult.error}`)
-                    }
-                } catch (e) {
-                    console.warn("[Onboarding] Sitemap sync failed, continuing without:", e)
-                }
-            }
-
-
-            // Step 2: Generate content plan with existing content context
-            const res = await fetch("/api/generate-content-plan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    seeds,
-                    brandData,
-                    brandId: effectiveBrandId,
-                    existingContent,
-                    competitorBrands: effectiveCompetitorBrands, // NEW: Pass competitor brands
-                }),
-            })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || "Failed to generate plan")
-
-            setContentPlan(data.plan || [])
-            localStorage.setItem(STORAGE_KEYS.CONTENT_PLAN, JSON.stringify(data.plan || []))
-        } catch (e: any) {
-            setError(e.message || "Failed to generate content plan")
-        } finally {
-            setGeneratingPlan(false)
-        }
-    }
-
-    // Save Content Plan handler
-    const handleSavePlan = async () => {
-        if (contentPlan.length === 0) return
-        setSavingPlan(true)
-        setError("")
-        try {
-            const res = await fetch("/api/content-plan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    planData: contentPlan,
-                    brandId,
-                    competitorSeeds,
-                }),
-            })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || "Failed to save plan")
-
-            setPlanId(data.id)
-            localStorage.setItem(STORAGE_KEYS.PLAN_ID, data.id)
-
-            // Proceed to GSC prompt
-            setStep("gsc-prompt")
-        } catch (e: any) {
-            setError(e.message || "Failed to save content plan")
-        } finally {
-            setSavingPlan(false)
-        }
-    }
-
-    // GSC Connection handler
-    const handleConnectGSC = () => {
-        // Redirect to GSC OAuth
-        window.location.href = "/api/auth/gsc"
-    }
-
-    // Skip GSC and complete onboarding
-    const handleSkipGSC = () => {
-        clearOnboardingStorage()
-        router.push("/content-plan")
-    }
-
-    // Fetch GSC sites after OAuth
-    const fetchGscSites = async () => {
-        setLoadingGscSites(true)
-        setError("")
-        try {
-            const res = await fetch("/api/gsc/sites")
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || "Failed to fetch sites")
-
-            setGscSites(data.sites || [])
-
-            // If only one site, auto-select it
-            if (data.sites?.length === 1) {
-                setSelectedSite(data.sites[0].siteUrl)
-            }
-        } catch (e: any) {
-            setError(e.message || "Failed to fetch GSC sites")
-        } finally {
-            setLoadingGscSites(false)
-        }
-    }
-
-    // Select site and proceed to enhancement
-    const handleSelectSiteAndEnhance = async () => {
-        if (!selectedSite) {
-            setError("Please select a site")
-            return
-        }
-
-        setStep("gsc-enhancing")
-        setEnhancingWithGSC(true)
-        setError("")
-
-        try {
-            // First, save the selected site
-            await fetch("/api/gsc/sites", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ siteUrl: selectedSite }),
-            })
-
-            // Call the new strategic GSC plan generation API
-            // This uses proper filtering, deduplication, and LLM-based planning
-            console.log("=== Calling GSC Strategic Plan Generation ===")
-            const planRes = await fetch("/api/gsc/generate-plan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    brandData: brandData,
-                    competitorSeeds: competitorSeeds,
-                    brandName: brandData?.product_name || "",
-                    existingPlan: contentPlan, // Pass the existing plan as blueprint
-                }),
-            })
-
-            if (!planRes.ok) {
-                const errorData = await planRes.json()
-                throw new Error(errorData.error || "Failed to generate strategic plan from GSC data")
-            }
-
-            const { plan: gscBasedPlan } = await planRes.json()
-
-            console.log("=== STRATEGIC GSC PLAN GENERATED ===")
-            console.log("Plan items:", gscBasedPlan.length)
-            console.log("Sample titles:", gscBasedPlan.slice(0, 3).map((p: any) => p.title))
-
-            // Update existing plan in database using PUT
-            if (planId) {
-                const updateRes = await fetch("/api/content-plan", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        planId,
-                        planData: gscBasedPlan,
-                        gscEnhanced: true,
-                    }),
-                })
-
-                if (!updateRes.ok) {
-                    console.error("Failed to save plan to database")
-                }
-            }
-
-            // Clear storage and redirect to content plan
-            clearOnboardingStorage()
-            router.push("/content-plan")
-        } catch (e: any) {
-            console.error("GSC plan generation failed:", e)
-            setError(e.message || "Failed to generate strategic plan. You can continue without GSC.")
-        } finally {
-            setEnhancingWithGSC(false)
-        }
-    }
-
-    // Complete with GSC enhancement
-    const handleCompleteWithGSC = async () => {
-        setEnhancingWithGSC(true)
-        setError("")
-        try {
-            // Enhance plan with GSC data
-            const res = await fetch("/api/gsc/fetch-insights", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ planItems: contentPlan }),
-            })
-
-            if (res.ok) {
-                const data = await res.json()
-                // Update plan with enhanced items
-                if (data.enhancedItems) {
-                    await fetch("/api/content-plan", {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            planId,
-                            planData: data.enhancedItems,
-                            gscEnhanced: true,
-                        }),
-                    })
-                }
-            }
-
-            clearOnboardingStorage()
-            router.push("/content-plan")
-        } catch (e: any) {
-            // Even on error, proceed to content plan
-            clearOnboardingStorage()
-            router.push("/content-plan")
-        } finally {
-            setEnhancingWithGSC(false)
-        }
-    }
+    // NOTE: Plan generation and GSC enhancement are now handled on /content-plan page
 
     // Helper to update nested brand state
     const updateField = (path: string, value: any) => {
@@ -637,43 +329,30 @@ export default function OnboardingPage() {
         setBrandData(prev => prev ? ({ ...prev, [field]: arr }) : null)
     }
 
-    // Progress indicator - simplified to show 3 main phases (voice step removed)
-    const stepOrder: Step[] = ["brand", "competitors", "plan", "gsc-prompt", "gsc-reassurance", "complete"]
-    const currentStepIndex = stepOrder.indexOf(step)
-
+    // Progress indicator - simplified to 2-step flow
     const isStepComplete = (checkStep: Step) => {
-        return stepOrder.indexOf(checkStep) < currentStepIndex
+        if (checkStep === "brand" && step === "competitors") return true
+        return false
     }
 
     const isStepActive = (checkStep: Step) => {
-        // Group steps into phases for display
-        if (checkStep === "brand") return step === "brand"
-        if (checkStep === "competitors" || checkStep === "plan") return step === "competitors" || step === "plan"
-        return step === "gsc-prompt" || step === "gsc-reassurance" || step === "complete"
+        return step === checkStep
     }
 
     const ProgressIndicator = () => (
         <div className="flex items-center justify-center gap-2 mb-6">
-            {/* Step 1: Brand DNA (includes voice extraction) */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${step === "brand" ? 'bg-stone-900 text-white' : isStepComplete("brand") ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-500'}`}>
+            {/* Step 1: Brand DNA */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${step === "brand" ? 'bg-stone-900 text-white' : 'bg-stone-800 text-stone-300'}`}>
                 <Globe className="w-3.5 h-3.5" />
                 <span>Brand</span>
-                {isStepComplete("brand") && <BadgeCheck className="w-3 h-3 text-green-500" />}
+                {step === "competitors" && <BadgeCheck className="w-3 h-3 text-green-500" />}
             </div>
             <div className={`w-4 h-px bg-stone-200`} />
 
-            {/* Step 2: Content Plan */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${(step === "competitors" || step === "plan") ? 'bg-stone-900 text-white' : isStepComplete("plan") ? 'bg-stone-800 text-stone-300' : 'bg-stone-100 text-stone-500'}`}>
+            {/* Step 2: Strategy (auto-redirects) */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${step === "competitors" ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-500'}`}>
                 <Calendar className="w-3.5 h-3.5" />
-                <span>Plan</span>
-                {isStepComplete("plan") && <BadgeCheck className="w-3 h-3 text-green-500" />}
-            </div>
-            <div className={`w-4 h-px bg-stone-200`} />
-
-            {/* Step 3: Complete/GSC */}
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${(step === "gsc-prompt" || step === "gsc-reassurance" || step === "complete") ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-500'}`}>
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>Insights</span>
+                <span>Strategy</span>
             </div>
         </div>
     )
@@ -954,346 +633,7 @@ export default function OnboardingPage() {
                                     </motion.div>
                                 )}
 
-                                {/* Step 2: Competitor Analysis & Content Plan Generation */}
-                                {(step === "competitors" || step === "plan") && (
-                                    <motion.div
-                                        key="plan-step"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="p-4 space-y-6"
-                                    >
-                                        {(analyzingCompetitors || generatingPlan) ? (
-                                            // Loading State with rotating trust-building messages
-                                            <div className="text-center space-y-6 py-8">
-                                                <div className="flex justify-center">
-                                                    <CustomSpinner className="w-12 h-12" />
-                                                </div>
-                                                <AnimatePresence mode="wait">
-                                                    <motion.div
-                                                        key={analyzingCompetitors ? "competitors" : planLoadingMessage}
-                                                        initial={{ opacity: 0, y: 10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: -10 }}
-                                                        transition={{ duration: 0.3 }}
-                                                        className="space-y-2"
-                                                    >
-                                                        <h2 className={`text-lg font-bold text-stone-900`}>
-                                                            {analyzingCompetitors
-                                                                ? "Researching your market..."
-                                                                : planLoadingMessages[planLoadingMessage].title}
-                                                        </h2>
-                                                        <p className={`text-sm text-stone-500`}>
-                                                            {analyzingCompetitors
-                                                                ? "Understanding what works in your industry"
-                                                                : planLoadingMessages[planLoadingMessage].subtitle}
-                                                        </p>
-                                                    </motion.div>
-                                                </AnimatePresence>
-                                                <div className="flex items-center justify-center gap-2">
-                                                    {analyzingCompetitors ? (
-                                                        <>
-                                                            <Users className={`w-4 h-4 text-stone-500`} />
-                                                            <span className={`text-xs text-stone-500`}>Analyzing top performers in your niche</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Target className={`w-4 h-4 text-stone-500`} />
-                                                            <span className={`text-xs text-stone-500`}>Building a plan that wins in AI search</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            // Plan Display
-                                            <>
-                                                <div className="text-center space-y-2">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <Sparkles className={`w-5 h-5 text-amber-500`} />
-                                                        <h2 className={`text-xl font-bold text-stone-900`}>
-                                                            Your 30-Day Content Plan
-                                                        </h2>
-                                                    </div>
-                                                    <p className={`text-sm text-stone-500`}>
-                                                        {contentPlan.length} blog posts tailored to your brand
-                                                    </p>
-                                                </div>
 
-                                                {/* Plan Preview */}
-                                                <div className={`rounded-xl border overflow-hidden bg-stone-50 border-stone-200`}>
-                                                    <div className="max-h-[300px] overflow-y-auto divide-y divide-stone-200">
-                                                        {contentPlan.slice(0, 10).map((item, i) => (
-                                                            <div key={item.id} className={`p-3 flex items-start gap-3 hover:bg-stone-100`}>
-                                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium bg-stone-200 text-stone-600`}>
-                                                                    {i + 1}
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className={`text-sm font-medium truncate text-stone-900`}>
-                                                                        {item.title}
-                                                                    </p>
-                                                                    <div className="flex items-center gap-2 mt-1">
-                                                                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium bg-stone-200 text-stone-600`}>
-                                                                            {item.main_keyword}
-                                                                        </span>
-                                                                        <span className={`text-[10px] capitalize text-stone-500`}>
-                                                                            {item.intent}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                    {contentPlan.length > 10 && (
-                                                        <div className={`p-3 text-center text-xs text-stone-500`}>
-                                                            +{contentPlan.length - 10} more posts in your plan
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Save Button */}
-                                                <Button
-                                                    onClick={handleSavePlan}
-                                                    disabled={savingPlan || contentPlan.length === 0}
-                                                    className={`
-                                                w-full h-10 font-semibold
-                                                bg-gradient-to-b from-stone-800 to-stone-950
-                                                hover:from-stone-700 hover:to-stone-900
-                                            `}
-                                                >
-                                                    {savingPlan ? (
-                                                        <>
-                                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                            Saving Plan...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            Save & Continue
-                                                            <ArrowRight className="w-4 h-4 ml-2" />
-                                                        </>
-                                                    )}
-                                                </Button>
-                                            </>
-                                        )}
-                                    </motion.div>
-                                )}
-
-                                {/* Step 4: GSC Upgrade Prompt - Combined Value + Transparency */}
-                                {step === "gsc-prompt" && (
-                                    <motion.div
-                                        key="gsc-prompt-step"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="p-4 space-y-5"
-                                    >
-                                        <div className="text-center space-y-2">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <CheckCircle2 className={`w-6 h-6 text-green-500`} />
-                                            </div>
-                                            <h2 className={`text-xl font-bold text-stone-900`}>
-                                                Your content plan is ready!
-                                            </h2>
-                                            <p className={`text-sm text-stone-500`}>
-                                                Connect GSC to tailor it using your real search footprint
-                                            </p>
-                                        </div>
-
-                                        {/* Value Unlocks + Transparency Card */}
-                                        <div className={`rounded-xl border p-4 space-y-4 bg-stone-50 border-stone-200`}>
-                                            {/* What you unlock */}
-                                            <div className="space-y-2.5">
-                                                <p className={`text-xs font-medium text-stone-500`}>
-                                                    We&apos;ll use your data for:
-                                                </p>
-                                                <ul className="space-y-2">
-                                                    {[
-                                                        { icon: Zap, text: "A map of what Google already wants to rank you for." },
-                                                        { icon: Target, text: "The exact keywords where you're inches from page 1." },
-                                                        { icon: TrendingUp, text: "The hidden topics your brand is quietly building authority on." },
-                                                    ].map((item, i) => (
-                                                        <li key={i} className="flex items-start gap-2.5">
-                                                            <item.icon className={`w-4 h-4 mt-0.5 flex-shrink-0 text-stone-500`} />
-                                                            <span className={`text-sm text-stone-600`}>
-                                                                {item.text}
-                                                            </span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-
-                                            {/* Divider */}
-                                            <div className={`border-t border-stone-200`} />
-
-                                            {/* Transparency Section */}
-                                            <div className="space-y-2.5">
-                                                <p className={`text-xs font-medium text-stone-500`}>
-                                                    Read-only. Zero changes. Zero storage.
-                                                </p>
-                                                <ul className="space-y-2">
-                                                    {[
-                                                        { icon: Lock, text: "We don't touch your account." },
-                                                        { icon: Ban, text: "We don't modify anything." },
-                                                        { icon: Trash2, text: "We don't store your raw GSC data." },
-                                                    ].map((item, i) => (
-                                                        <li key={i} className="flex items-center gap-2.5">
-                                                            <item.icon className={`w-4 h-4 flex-shrink-0 text-stone-500`} />
-                                                            <span className={`text-sm text-stone-600`}>
-                                                                {item.text}
-                                                            </span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                                <p className={`text-xs text-stone-500`}>
-                                                    We use it only to shape your content plan — then discard it on the way.
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <Button
-                                            onClick={handleConnectGSC}
-                                            className={`
-                                        w-full h-10 font-semibold
-                                        bg-gradient-to-b from-stone-800 to-stone-950
-                                        hover:from-stone-700 hover:to-stone-900
-                                    `}
-                                        >
-                                            <Image src="/brands/search-console.svg" alt="" width={16} height={16} className="w-4 h-4 mr-2" />
-                                            Connect Search Console
-                                        </Button>
-
-                                        {/* Skip Option */}
-                                        <button
-                                            onClick={handleSkipGSC}
-                                            className={`cursor-pointer w-full text-center text-xs underline underline-offset-2 text-stone-500 hover:text-stone-400`}
-                                        >
-                                            Continue without Search Console
-                                        </button>
-                                    </motion.div>
-                                )}
-
-                                {/* Step 6: GSC Site Selection */}
-                                {step === "gsc-sites" && (
-                                    <motion.div
-                                        key="gsc-sites-step"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="p-4 space-y-6"
-                                    >
-                                        <div className="text-center space-y-2">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <CheckCircle2 className={`w-6 h-6 text-green-500`} />
-                                            </div>
-                                            <h2 className={`text-xl font-bold text-stone-900`}>
-                                                Connected to Search Console!
-                                            </h2>
-                                            <p className={`text-sm text-stone-500`}>
-                                                Select which site to analyze
-                                            </p>
-                                        </div>
-
-                                        {loadingGscSites ? (
-                                            <div className="flex items-center justify-center py-8">
-                                                <Loader2 className={`w-6 h-6 animate-spin text-stone-500`} />
-                                            </div>
-                                        ) : gscSites.length === 0 ? (
-                                            <div className={`text-center py-8 text-stone-500`}>
-                                                <p className="text-sm">No sites found in your Search Console account.</p>
-                                                <button
-                                                    onClick={handleSkipGSC}
-                                                    className="cursor-pointer mt-4 text-sm underline"
-                                                >
-                                                    Continue without GSC data
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className={`rounded-xl border overflow-hidden bg-stone-50 border-stone-200`}>
-                                                    <div className="max-h-[250px] overflow-y-auto divide-y divide-stone-200">
-                                                        {gscSites.map((site) => (
-                                                            <button
-                                                                key={site.siteUrl}
-                                                                onClick={() => setSelectedSite(site.siteUrl)}
-                                                                className={`cursor-pointer w-full p-3 flex items-center gap-3 text-left transition-all ${selectedSite === site.siteUrl
-                                                                    ? 'bg-stone-200'
-                                                                    : 'hover:bg-stone-100'
-                                                                    }`}
-                                                            >
-                                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedSite === site.siteUrl
-                                                                    ? 'border-green-500 bg-green-500'
-                                                                    : 'border-stone-300'
-                                                                    }`}>
-                                                                    {selectedSite === site.siteUrl && (
-                                                                        <CheckCircle2 className="w-3 h-3 text-white" />
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className={`text-sm font-medium truncate text-stone-900`}>
-                                                                        {site.siteUrl.replace('sc-domain:', '').replace('https://', '').replace('http://', '')}
-                                                                    </p>
-                                                                    <p className={`text-xs text-stone-500`}>
-                                                                        {site.permissionLevel}
-                                                                    </p>
-                                                                </div>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <Button
-                                                    onClick={handleSelectSiteAndEnhance}
-                                                    disabled={!selectedSite}
-                                                    className={`
-                                                w-full h-10 font-semibold
-                                                bg-gradient-to-b from-stone-800 to-stone-950
-                                                hover:from-stone-700 hover:to-stone-900
-                                                disabled:opacity-50
-                                            `}
-                                                >
-                                                    <TrendingUp className="w-4 h-4 mr-2" />
-                                                    Fetch Insights & Enhance Plan
-                                                </Button>
-
-                                                <button
-                                                    onClick={handleSkipGSC}
-                                                    className={`w-full text-center text-sm underline underline-offset-2 text-stone-500 hover:text-stone-600`}
-                                                >
-                                                    Skip and continue without GSC data
-                                                </button>
-                                            </>
-                                        )}
-                                    </motion.div>
-                                )}
-
-                                {/* Step 7: GSC Enhancing (Loading State) */}
-                                {step === "gsc-enhancing" && (
-                                    <motion.div
-                                        key="gsc-enhancing-step"
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="p-4 space-y-6"
-                                    >
-                                        <div className="text-center space-y-6 py-8">
-                                            <div className="relative w-16 h-16 mx-auto">
-                                                <div className={`absolute inset-0 rounded-full border-4 border-stone-200`} />
-                                                <div className={`absolute inset-0 rounded-full border-4 border-t-green-500 animate-spin`} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <h2 className={`text-lg font-bold text-stone-900`}>
-                                                    Enhancing your content plan...
-                                                </h2>
-                                                <p className={`text-sm text-stone-500`}>
-                                                    Analyzing your search data to find opportunities
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <TrendingUp className={`w-4 h-4 text-stone-500`} />
-                                                <span className={`text-xs text-stone-500`}>Adding opportunity scores and badges</span>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
                             </AnimatePresence>
                         </div>
                     </motion.div>
