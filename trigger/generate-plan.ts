@@ -3,6 +3,8 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { generateStrategicPlan } from "@/lib/plans/strategic-planner"
 import { tavily } from "@tavily/core"
+import Sitemapper from "sitemapper"
+import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
 
 
 interface GeneratePlanPayload {
@@ -13,6 +15,118 @@ interface GeneratePlanPayload {
     brandUrl?: string
     competitorBrands?: Array<{ name: string; url?: string }>
     existingContent?: string[]
+}
+
+/**
+ * Sync sitemap URLs to internal_links table.
+ * Returns titles for use in plan generation to avoid duplicate content.
+ */
+async function syncSitemapToInternalLinks(
+    websiteUrl: string,
+    userId: string,
+    brandId: string
+): Promise<{ titles: string[]; syncedCount: number }> {
+    const supabase = createAdminClient()
+
+    // Build sitemap URLs to try
+    const baseUrl = websiteUrl.replace(/\/$/, '')
+    const sitemapPaths = ['/sitemap.xml', '/sitemap_index.xml', '/wp-sitemap.xml']
+
+    let sitemapUrls: string[] = []
+
+    console.log(`[Sitemap Sync] Starting sync for ${baseUrl}`)
+
+    // Try paths sequentially until we find one with URLs
+    for (const path of sitemapPaths) {
+        const currentUrl = `${baseUrl}${path}`
+        console.log(`[Sitemap Sync] Trying: ${currentUrl}`)
+
+        try {
+            const sitemapper = new Sitemapper({
+                url: currentUrl,
+                timeout: 15000,
+            })
+
+            const { sites } = await sitemapper.fetch()
+            if (sites && sites.length > 0) {
+                sitemapUrls = Array.from(new Set(sites as string[])) // Deduplicate
+                console.log(`[Sitemap Sync] Found ${sitemapUrls.length} URLs at ${currentUrl}`)
+                break // Stop if we found a working sitemap
+            }
+        } catch (e) {
+            console.log(`[Sitemap Sync] Failed to fetch ${currentUrl}`)
+        }
+    }
+
+    if (sitemapUrls.length === 0) {
+        console.warn(`[Sitemap Sync] No URLs found in any sitemap for ${baseUrl}`)
+        return { titles: [], syncedCount: 0 }
+    }
+
+    // Get existing URLs to avoid duplicates
+    const { data: existingRecords } = await (supabase as any)
+        .from("internal_links")
+        .select("url")
+        .eq("user_id", userId)
+        .eq("brand_id", brandId)
+
+    const existingUrls = new Set<string>(existingRecords?.map((r: any) => r.url) || [])
+    const urlsToAdd = sitemapUrls.filter(url => !existingUrls.has(url))
+
+    console.log(`[Sitemap Sync] ${urlsToAdd.length} new URLs to add`)
+
+    // Extract titles for all URLs (for immediate return to plan generator)
+    const allTitles = sitemapUrls.map(url => extractTitleFromUrl(url))
+
+    // Process new URLs in batches
+    const BATCH_SIZE = 5
+    let syncedCount = 0
+
+    for (let i = 0; i < urlsToAdd.length; i += BATCH_SIZE) {
+        const batch = urlsToAdd.slice(i, i + BATCH_SIZE)
+
+        const inserts = await Promise.all(batch.map(async (url) => {
+            const title = extractTitleFromUrl(url)
+
+            try {
+                const embedding = await generateEmbedding(title)
+                return {
+                    user_id: userId,
+                    brand_id: brandId,
+                    url,
+                    title,
+                    embedding
+                }
+            } catch (e) {
+                console.error(`[Sitemap Sync] Failed embedding for ${url}:`, e)
+                // Still save without embedding - can be backfilled later
+                return {
+                    user_id: userId,
+                    brand_id: brandId,
+                    url,
+                    title,
+                    embedding: null
+                }
+            }
+        }))
+
+        const validInserts = inserts.filter(item => item !== null)
+
+        if (validInserts.length > 0) {
+            const { error } = await (supabase as any)
+                .from("internal_links")
+                .insert(validInserts)
+
+            if (error) {
+                console.error("[Sitemap Sync] DB Insert error:", error)
+            } else {
+                syncedCount += validInserts.length
+            }
+        }
+    }
+
+    console.log(`[Sitemap Sync] Synced ${syncedCount} new links`)
+    return { titles: allTitles, syncedCount }
 }
 
 /**
@@ -118,6 +232,28 @@ export const generatePlanTask = task({
         }
 
         try {
+            // === PHASE 0: SITEMAP SYNC (Save internal links + get existing content) ===
+            let sitemapTitles: string[] = []
+            if (brandUrl) {
+                await updateStatus("generating", "sitemap")
+                console.log(`[Generate Plan Task] Phase 0: Syncing sitemap...`)
+
+                try {
+                    const syncResult = await syncSitemapToInternalLinks(brandUrl, userId, brandId)
+                    sitemapTitles = syncResult.titles
+                    console.log(`[Generate Plan Task] Sitemap sync: ${syncResult.syncedCount} new links, ${sitemapTitles.length} total titles`)
+                } catch (e) {
+                    console.warn(`[Generate Plan Task] Sitemap sync failed (non-blocking):`, e)
+                }
+            }
+
+            // Merge existing content: passed content + sitemap titles (deduplicated)
+            const allExistingContent = Array.from(new Set([
+                ...(existingContent || []),
+                ...sitemapTitles
+            ]))
+            console.log(`[Generate Plan Task] Total existing content for deduplication: ${allExistingContent.length}`)
+
             // === PHASE 1: INTELLIGENCE (Competitor Discovery) ===
             await updateStatus("generating", "intelligence")
             console.log(`[Generate Plan Task] Phase 1: Intelligence gathering...`)
@@ -139,7 +275,7 @@ export const generatePlanTask = task({
                 brandData,
                 brandUrl,
                 competitorBrands,
-                existingContent: existingContent || []
+                existingContent: allExistingContent
             })
 
             console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)

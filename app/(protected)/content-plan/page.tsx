@@ -452,6 +452,7 @@ export default function ContentPlanPage() {
     // This MUST be checked before accessing plan_data since it's empty during generation
     if (plan.generation_status === 'pending' || plan.generation_status === 'generating') {
         const phaseLabels: Record<string, { title: string; description: string }> = {
+            sitemap: { title: "Syncing Your Content", description: "Fetching existing pages from your sitemap..." },
             seeds: { title: "Setting Up Your Strategy", description: "Preparing your content strategy foundation..." },
             intelligence: { title: "Analyzing Market Landscape", description: "Discovering competitors and market trends..." },
             serp: { title: "Analyzing Market Landscape", description: "Scanning competitors and SERP patterns..." },
@@ -459,7 +460,8 @@ export default function ContentPlanPage() {
             hierarchy: { title: "Building Topic Hierarchy", description: "Organizing topics by strategic importance..." },
             plan: { title: "Generating Your 30-Day Plan", description: "Creating your personalized content roadmap..." }
         }
-        const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] || phaseLabels.intelligence : phaseLabels.intelligence
+        const phaseOrder = ['sitemap', 'intelligence', 'plan']
+        const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] || phaseLabels.sitemap : phaseLabels.sitemap
 
         return (
             <div className="min-h-screen flex items-center justify-center p-4">
@@ -477,14 +479,14 @@ export default function ContentPlanPage() {
                             </p>
                         </div>
                         <div className="flex items-center justify-center gap-2">
-                            {['intelligence', 'plan'].map((phase, i) => (
+                            {phaseOrder.map((phase, i) => (
                                 <div
                                     key={phase}
                                     className={cn(
                                         "w-2 h-2 rounded-full transition-all",
                                         plan.generation_phase === phase
                                             ? "bg-stone-900 w-6"
-                                            : i < ['intelligence', 'plan'].indexOf(plan.generation_phase || 'intelligence')
+                                            : i < phaseOrder.indexOf(plan.generation_phase || 'sitemap')
                                                 ? "bg-stone-400"
                                                 : "bg-stone-200"
                                     )}
