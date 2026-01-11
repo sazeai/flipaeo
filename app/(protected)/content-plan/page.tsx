@@ -32,7 +32,8 @@ import {
     Award,
     Waypoints,
     Calendar as CalendarIcon,
-    MousePointer2
+    MousePointer2,
+    ChevronDown,
 } from "lucide-react"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { Button } from "@/components/ui/button"
@@ -136,6 +137,7 @@ const ARTICLE_CATEGORY_CONFIG: Record<string, {
 export default function ContentPlanPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
+    const [isAnalysisOpen, setIsAnalysisOpen] = useState(false) // Default closed/collapsible
     const [plan, setPlan] = useState<{
         id: string;
         plan_data: ContentPlanItem[];
@@ -691,18 +693,52 @@ export default function ContentPlanPage() {
 
                 {/* --- Body Content --- */}
                 <div className="p-4 space-y-8">
-                    {/* Strategic Analysis - First item with bottom border */}
+                    {/* Strategic Analysis - Premium Accordion */}
                     {plan?.content_gap_analysis && (
-                        <div className="pb-6 mb-6 border-b border-stone-200">
-                            <div className="flex items-start gap-3">
-                                <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                                <div className="flex-1">
-                                    <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Strategic Analysis</h3>
-                                    <p className="text-sm text-stone-600 leading-relaxed">
-                                        {plan.content_gap_analysis}
-                                    </p>
+                        <div className="border-b border-stone-200 pb-2 mb-6">
+                            <button
+                                onClick={() => setIsAnalysisOpen(!isAnalysisOpen)}
+                                className="w-full flex items-center justify-between group py-2"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                                        isAnalysisOpen ? "bg-amber-100/50 text-amber-600" : "bg-stone-100 text-stone-500 group-hover:text-amber-600 group-hover:bg-amber-50"
+                                    )}>
+                                        <Lightbulb className="w-4 h-4" />
+                                    </div>
+                                    <h3 className={cn(
+                                        "text-xs font-bold uppercase tracking-wide transition-colors",
+                                        isAnalysisOpen ? "text-amber-900" : "text-stone-500 group-hover:text-amber-900"
+                                    )}>
+                                        Strategic Analysis
+                                    </h3>
                                 </div>
-                            </div>
+                                <div className={cn(
+                                    "w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300",
+                                    isAnalysisOpen ? "bg-amber-100 text-amber-900 rotate-180" : "bg-stone-100 text-stone-400 group-hover:text-stone-600"
+                                )}>
+                                    <ChevronDown className="w-4 h-4" />
+                                </div>
+                            </button>
+
+                            <AnimatePresence initial={false}>
+                                {isAnalysisOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="pl-11 pr-2 pb-6">
+                                            <p className="text-sm text-stone-600 leading-relaxed">
+                                                {plan.content_gap_analysis}
+                                            </p>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     )}
 

@@ -64,7 +64,7 @@ Current Date: ${currentDate}
 - **What it is (literally):** ${brandData.product_identity.literally}
 - **Category:** ${brandData.category || 'SaaS Software'}
 - **Primary Audience:** ${brandData.audience.primary}
-- **The Problem We Solve:** ${Array.isArray(brandData.enemy) ? brandData.enemy.slice(0, 2).join(', ') : brandData.enemy}
+- **The Problem We Solve:** ${Array.isArray(brandData.uvp) ? brandData.uvp.slice(0, 2).join(', ') : brandData.uvp}
 - **Core Features:** ${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
 
 here are the competitor brands:
