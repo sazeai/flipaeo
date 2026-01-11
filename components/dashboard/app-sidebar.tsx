@@ -3,14 +3,7 @@
 import * as React from "react"
 import {
   Send,
-  Brain,
-  Feather,
   Sparkles,
-  Image as ImageIcon,
-  DatabaseZap,
-  Sparkles as SparklesIcon,
-  Settings,
-  NotebookPen,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -29,6 +22,13 @@ import {
 import { useCreditManager } from "@/lib/credit-manager"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+
+// Custom animated icons
+import { BookTextIcon } from "@/components/icons/book-text"
+import { FeatherIcon } from "@/components/icons/feathericon"
+import { SyringeIcon } from "@/components/icons/syringe"
+import { SettingsIcon } from "@/components/icons/settings"
+import { WebhookIcon } from "@/components/icons/webhook"
 
 
 const navSecondary = [
@@ -60,7 +60,7 @@ function CreditsCard({ userId }: { userId?: string }) {
       <CardContent className="gap-1 flex flex-col px-3">
         <div className="text-sm font-medium mb-1">Plan Usage</div>
         <div className="text-xs text-muted-foreground mb-3 flex justify-between">
-          <span className="flex items-center gap-2"><Feather className="h-3 w-3" />Articles</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
+          <span className="flex items-center gap-2"><FeatherIcon size={12} />Articles</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
         </div>
         <Button size="sm" className="w-full bg-black hover:bg-black/90 text-white border-0" asChild>
           <Link href="/subscribe" prefetch={false}>
@@ -93,28 +93,28 @@ export function AppSidebar({
     {
       title: "Content Plan",
       url: "/content-plan",
-      icon: NotebookPen,
+      icon: BookTextIcon,
       isActive: true,
     },
     {
       title: "Articles",
       url: "/articles",
-      icon: SparklesIcon,
+      icon: FeatherIcon,
     },
     {
       title: "SEO Health",
       url: "/seo-health",
-      icon: Brain,
+      icon: SyringeIcon,
     },
     {
       title: "Settings",
       url: "/settings",
-      icon: Settings,
+      icon: SettingsIcon,
     },
     {
       title: "Integrations",
       url: "/integrations",
-      icon: DatabaseZap,
+      icon: WebhookIcon,
     },
 
 
@@ -148,3 +148,4 @@ export function AppSidebar({
     </Sidebar>
   )
 }
+

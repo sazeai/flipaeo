@@ -1,1 +1,103 @@
-[{"id":"plan-1767322769694-0","title":"5 Hidden Costs of Poor Marketing Attribution in 2026","status":"pending","cluster":"Revenue Attribution","intent_role":"Decision","article_type":"informational","main_keyword":"marketing attribution costs","scheduled_date":"2026-01-02","article_category":"Core Answers","supporting_keywords":["ROI measurement","data accuracy","budget waste"]},{"id":"plan-1767322769694-1","title":"How Much Does Customer Acquisition Cost Actually Matter?","status":"pending","cluster":"Customer Acquisition","intent_role":"Decision","article_type":"informational","main_keyword":"customer acquisition cost","scheduled_date":"2026-01-03","article_category":"Core Answers","supporting_keywords":["CAC impact","startup growth","SaaS metrics"]},{"id":"plan-1767322769694-2","title":"Is Attribution Software Worth It for Small E-commerce? (2026 Data)","status":"pending","cluster":"Revenue Attribution","intent_role":"Decision","article_type":"commercial","main_keyword":"attribution software worth","scheduled_date":"2026-01-04","article_category":"Core Answers","supporting_keywords":["e-commerce ROI","marketing spend","small business growth"]},{"id":"plan-1767322769694-3","title":"The Exact 7 Metrics for Smarter Marketing Budget Allocation (2026)","status":"pending","cluster":"Marketing Budget","intent_role":"Core Answer","article_type":"informational","main_keyword":"marketing budget allocation","scheduled_date":"2026-01-05","article_category":"Core Answers","supporting_keywords":["budget strategy","growth spend","ROI optimization"]},{"id":"plan-1767322769694-4","title":"What is a Sales Funnel Leak & How to Spot One Fast?","status":"pending","cluster":"Sales Funnel Performance","intent_role":"Core Answer","article_type":"informational","main_keyword":"sales funnel leak","scheduled_date":"2026-01-06","article_category":"Core Answers","supporting_keywords":["funnel optimization","startup sales","conversion loss"]},{"id":"plan-1767322769694-5","title":"9 Proven Lead Generation Metrics Every Entrepreneur Needs Now","status":"pending","cluster":"Lead Generation Analysis","intent_role":"Core Answer","article_type":"informational","main_keyword":"lead generation metrics","scheduled_date":"2026-01-07","article_category":"Core Answers","supporting_keywords":["entrepreneur leads","B2B lead gen","sales pipeline"]},{"id":"plan-1767322769694-6","title":"The Simple Secret to Untangling Complex Customer Journeys in 2026","status":"pending","cluster":"Customer Journey Analysis","intent_role":"Core Answer","article_type":"informational","main_keyword":"complex customer journeys","scheduled_date":"2026-01-08","article_category":"Core Answers","supporting_keywords":["journey mapping","user paths","online behavior"]},{"id":"plan-1767322769694-7","title":"Why Your Paid Ad Campaigns Are Failing (And 5 Fixes for 2026)","status":"pending","cluster":"Campaign Optimization","intent_role":"Problem-Specific","article_type":"informational","main_keyword":"paid ad campaign failure","scheduled_date":"2026-01-09","article_category":"Core Answers","supporting_keywords":["ad optimization","campaign ROI","PPC issues"]},{"id":"plan-1767322769694-8","title":"Is First-Party Data the ONLY Way to Win Customer Acquisition in 2026?","status":"pending","cluster":"Customer Acquisition","intent_role":"Decision","article_type":"informational","main_keyword":"first party data acquisition","scheduled_date":"2026-01-10","article_category":"Core Answers","supporting_keywords":["privacy-first marketing","customer insights","data strategy"]},{"id":"plan-1767322769694-9","title":"The Definitive 2026 Guide to Holistic Web Analytics for Growth","status":"pending","cluster":"Web Analytics","intent_role":"Core Answer","article_type":"informational","main_keyword":"holistic web analytics","scheduled_date":"2026-01-11","article_category":"Core Answers","supporting_keywords":["growth insights","data interpretation","site performance"]},{"id":"plan-1767322769694-10","title":"Don't Guess! The 3 Step Framework for Accurate Marketing ROI for SMBs","status":"pending","cluster":"Marketing ROI","intent_role":"Core Answer","article_type":"informational","main_keyword":"marketing ROI smb","scheduled_date":"2026-01-12","article_category":"Core Answers","supporting_keywords":["small business marketing","return on investment","budget tracking"]},{"id":"plan-1767322769694-11","title":"What is a Good Website Conversion Rate in 2026? (Industry Benchmarks)","status":"pending","cluster":"Website Conversion Tracking","intent_role":"Core Answer","article_type":"informational","main_keyword":"good conversion rate","scheduled_date":"2026-01-13","article_category":"Core Answers","supporting_keywords":["website optimization","industry average","CRO goals"]},{"id":"plan-1767322769694-12","title":"How to Fix Inaccurate Revenue Attribution Data in 7 Steps (2026)","status":"pending","cluster":"Revenue Attribution","intent_role":"Problem-Specific","article_type":"howto","main_keyword":"fix inaccurate attribution","scheduled_date":"2026-01-14","article_category":"Supporting Articles","supporting_keywords":["data cleansing","attribution models","reporting errors"]},{"id":"plan-1767322769694-13","title":"Reduce Website Bounce Rate by 20% in 2026: The Secret Strategy","status":"pending","cluster":"Website Conversion Tracking","intent_role":"Problem-Specific","article_type":"howto","main_keyword":"reduce bounce rate","scheduled_date":"2026-01-15","article_category":"Supporting Articles","supporting_keywords":["site engagement","user experience","conversion optimization"]},{"id":"plan-1767322769694-14","title":"How to Actually Use Search Console Data for Blog Traffic Growth","status":"pending","cluster":"Search Console Integration","intent_role":"How-To","article_type":"howto","main_keyword":"search console blog growth","scheduled_date":"2026-01-16","article_category":"Supporting Articles","supporting_keywords":["SEO strategy","keyword optimization","content ranking"]},{"id":"plan-1767322769694-15","title":"Stop Wasting Ad Spend: Optimize Paid Campaigns with 3 Key Analytics","status":"pending","cluster":"Campaign Optimization","intent_role":"How-To","article_type":"howto","main_keyword":"optimize paid campaigns","scheduled_date":"2026-01-17","article_category":"Supporting Articles","supporting_keywords":["ad performance","PPC ROI","campaign reporting"]},{"id":"plan-1767322769694-16","title":"The Entrepreneur's Guide: 5 Steps to Deeper Lead Generation Analysis","status":"pending","cluster":"Lead Generation Analysis","intent_role":"How-To","article_type":"howto","main_keyword":"deeper lead generation analysis","scheduled_date":"2026-01-18","article_category":"Supporting Articles","supporting_keywords":["lead quality","pipeline forecasting","sales enablement"]},{"id":"plan-1767322769694-17","title":"How to Build a Customer Acquisition Dashboard That Actually Works (2026)","status":"pending","cluster":"Customer Acquisition","intent_role":"How-To","article_type":"howto","main_keyword":"customer acquisition dashboard","scheduled_date":"2026-01-19","article_category":"Supporting Articles","supporting_keywords":["acquisition metrics","data visualization","business intelligence"]},{"id":"plan-1767322769694-18","title":"3 Critical Ways to Track Social Media Marketing ROI Precisely","status":"pending","cluster":"Marketing ROI","intent_role":"How-To","article_type":"howto","main_keyword":"social media marketing ROI","scheduled_date":"2026-01-20","article_category":"Supporting Articles","supporting_keywords":["social analytics","campaign measurement","digital marketing"]},{"id":"plan-1767322769694-19","title":"When Plausible.io Data Isn't Enough: How to Get Deeper Insights","status":"pending","cluster":"Data Import","intent_role":"Problem-Specific","article_type":"informational","main_keyword":"plausible io deeper insights","scheduled_date":"2026-01-21","article_category":"Supporting Articles","supporting_keywords":["data import","advanced analytics","website data"]},{"id":"plan-1767322769694-20","title":"Last-Click vs. Multi-Touch Attribution: Which is Better for E-commerce?","status":"pending","cluster":"Revenue Attribution","intent_role":"Comparison","article_type":"commercial","main_keyword":"last click vs multi touch","scheduled_date":"2026-01-22","article_category":"Conversion Pages","supporting_keywords":["e-commerce attribution","marketing models","ROI comparison"]},{"id":"plan-1767322769694-21","title":"Google Analytics 4 vs. Dedicated Attribution: What's Best for SaaS?","status":"pending","cluster":"Revenue Attribution","intent_role":"Comparison","article_type":"commercial","main_keyword":"ga4 vs dedicated attribution","scheduled_date":"2026-01-23","article_category":"Conversion Pages","supporting_keywords":["SaaS analytics","marketing tools","platform comparison"]},{"id":"plan-1767322769694-22","title":"Attribution Software: Build Your Own or Buy a Proven Solution in 2026?","status":"pending","cluster":"Revenue Attribution","intent_role":"Decision","article_type":"commercial","main_keyword":"build vs buy attribution","scheduled_date":"2026-01-24","article_category":"Conversion Pages","supporting_keywords":["custom software","off-the-shelf","development costs"]},{"id":"plan-1767322769694-23","title":"Is Automated Marketing Analytics Worth the Cost for Startups?","status":"pending","cluster":"Marketing Analytics","intent_role":"Decision","article_type":"commercial","main_keyword":"automated analytics cost","scheduled_date":"2026-01-25","article_category":"Conversion Pages","supporting_keywords":["startup tools","marketing efficiency","data automation"]},{"id":"plan-1767322769694-24","title":"Datafa.st vs. [Generic Competitor Tool]: The Real Truth for Customer Acquisition","status":"pending","cluster":"Customer Acquisition","intent_role":"Comparison","article_type":"commercial","main_keyword":"datafa.st competitor","scheduled_date":"2026-01-26","article_category":"Conversion Pages","supporting_keywords":["marketing analytics tools","acquisition software","feature battle"]},{"id":"plan-1767322769694-25","title":"Why Your Current Website Analytics Isn't Enough for Conversion Tracking","status":"pending","cluster":"Website Conversion Tracking","intent_role":"Decision","article_type":"commercial","main_keyword":"website analytics limitations","scheduled_date":"2026-01-27","article_category":"Conversion Pages","supporting_keywords":["conversion tracking","data gaps","advanced analytics"]},{"id":"plan-1767322769694-26","title":"The Hidden Trap: When Relying Solely on Google Search Console Data Fails","status":"pending","cluster":"Search Console Integration","intent_role":"Authority/Edge","article_type":"informational","main_keyword":"search console limitations","scheduled_date":"2026-01-28","article_category":"Authority Plays","supporting_keywords":["SEO data gaps","traffic insights","keyword accuracy"]},{"id":"plan-1767322769694-27","title":"Why Your Marketing ROI Goes Sideways for New Product Launches (Edge Case)","status":"pending","cluster":"Marketing ROI","intent_role":"Authority/Edge","article_type":"informational","main_keyword":"marketing ROI new product","scheduled_date":"2026-01-29","article_category":"Authority Plays","supporting_keywords":["launch strategy","market entry","measurement challenges"]},{"id":"plan-1767322769694-28","title":"The True Story of the $1M Attribution Mistake (And How to Avoid It)","status":"pending","cluster":"Revenue Attribution","intent_role":"Emotional/Story","article_type":"informational","main_keyword":"attribution mistake story","scheduled_date":"2026-01-30","article_category":"Authority Plays","supporting_keywords":["data error","revenue loss","case study"]},{"id":"plan-1767322769694-29","title":"Beyond Vanity Metrics: The Ethical Imperative of Accurate Web Analytics","status":"pending","cluster":"Web Analytics","intent_role":"Authority/Edge","article_type":"informational","main_keyword":"ethical web analytics","scheduled_date":"2026-01-31","article_category":"Authority Plays","supporting_keywords":["data privacy","transparent reporting","user trust"]}]
+"use client";
+
+import type { Variants } from "motion/react";
+import { motion, useAnimation } from "motion/react";
+import type { HTMLAttributes } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+
+import { cn } from "@/lib/utils";
+
+export interface FeatherIconHandle {
+  startAnimation: () => void;
+  stopAnimation: () => void;
+}
+
+interface FeatherIconProps extends HTMLAttributes<HTMLDivElement> {
+  size?: number;
+}
+
+const FEATHER_VARIANTS: Variants = {
+  normal: {
+    rotate: 0,
+    y: 0,
+    x: 0,
+  },
+  animate: {
+    rotate: [0, -8, 4, -3, 0],
+    y: [0, -4, -2, -1, 0],
+    x: [0, 2, -2, 1, 0],
+    transition: {
+      duration: 1.6,
+      ease: "easeInOut",
+    },
+  },
+};
+
+const FeatherIcon = forwardRef<FeatherIconHandle, FeatherIconProps>(
+  ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
+    const controls = useAnimation();
+    const isControlledRef = useRef(false);
+
+    useImperativeHandle(ref, () => {
+      isControlledRef.current = true;
+
+      return {
+        startAnimation: () => controls.start("animate"),
+        stopAnimation: () => controls.start("normal"),
+      };
+    });
+
+    const handleMouseEnter = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isControlledRef.current) {
+          onMouseEnter?.(e);
+        } else {
+          controls.start("animate");
+        }
+      },
+      [controls, onMouseEnter]
+    );
+
+    const handleMouseLeave = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isControlledRef.current) {
+          onMouseLeave?.(e);
+        } else {
+          controls.start("normal");
+        }
+      },
+      [controls, onMouseLeave]
+    );
+
+    return (
+      <div
+        className={cn(className)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        {...props}
+      >
+        <motion.svg
+          animate={controls}
+          fill="none"
+          height={size}
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          variants={FEATHER_VARIANTS}
+          viewBox="0 0 24 24"
+          width={size}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z" />
+          <path d="M16 8 2 22" />
+          <path d="M17.5 15H9" />
+        </motion.svg>
+      </div>
+    );
+  }
+);
+
+FeatherIcon.displayName = "FeatherIcon";
+
+export { FeatherIcon };
