@@ -1,89 +1,88 @@
 import { task } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { BrandDetails } from "@/lib/schemas/brand"
-import { gatherSERPIntelligence, extractCompetitorBrands } from "@/lib/plans/serp-intelligence"
-import { performGapAnalysis } from "@/lib/plans/gap-analysis"
-import { buildTopicHierarchy } from "@/lib/plans/topic-hierarchy"
-import { generateContentPlan } from "@/lib/plans/generator"
-import { getGeminiClient } from "@/utils/gemini/geminiClient"
+import { generateStrategicPlan } from "@/lib/plans/strategic-planner"
+import { tavily } from "@tavily/core"
+
 
 interface GeneratePlanPayload {
     planId: string
     userId: string
     brandId: string
     brandData: BrandDetails
-    // seeds are always generated in this task from brandData
+    brandUrl?: string
     competitorBrands?: Array<{ name: string; url?: string }>
     existingContent?: string[]
 }
 
 /**
- * Generate content seeds from brand data using AI.
- * This replaces the server-side competitor analysis for onboarding.
+ * Quick competitor discovery using Tavily search.
+ * Searches for "[category] tools" to find real competitor brands.
  */
-async function generateSeedsFromBrand(brandData: BrandDetails): Promise<string[]> {
-    const client = getGeminiClient()
-
-    const brandContext = `${brandData.product_name} - ${brandData.product_identity.literally}. 
-Category: ${brandData.category || 'SaaS Software'}. 
-Target: ${brandData.audience.primary}. 
-Features: ${brandData.core_features.slice(0, 5).join(', ')}`
-
-    const prompt = `
-Given this brand, generate 15-20 SEO keyword seeds for a content plan.
-
-Brand Context: ${brandContext}
-
-REQUIREMENTS:
-1. Focus on the PRIMARY PRODUCT CATEGORY (e.g., "web analytics", "AI photo editing", "CRM")
-2. Include a mix of:
-   - Informational keywords ("what is [topic]", "how to [task]", "[topic] guide")
-   - Commercial keywords ("best [category] tools", "[product] alternatives", "[competitor] vs")
-   - Feature-based keywords ("[feature] software", "tools with [feature]")
-3. Keywords should be relevant to what the brand's target audience would search
-4. Include some long-tail variations
-
-Return a JSON object with:
-{
-  "seeds": ["keyword1", "keyword2", ...]
-}
-`
+async function discoverCompetitors(
+    brandData: BrandDetails
+): Promise<Array<{ name: string; url?: string }>> {
+    const apiKey = process.env.TAVILY_API_KEY
+    if (!apiKey) {
+        console.warn("[Generate Plan] No Tavily API key, skipping competitor discovery")
+        return []
+    }
 
     try {
-        const response = await client.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: { responseMimeType: "application/json" }
+        const tvly = tavily({ apiKey })
+        const category = brandData.category || brandData.product_identity.literally
+        const searchQuery = `best ${category} tools software 2024`
+
+        console.log(`[Generate Plan] Discovering competitors for: "${searchQuery}"`)
+
+        const response = await tvly.search(searchQuery, {
+            maxResults: 10,
+            searchDepth: "basic"
         })
 
-        const text = response.text || "{}"
-        const data = JSON.parse(text)
-        return data.seeds || []
+        // Extract unique domains as competitors
+        const competitors: Array<{ name: string; url: string }> = []
+        const seenDomains = new Set<string>()
+
+        for (const result of response.results || []) {
+            try {
+                const url = new URL(result.url)
+                const domain = url.hostname.replace('www.', '')
+
+                // Skip if already seen or is the brand itself
+                if (seenDomains.has(domain)) continue
+                if (brandData.product_name.toLowerCase().includes(domain.split('.')[0])) continue
+
+                seenDomains.add(domain)
+
+                // Extract brand name from title or domain
+                const brandName = result.title?.split(' - ')[0]?.split(' | ')[0]?.trim() ||
+                    domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)
+
+                competitors.push({
+                    name: brandName,
+                    url: url.origin
+                })
+            } catch {
+                // Invalid URL, skip
+            }
+        }
+
+        console.log(`[Generate Plan] Found ${competitors.length} competitors`)
+        return competitors.slice(0, 8) // Max 8 competitors
+
     } catch (error) {
-        console.error("[generateSeedsFromBrand] Error:", error)
-        // Fallback: generate basic seeds from brand data
-        const category = brandData.category || brandData.product_identity.literally
-        return [
-            `best ${category} tools`,
-            `${category} software`,
-            `${category} guide`,
-            `how to ${category}`,
-            `${brandData.product_name} alternatives`,
-            ...brandData.core_features.slice(0, 5).map(f => `${f} tools`)
-        ]
+        console.error("[Generate Plan] Competitor discovery failed:", error)
+        return []
     }
 }
 
 /**
  * Background task for generating content plan using Trigger.dev.
- * This runs after user saves brand data during onboarding.
  * 
- * Flow:
- * 1. User completes brand step → saves brand
- * 2. API creates plan with status='pending' → triggers this task
- * 3. This task runs: Seeds (if needed) → SERP → Gap → Hierarchy → Plan Generation
- * 4. Updates plan in DB at each phase
- * 5. User sees progress on /content-plan page via polling/realtime
+ * REVAMPED FLOW (2 phases instead of 5):
+ * 1. Intelligence Phase: Discover competitors if not provided
+ * 2. Generation Phase: Use strategic mega-prompt to generate plan
  */
 export const generatePlanTask = task({
     id: "generate-content-plan",
@@ -94,7 +93,15 @@ export const generatePlanTask = task({
         maxTimeoutInMs: 30000,
     },
     run: async (payload: GeneratePlanPayload) => {
-        const { planId, userId, brandId, brandData, competitorBrands: passedCompetitorBrands, existingContent } = payload
+        const {
+            planId,
+            userId,
+            brandId,
+            brandData,
+            brandUrl,
+            competitorBrands: passedCompetitors,
+            existingContent
+        } = payload
         const supabase = createAdminClient()
 
         console.log(`[Generate Plan Task] Starting for plan: ${planId}`)
@@ -104,7 +111,6 @@ export const generatePlanTask = task({
             if (phase !== undefined) updates.generation_phase = phase
             if (error) updates.generation_error = error
 
-            // Cast to any - content_plans table exists but not in generated types
             await (supabase as any)
                 .from("content_plans")
                 .update(updates)
@@ -112,75 +118,42 @@ export const generatePlanTask = task({
         }
 
         try {
-            // === PHASE 1: Generate Seeds from Brand Data ===
-            await updateStatus("generating", "seeds")
-            console.log(`[Generate Plan Task] Phase 1: Generating seeds from brand data...`)
-            const seeds = await generateSeedsFromBrand(brandData)
-            console.log(`[Generate Plan Task] Seeds generated: ${seeds.length} keywords`)
+            // === PHASE 1: INTELLIGENCE (Competitor Discovery) ===
+            await updateStatus("generating", "intelligence")
+            console.log(`[Generate Plan Task] Phase 1: Intelligence gathering...`)
 
-            // Update plan with generated seeds
-            await (supabase as any)
-                .from("content_plans")
-                .update({ competitor_seeds: seeds })
-                .eq("id", planId)
+            let competitorBrands = passedCompetitors || []
 
-            // === PHASE 1: SERP Intelligence ===
-            await updateStatus("generating", "serp")
-            console.log(`[Generate Plan Task] Phase 1: SERP Intelligence...`)
+            // Discover competitors if not provided
+            if (competitorBrands.length === 0) {
+                competitorBrands = await discoverCompetitors(brandData)
+            }
 
-            const serpData = await gatherSERPIntelligence(seeds, 3)
-            console.log(`[Generate Plan Task] SERP complete: ${serpData.length} seeds analyzed`)
+            console.log(`[Generate Plan Task] Using ${competitorBrands.length} competitors`)
 
-            // Extract competitor brands if not passed
-            const competitorBrands = (passedCompetitorBrands && passedCompetitorBrands.length > 0)
-                ? passedCompetitorBrands
-                : extractCompetitorBrands(serpData)
-
-            // === PHASE 2: Gap Analysis ===
-            await updateStatus("generating", "gap")
-            console.log(`[Generate Plan Task] Phase 2: Gap Analysis...`)
-
-            const gapAnalysis = await performGapAnalysis(serpData, brandData, existingContent || [])
-            console.log(`[Generate Plan Task] Gap complete: ${gapAnalysis.blueOceanTopics.length} blue ocean topics`)
-
-            // === PHASE 3: Topic Hierarchy ===
-            await updateStatus("generating", "hierarchy")
-            console.log(`[Generate Plan Task] Phase 3: Topic Hierarchy...`)
-
-            const competitorNames = competitorBrands.map(c => c.name)
-            const hierarchy = await buildTopicHierarchy(gapAnalysis, brandData, competitorNames)
-            console.log(`[Generate Plan Task] Hierarchy complete: ${hierarchy.nodes.length} topics mapped`)
-
-            // === PHASE 4: Plan Generation ===
+            // === PHASE 2: STRATEGIC PLAN GENERATION ===
             await updateStatus("generating", "plan")
-            console.log(`[Generate Plan Task] Phase 4: Plan Generation...`)
+            console.log(`[Generate Plan Task] Phase 2: Strategic plan generation...`)
 
-            const { plan, categoryDistribution } = await generateContentPlan({
-                userId,
-                brandId,
+            const result = await generateStrategicPlan({
                 brandData,
-                seeds,
+                brandUrl,
                 competitorBrands,
-                gapAnalysis: {
-                    blueOceanTopics: gapAnalysis.blueOceanTopics,
-                    saturatedTopics: gapAnalysis.saturatedTopics,
-                    competitorWeaknesses: gapAnalysis.competitorWeaknesses
-                },
-                topicHierarchy: hierarchy,
-                existingContent
+                existingContent: existingContent || []
             })
 
-            console.log(`[Generate Plan Task] Plan generated: ${plan.length} articles`)
+            console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)
+            console.log(`[Generate Plan Task] Content Gap Analysis:`, result.contentGapAnalysis.slice(0, 200) + "...")
 
             // === SAVE PLAN ===
-            // Cast to any - content_plans table exists but not in generated types
             const { error: updateError } = await (supabase as any)
                 .from("content_plans")
                 .update({
-                    plan_data: plan,
-                    competitor_seeds: seeds,
+                    plan_data: result.plan,
+                    competitor_seeds: competitorBrands.map(c => c.name), // Store competitor names as seeds for reference
                     generation_status: "complete",
                     generation_phase: undefined,
+                    content_gap_analysis: result.contentGapAnalysis, // Store the analysis if column exists
                     updated_at: new Date().toISOString()
                 })
                 .eq("id", planId)
@@ -194,8 +167,9 @@ export const generatePlanTask = task({
             return {
                 success: true,
                 planId,
-                articleCount: plan.length,
-                categoryDistribution
+                articleCount: result.plan.length,
+                categoryDistribution: result.categoryDistribution,
+                contentGapAnalysis: result.contentGapAnalysis
             }
 
         } catch (error: any) {
@@ -205,4 +179,3 @@ export const generatePlanTask = task({
         }
     }
 })
-

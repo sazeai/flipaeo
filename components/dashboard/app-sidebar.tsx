@@ -29,7 +29,7 @@ import {
 import { useCreditManager } from "@/lib/credit-manager"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { createClient } from "@/utils/supabase/client"
+
 
 const navSecondary = [
   {
@@ -63,7 +63,7 @@ function CreditsCard({ userId }: { userId?: string }) {
           <span className="flex items-center gap-2"><Feather className="h-3 w-3" />Articles</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
         </div>
         <Button size="sm" className="w-full bg-black hover:bg-black/90 text-white border-0" asChild>
-          <Link href="/subscribe">
+          <Link href="/subscribe" prefetch={false}>
             <Sparkles className="h-3 w-3" /> Subscribe
           </Link>
         </Button>
@@ -88,8 +88,6 @@ export function AppSidebar({
     email: "user@example.com",
     avatar: "/placeholder-user.jpg",
   }
-
-  const supabase = createClient()
 
   const navItems = React.useMemo(() => [
     {
@@ -128,7 +126,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/" prefetch={false}>
                 <Image src="/site-logo.png" alt="FlipAEO AI" width={30} height={30} className="rounded-sm" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">FlipAEO</span>

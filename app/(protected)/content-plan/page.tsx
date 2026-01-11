@@ -40,7 +40,7 @@ import { GlobalCard } from "@/components/ui/global-card"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { AutomationModal } from "@/components/automation-modal"
 import { cn } from "@/lib/utils"
-import { useCredits } from "@/hooks/useCredits"
+import { useCreditManager } from "@/lib/credit-manager"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { CalendarView } from "@/components/content-plan/calendar-view"
@@ -142,8 +142,9 @@ export default function ContentPlanPage() {
         gsc_enhanced: boolean;
         automation_status?: string;
         generation_status?: string; // 'pending' | 'generating' | 'complete' | 'failed'
-        generation_phase?: string; // 'serp' | 'gap' | 'hierarchy' | 'plan'
+        generation_phase?: string; // 'intelligence' | 'plan'
         generation_error?: string;
+        content_gap_analysis?: string; // Strategic analysis from mega-prompt
     } | null>(null)
     const [filter, setFilter] = useState<"all" | "pending" | "writing" | "published">("all")
     const [error, setError] = useState("")
@@ -155,8 +156,10 @@ export default function ContentPlanPage() {
     const [viewMode, setViewMode] = useState<"strategy" | "calendar">("strategy")
     const [selectedItem, setSelectedItem] = useState<ContentPlanItem | null>(null)
 
-    // Credit gating
-    const { balance: creditBalance, hasCredits } = useCredits()
+    // Credit gating - use centralized credit manager (no extra API calls)
+    // Note: useCreditManager is already initialized by header/sidebar, so this is just reading the cached value
+    const { balance: creditBalance } = useCreditManager(null)
+    const hasCredits = creditBalance > 0
 
     useEffect(() => {
         fetchPlan()
@@ -566,6 +569,23 @@ export default function ContentPlanPage() {
                             </p>
                         )}
                     </div>
+
+                    {/* Content Gap Analysis - Strategic Insight */}
+                    {plan?.content_gap_analysis && (
+                        <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-xl">
+                            <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 flex-shrink-0 mt-0.5">
+                                    <Lightbulb className="w-4 h-4 text-amber-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wide mb-1">Strategic Analysis</h3>
+                                    <p className="text-sm text-amber-800/80 leading-relaxed">
+                                        {plan.content_gap_analysis}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Consolidated Toolbar */}
                     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full">

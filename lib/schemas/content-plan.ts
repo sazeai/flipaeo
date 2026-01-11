@@ -26,21 +26,26 @@ export const ContentPlanItemSchema = z.object({
     // Strategic planning fields (from LLM analysis)
     reason: z.string().optional(), // Why this topic matters
     impact: z.enum(["Low", "Medium", "High"]).optional(), // Expected traffic impact
-    // Intent Role for strategic content coverage (6 roles × 5 articles)
-    intent_role: z.enum([
-        "Core Answer",
-        "Problem-Specific",
-        "Comparison",
-        "Decision",
-        "Emotional/Story",
-        "Authority/Edge"
-    ]).optional(),
     // Article Category for 12-8-6-4 strategic distribution
     article_category: z.enum([
         "Core Answers",        // 12 articles - establish authority on parent questions
         "Supporting Articles", // 8 articles - deepen existing coverage
         "Conversion Pages",    // 6 articles - comparisons, decisions
         "Authority Plays"      // 4 articles - edge cases, technical deep-dives
+    ]).optional(),
+    // Strategic Planner fields (new revamp)
+    connected_to: z.array(z.string()).optional(), // Day numbers or article IDs this links to
+    hook: z.string().optional(), // One-sentence value proposition
+    phase: z.enum([
+        "Foundation",   // Days 1-7: Establish authority
+        "Use-Case",     // Days 8-14: Capture specific personas
+        "Technical",    // Days 15-21: LLM optimization, "how it works"
+        "Trust"         // Days 22-30: Overcome objections, build confidence
+    ]).optional(),
+    user_intent: z.enum([
+        "Informational",
+        "Transactional",
+        "Commercial Investigation"
     ]).optional(),
 })
 
@@ -62,6 +67,8 @@ export const ContentPlanSchema = z.object({
     plan_data: z.array(ContentPlanItemSchema),
     competitor_seeds: z.array(z.string()).optional(),
     gsc_enhanced: z.boolean().default(false),
+    // Strategic planner analysis (new)
+    content_gap_analysis: z.string().optional(),
     // Automation control for Watchman pattern
     automation_status: AutomationStatusSchema,
     // How to handle missed articles when resuming
