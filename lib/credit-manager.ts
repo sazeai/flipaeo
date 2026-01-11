@@ -33,6 +33,12 @@ class CreditManager {
   // Initialize credit tracking for a user
   async initializeUser(userId: string): Promise<number> {
     try {
+      // Optimization: If we already have a subscription and cached value, return it
+      // This prevents duplicate API calls when multiple components use the hook
+      if (this.subscriptions.has(userId) && this.userCredits.has(userId)) {
+        return this.userCredits.get(userId) || 0
+      }
+
       // Fetch current balance
       const { data, error } = await this.supabase
         .from('credits')
@@ -77,9 +83,9 @@ class CreditManager {
             const newBalance = payload.new.credits as number
             const oldBalance = this.userCredits.get(userId) || 0
             const change = newBalance - oldBalance
-            
+
             this.userCredits.set(userId, newBalance)
-            
+
             // Emit credit update event
             this.emitCreditUpdate({
               userId,
@@ -105,9 +111,9 @@ class CreditManager {
   updateCreditsLocally(userId: string, newBalance: number, operation: 'add' | 'deduct' | 'set' = 'set') {
     const oldBalance = this.userCredits.get(userId) || 0
     const change = newBalance - oldBalance
-    
+
     this.userCredits.set(userId, newBalance)
-    
+
     this.emitCreditUpdate({
       userId,
       newBalance,
@@ -120,7 +126,7 @@ class CreditManager {
   // Add event listener for credit updates
   onCreditUpdate(callback: (event: CreditUpdateEvent) => void): () => void {
     this.listeners.add(callback)
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners.delete(callback)
@@ -221,18 +227,18 @@ export async function makeApiCallWithCreditUpdate<T>(
   userId: string
 ): Promise<T> {
   const response = await apiCall()
-  
+
   if (!response.ok) {
     throw new Error(`API call failed: ${response.status}`)
   }
-  
+
   const data = await response.json()
-  
+
   // If the response includes a new balance, update it locally for immediate UI feedback
   if (data.newBalance !== undefined) {
     creditManager.updateCreditsLocally(userId, data.newBalance)
   }
-  
+
   return data
 }
 

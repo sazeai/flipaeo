@@ -42,6 +42,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { AutomationModal } from "@/components/automation-modal"
 import { cn } from "@/lib/utils"
 import { useCreditManager } from "@/lib/credit-manager"
+import { createClient } from "@/utils/supabase/client"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { CalendarView } from "@/components/content-plan/calendar-view"
@@ -158,12 +159,21 @@ export default function ContentPlanPage() {
     const [viewMode, setViewMode] = useState<"strategy" | "calendar">("strategy")
     const [selectedItem, setSelectedItem] = useState<ContentPlanItem | null>(null)
 
-    // Credit gating - use centralized credit manager (no extra API calls)
-    // Note: useCreditManager is already initialized by header/sidebar, so this is just reading the cached value
-    const { balance: creditBalance } = useCreditManager(null)
+    const [userId, setUserId] = useState<string | null>(null)
+
+    // Credit gating - use centralized credit manager
+    const { balance: creditBalance } = useCreditManager(userId)
     const hasCredits = creditBalance > 0
 
     useEffect(() => {
+        // Fetch current user for credit tracking
+        const supabase = createClient()
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) {
+                setUserId(data.user.id)
+            }
+        })
+
         fetchPlan()
     }, [])
 
