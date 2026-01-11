@@ -49,17 +49,18 @@ async function syncSitemapToInternalLinks(
                 console.log(`[Sitemap Sync] Found sitemap in robots.txt: ${foundSitemap}`)
                 // Add to front of paths to try (extracted path only)
                 try {
-                    const sitemapPath = new URL(foundSitemap).pathname
-                    if (!sitemapPaths.includes(sitemapPath)) {
-                        sitemapPaths.unshift(sitemapPath)
+                    // Extract path if it's on the same domain, or handle full URL logic
+                    const sitemapUrl = new URL(foundSitemap)
+                    // If it's a full URL that's not already in our paths-to-try, add it
+                    const relativePath = sitemapUrl.pathname
+
+                    if (!sitemapPaths.includes(relativePath) && !sitemapPaths.includes(foundSitemap)) {
+                        // Priority to full URL if it differs from base, but ensure we check it
+                        // The loop logic handles full URLs correctly now.
+                        sitemapPaths.unshift(foundSitemap)
                     }
                 } catch (e) {
-                    // If full URL, push it as a custom check or handle logic below
-                    // For simplicity, we just add the path if it's on same domain, 
-                    // or we should logic to handle full URL in the loop.
-                    // The loop checks `${baseUrl}${path}`. 
-                    // Let's just use the full URL if we can, but the loop expects paths.
-                    // Modifying logic to handle full URLs or paths.
+                    console.warn(`[Sitemap Sync] Invalid sitemap URL in robots.txt: ${foundSitemap}`)
                 }
             }
         }
