@@ -153,11 +153,15 @@ export default function OnboardingPage() {
 
     const handleSaveBrand = async () => {
         if (!brandData) return
+        if (!url || url.trim() === '') {
+            setError("Website URL is required. Please enter your website domain.")
+            return
+        }
         setSavingBrand(true)
         setError("")
         try {
             // Save brand data (style_dna is already included in brandData)
-            const fullUrl = `https://${url}`
+            const fullUrl = `https://${url.trim()}`
             const res = await saveBrandAction(fullUrl, brandData)
             if (!res.success) {
                 throw new Error('error' in res ? res.error : "Failed to save brand")

@@ -463,8 +463,8 @@ export default function ContentPlanPage() {
 
         return (
             <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="w-full max-w-md">
-                    <GlobalCard className="p-8 text-center space-y-6">
+                <div className="w-full max-w-lg">
+                    <GlobalCard contentClassName="p-4 text-center space-y-4">
                         <div className="flex justify-center">
                             <CustomSpinner className="w-12 h-12" />
                         </div>
@@ -492,7 +492,7 @@ export default function ContentPlanPage() {
                             ))}
                         </div>
                         <p className="text-xs text-stone-400">
-                            This usually takes 3-5 minutes. You can keep this page open.
+                            This usually takes 3-5 minutes. You can leave this page if you want.
                         </p>
                     </GlobalCard>
                 </div>

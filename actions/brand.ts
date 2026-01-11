@@ -12,60 +12,61 @@ export async function saveBrandAction(url: string, brandData: BrandDetails) {
     return { success: false, error: "Not authenticated" }
   }
 
-  // 0. Check for existing brand with same URL (UPSERT)
-  const { data: existingBrand } = await supabase
-    .from("brand_details")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("website_url", url)
-    .maybeSingle() // Use maybeSingle to avoid 406 error if multiple (shouldn't happen but safe) or 0
-
-  if (existingBrand) {
-    // If exact URL match, just update it
-    return updateBrandAction(existingBrand.id, brandData)
-  }
-
-  // 1. Check Limits
+  // Get user's brand limit
   let limit = await getUserBrandLimit(user.id)
-  const currentCount = await getBrandCount(user.id)
-
   // Fail-safe: If limit is 0 (unknown active plan or glitch), allow 1 slot
   if (limit === 0) limit = 1
 
-  if (currentCount >= limit) {
-    // Smart Swap: If user is at limit 1 (typical starter), allows overwriting the single slot
-    // This handles "I want to update the raw" request even if URL is different
-    if (currentCount === 1) {
-      const { data: singleBrand } = await supabase
+  // For users with single-brand limit (most common case), always update existing brand
+  if (limit === 1) {
+    const { data: existingBrand } = await supabase
+      .from("brand_details")
+      .select("id")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .limit(1)
+      .maybeSingle()
+
+    if (existingBrand) {
+      // Update existing brand with new URL and data
+      const { error } = await supabase
         .from("brand_details")
-        .select("id")
+        .update({
+          brand_data: brandData,
+          website_url: url
+        })
+        .eq("id", existingBrand.id)
         .eq("user_id", user.id)
-        .limit(1)
-        .single()
 
-      if (singleBrand) {
-        // Overwrite the existing slot with NEW URL and Data
-        const { error } = await supabase
-          .from("brand_details")
-          .update({
-            brand_data: brandData,
-            website_url: url
-          })
-          .eq("id", singleBrand.id)
-          .eq("user_id", user.id)
+      if (error) return { success: false, error: error.message }
+      return { success: true, brandId: existingBrand.id }
+    }
+    // No existing brand, will insert below
+  } else {
+    // Multi-brand users: check for existing brand with same URL
+    const { data: existingBrand } = await supabase
+      .from("brand_details")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("website_url", url)
+      .is("deleted_at", null)
+      .maybeSingle()
 
-        if (error) return { success: false, error: error.message }
-        return { success: true, brandId: singleBrand.id }
-      }
+    if (existingBrand) {
+      return updateBrandAction(existingBrand.id, brandData)
     }
 
-    return {
-      success: false,
-      error: `Plan limit reached. You have ${currentCount} brands, but your plan allows ${limit}. Please upgrade.`
+    // Check limit for multi-brand users
+    const currentCount = await getBrandCount(user.id)
+    if (currentCount >= limit) {
+      return {
+        success: false,
+        error: `Plan limit reached. You have ${currentCount} brands, but your plan allows ${limit}. Please upgrade.`
+      }
     }
   }
 
-  // 2. Insert
+  // Insert new brand
   const { data, error } = await supabase
     .from("brand_details")
     .insert({
