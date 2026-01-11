@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
-import { Loader2, ChevronUp, ArrowRight } from "lucide-react"
+import { Loader2, ChevronUp, ArrowRight, Sparkles, Eye } from "lucide-react"
 import { saveBrandAction } from "@/actions/brand"
 import { canAccessOnboarding } from "@/actions/onboarding"
 import { BrandDetails } from "@/lib/schemas/brand"
@@ -60,42 +60,39 @@ export default function OnboardingPage() {
     useEffect(() => {
         if (typeof window === 'undefined') return
 
-        const urlStep = searchParams.get('step') // Keep as string for gsc-success handling
+        const urlStep = searchParams.get('step')
         const urlBrandId = searchParams.get('brandId')
 
-        if (!urlStep && !urlBrandId) {
-            const savedBrandId = localStorage.getItem(STORAGE_KEYS.BRAND_ID)
-            if (savedBrandId) {
-                clearOnboardingStorage()
-                setBrandId(null)
-                setUrl("")
-                setBrandData(null)
-                setStep("brand")
-                setIsHydrated(true)
-                return // Exit early, don't restore anything
-            }
+        // Restore saved data from localStorage
+        const savedUrl = localStorage.getItem(STORAGE_KEYS.BRAND_URL)
+        const savedBrandData = localStorage.getItem(STORAGE_KEYS.BRAND_DATA)
+        const savedBrandId = urlBrandId || localStorage.getItem(STORAGE_KEYS.BRAND_ID)
+
+        // Only clear storage if: user completed onboarding (has brandId) AND has no unsaved brandData
+        // This allows fresh start for returning users while preserving progress for those mid-onboarding
+        if (!urlStep && !urlBrandId && savedBrandId && !savedBrandData) {
+            clearOnboardingStorage()
+            setBrandId(null)
+            setUrl("")
+            setBrandData(null)
+            setIsHydrated(true)
+            return
         }
 
-        const savedStep = urlStep || localStorage.getItem(STORAGE_KEYS.STEP)
-        setStep("brand")
+        // Restore URL (strip protocol if present from old data)
+        if (savedUrl) setUrl(savedUrl.replace(/^https?:\/\//i, ''))
 
-        const savedUrl = localStorage.getItem(STORAGE_KEYS.BRAND_URL)
-        if (savedUrl) setUrl(savedUrl)
-
-        const savedBrandData = localStorage.getItem(STORAGE_KEYS.BRAND_DATA)
+        // Restore brand data if exists (saves API costs on refresh!)
         if (savedBrandData) {
             try {
                 setBrandData(JSON.parse(savedBrandData))
             } catch { }
         }
 
-        const savedBrandId = urlBrandId || localStorage.getItem(STORAGE_KEYS.BRAND_ID)
+        // Restore brandId if exists
         if (savedBrandId) {
             setBrandId(savedBrandId)
         }
-
-
-
 
         setIsHydrated(true)
     }, [searchParams])
@@ -142,7 +139,7 @@ export default function OnboardingPage() {
             const res = await fetch("/api/analyze-brand", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url }),
+                body: JSON.stringify({ url: `https://${url}` }),
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Failed to analyze brand")
@@ -160,7 +157,8 @@ export default function OnboardingPage() {
         setError("")
         try {
             // Save brand data (style_dna is already included in brandData)
-            const res = await saveBrandAction(url, brandData)
+            const fullUrl = `https://${url}`
+            const res = await saveBrandAction(fullUrl, brandData)
             if (!res.success) {
                 throw new Error('error' in res ? res.error : "Failed to save brand")
             }
@@ -172,10 +170,10 @@ export default function OnboardingPage() {
 
             // Quick sitemap sync (optional, non-blocking)
             let existingContent: string[] = []
-            if (url) {
+            if (fullUrl) {
                 try {
                     const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
-                    const syncResult = await syncSitemapToInternalLinksAction(url, savedBrandId)
+                    const syncResult = await syncSitemapToInternalLinksAction(fullUrl, savedBrandId)
                     if (syncResult.success) {
                         existingContent = syncResult.titles
                     }
@@ -244,11 +242,7 @@ export default function OnboardingPage() {
                 </div>
             ) : (
                 <>
-                    {/* Page Header */}
-                    <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold text-stone-900">Onboarding</h1>
-                        <p className="text-sm text-stone-500">Let's set up your brand profile</p>
-                    </div>
+
 
                     {/* Island Container */}
                     <motion.div
@@ -285,7 +279,12 @@ export default function OnboardingPage() {
                                         {!brandData ? (
                                             // URL Input Form
                                             <div className="space-y-6">
-                                                <div className="text-center space-y-2">
+                                                <div className="text-center space-y-3">
+                                                    <div className="flex justify-center">
+                                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center border border-stone-200">
+                                                            <Sparkles className="w-6 h-6 text-stone-600" />
+                                                        </div>
+                                                    </div>
                                                     <h2 className={`text-xl font-bold text-stone-900`}>
                                                         Let&apos;s understand your brand
                                                     </h2>
@@ -295,32 +294,43 @@ export default function OnboardingPage() {
                                                 </div>
 
                                                 <div className="flex flex-col sm:flex-row gap-2">
-                                                    <Input
-                                                        type="url"
-                                                        placeholder="https://yourwebsite.com"
-                                                        className={`flex-1 bg-stone-50 border-stone-200 py-2 px-3 text-sm`}
-                                                        value={url}
-                                                        onChange={(e) => setUrl(e.target.value)}
-                                                        onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeBrand()}
-                                                    />
+                                                    <div className="flex-1 flex">
+                                                        <span className="inline-flex items-center px-3 text-sm text-stone-500 bg-stone-100 border border-r-0 border-stone-200 rounded-l-md font-medium select-none">
+                                                            https://
+                                                        </span>
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="yourwebsite.com"
+                                                            className="flex-1 bg-stone-50 border-stone-200 py-2 px-3 text-sm rounded-l-none focus:ring-0 focus:outline-none focus-visible:ring-0"
+                                                            value={url}
+                                                            onChange={(e) => setUrl(e.target.value.replace(/^https?:\/\//i, ''))}
+                                                            onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeBrand()}
+                                                        />
+                                                    </div>
                                                     <Button
                                                         onClick={handleAnalyzeBrand}
                                                         disabled={analyzing || !url}
                                                         className={`
-                          px-6 font-semibold
+                          px-6 font-semibold gap-2
                           bg-gradient-to-b from-stone-800 to-stone-950
                           hover:from-stone-700 hover:to-stone-900
                           shadow-sm
                         `}
                                                     >
-                                                        {analyzing ? (
-                                                            <>
-                                                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                                Analyzing...
-                                                            </>
-                                                        ) : (
-                                                            "Analyze"
-                                                        )}
+                                                        <motion.div
+                                                            animate={analyzing ? {
+                                                                scale: [1, 1.2, 1],
+                                                                rotate: [0, 180, 360],
+                                                            } : {}}
+                                                            transition={{
+                                                                duration: 2,
+                                                                repeat: Infinity,
+                                                                ease: "easeInOut"
+                                                            }}
+                                                        >
+                                                            <Eye className="w-4 h-4 text-white" />
+                                                        </motion.div>
+                                                        {analyzing ? "Analyzing..." : "Analyze"}
                                                     </Button>
                                                 </div>
                                             </div>

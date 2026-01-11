@@ -429,18 +429,7 @@ export default function ContentPlanPage() {
         }
     }
 
-    const filteredPlan = plan?.plan_data.filter(item => {
-        if (filter === "all") return true
-        return item.status === filter
-    }) || []
-
-    const urgentItems = filteredPlan.filter(item => item.badge && ["high_impact", "quick_win"].includes(item.badge)).slice(0, 5)
-    const regularItems = filteredPlan.filter(item => !urgentItems.includes(item))
-
-    const planStats = plan?.plan_data.reduce((acc, item) => {
-        acc[item.status] = (acc[item.status] || 0) + 1
-        return acc
-    }, {} as Record<string, number>) || {}
+    // === EARLY RETURNS - Must come BEFORE computed values to prevent crashes ===
 
     if (loading) {
         return (
@@ -449,7 +438,6 @@ export default function ContentPlanPage() {
             </div>
         )
     }
-
 
     if (!plan) {
         // Redirect is handled by useEffect above, show spinner while redirecting
@@ -461,14 +449,17 @@ export default function ContentPlanPage() {
     }
 
     // Show generating state while background job runs
+    // This MUST be checked before accessing plan_data since it's empty during generation
     if (plan.generation_status === 'pending' || plan.generation_status === 'generating') {
         const phaseLabels: Record<string, { title: string; description: string }> = {
+            seeds: { title: "Setting Up Your Strategy", description: "Preparing your content strategy foundation..." },
+            intelligence: { title: "Analyzing Market Landscape", description: "Discovering competitors and market trends..." },
             serp: { title: "Analyzing Market Landscape", description: "Scanning competitors and SERP patterns..." },
             gap: { title: "Finding Blue Ocean Opportunities", description: "Identifying content gaps your competitors missed..." },
             hierarchy: { title: "Building Topic Hierarchy", description: "Organizing topics by strategic importance..." },
             plan: { title: "Generating Your 30-Day Plan", description: "Creating your personalized content roadmap..." }
         }
-        const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] : phaseLabels.serp
+        const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] || phaseLabels.intelligence : phaseLabels.intelligence
 
         return (
             <div className="min-h-screen flex items-center justify-center p-4">
@@ -486,14 +477,14 @@ export default function ContentPlanPage() {
                             </p>
                         </div>
                         <div className="flex items-center justify-center gap-2">
-                            {['serp', 'gap', 'hierarchy', 'plan'].map((phase, i) => (
+                            {['intelligence', 'plan'].map((phase, i) => (
                                 <div
                                     key={phase}
                                     className={cn(
                                         "w-2 h-2 rounded-full transition-all",
                                         plan.generation_phase === phase
                                             ? "bg-stone-900 w-6"
-                                            : i < ['serp', 'gap', 'hierarchy', 'plan'].indexOf(plan.generation_phase || 'serp')
+                                            : i < ['intelligence', 'plan'].indexOf(plan.generation_phase || 'intelligence')
                                                 ? "bg-stone-400"
                                                 : "bg-stone-200"
                                     )}
@@ -508,6 +499,23 @@ export default function ContentPlanPage() {
             </div>
         )
     }
+
+    // === COMPUTED VALUES - Safe to access plan_data after early returns ===
+
+    const planData = plan.plan_data || []
+
+    const filteredPlan = planData.filter(item => {
+        if (filter === "all") return true
+        return item.status === filter
+    })
+
+    const urgentItems = filteredPlan.filter(item => item.badge && ["high_impact", "quick_win"].includes(item.badge)).slice(0, 5)
+    const regularItems = filteredPlan.filter(item => !urgentItems.includes(item))
+
+    const planStats = planData.reduce((acc, item) => {
+        acc[item.status] = (acc[item.status] || 0) + 1
+        return acc
+    }, {} as Record<string, number>)
 
     // Show error state if generation failed
     if (plan.generation_status === 'failed') {
