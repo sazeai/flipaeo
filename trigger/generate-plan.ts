@@ -36,30 +36,70 @@ async function syncSitemapToInternalLinks(
 
     console.log(`[Sitemap Sync] Starting sync for ${baseUrl}`)
 
+    // 1. Try to find sitemap in robots.txt first
+    try {
+        const robotsUrl = `${baseUrl}/robots.txt`
+        console.log(`[Sitemap Sync] Checking robots.txt at ${robotsUrl}`)
+        const robotsRes = await fetch(robotsUrl)
+        if (robotsRes.ok) {
+            const robotsTxt = await robotsRes.text()
+            const sitemapMatch = robotsTxt.match(/Sitemap:\s*(https?:\/\/[^\s]+)/i)
+            if (sitemapMatch && sitemapMatch[1]) {
+                const foundSitemap = sitemapMatch[1].trim()
+                console.log(`[Sitemap Sync] Found sitemap in robots.txt: ${foundSitemap}`)
+                // Add to front of paths to try (extracted path only)
+                try {
+                    const sitemapPath = new URL(foundSitemap).pathname
+                    if (!sitemapPaths.includes(sitemapPath)) {
+                        sitemapPaths.unshift(sitemapPath)
+                    }
+                } catch (e) {
+                    // If full URL, push it as a custom check or handle logic below
+                    // For simplicity, we just add the path if it's on same domain, 
+                    // or we should logic to handle full URL in the loop.
+                    // The loop checks `${baseUrl}${path}`. 
+                    // Let's just use the full URL if we can, but the loop expects paths.
+                    // Modifying logic to handle full URLs or paths.
+                }
+            }
+        }
+    } catch (e) {
+        console.warn(`[Sitemap Sync] Failed to check robots.txt:`, e)
+    }
+
     // Try paths sequentially until we find one with URLs
-    for (const path of sitemapPaths) {
-        const currentUrl = `${baseUrl}${path}`
+    for (const pathOrUrl of sitemapPaths) {
+        // If it looks like a full URL, use it, otherwise append to base
+        const currentUrl = pathOrUrl.startsWith('http') ? pathOrUrl : `${baseUrl}${pathOrUrl}`
         console.log(`[Sitemap Sync] Trying: ${currentUrl}`)
 
         try {
             const sitemapper = new Sitemapper({
                 url: currentUrl,
                 timeout: 15000,
+                debug: true, // Enable internal debug logs if any
             })
 
-            const { sites } = await sitemapper.fetch()
+            const { sites, errors } = await sitemapper.fetch()
+
+            if (errors && errors.length > 0) {
+                console.warn(`[Sitemap Sync] Errors fetching ${currentUrl}:`, errors)
+            }
+
             if (sites && sites.length > 0) {
                 sitemapUrls = Array.from(new Set(sites as string[])) // Deduplicate
                 console.log(`[Sitemap Sync] Found ${sitemapUrls.length} URLs at ${currentUrl}`)
                 break // Stop if we found a working sitemap
+            } else {
+                console.log(`[Sitemap Sync] No URLs found at ${currentUrl}`)
             }
-        } catch (e) {
-            console.log(`[Sitemap Sync] Failed to fetch ${currentUrl}`)
+        } catch (e: any) {
+            console.error(`[Sitemap Sync] Failed to fetch ${currentUrl}:`, e.message || e)
         }
     }
 
     if (sitemapUrls.length === 0) {
-        console.warn(`[Sitemap Sync] No URLs found in any sitemap for ${baseUrl}`)
+        console.warn(`[Sitemap Sync] FAILED: No URLs found in any sitemap for ${baseUrl}. Checked: ${sitemapPaths.join(', ')}`)
         return { titles: [], syncedCount: 0 }
     }
 
