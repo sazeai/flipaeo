@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
-import { Loader2, ChevronUp, ArrowRight, Sparkles, Eye } from "lucide-react"
+import { Loader2, ChevronUp, ArrowRight, Sparkles, Eye, Globe, Globe2 } from "lucide-react"
 import { saveBrandAction } from "@/actions/brand"
 import { canAccessOnboarding } from "@/actions/onboarding"
 import { BrandDetails } from "@/lib/schemas/brand"
@@ -332,7 +332,7 @@ export default function OnboardingPage() {
                                                                 ease: "easeInOut"
                                                             }}
                                                         >
-                                                            <Eye className="w-4 h-4 text-white" />
+                                                            <Globe2 className="w-4 h-4 text-white" />
                                                         </motion.div>
                                                         {analyzing ? "Analyzing..." : "Analyze"}
                                                     </Button>
@@ -415,8 +415,9 @@ export default function OnboardingPage() {
                                                     <Textarea
                                                         value={brandData.enemy.join('\n')}
                                                         onChange={e => updateArray('enemy', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        className="text-sm"
                                                         placeholder="One item per line"
+                                                        rows={4}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
@@ -426,9 +427,10 @@ export default function OnboardingPage() {
                                                     <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>6. Brand Voice & Tone</h3>
                                                     <Textarea
                                                         value={brandData.style_dna}
-                                                        onChange={e => updateArray('style_dna', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        onChange={e => updateField('style_dna', e.target.value)}
+                                                        className="text-sm"
                                                         placeholder="Describe your brand's voice and tone in detail."
+                                                        rows={4}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>Comprehensive writing style guide</p>
                                                 </div>
@@ -439,8 +441,9 @@ export default function OnboardingPage() {
                                                     <Textarea
                                                         value={brandData.uvp.join('\n')}
                                                         onChange={e => updateArray('uvp', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        className="text-sm"
                                                         placeholder="One item per line"
+                                                        rows={4}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
@@ -451,8 +454,9 @@ export default function OnboardingPage() {
                                                     <Textarea
                                                         value={brandData.core_features.join('\n')}
                                                         onChange={e => updateArray('core_features', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        className="text-sm"
                                                         placeholder="One item per line"
+                                                        rows={4}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
@@ -463,8 +467,9 @@ export default function OnboardingPage() {
                                                     <Textarea
                                                         value={brandData.pricing?.join('\n') || ''}
                                                         onChange={e => updateArray('pricing', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        className="text-sm"
                                                         placeholder="e.g. Pro Plan: $29/mo"
+                                                        rows={3}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One line e.g. "Pro Plan: $29/mo"</p>
                                                 </div>
@@ -475,8 +480,9 @@ export default function OnboardingPage() {
                                                     <Textarea
                                                         value={brandData.how_it_works?.join('\n') || ''}
                                                         onChange={e => updateArray('how_it_works', e.target.value)}
-                                                        className="text-sm min-h-[60px]"
+                                                        className="text-sm"
                                                         placeholder="One step per line"
+                                                        rows={4}
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One step per line</p>
                                                 </div>

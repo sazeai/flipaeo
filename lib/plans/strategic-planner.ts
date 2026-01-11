@@ -59,138 +59,159 @@ You are analyzing a brand: ${brandData.product_name}
 ${brandUrl ? `Website: ${brandUrl}` : ''}
 Current Date: ${currentDate}
 
-## Brand Intelligence (Extracted from Website)
-- **Product Name:** ${brandData.product_name}
+## Brand Intelligence (HIGH-LEVEL ONLY)
+- **Product:** ${brandData.product_name} - ${brandData.product_identity.literally}
 - **What it is (literally):** ${brandData.product_identity.literally}
-- **What it is (emotionally):** ${brandData.product_identity.emotionally}
-- **What it is NOT:** ${brandData.product_identity.not}
 - **Category:** ${brandData.category || 'SaaS Software'}
-- **Mission:** ${brandData.mission}
 - **Primary Audience:** ${brandData.audience.primary}
-- **Audience Psychology:** ${brandData.audience.psychology}
-- **The Enemy (problems we fight):** ${Array.isArray(brandData.enemy) ? brandData.enemy.join(', ') : brandData.enemy}
-- **Unique Value Props:** ${Array.isArray(brandData.uvp) ? brandData.uvp.join(' | ') : brandData.uvp}
+- **The Problem We Solve:** ${Array.isArray(brandData.enemy) ? brandData.enemy.slice(0, 2).join(', ') : brandData.enemy}
 - **Core Features:** ${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
-- **Writing Style DNA:** ${brandData.style_dna || 'Professional, conversational, outcome-focused'}
 
+here are the competitor brands:
 ${competitorSection}
 
+here is the existing content which is already been published by the brand:
 ${existingContentSection}
 
 ---
 
 ## Your Role
-Act as a Senior SEO Strategist and Head of Content Growth. Your goal is NOT just "traffic" but building a **Topic Cluster Ecosystem** that establishes this brand as the authority in "${brandData.category || brandData.product_identity.literally}".
+Senior SEO Strategist. Your goal: Create a 30-day content plan based on **REAL SEARCH QUERIES** users type into Google and AI assistants.
 
-## The Objective
-Generate a comprehensive **30-Day Content Roadmap** designed to:
-1. Capture users at every funnel stage: **Awareness → Consideration → Decision**
-2. Optimize for both Google Search (SEO) and LLM Answers (AEO - Answer Engine Optimization)
-3. Create interconnected content that keeps users on the site
+## CRITICAL: What Makes a GOOD Content Plan
+
+### ✅ GOOD Keyword Examples (Real queries people search):
+- "best AI headshot generator 2026"
+- "how to get professional headshots without a photographer"
+- "AI headshots vs professional photographer cost"
+- "do AI headshots look fake on LinkedIn"
+- "corporate headshot poses male"
+
+### ❌ BAD Keyword Examples (Nobody searches these):
+- "money back guarantee AI photos" ← Not a search query
+- "our privacy policy" ← Self-promotional
+- "how nano-texture engine works" ← Brand-specific jargon
+- "why we delete your data" ← Self-promotional sales copy
+- "what our users say" ← Testimonials are not SEO content
+
+## The 4 Content Categories (Strict Distribution)
+
+### 1. Core Answers (12 articles)
+Educational "hub" content. Example queries:
+- "what are AI headshots"
+- "are AI generated photos legal to use"
+- "how long do AI headshots take"
+
+### 2. Supporting Articles (8 articles)
+Specific how-to guides. Example queries:
+- "how to take good photos for AI headshot"
+- "best outfit for professional headshot"
+- "how to smile naturally in photos"
+
+### 3. Conversion Pages (6 articles)
+Persona + comparison content. Example queries:
+- "AI headshots for realtors"
+- "HeadshotPro vs [competitor]"
+- "best AI headshot for LinkedIn 2026"
+
+### 4. Authority Plays (4 articles)
+Data-driven thought leadership. Example queries:
+- "AI headshot industry statistics 2026"
+- "study: do recruiters prefer professional photos"
 
 ---
 
-## Strategic Framework (The 4 Pillars)
+## MANDATORY CONSTRAINTS
 
-Categorize every content piece into one of these buckets:
+### 1. Title Length: MAXIMUM 60 CHARACTERS
+- ❌ BANNED: "Data Study of Ten Thousand Users Shows That Authentic AI Photos Increase Recruiter Response by Forty Percent" (107 chars!)
+- ✅ GOOD: "Do AI Photos Hurt Your LinkedIn Response Rate?" (46 chars)
 
-### 1. Core Answers (12 articles) - "Hubs"
-Broad, educational topics that define the category.
-- Answer fundamental questions in the space
-- Establish topical authority
-- Examples: "The future of [category]", "What is [concept]?"
+### 2. Keywords Must Be REAL Search Queries
+- Test: Would a real person type this into Google?
+- ❌ "nano texture engine explained" ← Brand feature, not a search
+- ✅ "why do AI photos look so fake" ← Real user question
 
-### 2. Supporting Articles (8 articles) - "Spokes"
-Specific "how-to" guides or problem-solving articles.
-- Link back to Core Answers
-- Solve specific user problems
-- Examples: "How to [specific task]", "Why your [thing] isn't working"
+### 3. NO Self-Promotional Content
+- ❌ "What our customers say about us"
+- ❌ "Why our money-back guarantee matters"
+- ❌ "How [brand name] works"
+- ✅ "How AI headshot generators work" (generic, educational)
 
-### 3. Conversion Pages (6 articles) - "Money Pages"
-High-intent pages targeting specific buyer personas.
-- Target people ready to buy/sign up
-- Persona-specific landing pages
-- Examples: "[Product] for [specific profession]", "Best [category] for [use case]"
+### 4. Supporting Keywords: Provide 3-5 Related Queries
+Each article must have \`supporting_keywords\` array with related search terms.
 
-### 4. Authority Plays (4 articles) - "Backlink Magnets"
-Thought leadership pieces designed to get cited.
-- Data studies, original research, bold takes
-- Examples: "Data study: Does X increase Y?", "The truth about [controversial topic]"
+### 5. Impact Must Vary
+- **High** (10 articles): Highest traffic potential, core topics
+- **Medium** (15 articles): Supporting content
+- **Low** (5 articles): Niche or experimental topics
+
+### 6. Reason Field = STRATEGIC RATIONALE (Not the hook!)
+Explain WHY this article is strategically important:
+- ❌ "Stop settling for rubbery skin..." (this is a hook)
+- ✅ "High-volume query with low competition; establishes authority on core category question"
+
+### 7. Connected_to = Article Day Numbers (Not titles)
+Use integers: \`[1, 5, 12]\` not \`["day-1", "day-5"]\`
 
 ---
 
-## Execution Constraints (MANDATORY)
+## Phased Rollout
 
-### 1. No Shallow Keywords
-- ❌ AVOID: "free headshot", "AI photo generator"
-- ✅ USE: "How to get a corporate headshot without a studio"
-- Focus on long-tail, semantic, AEO-optimized queries
-
-### 2. The "Interconnection" Rule
-For every content piece, specify which OTHER article(s) it links to.
-The goal is to keep users on the site and build topic clusters.
-
-### 3. User Intent Labels
-Every piece must have clear intent:
-- **Informational**: Learning, researching
-- **Transactional**: Ready to act/buy
-- **Commercial Investigation**: Comparing options
-
-### 4. LLM/AEO Optimization
-Keywords must answer complex questions users ask ChatGPT or Perplexity.
-Think: "What is the user really trying to solve?"
-
-### 5. Phased Rollout (4 Phases)
-- **Phase 1 (Days 1-7): Foundation** - Establish the "Anti-[Enemy]" philosophy, build hub pages
-- **Phase 2 (Days 8-14): Use-Case Expansion** - Capture specific user personas
-- **Phase 3 (Days 15-21): Technical/Vibe** - LLM "how does it work" optimization
-- **Phase 4 (Days 22-30): Trust & Safety** - Overcome objections, build confidence
-
-### 6. Natural Language Titles
-- ❌ BANNED: "AI Photoshoot: A Complete Guide" (keyword: subtitle format)
-- ❌ BANNED: "The Ultimate Guide to X"
-- ✅ GOOD: "How to Generate Candid Hinge Photos That Actually Look Real"
-- ✅ GOOD: "Hollywood-Grade Headshots for the Price of a Coffee"
+- **Days 1-7 (Foundation):** Core category definitions, "what is X" content
+- **Days 8-14 (Use-Case):** Persona-specific and problem-solving content
+- **Days 15-21 (Technical):** How-to guides, process content
+- **Days 22-30 (Trust):** Comparisons, alternatives, decision content
 
 ---
 
 ## Deep Analysis Requirement
 
-BEFORE generating the plan, provide a ~200-word analysis of the brand's current "Content Gap":
-- What traffic is the brand MISSING right now?
-- What vocabulary/concepts should they OWN but don't?
-- What niche landing pages are absent?
-- What will this plan FIX?
+BEFORE the plan, provide ~150 words analyzing:
+- What high-traffic queries is the brand missing?
+- What comparison keywords should they target?
+- What user questions remain unanswered by competitors?
 
 ---
 
 ## Output Format
 
-Return a JSON object with:
-1. \`content_gap_analysis\`: Your 200-word analysis
-2. \`plan\`: Array of 30 articles with the schema below
+Return JSON with:
+1. \`content_gap_analysis\`: Your analysis
+2. \`plan\`: Array of 30 articles
 
-Each article needs:
-- \`day\`: 1-30
-- \`phase\`: "Foundation" | "Use-Case" | "Technical" | "Trust"
-- \`category\`: "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays"
-- \`main_keyword\`: The target search query (long-tail, specific)
-- \`title\`: Click-worthy H1 title (NO keyword:subtitle format!)
-- \`hook\`: One sentence on why a user needs this NOW
-- \`user_intent\`: "Informational" | "Transactional" | "Commercial Investigation"
-- \`connected_to\`: Array of day numbers this links to (e.g., [1, 5] means links to Day 1 and Day 5)
-- \`cluster\`: Topic cluster name for grouping
-- \`article_type\`: "informational" | "commercial" | "howto"
+Each article schema:
+\`\`\`json
+{
+  "day": 1,
+  "phase": "Foundation",
+  "category": "Core Answers",
+  "main_keyword": "what are AI headshots",
+  "supporting_keywords": ["AI generated photos", "AI portrait generator", "fake headshots AI"],
+  "title": "What Are AI Headshots? Everything You Need to Know",
+  "hook": "One-sentence user benefit",
+  "reason": "Strategic rationale explaining traffic potential and competitive advantage",
+  "user_intent": "Informational",
+  "impact": "High",
+  "connected_to": [2, 5, 8],
+  "cluster": "Category Fundamentals",
+  "article_type": "informational"
+}
+\`\`\`
 
 ---
 
-## CRITICAL: Quality Checklist
+## FINAL CHECKLIST
 Before finalizing, verify:
-- [ ] At least 3 persona-specific articles of the brand (e.g., "for realtors", "for medical residents")
-- [ ] At least 3 competitor comparison articles using real names
-- [ ] NO abstract/theoretical topics (e.g., "the ethics of AI")
-- [ ] ALL titles are natural language, NOT "Keyword: Subtitle" format
-- [ ] Interconnections form logical topic clusters
+- [ ] ALL titles are under 60 characters
+- [ ] NO self-promotional content (testimonials, pricing, guarantees)
+- [ ] Keywords are REAL search queries (test: would someone Google this?)
+- [ ] \`supporting_keywords\` has 3-5 items per article
+- [ ] \`reason\` explains strategy, NOT repeat the hook
+- [ ] \`impact\` is properly distributed (10 High, 15 Medium, 5 Low)
+- [ ] \`connected_to\` uses day numbers as integers
+- [ ] At least 3 competitor comparison articles with real names
+- [ ] At least 3 persona-specific articles (realtors, doctors, actors, etc.)
 `
 
     try {
@@ -204,7 +225,7 @@ Before finalizing, verify:
                     properties: {
                         content_gap_analysis: {
                             type: "STRING",
-                            description: "200-word analysis of content gaps"
+                            description: "150-word analysis of content gaps"
                         },
                         plan: {
                             type: "ARRAY",
@@ -215,9 +236,15 @@ Before finalizing, verify:
                                     phase: { type: "STRING" },
                                     category: { type: "STRING" },
                                     main_keyword: { type: "STRING" },
+                                    supporting_keywords: {
+                                        type: "ARRAY",
+                                        items: { type: "STRING" }
+                                    },
                                     title: { type: "STRING" },
                                     hook: { type: "STRING" },
+                                    reason: { type: "STRING" },
                                     user_intent: { type: "STRING" },
+                                    impact: { type: "STRING" },
                                     connected_to: {
                                         type: "ARRAY",
                                         items: { type: "INTEGER" }
@@ -225,7 +252,7 @@ Before finalizing, verify:
                                     cluster: { type: "STRING" },
                                     article_type: { type: "STRING" }
                                 },
-                                required: ["day", "phase", "category", "main_keyword", "title", "hook", "user_intent", "connected_to", "cluster", "article_type"]
+                                required: ["day", "phase", "category", "main_keyword", "supporting_keywords", "title", "hook", "reason", "user_intent", "impact", "connected_to", "cluster", "article_type"]
                             }
                         }
                     },
@@ -246,7 +273,7 @@ Before finalizing, verify:
                 id: `plan-${Date.now()}-${index}`,
                 title: item.title || `Article ${index + 1}`,
                 main_keyword: item.main_keyword || "",
-                supporting_keywords: [], // Can be enhanced later
+                supporting_keywords: item.supporting_keywords || [],
                 article_type: validateArticleType(item.article_type),
                 cluster: item.cluster || "General",
                 scheduled_date: scheduledDate.toISOString().split('T')[0],
@@ -256,10 +283,10 @@ Before finalizing, verify:
                 phase: validatePhase(item.phase),
                 hook: item.hook || "",
                 user_intent: validateUserIntent(item.user_intent),
-                connected_to: (item.connected_to || []).map((d: number) => `day-${d}`),
-                // Legacy fields for compatibility
-                impact: "Medium" as const,
-                reason: item.hook || "Strategic content for topic cluster authority."
+                connected_to: (item.connected_to || []).map((d: number) => d), // Keep as integers
+                // New fields from improved prompt
+                impact: validateImpact(item.impact),
+                reason: item.reason || "Strategic content for topic cluster authority."
             }
         })
 
@@ -312,3 +339,9 @@ function validateUserIntent(intent: string): "Informational" | "Transactional" |
     const valid = ["Informational", "Transactional", "Commercial Investigation"]
     return valid.includes(intent) ? intent as any : "Informational"
 }
+
+function validateImpact(impact: string): "High" | "Medium" | "Low" {
+    const valid = ["High", "Medium", "Low"]
+    return valid.includes(impact) ? impact as any : "Medium"
+}
+

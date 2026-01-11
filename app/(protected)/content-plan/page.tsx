@@ -580,23 +580,6 @@ export default function ContentPlanPage() {
                         )}
                     </div>
 
-                    {/* Content Gap Analysis - Strategic Insight */}
-                    {plan?.content_gap_analysis && (
-                        <div className="px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-xl">
-                            <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 flex-shrink-0 mt-0.5">
-                                    <Lightbulb className="w-4 h-4 text-amber-600" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wide mb-1">Strategic Analysis</h3>
-                                    <p className="text-sm text-amber-800/80 leading-relaxed">
-                                        {plan.content_gap_analysis}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Consolidated Toolbar */}
                     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full">
                         {/* Left: Filter Tabs */}
@@ -708,6 +691,21 @@ export default function ContentPlanPage() {
 
                 {/* --- Body Content --- */}
                 <div className="p-4 space-y-8">
+                    {/* Strategic Analysis - First item with bottom border */}
+                    {plan?.content_gap_analysis && (
+                        <div className="pb-6 mb-6 border-b border-stone-200">
+                            <div className="flex items-start gap-3">
+                                <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                    <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide mb-2">Strategic Analysis</h3>
+                                    <p className="text-sm text-stone-600 leading-relaxed">
+                                        {plan.content_gap_analysis}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {loading ? (
                         <div className="h-64 flex flex-col items-center justify-center gap-3">
                             <CustomSpinner className="w-10 h-10" />
