@@ -1,11 +1,13 @@
 "use client"
-import { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { saveBrandAction, updateBrandAction } from "@/actions/brand"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { Loader2, ArrowLeft, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+
+import { PillInput } from "@/components/ui/pill-input"
 
 interface BrandOnboardingProps {
     onComplete: (brandId: string) => void
@@ -52,11 +54,29 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
         return true
     }
 
+    // Helper to clean array data before sending to DB
+    const cleanArray = (arr: string[] | undefined) => {
+        if (!arr) return []
+        return arr.map(item => item.trim()).filter(item => item !== "")
+    }
+
     const handleSave = async () => {
         if (!brandData) return
 
+        // 1. Clean the data here
+        // For textareas (Enemy, UVP, How it Works), we split by newline if they haven't been already
+        // Pill inputs (Pricing, Core Features) are already arrays
+        const cleanData: BrandDetails = {
+            ...brandData,
+            enemy: cleanArray(brandData.enemy),
+            uvp: cleanArray(brandData.uvp),
+            how_it_works: cleanArray(brandData.how_it_works),
+            core_features: cleanArray(brandData.core_features),
+            pricing: cleanArray(brandData.pricing),
+        }
+
         // Validate required fields
-        if (!isValidBrand(brandData)) {
+        if (!isValidBrand(cleanData)) {
             setError("Please fill in all required fields: Product Name, Product Identity, Category, Mission, and Primary Audience")
             return
         }
@@ -65,15 +85,15 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
         setError("")
         try {
             if (brandId) {
-                // Update existing
-                const res = await updateBrandAction(brandId, brandData)
+                // Update existing - pass cleanData instead of brandData
+                const res = await updateBrandAction(brandId, cleanData)
                 if (!res.success) {
                     throw new Error(res.error || "Failed to update brand")
                 }
                 onComplete(brandId)
             } else {
-                // Create new
-                const res = await saveBrandAction(url, brandData)
+                // Create new - pass cleanData instead of brandData
+                const res = await saveBrandAction(url, cleanData)
                 if (!res.success) {
                     throw new Error('error' in res ? res.error : "Failed to save brand")
                 }
@@ -103,12 +123,6 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
             newData[path] = value
         }
         setBrandData(newData)
-    }
-
-    const updateArray = (field: keyof BrandDetails, value: string) => {
-        // Split by newline and filter empty
-        const arr = value.split('\n').filter(line => line.trim() !== '')
-        setBrandData(prev => prev ? ({ ...prev, [field]: arr }) : null)
     }
 
     if (!brandData) {
@@ -271,11 +285,11 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                     <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">4. Enemy (What you fight against)</h3>
                     <div className="relative">
                         <Textarea
-                            value={brandData.enemy.join('\n')}
-                            onChange={e => updateArray('enemy', e.target.value)}
+                            value={Array.isArray(brandData.enemy) ? brandData.enemy.join('\n') : brandData.enemy || ""}
+                            onChange={e => setBrandData(prev => prev ? ({ ...prev, enemy: e.target.value.split('\n') }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
+                            placeholder="Describe the problem or enemy you are fighting against..."
                         />
-                        <p className="text-[10px] text-stone-400 mt-1 text-right">One item per line</p>
                     </div>
                 </div>
 
@@ -298,11 +312,11 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                     <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">6. Unique Value Proposition</h3>
                     <div className="relative">
                         <Textarea
-                            value={brandData.uvp.join('\n')}
-                            onChange={e => updateArray('uvp', e.target.value)}
+                            value={Array.isArray(brandData.uvp) ? brandData.uvp.join('\n') : brandData.uvp || ""}
+                            onChange={e => setBrandData(prev => prev ? ({ ...prev, uvp: e.target.value.split('\n') }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
+                            placeholder="What makes your product unique?"
                         />
-                        <p className="text-[10px] text-stone-400 mt-1 text-right">One item per line</p>
                     </div>
                 </div>
 
@@ -310,12 +324,13 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                 <div className="space-y-4">
                     <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">7. Core Features</h3>
                     <div className="relative">
-                        <Textarea
-                            value={brandData.core_features.join('\n')}
-                            onChange={e => updateArray('core_features', e.target.value)}
+                        <PillInput
+                            value={brandData.core_features}
+                            onChange={arr => setBrandData(prev => prev ? ({ ...prev, core_features: arr }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
+                            placeholder="Type feature and press Enter"
                         />
-                        <p className="text-[10px] text-stone-400 mt-1 text-right">One item per line</p>
+                        <p className="text-[10px] text-stone-400 mt-1 text-right">Press Enter to add feature</p>
                     </div>
                 </div>
 
@@ -323,10 +338,11 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                 <div className="space-y-4">
                     <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">8. Pricing</h3>
                     <div className="relative">
-                        <Textarea
-                            value={brandData.pricing?.join('\n') || ''}
-                            onChange={e => updateArray('pricing', e.target.value)}
+                        <PillInput
+                            value={brandData.pricing || []}
+                            onChange={arr => setBrandData(prev => prev ? ({ ...prev, pricing: arr }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
+                            placeholder="Type plan and press Enter"
                         />
                         <p className="text-[10px] text-stone-400 mt-1 text-right">One line e.g. "Pro Plan: $29/mo"</p>
                     </div>
@@ -337,11 +353,11 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                     <h3 className="font-semibold text-base border-b border-stone-100 pb-2 text-stone-900">9. How it Works</h3>
                     <div className="relative">
                         <Textarea
-                            value={brandData.how_it_works?.join('\n') || ''}
-                            onChange={e => updateArray('how_it_works', e.target.value)}
+                            value={Array.isArray(brandData.how_it_works) ? brandData.how_it_works.join('\n') : brandData.how_it_works || ""}
+                            onChange={e => setBrandData(prev => prev ? ({ ...prev, how_it_works: e.target.value.split('\n') }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
+                            placeholder="Step 1: ..."
                         />
-                        <p className="text-[10px] text-stone-400 mt-1 text-right">One step per line</p>
                     </div>
                 </div>
 

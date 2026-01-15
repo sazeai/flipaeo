@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { CustomSpinner } from "@/components/CustomSpinner"
+import { PillInput } from "@/components/ui/pill-input"
 
 const STORAGE_KEYS = {
     STEP: 'onboarding_step',
@@ -151,18 +152,35 @@ export default function OnboardingPage() {
         }
     }
 
+    // Helper to clean array data
+    const cleanArray = (arr: string[] | undefined) => {
+        if (!arr) return []
+        return arr.map(item => item.trim()).filter(item => item !== "")
+    }
+
     const handleSaveBrand = async () => {
         if (!brandData) return
         if (!url || url.trim() === '') {
             setError("Website URL is required. Please enter your website domain.")
             return
         }
+
+        // Clean data before saving (remove empty lines)
+        const cleanData: BrandDetails = {
+            ...brandData,
+            enemy: cleanArray(brandData.enemy),
+            uvp: cleanArray(brandData.uvp),
+            how_it_works: cleanArray(brandData.how_it_works),
+            core_features: cleanArray(brandData.core_features),
+            pricing: cleanArray(brandData.pricing),
+        }
+
         setSavingBrand(true)
         setError("")
         try {
             // Save brand data (style_dna is already included in brandData)
             const fullUrl = `https://${url.trim()}`
-            const res = await saveBrandAction(fullUrl, brandData)
+            const res = await saveBrandAction(fullUrl, cleanData)
             if (!res.success) {
                 throw new Error('error' in res ? res.error : "Failed to save brand")
             }
@@ -179,7 +197,7 @@ export default function OnboardingPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     brandId: savedBrandId,
-                    brandData,
+                    brandData: cleanData,
                     brandUrl: fullUrl // Pass URL for sitemap sync in Trigger task
                 }),
             })
@@ -217,8 +235,10 @@ export default function OnboardingPage() {
         setBrandData(newData)
     }
 
+    // Updated helper: NO FILTERING on change to allow newlines
     const updateArray = (field: keyof BrandDetails, value: string) => {
-        const arr = value.split('\n').filter(line => line.trim() !== '')
+        // Just split by newlines, preserving empty ones for editing
+        const arr = value.split('\n')
         setBrandData(prev => prev ? ({ ...prev, [field]: arr }) : null)
     }
 
@@ -402,10 +422,9 @@ export default function OnboardingPage() {
                                                         value={brandData.enemy.join('\n')}
                                                         onChange={e => updateArray('enemy', e.target.value)}
                                                         className="text-sm"
-                                                        placeholder="One item per line"
+                                                        placeholder="Describe the problem or enemy you are fighting against..."
                                                         rows={4}
                                                     />
-                                                    <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
 
                                                 {/* 6. Voice & Tone */}
@@ -428,34 +447,31 @@ export default function OnboardingPage() {
                                                         value={brandData.uvp.join('\n')}
                                                         onChange={e => updateArray('uvp', e.target.value)}
                                                         className="text-sm"
-                                                        placeholder="One item per line"
+                                                        placeholder="What makes your product unique?"
                                                         rows={4}
                                                     />
-                                                    <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
                                                 </div>
 
                                                 {/* 8. Core Features */}
                                                 <div className="space-y-2">
                                                     <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>8. Core Features</h3>
-                                                    <Textarea
-                                                        value={brandData.core_features.join('\n')}
-                                                        onChange={e => updateArray('core_features', e.target.value)}
-                                                        className="text-sm"
-                                                        placeholder="One item per line"
-                                                        rows={4}
+                                                    <PillInput
+                                                        value={brandData.core_features}
+                                                        onChange={arr => setBrandData(prev => prev ? ({ ...prev, core_features: arr }) : null)}
+                                                        className="min-h-[80px]"
+                                                        placeholder="Type feature and press Enter"
                                                     />
-                                                    <p className={`text-[10px] text-right text-stone-400`}>One item per line</p>
+                                                    <p className={`text-[10px] text-right text-stone-400`}>Press Enter to add feature</p>
                                                 </div>
 
                                                 {/* 9. Pricing */}
                                                 <div className="space-y-2">
                                                     <h3 className={`text-sm font-semibold border-b pb-2 border-stone-100 text-stone-900`}>9. Pricing</h3>
-                                                    <Textarea
-                                                        value={brandData.pricing?.join('\n') || ''}
-                                                        onChange={e => updateArray('pricing', e.target.value)}
-                                                        className="text-sm"
-                                                        placeholder="e.g. Pro Plan: $29/mo"
-                                                        rows={3}
+                                                    <PillInput
+                                                        value={brandData.pricing || []}
+                                                        onChange={arr => setBrandData(prev => prev ? ({ ...prev, pricing: arr }) : null)}
+                                                        className="min-h-[80px]"
+                                                        placeholder="Type plan and press Enter"
                                                     />
                                                     <p className={`text-[10px] text-right text-stone-400`}>One line e.g. "Pro Plan: $29/mo"</p>
                                                 </div>
@@ -470,7 +486,6 @@ export default function OnboardingPage() {
                                                         placeholder="One step per line"
                                                         rows={4}
                                                     />
-                                                    <p className={`text-[10px] text-right text-stone-400`}>One step per line</p>
                                                 </div>
 
                                                 {/* 11. Featured Image Style */}
