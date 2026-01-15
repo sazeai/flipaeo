@@ -7,7 +7,7 @@ import { getCoverageContext, summarizeCoverage } from "@/lib/coverage/analyzer"
 import { detectContentStage, getStrategyPrompt } from "@/lib/plans/strategy-detector"
 import { scheduleByCluster, consolidateClusters } from "@/lib/plans/cluster-scheduler"
 import { TopicHierarchy } from "@/lib/plans/topic-hierarchy"
-import { KeywordCluster } from "@/lib/plans/gsc-processor"
+import { KeywordCluster } from "./gsc-processor"
 
 // Strategic Article Category Distribution (30 = 12 + 8 + 6 + 4)
 export const ARTICLE_CATEGORIES = {
@@ -27,10 +27,10 @@ export const ARTICLE_CATEGORIES = {
     },
     "Conversion Pages": {
         count: 6,
-        description: "Commercial intent - comparisons and buying decisions",
+        description: "Commercial comparisons based on UNIQUE TESTING or DATA (Proprietary Analysis)",
         intentRoles: ["Comparison", "Decision"],
         articleType: "commercial" as const,
-        prompt: "Help users choose between options and make buying decisions"
+        prompt: "Frame comparisons as 'We Tested', 'Cost Analysis', or 'Experiments', NOT generic 'Vs'"
     },
     "Authority Plays": {
         count: 4,
@@ -375,6 +375,7 @@ INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTE
 - ❌ "The Ultimate Guide to [Keyword]" -> DISQUALIFIED
 - ❌ "Everything You Need to Know About [Keyword]" -> DISQUALIFIED
 - ❌ "Unlocking the Power of [Keyword]" -> DISQUALIFIED
+- ❌ "X vs Y: Which is Better?" (e.g., "HeadshotPro vs Aragon: Which is Best?") -> DISQUALIFIED
 
 ### ✅ REQUIRED PATTERNS (MIX THESE):
 1. **The "How-To" Specific:** "How to Generate AI Family Portraits Without a Studio"
@@ -393,6 +394,13 @@ At least 3-4 articles MUST use decision-stage patterns (#8, #9, #10 above). Thes
 - "Should I do X?" → Direct recommendation
 - "Is X worth it?" → Value judgment
 - "When should I NOT do X?" → Honest limitation
+
+**COMPARISON QUALITY REQUIREMENT (MANDATORY):**
+Comparison articles MUST imply proprietary testing, original data, or unique analysis.
+- 🛑 BAD: "HeadshotPro vs Aragon: Which is Best?" (Too generic)
+- ✅ GOOD: "HeadshotPro vs Aragon: We Spent $100 Testing Both"
+- ✅ GOOD: "HeadshotPro vs Aragon: Side-by-Side Photo Quality Test"
+- ✅ GOOD: "AI Headshots vs Real Photos: Blind Test Results"
 
 ### STYLE GUIDE:
 - **Be Conversational:** Write titles you'd click on Reddit or YouTube.
@@ -438,12 +446,14 @@ For each article provide:
 10. reason: A 1-sentence strategic rationale (WHY this content matters for THIS brand)
 11. impact: "High" | "Medium" | "Low" (Strategic importance)
 12. priority_score: 0-100 (Based on keyword relevance and business value)
+13. schema_type: "Article" | "HowTo" | "FAQPage" (Technical SEO signal)
 
 ## CRITICAL REQUIREMENTS:
 1. Each article's parent_question must be UNIQUE across the plan.
 2. If the brand has multiple features, articles must be distributed across ALL features.
 3. You MUST generate EXACTLY 30 articles with the 12-8-6-4 distribution.
 4. article_type MUST match the category (see table above). Supporting Articles = howto, Conversion Pages = commercial.
+5. schema_type MUST be "HowTo" if article_type is "howto". Otherwise use "Article" (or "FAQPage" if strictly Q&A format).
 `
 
     const response = await client.models.generateContent({
@@ -553,6 +563,25 @@ For each article provide:
     const infoPercent = validPosts.length > 0 ? (typeDistribution.informational / validPosts.length) * 100 : 0
     if (infoPercent > 70) {
         console.warn(`[Content Plan] ⚠️ WARNING: ${infoPercent.toFixed(0)}% informational. LLM may have ignored article_type rules.`)
+    }
+
+    // --- DECISION PATTERN VALIDATION ---
+    const decisionCount = validPosts.filter(p => /^(Should|Is|When)\b/i.test(p.title || "")).length
+    if (decisionCount < 3) {
+        console.warn(`[Content Plan] ⚠️ WARNING: Only ${decisionCount} decision-stage articles. Expected 3-4.`)
+    }
+
+    // --- COMPARISON DIFFERENTIATION VALIDATION ---
+    const comparisonArticles = validPosts.filter(p => p.article_category === "Conversion Pages" || /\bvs\b/i.test(p.title || ""))
+    const genericComparisons = comparisonArticles.filter(p => {
+        const title = (p.title || "").toLowerCase()
+        const hasDifferentiator = /(tested|experiment|test|review|analysis|spent|cost|results)/.test(title)
+        return !hasDifferentiator
+    })
+
+    if (genericComparisons.length > 0) {
+        console.warn(`[Content Plan] ⚠️ WARNING: Found ${genericComparisons.length} generic comparisons (Weak Differentiation).`)
+        genericComparisons.forEach(p => console.warn(`   - Weak Title: ${p.title}`))
     }
 
     // --- CATEGORY-AWARE TOP-UP LOOP ---
