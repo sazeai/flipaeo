@@ -1,12 +1,25 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { Database } from '@/types/supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 type Credits = Database['public']['Tables']['credits']['Row']
 type CreditsInsert = Database['public']['Tables']['credits']['Insert']
 type CreditsUpdate = Database['public']['Tables']['credits']['Update']
 
 export class CreditService {
+  private customClient?: SupabaseClient<Database>
+
+  constructor(client?: SupabaseClient<Database>) {
+    this.customClient = client
+  }
+
   private async getClient() {
+    // Use custom client if provided (e.g., admin client for background jobs)
+    if (this.customClient) {
+      return this.customClient
+    }
+    // Otherwise use the server client (requires auth context)
     return await createClient()
   }
 
@@ -189,10 +202,13 @@ export class CreditService {
   }
 }
 
-// Export a singleton instance
+// Export a singleton instance for server-side use with auth context
 export const creditService = new CreditService()
 
-// Helper functions
+// Export admin service for background jobs (no auth context needed)
+export const adminCreditService = new CreditService(createAdminClient())
+
+// Helper functions using server client (require auth context)
 export async function getUserCredits(userId: string) {
   return creditService.getUserCredits(userId)
 }
@@ -211,4 +227,17 @@ export async function deductCredits(userId: string, amount: number, description?
 
 export async function hasCredits(userId: string, requiredAmount: number) {
   return creditService.hasCredits(userId, requiredAmount)
+}
+
+// Admin helper functions for background jobs (no auth context needed)
+export async function adminHasCredits(userId: string, requiredAmount: number) {
+  return adminCreditService.hasCredits(userId, requiredAmount)
+}
+
+export async function adminDeductCredits(userId: string, amount: number, description?: string) {
+  return adminCreditService.deductCredits(userId, amount, description)
+}
+
+export async function adminAddCredits(userId: string, amount: number, description?: string) {
+  return adminCreditService.addCredits(userId, amount, description)
 }

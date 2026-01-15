@@ -38,7 +38,6 @@ import {
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { Button } from "@/components/ui/button"
 import { GlobalCard } from "@/components/ui/global-card"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { AutomationModal } from "@/components/automation-modal"
 import { cn } from "@/lib/utils"
 import { useCreditManager } from "@/lib/credit-manager"

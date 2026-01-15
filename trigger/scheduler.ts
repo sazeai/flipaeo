@@ -1,7 +1,7 @@
 import { schedules } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { generateBlogPost } from "./generate-blog"
-import { hasCredits, deductCredits, addCredits } from "@/lib/credits"
+import { adminHasCredits, adminDeductCredits, adminAddCredits } from "@/lib/credits"
 
 /**
  * The Watchman - Daily Content Automation Scheduler
@@ -163,7 +163,7 @@ export const dailyContentWatchman = schedules.task({
 
             // Check credits for the user (only need 1 credit at a time for gradual mode)
             const creditsNeeded = catchUpMode === "gradual" ? 1 : itemsToProcess.length
-            const { hasCredits: userHasCredits, currentBalance, error: creditError } = await hasCredits(plan.user_id, creditsNeeded)
+            const { hasCredits: userHasCredits, currentBalance, error: creditError } = await adminHasCredits(plan.user_id, creditsNeeded)
 
             if (creditError) {
                 console.error(`❌ Failed to check credits for User ${plan.user_id}: ${creditError}. Skipping plan to avoid false pause.`)
@@ -200,7 +200,7 @@ export const dailyContentWatchman = schedules.task({
                 console.log(`🚀 Triggering article: "${item.title}" (${item.main_keyword}) for Plan ${plan.id}`)
 
                 // Deduct credit
-                const { success: deductionSuccess } = await deductCredits(plan.user_id, 1, `Automated article: ${item.main_keyword}`)
+                const { success: deductionSuccess } = await adminDeductCredits(plan.user_id, 1, `Automated article: ${item.main_keyword}`)
                 if (!deductionSuccess) {
                     console.error(`❌ Failed to deduct credit for user ${plan.user_id}. Skipping item.`)
                     continue
@@ -225,7 +225,7 @@ export const dailyContentWatchman = schedules.task({
                         if (articleError || !newArticle) {
                             console.error(`❌ Failed to create article for "${item.title}":`, articleError)
                             // Refund credit since we failed before triggering task
-                            await addCredits(plan.user_id, 1, "Refund: Failed to create article record")
+                            await adminAddCredits(plan.user_id, 1, "Refund: Failed to create article record")
                             continue
                         }
                         articleId = newArticle.id
@@ -257,7 +257,7 @@ export const dailyContentWatchman = schedules.task({
                 } catch (e) {
                     // Catch trigger failures and refund
                     console.error(`❌ Failed to trigger automation for item ${item.id}`, e)
-                    await addCredits(plan.user_id, 1, "Refund: Automation trigger failed")
+                    await adminAddCredits(plan.user_id, 1, "Refund: Automation trigger failed")
                 }
             }
         }
