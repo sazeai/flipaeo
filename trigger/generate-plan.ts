@@ -185,8 +185,8 @@ async function discoverCompetitors(
 
     try {
         const tvly = tavily({ apiKey })
-        const category = brandData.category || brandData.product_identity.literally
-        const searchQuery = `best ${category} tools software 2024`
+        const category = brandData.product_identity.literally || brandData.category
+        const searchQuery = category
 
         console.log(`[Generate Plan] Discovering competitors for: "${searchQuery}"`)
 
