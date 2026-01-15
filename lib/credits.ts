@@ -152,11 +152,12 @@ export class CreditService {
   /**
    * Check if user has sufficient credits
    */
-  async hasCredits(userId: string, requiredAmount: number): Promise<{ hasCredits: boolean; currentBalance: number }> {
-    const { balance } = await this.getUserCredits(userId)
+  async hasCredits(userId: string, requiredAmount: number): Promise<{ hasCredits: boolean; currentBalance: number; error?: string }> {
+    const { balance, error } = await this.getUserCredits(userId)
     return {
       hasCredits: balance >= requiredAmount,
-      currentBalance: balance
+      currentBalance: balance,
+      error
     }
   }
 

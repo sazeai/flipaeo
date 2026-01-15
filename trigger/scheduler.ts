@@ -163,16 +163,23 @@ export const dailyContentWatchman = schedules.task({
 
             // Check credits for the user (only need 1 credit at a time for gradual mode)
             const creditsNeeded = catchUpMode === "gradual" ? 1 : itemsToProcess.length
-            const { hasCredits: userHasCredits, currentBalance } = await hasCredits(plan.user_id, creditsNeeded)
+            const { hasCredits: userHasCredits, currentBalance, error: creditError } = await hasCredits(plan.user_id, creditsNeeded)
+
+            if (creditError) {
+                console.error(`❌ Failed to check credits for User ${plan.user_id}: ${creditError}. Skipping plan to avoid false pause.`)
+                continue
+            }
 
             console.log(`💰 User ${plan.user_id}: Credits needed=${creditsNeeded}, hasCredits=${userHasCredits}, balance=${currentBalance}`)
 
             if (!userHasCredits) {
-                // GRACE PERIOD: If plan was enabled in the last 5 minutes, don't pause immediately
-                // This prevents the scheduler from immediately pausing a just-enabled automation
-                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-                if (plan.updated_at && plan.updated_at > fiveMinutesAgo) {
-                    console.log(`⏳ Skipping pause for Plan ${plan.id} - grace period (enabled ${plan.updated_at})`)
+                // GRACE PERIOD: If plan was enabled in the last 60 minutes, don't pause immediately
+                // This prevents the scheduler from immediately pausing a just-enabled automation due to sync delays
+                const gracePeriod = 60 * 60 * 1000 // 1 Hour
+                const graceCutoff = new Date(Date.now() - gracePeriod).toISOString()
+
+                if (plan.updated_at && plan.updated_at > graceCutoff) {
+                    console.log(`⏳ Grace Period: Skipping pause for Plan ${plan.id} (updated ${plan.updated_at}). Credits will be checked again next run.`)
                     continue
                 }
 
