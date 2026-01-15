@@ -813,6 +813,11 @@ ${linkInstruction}
 
 export const generateBlogPost = task({
   id: "generate-blog-post",
+  // Queue configuration: Limit concurrent article generations to prevent API rate limits
+  // Even if 100 articles are triggered at once, only 3 will run at a time, others wait in queue
+  queue: {
+    concurrencyLimit: 3, // Max 3 articles generating simultaneously across all users
+  },
   run: async (payload: {
     articleId: string;
     keyword: string;
