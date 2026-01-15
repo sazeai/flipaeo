@@ -25,10 +25,10 @@ export const dailyContentWatchman = schedules.task({
         // Get current date (YYYY-MM-DD) in UTC
         const today = new Date().toISOString().split('T')[0]
 
-        // Fetch ALL active plans with catch_up_mode
+        // Fetch ALL active plans with catch_up_mode and updated_at for grace period check
         const { data: plans, error } = await supabase
             .from("content_plans")
-            .select("id, user_id, brand_id, plan_data, catch_up_mode")
+            .select("id, user_id, brand_id, plan_data, catch_up_mode, updated_at")
             .eq("automation_status", "active")
 
         if (error) {
@@ -40,6 +40,8 @@ export const dailyContentWatchman = schedules.task({
             console.log("😴 Watchman: No active automation plans found.")
             return { result: "No active plans", triggeredCount: 0 }
         }
+
+        console.log(`📋 Watchman: Found ${plans.length} active plans to check`)
 
         let triggeredCount = 0
         let completedPlans = 0
@@ -159,16 +161,27 @@ export const dailyContentWatchman = schedules.task({
             const itemsToProcess = catchUpMode === "gradual" ? [itemsDue[0]] : itemsDue
             console.log(`📋 Plan ${plan.id}: ${itemsDue.length} due, processing ${itemsToProcess.length} (mode: ${catchUpMode})`)
 
-            // Check credits for the user
-            const { hasCredits: userHasCredits } = await hasCredits(plan.user_id, itemsToProcess.length)
+            // Check credits for the user (only need 1 credit at a time for gradual mode)
+            const creditsNeeded = catchUpMode === "gradual" ? 1 : itemsToProcess.length
+            const { hasCredits: userHasCredits, currentBalance } = await hasCredits(plan.user_id, creditsNeeded)
+
+            console.log(`💰 User ${plan.user_id}: Credits needed=${creditsNeeded}, hasCredits=${userHasCredits}, balance=${currentBalance}`)
 
             if (!userHasCredits) {
-                console.warn(`⚠️ User ${plan.user_id} has insufficient credits for plan ${plan.id}. Pausing automation.`)
+                // GRACE PERIOD: If plan was enabled in the last 5 minutes, don't pause immediately
+                // This prevents the scheduler from immediately pausing a just-enabled automation
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+                if (plan.updated_at && plan.updated_at > fiveMinutesAgo) {
+                    console.log(`⏳ Skipping pause for Plan ${plan.id} - grace period (enabled ${plan.updated_at})`)
+                    continue
+                }
+
+                console.warn(`⚠️ User ${plan.user_id} has insufficient credits (${currentBalance}) for plan ${plan.id}. Pausing automation.`)
 
                 // Pause the plan
                 await supabase
                     .from("content_plans")
-                    .update({ automation_status: "paused" }) // Or 'paused_no_credits' if we add that enum state later
+                    .update({ automation_status: "paused" })
                     .eq("id", plan.id)
 
                 // TODO: Notify user via email (future feature)
