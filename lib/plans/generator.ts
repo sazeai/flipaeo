@@ -384,6 +384,15 @@ INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTE
 5. **The "For" Audience:** "AI Family Portraits for Parents, Grandparents, and Memories"
 6. **The "Problem" Solver:** "Why Your AI Photos Look Fake (And How to Fix It)"
 7. **The "Question" Hook:** "Can AI Restore Old Photos? We Tested 5 Tools"
+8. **The "Should I" Decision:** "Should I Use AI Headshots for My Job Application?"
+9. **The "Is It Worth" Evaluation:** "Is a $30 AI Headshot Worth It vs a $300 Photographer?"
+10. **The "When NOT To" Warning:** "When You Shouldn't Use AI Headshots (And What to Do Instead)"
+
+**DECISION-STAGE REQUIREMENT (MANDATORY):**
+At least 3-4 articles MUST use decision-stage patterns (#8, #9, #10 above). These are the articles that LLMs cite most frequently because they answer:
+- "Should I do X?" → Direct recommendation
+- "Is X worth it?" → Value judgment
+- "When should I NOT do X?" → Honest limitation
 
 ### STYLE GUIDE:
 - **Be Conversational:** Write titles you'd click on Reddit or YouTube.
@@ -395,16 +404,32 @@ INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTE
 ## YOUR TASK
 
 Generate EXACTLY 30 articles distributed as follows (NO EXCEPTIONS):
-- Core Answers: 12 articles (EMPTY parent questions only)
-- Supporting Articles: 8 articles (expand coverage with how-tos)
-- Conversion Pages: 6 articles (comparisons, decisions)
-- Authority Plays: 4 articles (edge cases, stories)
+
+| Category | Count | REQUIRED article_type |
+|----------|-------|----------------------|
+| Core Answers | 12 | informational |
+| Supporting Articles | 8 | howto |
+| Conversion Pages | 6 | commercial |
+| Authority Plays | 4 | informational |
+
+**ARTICLE TYPE RULES (MANDATORY - DO NOT IGNORE):**
+- Core Answers → article_type MUST be "informational"
+- Supporting Articles → article_type MUST be "howto" 
+- Conversion Pages → article_type MUST be "commercial"
+- Authority Plays → article_type MUST be "informational"
+
+**EXPECTED FINAL DISTRIBUTION:**
+- informational: 16 articles (Core + Authority)
+- howto: 8 articles (Supporting)
+- commercial: 6 articles (Conversion)
+
+If your output has >20 informational articles, YOU HAVE FAILED. Check your work.
 
 For each article provide:
 1. title: Compelling blog post title (follow MODERN SEO rules above)
 2. main_keyword: Primary target keyword (2-4 words)
 3. supporting_keywords: 2-3 related keywords (array) which are user intent keywords
-4. article_type: "informational" | "commercial" | "howto"
+4. article_type: "informational" | "commercial" | "howto" (MUST match category above)
 5. cluster: Topic cluster for organization
 6. intent_role: The specific intent ("Core Answer", "Problem-Specific", "Comparison", "Decision", "Emotional/Story", "Authority/Edge")
 7. article_category: One of "Core Answers", "Supporting Articles", "Conversion Pages", "Authority Plays"
@@ -418,6 +443,7 @@ For each article provide:
 1. Each article's parent_question must be UNIQUE across the plan.
 2. If the brand has multiple features, articles must be distributed across ALL features.
 3. You MUST generate EXACTLY 30 articles with the 12-8-6-4 distribution.
+4. article_type MUST match the category (see table above). Supporting Articles = howto, Conversion Pages = commercial.
 `
 
     const response = await client.models.generateContent({
@@ -515,6 +541,18 @@ For each article provide:
                 }
             }
         }
+    }
+
+    // --- ARTICLE TYPE DISTRIBUTION VALIDATION ---
+    const typeDistribution: Record<string, number> = { informational: 0, commercial: 0, howto: 0 }
+    for (const post of validPosts) {
+        const type = post.article_type || "informational"
+        if (type in typeDistribution) typeDistribution[type]++
+    }
+    console.log(`[Content Plan] Article Type Distribution:`, typeDistribution)
+    const infoPercent = validPosts.length > 0 ? (typeDistribution.informational / validPosts.length) * 100 : 0
+    if (infoPercent > 70) {
+        console.warn(`[Content Plan] ⚠️ WARNING: ${infoPercent.toFixed(0)}% informational. LLM may have ignored article_type rules.`)
     }
 
     // --- CATEGORY-AWARE TOP-UP LOOP ---
