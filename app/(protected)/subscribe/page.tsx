@@ -119,7 +119,7 @@ export default async function SubscribePage() {
     const plan = plans?.[0]
 
     return (
-        <main className="min-h-screen font-sans text-stone-900 flex flex-col items-center justify-center py-12 px-4 sm:px-6">
+        <main className="min-h-screen font-sans text-stone-900 flex flex-col items-center justify-center py-4">
             {/* After returning from hosted checkout (?subscribed=1), auto-refresh and poll until active */}
             <RealtimeSubscriptionSync userId={user?.id} />
 
@@ -157,7 +157,7 @@ export default async function SubscribePage() {
 
                     {/* Content Section */}
                     {plan ? (
-                        <div className="p-6 sm:p-8">
+                        <div className="p-4 sm:p-6">
 
                             {/* Price Block */}
                             <div className="flex flex-col items-center mb-8">
@@ -188,7 +188,7 @@ export default async function SubscribePage() {
                                     productId={plan.dodo_product_id}
                                     isAuthenticated={!!user}
                                     className="
-                    cursor-pointer w-full sm:w-full h-12 rounded-xl text-base font-semibold text-white shadow-lg
+                    cursor-pointer w-full sm:w-full rounded-lg text-base font-semibold text-white shadow-xs
                     bg-gradient-to-b from-stone-800 to-stone-950
                     hover:from-stone-700 hover:to-stone-900
                     shadow-[0_0_1px_1px_rgba(255,255,255,0.08)_inset,0_1px_1.5px_0_rgba(0,0,0,0.32)]
@@ -216,18 +216,23 @@ export default async function SubscribePage() {
                     {/* Footer Info */}
                     <div className="bg-stone-50/50 border-t border-stone-100 p-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
 
-                        <div className="flex items-center gap-2 hover:grayscale-60 transition-all">
-                            <Image src="/dodo-logo.png" alt="dodopayments" width={96} height={96} className="inline-block ml-1 bg-black" />
-                            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Secure payments by Dodo Payments</span>
+                        <div className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+                                Secure payments by{' '}
+                                <Image
+                                    src="/dodo-logo.png"
+                                    alt="Dodo Payments"
+                                    width={70}
+                                    height={14}
+                                    className="inline-block align-middle ml-1"
+                                />
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Bottom FAQ Links (Subtle) */}
-            <div className="mt-8 flex gap-6 text-xs text-stone-400 font-medium">
-                <p>Fully secure payment processing.</p>
-            </div>
+
 
         </main>
     )

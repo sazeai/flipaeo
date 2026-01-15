@@ -13,7 +13,7 @@ export const Hero: React.FC = () => {
       {/* Badge */}
       <div className="inline-flex items-center justify-center bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1.5 transform -rotate-2 mb-8 hover:rotate-0 transition-transform duration-300 cursor-default">
         <span className="font-display font-bold uppercase tracking-wider text-sm">
-          THE POST-SEO ERA IS HERE
+          THE POST-SEO ERA
         </span>
       </div>
 
@@ -21,13 +21,13 @@ export const Hero: React.FC = () => {
       <h1 className="font-display font-black text-5xl md:text-6xl lg:text-[6rem] leading-[0.9] tracking-tighter mb-8 text-black uppercase">
         Don’t just rank<br />
         <span className="text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black">
-          Be the Source AI cites.
+          Be the Source AI cites
         </span>
       </h1>
 
       {/* Subtext */}
       <p className="font-sans text-gray-600 text-lg md:text-2xl max-w-3xl mb-12 leading-relaxed font-medium px-4">
-        FlipAEO is an <span className="font-bold text-black border-b-[3px] border-brand-orange/30">Strategic Content Engine</span> designed for Generative Engine Optimization (GEO). We analyze your brand, competitors, and visibility gaps to decide what content should exist, what should come next, and what actually moves authority forward before it ever writes a word.
+        <span className="font-bold text-black border-b-[3px] border-brand-orange/30">FlipAEO is an Strategic Content Engine for AEO/GEO.</span> We engineer the exact content required to make your brand the #1 citation in AI search results.
       </p>
 
       {/* Actions */}

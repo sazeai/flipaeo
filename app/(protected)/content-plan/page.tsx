@@ -708,7 +708,7 @@ export default function ContentPlanPage() {
                         <div className="border-b border-stone-200 pb-2 mb-6">
                             <button
                                 onClick={() => setIsAnalysisOpen(!isAnalysisOpen)}
-                                className="w-full flex items-center justify-between group py-2"
+                                className="cursor-pointer w-full flex items-center justify-between group py-2"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={cn(

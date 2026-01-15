@@ -172,29 +172,15 @@ export default function OnboardingPage() {
             const savedBrandId = res.brandId
             setBrandId(savedBrandId)
 
-            // Quick sitemap sync (optional, non-blocking)
-            let existingContent: string[] = []
-            if (fullUrl) {
-                try {
-                    const { syncSitemapToInternalLinksAction } = await import("@/actions/sync-internal-links")
-                    const syncResult = await syncSitemapToInternalLinksAction(fullUrl, savedBrandId)
-                    if (syncResult.success) {
-                        existingContent = syncResult.titles
-                    }
-                } catch (e) {
-                    console.warn("[Onboarding] Sitemap sync failed:", e)
-                }
-            }
-
-            // Trigger background plan generation (seeds will be generated in the task)
+            // Trigger background plan generation
+            // Sitemap sync happens inside the Trigger task, not here
             const bgRes = await fetch("/api/content-plan/start-background", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     brandId: savedBrandId,
                     brandData,
-                    // seeds are now optional - trigger task generates them
-                    existingContent
+                    brandUrl: fullUrl // Pass URL for sitemap sync in Trigger task
                 }),
             })
 

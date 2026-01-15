@@ -169,21 +169,23 @@ const ProblemCard: React.FC<{ title: string; description: string; graphic: React
 export const ProblemSection: React.FC = () => {
   return (
     <section className="w-full py-24 px-4 flex flex-col items-center">
-      {/* Section Badge */}
-      <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8">
-        <span className="font-display font-black text-xs uppercase tracking-widest">Market Audit</span>
+      <div className="flex flex-col items-center text-center mb-16 max-w-3xl">
+
+        {/* Section Badge */}
+        <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8">
+          <span className="font-display font-black text-xs uppercase tracking-widest">Market Audit</span>
+        </div>
+
+        {/* Headline */}
+        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
+          One-click AI content is<br />quietly killing your growth.
+        </h2>
+
+        {/* Subtext */}
+        <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed">
+          You’re publishing more than ever, yet traffic stays flat. Modern search engines can tell the difference between real answers and mass-produced content.
+        </p>
       </div>
-
-      {/* Headline */}
-      <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl text-center leading-tight mb-6 uppercase">
-        One-click AI content is<br />quietly killing your growth.
-      </h2>
-
-      {/* Subtext */}
-      <p className="font-sans text-gray-500 text-lg md:text-xl text-center leading-relaxed mb-8">
-        You’re publishing more than ever, yet traffic stays flat. Modern search engines can tell the difference between real answers and mass-produced content.
-      </p>
-
       {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
         <ProblemCard

@@ -125,20 +125,29 @@ export default function SettingsPage() {
   useEffect(() => {
     async function checkGscConnection() {
       try {
+        // First check if connection exists in database
+        const { data: connection } = await supabase
+          .from("gsc_connections")
+          .select("site_url, access_token")
+          .single()
+
+        if (!connection?.access_token) {
+          // No GSC connection exists
+          setGscConnected(false)
+          return
+        }
+
+        // Connection exists, fetch available sites
         const res = await fetch("/api/gsc/sites")
         if (res.ok) {
           const data = await res.json()
           setGscConnected(true)
           setGscSites(data.sites || [])
-          // Get saved site URL from connection
-          const { data: connection } = await supabase
-            .from("gsc_connections")
-            .select("site_url")
-            .single()
-          if (connection?.site_url) {
+          if (connection.site_url) {
             setGscSiteUrl(connection.site_url)
           }
         } else {
+          // Token might be expired/invalid
           setGscConnected(false)
         }
       } catch {
@@ -199,22 +208,15 @@ export default function SettingsPage() {
   const handleEnhancePlan = async (brand: BrandInfo) => {
     setEnhancingBrandId(brand.id)
     try {
-      // First, get the current plan for this brand
-      const planRes = await fetch("/api/content-plan")
-      if (!planRes.ok) throw new Error("No content plan found")
-
-      const currentPlan = await planRes.json()
-
-      // Generate enhanced plan from GSC data
-      const enhanceRes = await fetch("/api/gsc/generate-plan", {
+      // Call the new enhance-plan endpoint that:
+      // 1. Fetches existing plan from DB
+      // 2. Enriches items with GSC metrics
+      // 3. Adds new opportunity articles
+      // 4. Saves with gsc_enhanced: true
+      const enhanceRes = await fetch("/api/gsc/enhance-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brandData: brand.brand_data,
-          brandName: brand.brand_data?.product_name || "",
-          existingPlan: currentPlan.plan_data || [],
-          competitorSeeds: currentPlan.competitor_seeds || []
-        })
+        body: JSON.stringify({})
       })
 
       if (!enhanceRes.ok) {
@@ -222,22 +224,8 @@ export default function SettingsPage() {
         throw new Error(error.error || "Failed to enhance plan")
       }
 
-      const { plan: enhancedPlan } = await enhanceRes.json()
-
-      // Update the plan in database
-      const updateRes = await fetch("/api/content-plan", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planId: currentPlan.id,
-          planData: enhancedPlan,
-          gscEnhanced: true
-        })
-      })
-
-      if (!updateRes.ok) throw new Error("Failed to save enhanced plan")
-
-      toast.success(`Plan enhanced with ${enhancedPlan.length} GSC-optimized articles!`)
+      const result = await enhanceRes.json()
+      toast.success(`Plan enhanced! ${result.enhanced_count} articles enriched, ${result.new_opportunities} new opportunities added.`)
     } catch (error: any) {
       toast.error(error.message || "Failed to enhance plan")
     } finally {

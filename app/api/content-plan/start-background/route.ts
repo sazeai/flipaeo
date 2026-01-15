@@ -27,20 +27,16 @@ export async function POST(req: NextRequest) {
         const {
             brandId,
             brandData,
-            competitorBrands,
-            existingContent
+            brandUrl
         } = await req.json() as {
             brandId: string
             brandData: BrandDetails
-            competitorBrands?: Array<{ name: string; url?: string }>
-            existingContent?: string[]
+            brandUrl?: string
         }
 
         if (!brandId || !brandData) {
             return NextResponse.json({ error: "Brand ID and data required" }, { status: 400 })
         }
-
-        // Seeds are generated in the trigger task from brandData
 
         // Delete any existing plans for this user
         await supabase
@@ -58,7 +54,7 @@ export async function POST(req: NextRequest) {
                 competitor_seeds: [], // Will be populated by trigger task
                 gsc_enhanced: false,
                 generation_status: "pending",
-                generation_phase: "seeds" // First phase: generate seeds
+                generation_phase: "sitemap" // First phase: sitemap sync
             })
             .select()
             .single()
@@ -70,7 +66,7 @@ export async function POST(req: NextRequest) {
 
         console.log(`[Start Background Plan] Created pending plan: ${plan.id}`)
 
-        // Trigger background task
+        // Trigger background task - all intelligence gathering happens there
         try {
             const handle = await tasks.trigger<typeof generatePlanTask>(
                 "generate-content-plan",
@@ -79,8 +75,7 @@ export async function POST(req: NextRequest) {
                     userId: user.id,
                     brandId,
                     brandData,
-                    competitorBrands,
-                    existingContent
+                    brandUrl // For sitemap sync in Trigger task
                 }
             )
 
