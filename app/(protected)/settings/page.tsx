@@ -6,7 +6,7 @@ import { getUserBrandStatus } from "@/actions/brand"
 import { getUserDefaults, setDefaultBrand } from "@/actions/preferences"
 import { createClient } from "@/utils/supabase/client"
 import { getBrandLinkCountAction } from "@/actions/internal-linking"
-import { Check, Globe, Plus, Edit, Settings2, Loader2, Link2, RefreshCcw, ExternalLink, Search, Sparkles, ChevronDown, Key, AlertCircle, X } from "lucide-react"
+import { Check, Globe, Plus, Edit, Settings2, Loader2, Link2, RefreshCcw, ExternalLink, AlertCircle } from "lucide-react"
 import BrandOnboarding from "@/components/brand-onboarding"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ import { GlobalCard } from "@/components/ui/global-card"
 import { CustomSpinner } from "@/components/CustomSpinner"
 
 type BrandInfo = { id: string; website_url: string; created_at: string; brand_data: BrandDetails }
-type GSCSite = { siteUrl: string; permissionLevel: string }
+
 
 export default function SettingsPage() {
   const supabase = createClient()
@@ -33,13 +33,7 @@ export default function SettingsPage() {
   const [syncingId, setSyncingId] = useState<string | null>(null)
   const [linkCounts, setLinkCounts] = useState<Record<string, number>>({})
 
-  // GSC State
-  const [gscConnected, setGscConnected] = useState(false)
-  const [gscSiteUrl, setGscSiteUrl] = useState<string | null>(null)
-  const [gscSites, setGscSites] = useState<GSCSite[]>([])
-  const [loadingGsc, setLoadingGsc] = useState(false)
-  const [enhancingBrandId, setEnhancingBrandId] = useState<string | null>(null)
-  const [showSiteSelector, setShowSiteSelector] = useState(false)
+
 
   // Dark mode detection
 
@@ -121,117 +115,7 @@ export default function SettingsPage() {
     }
   }
 
-  // Check GSC connection status on mount
-  useEffect(() => {
-    async function checkGscConnection() {
-      try {
-        // First check if connection exists in database
-        const { data: connection } = await supabase
-          .from("gsc_connections")
-          .select("site_url, access_token")
-          .single()
 
-        if (!connection?.access_token) {
-          // No GSC connection exists
-          setGscConnected(false)
-          return
-        }
-
-        // Connection exists, fetch available sites
-        const res = await fetch("/api/gsc/sites")
-        if (res.ok) {
-          const data = await res.json()
-          setGscConnected(true)
-          setGscSites(data.sites || [])
-          if (connection.site_url) {
-            setGscSiteUrl(connection.site_url)
-          }
-        } else {
-          // Token might be expired/invalid
-          setGscConnected(false)
-        }
-      } catch {
-        setGscConnected(false)
-      }
-    }
-    checkGscConnection()
-  }, [supabase])
-
-  // Handle GSC connection callback
-  useEffect(() => {
-    const gscParam = searchParams.get("gsc")
-    const gscError = searchParams.get("gsc_error")
-
-    if (gscParam === "connected") {
-      toast.success("Google Search Console connected!")
-      setGscConnected(true)
-      // Fetch sites
-      fetch("/api/gsc/sites")
-        .then(res => res.json())
-        .then(data => {
-          setGscSites(data.sites || [])
-          if (data.sites?.length === 1) {
-            setGscSiteUrl(data.sites[0].siteUrl)
-            handleSelectSite(data.sites[0].siteUrl)
-          } else if (data.sites?.length > 1) {
-            setShowSiteSelector(true)
-          }
-        })
-        .catch(() => { })
-      // Clear URL params
-      window.history.replaceState({}, "", "/settings")
-    }
-
-    if (gscError) {
-      toast.error(`GSC connection failed: ${gscError}`)
-      window.history.replaceState({}, "", "/settings")
-    }
-  }, [searchParams])
-
-  // Handle site selection
-  const handleSelectSite = async (siteUrl: string) => {
-    try {
-      await fetch("/api/gsc/sites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ siteUrl })
-      })
-      setGscSiteUrl(siteUrl)
-      setShowSiteSelector(false)
-      toast.success("Site selected!")
-    } catch {
-      toast.error("Failed to save site selection")
-    }
-  }
-
-  // Enhance plan with GSC data
-  const handleEnhancePlan = async (brand: BrandInfo) => {
-    setEnhancingBrandId(brand.id)
-    try {
-      // Call the new enhance-plan endpoint that:
-      // 1. Fetches existing plan from DB
-      // 2. Enriches items with GSC metrics
-      // 3. Adds new opportunity articles
-      // 4. Saves with gsc_enhanced: true
-      const enhanceRes = await fetch("/api/gsc/enhance-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
-      })
-
-      if (!enhanceRes.ok) {
-        const error = await enhanceRes.json()
-        throw new Error(error.error || "Failed to enhance plan")
-      }
-
-      const result = await enhanceRes.json()
-      toast.success(`Plan enhanced! ${result.enhanced_count} articles enriched, ${result.new_opportunities} new opportunities added.`)
-    } catch (error: any) {
-      toast.error(error.message || "Failed to enhance plan")
-    } finally {
-      setEnhancingBrandId(null)
-    }
-  }
 
   if (loading) {
     return (
@@ -376,84 +260,6 @@ export default function SettingsPage() {
                           </Button>
                         </div>
                       </div>
-
-                      {/* Google Search Console Section (Hidden) */}
-                      <div className="hidden">
-                        <div className="p-3 bg-white rounded-lg border border-stone-100 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="p-1.5 bg-green-50 rounded-md border border-green-100">
-                                <Search className="w-3.5 h-3.5 text-green-600" />
-                              </div>
-                              <div>
-                                <div className="text-[9px] font-bold text-stone-400 uppercase tracking-wider">Search Console</div>
-                                <div className="text-[11px] text-stone-600 font-medium leading-tight">
-                                  {gscConnected
-                                    ? (gscSiteUrl ? `Connected: ${gscSiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}` : 'Select a site')
-                                    : 'Enhance plan with real search data'}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              {!gscConnected ? (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-green-50 hover:bg-green-100 text-green-700 border-none"
-                                  onClick={() => window.location.href = "/api/auth/gsc"}
-                                >
-                                  <Key className="w-3 h-3" />
-                                  CONNECT GSC
-                                </Button>
-                              ) : showSiteSelector && gscSites.length > 1 ? (
-                                <select
-                                  className="h-8 text-[10px] px-2 rounded-md border border-stone-200 bg-white"
-                                  value={gscSiteUrl || ""}
-                                  onChange={(e) => handleSelectSite(e.target.value)}
-                                >
-                                  <option value="">Select site...</option>
-                                  {gscSites.map(site => (
-                                    <option key={site.siteUrl} value={site.siteUrl}>
-                                      {site.siteUrl.replace(/^https?:\/\//, '')}
-                                    </option>
-                                  ))}
-                                </select>
-                              ) : gscSiteUrl ? (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white border-none"
-                                  onClick={() => handleEnhancePlan(b)}
-                                  disabled={enhancingBrandId === b.id}
-                                >
-                                  {enhancingBrandId === b.id ? (
-                                    <>
-                                      <Loader2 className="w-3 h-3 animate-spin" />
-                                      ENHANCING...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Sparkles className="w-3 h-3" />
-                                      ENHANCE PLAN
-                                    </>
-                                  )}
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-stone-100 hover:bg-stone-200 text-stone-900 border-none"
-                                  onClick={() => setShowSiteSelector(true)}
-                                >
-                                  <ChevronDown className="w-3 h-3" />
-                                  SELECT SITE
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   )
                 })}
@@ -469,72 +275,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* Global Integrations */}
-            <div className="border-t border-stone-100 p-6 bg-stone-50/50">
-              <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider mb-4">Integrations</h3>
-              <div className="bg-white rounded-xl border border-stone-200 p-4 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
-                    {/* Google G Logo */}
-                    <svg viewBox="0 0 24 24" className="w-5 h-5"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84.81-.84z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-stone-900">Google Search Console</h4>
-                    {gscConnected ? (
-                      <p className="text-xs text-stone-500">Connected to <span className="font-semibold text-stone-700">{gscSiteUrl || "your site"}</span></p>
-                    ) : (
-                      <p className="text-xs text-stone-500">Connect to access real search data</p>
-                    )}
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  {gscConnected ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowSiteSelector(true)}
-                        className="text-xs h-8"
-                      >
-                        Change Site
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      onClick={() => window.location.href = "/api/auth/gsc"}
-                      size="sm"
-                      className="bg-[#4285F4] hover:bg-[#3367D6] text-white text-xs h-8"
-                    >
-                      Connect
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {showSiteSelector && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-                  <div className="p-4 border-b border-stone-100 flex justify-between items-center">
-                    <h3 className="font-bold text-stone-900">Select Property</h3>
-                    <button onClick={() => setShowSiteSelector(false)}><X className="w-4 h-4" /></button>
-                  </div>
-                  <div className="p-2 max-h-[300px] overflow-y-auto">
-                    {gscSites.map(s => (
-                      <button
-                        key={s.siteUrl}
-                        onClick={() => handleSelectSite(s.siteUrl)}
-                        className="w-full text-left px-4 py-3 hover:bg-stone-50 rounded-lg text-sm text-stone-700 font-medium truncate"
-                      >
-                        {s.siteUrl}
-                      </button>
-                    ))}
-                    {gscSites.length === 0 && <p className="p-4 text-center text-sm text-stone-500">No verified sites found.</p>}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </GlobalCard >

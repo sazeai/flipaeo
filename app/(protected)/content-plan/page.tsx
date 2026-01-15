@@ -46,8 +46,6 @@ import { createClient } from "@/utils/supabase/client"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { CalendarView } from "@/components/content-plan/calendar-view"
-import { GSCConnectionCard } from "@/components/gsc-connection-card"
-import { toast } from "sonner"
 import {
     Sheet,
     SheetContent,
@@ -166,30 +164,6 @@ export default function ContentPlanPage() {
     // Credit gating - use centralized credit manager
     const { balance: creditBalance } = useCreditManager(userId)
     const hasCredits = creditBalance > 0
-
-    // GSC State
-    const [gscConnected, setGscConnected] = useState(false)
-    const [isGscDismissed, setIsGscDismissed] = useState(false)
-    const [enhancing, setEnhancing] = useState(false)
-
-    useEffect(() => {
-        // Init persisted state
-        const dismissed = localStorage.getItem("hide_gsc_promo") === "true"
-        setIsGscDismissed(dismissed)
-
-        // Check GSC status
-        const checkGSC = async () => {
-            const supabase = createClient()
-            const { data } = await supabase.from("gsc_connections").select("id").single()
-            if (data) setGscConnected(true)
-        }
-        checkGSC()
-    }, [])
-
-    const handleDismissGSC = () => {
-        setIsGscDismissed(true)
-        localStorage.setItem("hide_gsc_promo", "true")
-    }
 
     useEffect(() => {
         // Fetch current user for credit tracking
@@ -442,26 +416,7 @@ export default function ContentPlanPage() {
         }
     }
 
-    // Enhance Plan with GSC Data
-    const handleEnhancePlan = async () => {
-        setEnhancing(true)
-        try {
-            const res = await fetch("/api/gsc/enhance-plan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({})
-            })
-            if (!res.ok) throw new Error("Failed to enhance plan")
-            const result = await res.json()
-            toast.success("Plan enhanced with GSC data!")
-            fetchPlan()
-        } catch (e) {
-            console.error(e)
-            toast.error("Failed to enhance plan")
-        } finally {
-            setEnhancing(false)
-        }
-    }
+
 
     // Handle activation with user's chosen action
     const handleActivateAutomation = async (action: "gradual" | "skip" | "reschedule") => {
@@ -711,51 +666,6 @@ export default function ContentPlanPage() {
                                 </button>
                             </div>
 
-                            {/* GSC Mini Button (Only if dismissed or connected) */}
-                            {((isGscDismissed && !gscConnected) || gscConnected) && (
-                                <Button
-                                    onClick={() => {
-                                        if (gscConnected) {
-                                            handleEnhancePlan()
-                                        } else {
-                                            window.location.href = "/api/auth/gsc"
-                                        }
-                                    }}
-                                    disabled={enhancing}
-                                    variant="outline"
-                                    size="sm"
-                                    className={cn(
-                                        "h-9 px-3 text-[11px] font-bold border-stone-200 transition-all rounded-lg",
-                                        gscConnected
-                                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                            : "text-stone-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
-                                    )}
-                                >
-                                    {enhancing ? (
-                                        <>
-                                            <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin text-stone-400" />
-                                            <span className="text-stone-500">Syncing...</span>
-                                        </>
-                                    ) : gscConnected ? (
-                                        plan?.gsc_enhanced ? (
-                                            <>
-                                                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
-                                                GSC Active
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Sparkles className="w-3.5 h-3.5 mr-1.5 " />
-                                                Enhance Plan
-                                            </>
-                                        )
-                                    ) : (
-                                        <>
-                                            <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
-                                            Connect GSC
-                                        </>
-                                    )}
-                                </Button>
-                            )}
 
                             {/* Auto-Refill Button (Clean) */}
                             {plan && (
@@ -797,15 +707,7 @@ export default function ContentPlanPage() {
                 {/* --- Body Content --- */}
                 <div className="p-4 space-y-8">
 
-                    {/* GSC Hero Card (Only if NOT dismissed AND NOT connected) */}
-                    {!isGscDismissed && !gscConnected && (
-                        <div className="mb-6">
-                            <GSCConnectionCard
-                                onConnect={() => window.location.href = "/api/auth/gsc"}
-                                onDismiss={handleDismissGSC}
-                            />
-                        </div>
-                    )}
+
 
                     {/* Strategic Analysis - Premium Accordion */}
                     {plan?.content_gap_analysis && (
