@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/landing/Button';
 
@@ -11,7 +11,6 @@ export const CTASection: React.FC = () => {
 
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform -rotate-1">
-          <Sparkles className="w-3.5 h-3.5 text-white fill-white" />
           <span className="font-display font-black text-xs uppercase tracking-widest text-black">Conversion Ready</span>
         </div>
 
@@ -29,7 +28,7 @@ export const CTASection: React.FC = () => {
         {/* Action Button (Direct Conversion) */}
         <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
           <Link href="/subscribe" className="w-full sm:w-auto">
-            <Button variant="secondary" size="lg" className="w-full sm:w-auto h-16 px-10 text-xl border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-white text-black">
+            <Button variant="secondary" size="md" className="w-full text-sm sm:w-auto h-12 px-10 sm:text-xl border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-white text-black">
               Get your brand cited
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

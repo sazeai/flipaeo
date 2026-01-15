@@ -33,8 +33,8 @@ export const PricingSection: React.FC = () => {
 
                     {/* Absolute Badge for Launch */}
                     <div className="absolute -top-5 -right-2 md:-right-4 z-20">
-                        <div className="bg-[#FF5F57] text-white border-2 border-black px-6 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform rotate-3 flex flex-col items-center animate-in slide-in-from-top-4 fade-in duration-700">
-                            <span className="font-display font-black text-lg uppercase leading-none">Launch Offer</span>
+                        <div className="bg-[#FF5F57] text-white border-2 border-black px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform rotate-3 flex flex-col items-center animate-in slide-in-from-top-4 fade-in duration-700">
+                            <span className="font-display font-black text-md uppercase leading-none">Launch Offer</span>
                             <span className="font-mono text-[10px] font-bold uppercase tracking-wider">Limited Time</span>
                         </div>
                     </div>
@@ -65,7 +65,7 @@ export const PricingSection: React.FC = () => {
 
                         <div className="relative z-10 mt-auto">
                             <Link href="/subscribe">
-                                <Button fullWidth variant="primary" size="lg" className="h-16 text-xl border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-black hover:bg-gray-800">
+                                <Button fullWidth variant="primary" size="md" className="h-12 text-md sm:text-lg border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-black hover:bg-gray-800">
                                     Win The AEO RACE
                                 </Button>
                             </Link>
@@ -74,7 +74,7 @@ export const PricingSection: React.FC = () => {
                     </div>
 
                     {/* Right Side: Features */}
-                    <div className="w-full lg:w-[60%] p-8 md:p-12 bg-white flex flex-col justify-center relative">
+                    <div className="w-full lg:w-[60%] p-4 md:p-8 bg-white flex flex-col justify-center relative">
 
                         {/* Decorative Window Controls */}
                         <div className="absolute top-4 right-4 flex gap-2">

@@ -173,12 +173,12 @@ export const ProblemSection: React.FC = () => {
 
         {/* Section Badge */}
         <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8">
-          <span className="font-display font-black text-xs uppercase tracking-widest">Market Audit</span>
+          <span className="font-display font-black text-xs uppercase tracking-widest">The Problem</span>
         </div>
 
         {/* Headline */}
         <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
-          One-click AI content is<br />quietly killing your growth.
+          One-click AI content is<br />quietly killing your growth
         </h2>
 
         {/* Subtext */}
