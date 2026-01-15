@@ -324,17 +324,41 @@ If you have strong ideas that don't fit the exact count, adjust slightly. Qualit
 
 ---
 
-## ANTI-CANNIBALIZATION RULES (CRITICAL)
+## ANTI-CANNIBALIZATION RULES (CRITICAL - READ TWICE)
 
-Each article must answer a DIFFERENT parent question. Examples of SAME parent question (BAD):
-- "How to restore old photos" = "What is AI photo restoration" = "Does AI enhancement work"
-These all answer: "Can AI restore my photos?"
+Each article must answer a DIFFERENT **intent cluster**. Similar wordings that address the SAME user concern = DUPLICATION.
 
-Examples of DIFFERENT parent questions (GOOD):
-- "Can AI restore my photos?" (Core Answer)
-- "How much does restoration cost?" (Core Answer - DIFFERENT)
-- "AI vs professional restoration?" (Conversion)
-- "Why some photos can't be restored?" (Authority)
+**THE INTENT CLUSTER TEST:**
+Before adding an article, ask: "What is the user's CORE CONCERN?"
+- If two articles address the same core concern, they are duplicates—even if titles differ.
+
+**EXPLICIT DUPLICATION EXAMPLES FOR AI HEADSHOTS (BAD - DO NOT DO THIS):**
+
+These are ALL the same intent cluster: **"Is AI acceptable/trustworthy?"**
+- ❌ "Are AI Headshots Professional Enough for Work?" 
+- ❌ "Are AI Generated Photos Legal to Use?"
+- ❌ "Do Recruiters Care if Your LinkedIn Photo is AI?"
+- ❌ "Can You Use AI Photos for Business Cards?"
+→ **PICK ONE. Cover the other angles as H2 sections within that article.**
+
+These are ALL the same intent cluster: **"How do I get good results?"**
+- ❌ "How to Take Perfect Selfies for AI Headshots"
+- ❌ "Best Lighting for AI Photo Input"
+- ❌ "What to Wear for AI Photoshoots"
+→ **Combine into ONE comprehensive "How to Prepare for AI Headshots" guide.**
+
+**VALID DIFFERENT INTENT CLUSTERS (GOOD):**
+| Intent Cluster | Example Article |
+|----------------|-----------------|
+| "What is this?" | "What Are AI Headshots and How Do They Work?" |
+| "Is it trustworthy?" | "Are AI Headshots Professional Enough for LinkedIn?" |
+| "How much does it cost?" | "AI Headshots Pricing: What to Expect in 2026" |
+| "How do I use it?" | "How to Get Your First AI Headshot in 10 Minutes" |
+| "Which one is best?" | "Best AI Headshot Generators Compared" |
+| "[Persona] specific" | "AI Headshots for Realtors: What You Need to Know" |
+| "[Persona] specific" | "AI Headshots for Actors: Casting-Ready Quality?" |
+
+**RULE:** You may have multiple persona-specific articles (realtors, actors, freelancers) because they are DIFFERENT audiences. But you may NOT have multiple "is it acceptable/trustworthy" articles with different framings.
 
 ---
 
@@ -379,7 +403,7 @@ Generate EXACTLY 30 articles distributed as follows (NO EXCEPTIONS):
 For each article provide:
 1. title: Compelling blog post title (follow MODERN SEO rules above)
 2. main_keyword: Primary target keyword (2-4 words)
-3. supporting_keywords: 2-3 related keywords (array)
+3. supporting_keywords: 2-3 related keywords (array) which are user intent keywords
 4. article_type: "informational" | "commercial" | "howto"
 5. cluster: Topic cluster for organization
 6. intent_role: The specific intent ("Core Answer", "Problem-Specific", "Comparison", "Decision", "Emotional/Story", "Authority/Edge")
