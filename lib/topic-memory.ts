@@ -1,11 +1,15 @@
-import { createClient } from "@/utils/supabase/server"
+
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
 
 // Type for admin Supabase client (inferred from createAdminClient)
 type AdminSupabaseClient = ReturnType<typeof createAdminClient>
 
-export async function checkTopicDuplication(topic: string, userId: string, brandId?: string | null) {
+export async function checkTopicDuplication(
+    topic: string,
+    userId: string,
+    brandId?: string | null
+) {
     const genAI = getGeminiClient()
 
     try {
@@ -24,7 +28,8 @@ export async function checkTopicDuplication(topic: string, userId: string, brand
         }
 
         // 2. Search for similar articles (brand-isolated)
-        const supabase = await createClient()
+        // Use admin client since this runs server-side (both API routes and scheduler)
+        const supabase = createAdminClient()
 
         // Brand-aware matching: pass brandId to RPC for isolation
         const rpcParams: any = {
@@ -35,7 +40,11 @@ export async function checkTopicDuplication(topic: string, userId: string, brand
             p_brand_id: brandId || null  // Brand isolation - only match within same brand
         }
 
-        const { data: similarArticles, error } = await supabase.rpc("match_articles_topic", rpcParams)
+        // Cast to any since match_articles_topic RPC isn't in generated types yet
+        const { data: similarArticles, error } = await (supabase as any).rpc("match_articles_topic", rpcParams) as {
+            data: Array<{ keyword: string; similarity: number }> | null;
+            error: any;
+        }
 
         if (error) {
             console.warn("Topic duplication check failed:", error)
@@ -77,8 +86,8 @@ export async function saveTopicMemory(articleId: string, topic: string, adminCli
 
         if (!embedding || embedding.length === 0) return
 
-        // Use provided admin client for background jobs, otherwise create server client
-        const supabase = adminClient ?? await createClient()
+        // Use provided admin client for background jobs, or create one
+        const supabase = adminClient ?? createAdminClient()
         await supabase
             .from("articles")
             .update({ topic_embedding: embedding } as any)

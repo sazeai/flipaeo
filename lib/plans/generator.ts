@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { BrandDetails } from "@/lib/schemas/brand"
