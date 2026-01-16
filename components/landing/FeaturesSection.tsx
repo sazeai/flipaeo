@@ -141,7 +141,7 @@ const ResearchGraphic = () => (
         &gt; AGENT: Hunting specific pricing tables...
       </div>
       <div className="bg-green-50 p-2 border-2 border-black text-green-800 font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-        &gt; ACQUIRED: 2025 Benchmarks found.
+        &gt; ACQUIRED: 2026 Benchmarks found.
       </div>
     </div>
   </div>

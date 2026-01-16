@@ -149,7 +149,7 @@ Avoid the "The old way is dead" drama. Instead, start with a boring but critical
 - **The "Boring Technical" Start:** Start with a specific setting, a line of code, or a mundane requirement that people miss.
   *Example:* "Most [Topic] configurations fail because of a single checkbox in the [Specific Menu]. It’s a tiny detail, but if it’s off, none of the high-level strategy matters."
 - **The "Middle of the Meeting" Start:** Start as if you are answering a question someone just asked you.
-  *Example:* "People keep asking if [Topic] is still worth the effort in 2025. The answer isn't a simple yes or no—it depends entirely on how you're handling [Specific Sub-task]."
+  *Example:* "People keep asking if [Topic] is still worth the effort in 2026. The answer isn't a simple yes or no—it depends entirely on how you're handling [Specific Sub-task]."
 
 **NEGATIVE CONSTRAINTS:**
 - NO "The rules have changed."
@@ -171,7 +171,7 @@ Skip the "We tested 50 tools" (everyone says this). Instead, start with the *typ
 
 **NEGATIVE CONSTRAINTS:**
 - NO "Choosing the right tool is a journey."
-- NO "Top 10 Best [Topic] in 2025."
+- NO "Top 10 Best [Topic] in 2026."
 - NO "Our expert team has evaluated..."
 `,
 
@@ -217,7 +217,7 @@ ${strategy.research_focus}
 
 THINK LIKE A CRITIC - Always find gaps:
 - "What SPECIFIC product names are mentioned? Extract them."
-- "I see features, but where is the 2025 pricing?"
+- "I see features, but where is the 2026 pricing?"
 - "They mention customer support, but is it 24/7 or email-only?"
 - "Where are the real user reviews? This is all marketing fluff."
 - "What specific statistics or benchmarks are missing?"
@@ -230,7 +230,7 @@ ${broadContext}
 IMPORTANT RULES:
 1. You MUST return 3-5 targeted queries - NEVER return an empty array
 2. If the data mentions ANY product/tool names, include queries about those specific products
-3. Be SPECIFIC - not "best CRM" but "Salesforce pricing 2025" or "HubSpot vs Pipedrive user reviews reddit"
+3. Be SPECIFIC - not "best CRM" but "Salesforce pricing 2026" or "HubSpot vs Pipedrive user reviews reddit"
 4. Include at least one query for "[keyword] reddit" or "[keyword] reviews" for real user opinions
 
 OUTPUT (Strict JSON):
@@ -351,7 +351,7 @@ const performDeepResearch = async (
       gap_analysis: parsed.gap_analysis || "Missing specific pricing, user reviews, and competitor comparisons.",
       targeted_queries: Array.isArray(parsed.targeted_queries) && parsed.targeted_queries.length > 0
         ? parsed.targeted_queries
-        : [`${keyword} pricing 2025`, `${keyword} reviews reddit`, `best ${keyword} comparison`], // Fallback queries
+        : [`${keyword} pricing 2026`, `${keyword} reviews reddit`, `best ${keyword} comparison`], // Fallback queries
       competitor_names: Array.isArray(parsed.competitor_names) ? parsed.competitor_names : []
     }
   } catch (parseError) {
@@ -359,7 +359,7 @@ const performDeepResearch = async (
     // Use intelligent fallback queries based on keyword
     criticAnalysis = {
       gap_analysis: "Parse failed - using fallback research queries.",
-      targeted_queries: [`${keyword} pricing 2025`, `${keyword} reviews reddit`, `best ${keyword} tools comparison`],
+      targeted_queries: [`${keyword} pricing 2026`, `${keyword} reviews reddit`, `best ${keyword} tools comparison`],
       competitor_names: []
     }
   }
@@ -732,7 +732,7 @@ You MUST include an external hyperlink in this section.
 - **CONSTRAINT:** The anchor text MUST be natural conversation part of a running sentence, NOT a forceful spammy keyword.
    - ❌ BAD: "Check out our [best ai photo restoration tool]."
    - ✅ GOOD: "We designed [our restoration engine] to handle this specific texture."
-   - ✅ GOOD: "According to [this 2025 study], pixel degradation..."
+   - ✅ GOOD: "According to [this 2026 study], pixel degradation..."
 `
   }
 

@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
 
         {/* Content */}
         <section className="max-w-5xl mx-auto px-4 py-12 w-full">
-          <p className="text-gray-600 mb-6">Effective Date: January 1, 2025</p>
+          <p className="text-gray-600 mb-6">Effective Date: January 20, 2026</p>
 
           <div className="space-y-8 bg-white border rounded-2xl p-5">
             <div className="">

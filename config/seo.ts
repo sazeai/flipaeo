@@ -252,7 +252,7 @@ export const schemaTemplates = {
       price: '59',
       priceCurrency: 'USD',
       availability: 'https://schema.org/InStock',
-      priceValidUntil: '2025-12-31',
+      priceValidUntil: '2026-02-29',
     },
     publisher: organizationSchema,
     aggregateRating: {

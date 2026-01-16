@@ -22,7 +22,7 @@ export const ARTICLE_TYPES: {
             value: 'commercial',
             label: 'Commercial / Comparison',
             description: 'Product comparisons, reviews, and "best of" listicles with pricing and features',
-            examples: ['Top 5 Boilerplates', 'ClickUp vs Monday', 'Best AI Writing Tools 2025']
+            examples: ['Top 5 Boilerplates', 'ClickUp vs Monday', 'Best AI Writing Tools 2026']
         },
         {
             value: 'howto',

@@ -4,10 +4,8 @@ import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { checkTopicDuplication } from "@/lib/topic-memory"
 import { getCoverageContext, summarizeCoverage } from "@/lib/coverage/analyzer"
-import { detectContentStage, getStrategyPrompt } from "@/lib/plans/strategy-detector"
 import { scheduleByCluster, consolidateClusters } from "@/lib/plans/cluster-scheduler"
 import { TopicHierarchy } from "@/lib/plans/topic-hierarchy"
-import { KeywordCluster } from "./gsc-processor"
 import { checkSitemapDuplication } from "@/lib/internal-linking"
 
 // Strategic Article Category Distribution (30 = 12 + 8 + 6 + 4)
@@ -55,7 +53,6 @@ interface GeneratePlanParams {
     }
     topicHierarchy?: TopicHierarchy
     existingContent?: string[]
-    gscClusters?: KeywordCluster[]
 }
 
 interface GeneratePlanResult {
@@ -75,8 +72,7 @@ export async function generateContentPlan({
     competitorBrands = [],
     gapAnalysis = {},
     topicHierarchy,
-    existingContent = [],
-    gscClusters = []
+    existingContent = []
 }: GeneratePlanParams): Promise<GeneratePlanResult> {
     const today = new Date()
     const client = getGeminiClient()
@@ -120,13 +116,7 @@ d) Address edge cases (why X fails)
 `
         : ""
 
-    // --- STEP 2: DETECT CONTENT STAGE (GSC-ONLY) ---
-    console.log("[Content Plan] Detecting content stage...")
-    const { stage, hasGSC } = await detectContentStage(userId)
-    const strategySection = getStrategyPrompt(stage, hasGSC)
-    console.log(`[Content Plan] Stage: ${stage}, GSC Connected: ${hasGSC}`)
-
-    // --- STEP 3: BUILD STRATEGIC PROMPT ---
+    // --- STEP 2: BUILD STRATEGIC PROMPT ---
     const categorySection = Object.entries(ARTICLE_CATEGORIES).map(([category, config]) => {
         return `### ${category} (~${config.count} articles)
 Purpose: ${config.description}
@@ -168,25 +158,7 @@ ${gapAnalysis.saturatedTopics?.length ? `**SATURATED TOPICS (AVOID OR DO 10X BET
 Heavy competition - only target if you have unique angle:
 ${gapAnalysis.saturatedTopics.slice(0, 5).map(t => `- ${t}`).join('\n')}
 ` : ''}
-`
-        : ""
-
-    // Format GSC validation section
-    const gscSection = gscClusters.length > 0
-        ? `
-## MARKET VALIDATION: GSC PERFORMANCE DATA (ENRICHMENT)
-
-Use this real search data to VALIDATE and AUGMENT your plan.
-
-**HIGH-OPPORTUNITY CLUSTERS:**
-${gscClusters.slice(0, 20).map(c => `- "${c.primary_keyword}" (Imps: ${c.impressions}, Pos: ${c.position}, Score: ${c.opportunity_score}/100)`).join('\n')}
-
-**AUGMENTATION RULES:**
-1. **Validate Strategy:** If a topic in the BLUEPRINT matches a GSC cluster, mark it as validated by setting the \`gsc_query\` field to the EXACT primary keyword from that cluster.
-2. **Smart Swapping:** If GSC shows a High Opportunity Score (>70) topic that is NOT in the blueprint, you may SWAP the least relevant blueprint topic for this search-proven one, provided it fits the category.
-3. **Data Enriching:** For any article linked to GSC, ensure the title and keywords align with the real intent discovered in search console.
-`
-        : ""
+` : ""
 
     const prompt = `
 You are an elite SEO strategist building a STRATEGIC content plan. [Current Date: ${currentDate}]
@@ -232,11 +204,7 @@ DEPRIORITIZE these patterns:
 
 ---
 
-${strategySection}
-
 ${competitorSection}
-
-${gscSection}
 
 ${gapSection}
 
@@ -264,22 +232,6 @@ The GAP ANALYSIS above is your primary strategic source.
 
 ${seeds.join("\\n")}
 
----
-
-## BRAND VOICE (USE FOR TONE, NOT TOPICS)
-
-Apply this voice when WRITING titles, not when CHOOSING topics.
-Topics come from MARKET DEMAND (above). Brand voice shapes HOW you write.
-
-- Product: ${brandData.product_name}
-- Core Features: ${brandData.core_features?.join(", ") || "Not specified"}
-- Audience: ${brandData.audience.primary}
-- What it is: ${brandData.product_identity.literally}
-
----
-
-
-
 
 ## THE GROUNDING PRINCIPLE (MANDATORY)
 
@@ -299,12 +251,12 @@ If an article title or keyword implies a capability the brand does not clearly h
 You may create AT MOST 4 feature-led articles in the entire 30-day plan.
 
 A "feature-led article" is one where:
-- The title mentions a proprietary feature name (e.g., "Identity-Lock™")
+- The title mentions a user intent based feature name not a technical term
 - The primary purpose is explaining how a specific feature works
 - The topic wouldn't exist without this specific product
 
 Examples of feature-led (COUNT TOWARD LIMIT):
-- "What is AI Identity-Lock™ Protocol"
+- "What is AI Identity-Lock Protocol"
 - "How Multi-Ratio Formatting Works"
 
 Examples of market-led (DO NOT COUNT):
@@ -325,7 +277,7 @@ If you have strong ideas that don't fit the exact count, adjust slightly. Qualit
 
 ---
 
-## ANTI-CANNIBALIZATION RULES (CRITICAL - READ TWICE)
+## ANTI-CANNIBALIZATION RULES (CRITICAL)
 
 Each article must answer a DIFFERENT **intent cluster**. Similar wordings that address the SAME user concern = DUPLICATION.
 
@@ -333,33 +285,25 @@ Each article must answer a DIFFERENT **intent cluster**. Similar wordings that a
 Before adding an article, ask: "What is the user's CORE CONCERN?"
 - If two articles address the same core concern, they are duplicates—even if titles differ.
 
-**EXPLICIT DUPLICATION EXAMPLES FOR AI HEADSHOTS (BAD - DO NOT DO THIS):**
+**COMMON DUPLICATION TRAPS (AVOID THESE):**
 
-These are ALL the same intent cluster: **"Is AI acceptable/trustworthy?"**
-- ❌ "Are AI Headshots Professional Enough for Work?" 
-- ❌ "Are AI Generated Photos Legal to Use?"
-- ❌ "Do Recruiters Care if Your LinkedIn Photo is AI?"
-- ❌ "Can You Use AI Photos for Business Cards?"
-→ **PICK ONE. Cover the other angles as H2 sections within that article.**
+These are the SAME intent cluster → **PICK ONE, cover others as H2 sections:**
+- "Is [Product] trustworthy?" = "Is [Product] legit?" = "Can I trust [Product]?" = "Is [Product] safe?"
+- "How to get started with [Product]" = "Getting started guide" = "Beginner's tutorial" = "First steps"
+- "Best settings for [Product]" = "Optimal configuration" = "How to set up [Product]"
+- "[Product] vs [Competitor]" articles should NOT repeat with different framings of same comparison
 
-These are ALL the same intent cluster: **"How do I get good results?"**
-- ❌ "How to Take Perfect Selfies for AI Headshots"
-- ❌ "Best Lighting for AI Photo Input"
-- ❌ "What to Wear for AI Photoshoots"
-→ **Combine into ONE comprehensive "How to Prepare for AI Headshots" guide.**
+**VALID DIFFERENT INTENT CLUSTERS:**
+| Intent Cluster | What Makes It Unique |
+|----------------|---------------------|
+| "What is this?" | Foundational definition |
+| "Is it worth it?" | Value/cost decision |
+| "How do I use it?" | Usage tutorial |
+| "Which one is best?" | Comparison/alternatives |
+| "[Persona] specific" | Different audience = different article OK |
+| "[Use case] specific" | Different context = different article OK |
 
-**VALID DIFFERENT INTENT CLUSTERS (GOOD):**
-| Intent Cluster | Example Article |
-|----------------|-----------------|
-| "What is this?" | "What Are AI Headshots and How Do They Work?" |
-| "Is it trustworthy?" | "Are AI Headshots Professional Enough for LinkedIn?" |
-| "How much does it cost?" | "AI Headshots Pricing: What to Expect in 2026" |
-| "How do I use it?" | "How to Get Your First AI Headshot in 10 Minutes" |
-| "Which one is best?" | "Best AI Headshot Generators Compared" |
-| "[Persona] specific" | "AI Headshots for Realtors: What You Need to Know" |
-| "[Persona] specific" | "AI Headshots for Actors: Casting-Ready Quality?" |
-
-**RULE:** You may have multiple persona-specific articles (realtors, actors, freelancers) because they are DIFFERENT audiences. But you may NOT have multiple "is it acceptable/trustworthy" articles with different framings.
+**RULE:** You may have multiple persona-specific articles (e.g., "for marketers", "for developers", "for small business") because they are DIFFERENT audiences. But you may NOT have multiple trust/legitimacy articles with different framings.
 
 ---
 
@@ -380,7 +324,7 @@ INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTE
 
 ### ✅ REQUIRED PATTERNS (MIX THESE):
 1. **The "How-To" Specific:** "How to Generate AI Family Portraits Without a Studio"
-2. **The "Best" List:** "7 Best AI Glamour Shot Generators for LinkedIn (2025)"
+2. **The "Best" List:** "7 Best AI Glamour Shot Generators for LinkedIn (2026)"
 3. **The "Vs" Decision:** "AI Photoshoot vs Professional Photographer: Cost Breakdown"
 4. **The "Outcome" Promise:** "Get Professional Headshots from Selfies (Free & Paid Methods)"
 5. **The "For" Audience:** "AI Family Portraits for Parents, Grandparents, and Memories"
@@ -443,18 +387,15 @@ For each article provide:
 6. intent_role: The specific intent ("Core Answer", "Problem-Specific", "Comparison", "Decision", "Emotional/Story", "Authority/Edge")
 7. article_category: One of "Core Answers", "Supporting Articles", "Conversion Pages", "Authority Plays"
 8. parent_question: The ONE fundamental user question this article answers
-9. gsc_query: EXACT primary keyword from GscClusters or null if no match
-10. reason: A 1-sentence strategic rationale (WHY this content matters for THIS brand)
-11. impact: "High" | "Medium" | "Low" (Strategic importance)
-12. priority_score: 0-100 (Based on keyword relevance and business value)
-13. schema_type: "Article" | "HowTo" | "FAQPage" (Technical SEO signal)
+9. reason: A 1-sentence strategic rationale (WHY this content matters for THIS brand)
+10. impact: "High" | "Medium" | "Low" (Strategic importance)
+11. priority_score: 0-100 (Based on keyword relevance and business value)
 
 ## CRITICAL REQUIREMENTS:
 1. Each article's parent_question must be UNIQUE across the plan.
 2. If the brand has multiple features, articles must be distributed across ALL features.
 3. You MUST generate EXACTLY 30 articles with the 12-8-6-4 distribution.
 4. article_type MUST match the category (see table above). Supporting Articles = howto, Conversion Pages = commercial.
-5. schema_type MUST be "HowTo" if article_type is "howto". Otherwise use "Article" (or "FAQPage" if strictly Q&A format).
 `
 
     const response = await client.models.generateContent({
@@ -481,7 +422,6 @@ For each article provide:
                                 intent_role: { type: "STRING" },
                                 article_category: { type: "STRING" },
                                 parent_question: { type: "STRING" },
-                                gsc_query: { type: "STRING" },
                                 reason: { type: "STRING" },
                                 impact: { type: "STRING" },
                                 priority_score: { type: "NUMBER" }
@@ -720,23 +660,7 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
             article_category: articleCategory as "Core Answers" | "Supporting Articles" | "Conversion Pages" | "Authority Plays",
             reason: post.reason || "Strategic foundational content to establish topical authority.",
             impact: post.impact || "Medium",
-            // Map GSC Metrics
-            gsc_query: post.gsc_query || null,
-            ...(post.gsc_query ? (() => {
-                const cluster = gscClusters.find(c => c.primary_keyword === post.gsc_query);
-                return {
-                    opportunity_score: cluster?.opportunity_score || post.priority_score || 0,
-                    gsc_impressions: cluster?.impressions || 0,
-                    gsc_position: cluster?.position || 0,
-                    gsc_ctr: cluster?.ctr || 0,
-                    badge: cluster?.category || "strategic"
-                };
-            })() : {
-                opportunity_score: 0,
-                gsc_impressions: 0,
-                gsc_position: 0,
-                gsc_ctr: 0
-            })
+            opportunity_score: post.priority_score || 0
         }
     })
 
