@@ -1184,23 +1184,106 @@ CRITICAL EXECUTION RULES:
       try {
         const imageStyle = brandDetails?.image_style || "stock"
 
-        // 1. Generate Image Prompt
-        const imagePromptSystem = `You are an expert AI Art Director.
-        Your task is to generate a detailed, creative prompt for an AI image generator to create a featured image for a blog post.
-        
-        INPUT:
-        Title: ${finalTitle}
-        Outline Summary: ${outline.sections.map(s => s.heading).join(", ")}
-        Style: ${imageStyle}
-        
-        REQUIREMENTS:
-        - The image should be highly relevant to the topic but abstract enough to be a background or hero image.
-        - PRIORITIZE LESS TEXT on the image itself (or no text).
-        - Make it visually appealing and conveying the essence of the topic.
-        - If style is 'stock', go for high-quality realistic photography or clean vector art.
-        - If style is 'indo', use vibrant colors and cultural elements if applicable, or specific artistic style associated with the brand.
-        - Output ONLY the prompt string. No JSON.
-        `
+        // 1. Generate Image Prompt with Style-Specific Templates
+        const getStyleTemplate = (style: string) => {
+          switch (style.toLowerCase()) {
+            case 'vector':
+              return `STYLE: Hand-drawn digital illustration with a clean, flat, professional aesthetic.
+
+VISUAL APPROACH:
+- Use thick black outlines with solid color fills
+- Choose a harmonious color palette that fits the topic (AI decides colors)
+- Include minimalist illustrations of people, objects, or abstract shapes relevant to the topic
+- Add floating elements like icons, cards, or geometric shapes for visual interest
+- Background should have a subtle pattern (grid, dots, or gradient) - AI decides what works best
+
+COMPOSITION:
+- Balanced layout with clear visual hierarchy
+- Title or key concept should be prominent but NOT dominating
+- Leave breathing room - don't overcrowd
+
+CONSTRAINTS:
+- NO photorealistic elements
+- NO stock photo clichés
+- Clean, modern, tech-forward aesthetic`
+
+            case 'photorealistic':
+            case 'photo':
+            case 'stock':
+              return `STYLE: High-quality professional editorial photography.
+
+VISUAL APPROACH:
+- Realistic, high-resolution photograph
+- Soft natural lighting with slight bokeh in background
+- Professional color grading (not oversaturated)
+- Real people, places, or objects relevant to the topic
+
+COMPOSITION:
+- Rule of thirds placement
+- Subject slightly off-center for visual interest
+- Clean background that doesn't distract
+
+CONSTRAINTS:
+- NO obvious stock photo clichés (handshakes, pointing at screens, etc.)
+- NO illustrations or vector elements
+- Editorial quality, suitable for premium business content`
+
+            case 'minimalist':
+              return `STYLE: Ultra-minimal, clean graphic design.
+
+VISUAL APPROACH:
+- Maximum 2-3 colors in the palette
+- Simple geometric shapes or single iconic element
+- Lots of negative space
+- Typography-inspired or abstract
+
+CONSTRAINTS:
+- NO busy backgrounds
+- NO photorealistic elements
+- NO cluttered compositions`
+
+            default:
+              // Default to vector for unknown styles
+              return `STYLE: Clean, professional digital illustration suitable for business blogs.
+
+VISUAL APPROACH:
+- Choose the most appropriate visual style for the topic (illustration or subtle photography)
+- Professional color palette that conveys trust and expertise
+- Include relevant visual elements that represent the article's core message
+
+CONSTRAINTS:
+- Professional and premium aesthetic
+- Suitable as a blog featured image`
+          }
+        }
+
+        const styleTemplate = getStyleTemplate(imageStyle)
+
+        const imagePromptSystem = `You are an expert AI Art Director creating a featured image for a blog post.
+
+ARTICLE CONTEXT:
+Title: ${finalTitle}
+Main Keyword: ${keyword}
+Topics Covered: ${outline.sections.map(s => s.heading).join(", ")}
+Image Style Preference: ${imageStyle}
+
+${styleTemplate}
+
+TEXT OVERLAY REQUIREMENT:
+- Include the text "${keyword.toUpperCase()}" as large, bold text on the image
+- Position the text on the left side or center
+- Use a clean, modern sans-serif font style
+- Ensure high contrast between text and background for readability
+- The text should be prominent but integrated with the overall design
+
+YOUR TASK:
+Generate a detailed, creative prompt that an AI image generator can use to create this featured image.
+- Be SPECIFIC about colors, composition, and visual elements
+- Include the text "${keyword.toUpperCase()}" as part of the image design
+- Describe the scene or illustration in detail
+- The prompt should be 2-3 sentences minimum
+
+OUTPUT: Return ONLY the image generation prompt as plain text. No JSON, no explanations.`
 
         const imagePromptConfig = { responseMimeType: "text/plain" }
         const imagePromptContents = [{ role: "user", parts: [{ text: imagePromptSystem }] }]
