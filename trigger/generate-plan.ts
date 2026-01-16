@@ -339,9 +339,33 @@ export const generatePlanTask = task({
 
             let competitorBrands = passedCompetitors || []
 
-            // Discover competitors if not provided
+            // Check for cached competitors in brand_details first
+            if (competitorBrands.length === 0 && brandId) {
+                const { data: brandRecord } = await (supabase as any)
+                    .from("brand_details")
+                    .select("discovered_competitors")
+                    .eq("id", brandId)
+                    .single()
+
+                if (brandRecord?.discovered_competitors?.length > 0) {
+                    competitorBrands = brandRecord.discovered_competitors
+                    console.log(`[Generate Plan Task] Using ${competitorBrands.length} cached competitors`)
+                }
+            }
+
+            // Discover competitors if not cached and not provided
             if (competitorBrands.length === 0) {
                 competitorBrands = await discoverCompetitors(brandData)
+
+                // Cache discovered competitors for future use (non-blocking)
+                if (brandId && competitorBrands.length > 0) {
+                    (supabase as any)
+                        .from("brand_details")
+                        .update({ discovered_competitors: competitorBrands })
+                        .eq("id", brandId)
+                        .then(() => console.log(`[Generate Plan Task] Cached ${competitorBrands.length} competitors to DB`))
+                        .catch((e: any) => console.warn(`[Generate Plan Task] Failed to cache competitors:`, e))
+                }
             }
 
             console.log(`[Generate Plan Task] Using ${competitorBrands.length} competitors`)
