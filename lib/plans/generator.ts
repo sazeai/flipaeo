@@ -160,12 +160,68 @@ ${gapAnalysis.saturatedTopics.slice(0, 5).map(t => `- ${t}`).join('\n')}
 ` : ''}
 ` : ""
 
+    // --- LAYER 1: SYSTEM PROMPT WITH AEO TITLE RULES ---
+    const systemPrompt = `You are an AEO (Answer Engine Optimization) content strategist.
+Your goal: Generate content that AI search engines (ChatGPT, Perplexity, Google AI) will CITE.
+
+TITLE RULES (NON-NEGOTIABLE - VIOLATIONS WILL NOT BE CITED BY AI):
+1. NEVER use generic fluff: "Everything You Need to Know", "Ultimate Guide", "Complete Guide"
+2. NEVER use "[Keyword]: [Subtitle]" format - AI interprets this as spam
+3. EVERY title MUST contain SPECIFIC VALUE: a number, cost, time, result, or personal experience
+4. WRITE for AI citation: Titles should be quotable as direct answers
+5. IMPLY authority through experience: "We Tested", "I Tried", "Based on [X] Users", "[Year] Data"
+
+EXAMPLES OF AI-CITABLE TITLES:
+✅ "I Tested 5 AI Headshot Tools—Here's Which One Looks Real"
+✅ "AI Headshots Cost $29. Pro Photographers Cost $300. Here's the Difference"
+✅ "Should You Use AI Headshots on LinkedIn? (Recruiter Survey)"
+
+EXAMPLES THAT AI WILL NOT CITE:
+❌ "AI Headshots: Everything You Need to Know"
+❌ "The Ultimate Guide to AI Headshots"
+❌ "What Are AI Headshots?"`
+
     const prompt = `
+## TITLE QUALITY MANDATE (AEO/GEO - READ FIRST)
+
+AI search engines (ChatGPT, Perplexity, Google AI Overviews) will ONLY cite content with high-quality titles.
+
+### 🛑 BANNED TITLE PATTERNS (INSTANT DISQUALIFICATION):
+- ❌ "[Keyword]: [Subtitle]" (e.g., "AI Photoshoot: A Complete Guide")
+- ❌ "[Keyword] - [Subtitle]" (e.g., "AI Photoshoot - The Future of Photography")
+- ❌ "The Ultimate Guide to [Keyword]"
+- ❌ "Everything You Need to Know About [Keyword]"
+- ❌ "Complete Guide to [Keyword]"
+- ❌ "Unlocking the Power of [Keyword]"
+- ❌ "X vs Y: Which is Better?" (generic comparison)
+- ❌ "What is [Keyword]?" (Definition without value)
+- ❌ "[Keyword] Price Guide" (generic pricing)
+
+### ✅ AI-CITABLE TITLE PATTERNS (USE THESE):
+1. **Experience-Based:** "I Tested 5 AI Headshot Tools—One Looks Fake"
+2. **Cost Comparison:** "AI Headshots Cost $29. Pro Photographers Cost $300. Here's Why"
+3. **Decision Question:** "Should I Use AI Headshots for LinkedIn? (Recruiter Survey)"
+4. **Specific Outcome:** "Get Professional Headshots From Selfies in 10 Minutes"
+5. **Problem-Solution:** "Why Your AI Photos Look Fake (And How to Fix It)"
+6. **Data-Backed:** "We Analyzed 500 LinkedIn Profiles—Here's What Makes Photos Work"
+7. **Honest Warning:** "When You Should NOT Use AI Headshots (And What to Do Instead)"
+8. **Worth It Evaluation:** "Is a $30 AI Headshot Worth It vs a $300 Photographer?"
+9. **Comparison with Testing:** "HeadshotPro vs Aragon: We Spent $100 Testing Both"
+10. **For Specific Persona:** "AI Headshots for Realtors: Do Clients Actually Care?"
+
+### TITLE QUALITY RULES:
+- Every title MUST contain SPECIFIC VALUE (number, cost, time, or result)
+- Titles should be quotable as direct answers
+- 40-60 characters is optimal. Never exceed 70.
+- Write titles that would work on Reddit or YouTube
+
+---
+
 You are an elite SEO strategist building a STRATEGIC content plan. [Current Date: ${currentDate}]
 
 ---
 
-## STRATEGIC PRIORITY (READ FIRST — THIS DEFINES YOUR MINDSET)
+## STRATEGIC PRIORITY (THIS DEFINES YOUR MINDSET)
 
 You are NOT here to explain product features.
 You are here to CAPTURE MARKET DEMAND and EXPAND TOPICAL AUTHORITY.
@@ -307,53 +363,6 @@ These are the SAME intent cluster → **PICK ONE, cover others as H2 sections:**
 
 ---
 
-## NATURAL LANGUAGE PROTOCOL (STRICT MANDATE)
-
-You are absolutely FORBIDDEN from using the robotic "Keyword: Subtitle" title format.
-Any title that looks like "AI Glamour Shots: Creating Stunning Portraits" is an FAIL.
-
-INSTEAD, you must use high-CTR, human-focused patterns that target SPECIFIC INTENT.
-
-### 🛑 BANNED PATTERNS (DO NOT USE):
-- ❌ "[Keyword]: [Subtitle]" (e.g., "AI Photoshoot: A Complete Guide") -> DISQUALIFIED
-- ❌ "[Keyword] - [Subtitle]" (e.g., "AI Photoshoot - The Future of Photography") -> DISQUALIFIED
-- ❌ "The Ultimate Guide to [Keyword]" -> DISQUALIFIED
-- ❌ "Everything You Need to Know About [Keyword]" -> DISQUALIFIED
-- ❌ "Unlocking the Power of [Keyword]" -> DISQUALIFIED
-- ❌ "X vs Y: Which is Better?" (e.g., "HeadshotPro vs Aragon: Which is Best?") -> DISQUALIFIED
-
-### ✅ REQUIRED PATTERNS (MIX THESE):
-1. **The "How-To" Specific:** "How to Generate AI Family Portraits Without a Studio"
-2. **The "Best" List:** "7 Best AI Glamour Shot Generators for LinkedIn (2026)"
-3. **The "Vs" Decision:** "AI Photoshoot vs Professional Photographer: Cost Breakdown"
-4. **The "Outcome" Promise:** "Get Professional Headshots from Selfies (Free & Paid Methods)"
-5. **The "For" Audience:** "AI Family Portraits for Parents, Grandparents, and Memories"
-6. **The "Problem" Solver:** "Why Your AI Photos Look Fake (And How to Fix It)"
-7. **The "Question" Hook:** "Can AI Restore Old Photos? We Tested 5 Tools"
-8. **The "Should I" Decision:** "Should I Use AI Headshots for My Job Application?"
-9. **The "Is It Worth" Evaluation:** "Is a $30 AI Headshot Worth It vs a $300 Photographer?"
-10. **The "When NOT To" Warning:** "When You Shouldn't Use AI Headshots (And What to Do Instead)"
-
-**DECISION-STAGE REQUIREMENT (MANDATORY):**
-At least 3-4 articles MUST use decision-stage patterns (#8, #9, #10 above). These are the articles that LLMs cite most frequently because they answer:
-- "Should I do X?" → Direct recommendation
-- "Is X worth it?" → Value judgment
-- "When should I NOT do X?" → Honest limitation
-
-**COMPARISON QUALITY REQUIREMENT (MANDATORY):**
-Comparison articles MUST imply proprietary testing, original data, or unique analysis.
-- 🛑 BAD: "HeadshotPro vs Aragon: Which is Best?" (Too generic)
-- ✅ GOOD: "HeadshotPro vs Aragon: We Spent $100 Testing Both"
-- ✅ GOOD: "HeadshotPro vs Aragon: Side-by-Side Photo Quality Test"
-- ✅ GOOD: "AI Headshots vs Real Photos: Blind Test Results"
-
-### STYLE GUIDE:
-- **Be Conversational:** Write titles you'd click on Reddit or YouTube.
-- **Be Specific:** "Creating Stunning Portraits" is bad. "For LinkedIn Profiles" is good.
-- **Length:** 40-60 characters is sweet spot. Never over 70.
-
----
-
 ## YOUR TASK
 
 Generate EXACTLY 30 articles distributed as follows (NO EXCEPTIONS):
@@ -400,7 +409,11 @@ For each article provide:
 
     const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            { role: "model", parts: [{ text: "I understand. I will follow the AEO title rules strictly and ensure every title contains specific value and is quotable by AI systems. I will never use banned patterns like 'Everything You Need to Know' or 'Ultimate Guide'." }] },
+            { role: "user", parts: [{ text: prompt }] }
+        ],
         config: {
             responseMimeType: "application/json",
             responseSchema: {
@@ -526,6 +539,72 @@ For each article provide:
     if (genericComparisons.length > 0) {
         console.warn(`[Content Plan] ⚠️ WARNING: Found ${genericComparisons.length} generic comparisons (Weak Differentiation).`)
         genericComparisons.forEach(p => console.warn(`   - Weak Title: ${p.title}`))
+    }
+
+    // --- LAYER 3: TITLE VIOLATION DETECTION & REGENERATION ---
+    const TITLE_VIOLATIONS = [
+        { pattern: /everything you need to know/i, reason: "Generic fluff" },
+        { pattern: /ultimate guide/i, reason: "Overused pattern" },
+        { pattern: /complete guide/i, reason: "Overused pattern" },
+        { pattern: /:\s+[A-Z][a-z]+\s+[A-Z]/i, reason: "Keyword: Subtitle format" },
+        { pattern: /which is (better|best)\??$/i, reason: "Generic comparison ending" },
+        { pattern: /^what (is|are)\s+[^?]+\??\s*$/i, reason: "Definition without value" },
+        { pattern: /price guide/i, reason: "Generic pricing" },
+        { pattern: /unlocking the power/i, reason: "Marketing fluff" },
+    ]
+
+    const titleViolations = validPosts.filter(p => {
+        const title = p.title || ""
+        return TITLE_VIOLATIONS.some(v => v.pattern.test(title))
+    })
+
+    if (titleViolations.length > 0) {
+        console.warn(`[Content Plan] ⚠️ TITLE VIOLATIONS DETECTED: ${titleViolations.length} titles need fixing`)
+        titleViolations.forEach(p => {
+            const violations = TITLE_VIOLATIONS.filter(v => v.pattern.test(p.title || ""))
+            console.warn(`   - "${p.title}" → ${violations.map(v => v.reason).join(", ")}`)
+        })
+
+        // Targeted regeneration for invalid titles (max 1 retry)
+        try {
+            console.log("[Content Plan] Attempting to regenerate invalid titles...")
+            const fixPrompt = `You must fix these ${titleViolations.length} article titles. Each title violates AEO (Answer Engine Optimization) rules.
+
+CURRENT VIOLATIONS:
+${titleViolations.map((p, i) => `${i + 1}. "${p.title}" (Keyword: ${p.main_keyword}) - VIOLATION: ${TITLE_VIOLATIONS.filter(v => v.pattern.test(p.title || "")).map(v => v.reason).join(", ")}`).join("\n")}
+
+RULES FOR FIXED TITLES:
+- Must contain SPECIFIC VALUE (number, cost, time, or result)
+- Must be quotable as a direct answer
+- Must imply authority ("We Tested", "I Tried", "[Year] Data")
+- 40-60 characters, max 70
+
+Return ONLY a JSON object with format: { "titles": ["Fixed Title 1", "Fixed Title 2", ...] }
+The order must match the violations list above.`
+
+            const fixResponse = await client.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: [{ role: "user", parts: [{ text: fixPrompt }] }],
+                config: { responseMimeType: "application/json" }
+            })
+
+            const fixText = fixResponse.text || "{}"
+            const fixResult = JSON.parse(fixText)
+
+            if (fixResult.titles && Array.isArray(fixResult.titles)) {
+                titleViolations.forEach((post, index) => {
+                    if (fixResult.titles[index]) {
+                        const oldTitle = post.title
+                        post.title = fixResult.titles[index]
+                        console.log(`   ✅ Fixed: "${oldTitle}" → "${post.title}"`)
+                    }
+                })
+            }
+        } catch (fixError) {
+            console.error("[Content Plan] Title regeneration failed:", fixError)
+        }
+    } else {
+        console.log("[Content Plan] ✅ All titles pass AEO validation")
     }
 
     // --- CATEGORY-AWARE TOP-UP LOOP ---

@@ -477,7 +477,7 @@ export default function ContentPlanPage() {
         const currentPhase = plan.generation_phase ? phaseLabels[plan.generation_phase] || phaseLabels.sitemap : phaseLabels.sitemap
 
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="w-full max-w-lg">
                     <GlobalCard contentClassName="p-4 text-center space-y-4">
                         <div className="flex justify-center">
@@ -535,7 +535,7 @@ export default function ContentPlanPage() {
     // Show error state if generation failed
     if (plan.generation_status === 'failed') {
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="w-full max-w-md">
                     <GlobalCard className="p-8 text-center space-y-6">
                         <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto">
@@ -546,7 +546,7 @@ export default function ContentPlanPage() {
                                 Generation Failed
                             </h2>
                             <p className="text-sm text-stone-500">
-                                {plan.generation_error || "Something went wrong. Please try again."}
+                                Something went wrong. Please try again.
                             </p>
                         </div>
                         <Button onClick={() => router.push("/onboarding")} className="w-full">
