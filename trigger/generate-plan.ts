@@ -104,6 +104,44 @@ async function syncSitemapToInternalLinks(
         return { titles: [], syncedCount: 0 }
     }
 
+    // --- BLOG CONTENT FILTER (Production-Grade) ---
+    // Only store URLs that are likely blog/article content, not product directories or misc pages
+    const BLOG_PATH_PATTERNS = [
+        '/blog/',
+        '/articles/',
+        '/article/',
+        '/posts/',
+        '/post/',
+        '/news/',
+        '/resources/',
+        '/guides/',
+        '/guide/',
+        '/insights/',
+        '/learn/',
+        '/tutorials/',
+        '/tutorial/',
+        '/how-to/',
+        '/tips/',
+    ]
+
+    const blogUrls = sitemapUrls.filter(url => {
+        try {
+            const pathname = new URL(url).pathname.toLowerCase()
+            // Check if URL path contains any blog pattern
+            return BLOG_PATH_PATTERNS.some(pattern => pathname.includes(pattern))
+        } catch {
+            return false // Invalid URL
+        }
+    })
+
+    console.log(`[Sitemap Sync] Filtered ${sitemapUrls.length} URLs -> ${blogUrls.length} blog URLs`)
+
+    if (blogUrls.length === 0) {
+        console.warn(`[Sitemap Sync] No blog URLs found. Site may use non-standard blog paths.`)
+        // Don't fail - just return empty. The site might not have a blog.
+        return { titles: [], syncedCount: 0 }
+    }
+
     // Get existing URLs to avoid duplicates
     const { data: existingRecords } = await (supabase as any)
         .from("internal_links")
@@ -112,12 +150,12 @@ async function syncSitemapToInternalLinks(
         .eq("brand_id", brandId)
 
     const existingUrls = new Set<string>(existingRecords?.map((r: any) => r.url) || [])
-    const urlsToAdd = sitemapUrls.filter(url => !existingUrls.has(url))
+    const urlsToAdd = blogUrls.filter(url => !existingUrls.has(url))
 
-    console.log(`[Sitemap Sync] ${urlsToAdd.length} new URLs to add`)
+    console.log(`[Sitemap Sync] ${urlsToAdd.length} new blog URLs to add`)
 
-    // Extract titles for all URLs (for immediate return to plan generator)
-    const allTitles = sitemapUrls.map(url => extractTitleFromUrl(url))
+    // Extract titles for blog URLs only (for immediate return to plan generator)
+    const allTitles = blogUrls.map(url => extractTitleFromUrl(url))
 
     // Process new URLs in batches
     const BATCH_SIZE = 5

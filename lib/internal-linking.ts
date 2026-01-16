@@ -97,3 +97,45 @@ export async function getRelevantInternalLinks(
         return [] // Return empty to prevent crashing the whole generation
     }
 }
+
+/**
+ * Check if a topic matches any existing sitemap URL using vector similarity.
+ * Uses a strict threshold (0.90) to only flag obvious duplicates.
+ */
+export async function checkSitemapDuplication(
+    topic: string,
+    userId: string,
+    brandId?: string | null
+): Promise<{ isDuplicate: boolean; similarUrl: string | null }> {
+    try {
+        const supabase = createAdminClient() as any
+        const embedding = await generateEmbedding(topic)
+
+        const { data, error } = await supabase.rpc('match_internal_links', {
+            query_embedding: embedding,
+            match_threshold: 0.90, // Strict threshold for deduplication
+            match_count: 1,
+            p_user_id: userId,
+            p_brand_id: brandId || null
+        })
+
+        if (error) {
+            console.error("❌ Error checking sitemap duplication:", error)
+            return { isDuplicate: false, similarUrl: null }
+        }
+
+        if (data && data.length > 0) {
+            console.log(`[Sitemap Dedup] Duplicate found for "${topic}" -> "${data[0].title}" (${data[0].url})`)
+            return {
+                isDuplicate: true,
+                similarUrl: data[0].url
+            }
+        }
+
+        return { isDuplicate: false, similarUrl: null }
+
+    } catch (error) {
+        console.error("❌ Error in checkSitemapDuplication:", error)
+        return { isDuplicate: false, similarUrl: null }
+    }
+}

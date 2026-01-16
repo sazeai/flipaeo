@@ -8,6 +8,7 @@ import { detectContentStage, getStrategyPrompt } from "@/lib/plans/strategy-dete
 import { scheduleByCluster, consolidateClusters } from "@/lib/plans/cluster-scheduler"
 import { TopicHierarchy } from "@/lib/plans/topic-hierarchy"
 import { KeywordCluster } from "./gsc-processor"
+import { checkSitemapDuplication } from "@/lib/internal-linking"
 
 // Strategic Article Category Distribution (30 = 12 + 8 + 6 + 4)
 export const ARTICLE_CATEGORIES = {
@@ -86,10 +87,10 @@ export async function generateContentPlan({
     const coverageData = await getCoverageContext(userId, brandId)
     const { stronglyAnswered } = summarizeCoverage(coverageData)
 
-    // Combine database coverage with sitemap-provided existing content
+    // Combine database coverage with valid answered questions
+    // [MODIFIED] Removed existingContent (sitemap titles) from prompt context to rely on VECTOR deduplication instead
     const allCoveredQuestions = [
-        ...stronglyAnswered,
-        ...existingContent
+        ...stronglyAnswered
     ]
 
     console.log(`[Content Plan] Total covered questions: ${allCoveredQuestions.length}`)
@@ -518,11 +519,14 @@ For each article provide:
             continue
         }
 
-        // Check duplication against existing articles
+        // Check duplication against existing articles (Topic Memory - Vector)
         const topicSignal = `${post.title || ""} : ${post.main_keyword || ""}`
-        const { isDuplicate } = await checkTopicDuplication(topicSignal, userId, brandId)
+        const { isDuplicate: isTopicDuplicate } = await checkTopicDuplication(topicSignal, userId, brandId)
 
-        if (!isDuplicate) {
+        // Check duplication against Sitemap (Internal Links - Vector) [NEW]
+        const { isDuplicate: isSitemapDuplicate } = await checkSitemapDuplication(topicSignal, userId, brandId)
+
+        if (!isTopicDuplicate && !isSitemapDuplicate) {
             validPosts.push(post)
             seenParentQuestions.add(normalizedPQ)
 
