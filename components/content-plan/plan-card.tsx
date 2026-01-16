@@ -84,11 +84,23 @@ const EditForm = memo(function EditForm({
         title: item.title || "",
         main_keyword: item.main_keyword || "",
         article_type: item.article_type || "informational",
-        supporting_keywords: item.supporting_keywords || [],
+        // Store as raw string for better typing experience
+        supporting_keywords_raw: (item.supporting_keywords || []).join(", "),
     })
 
     const handleSave = () => {
-        onSave(localForm)
+        // Split keywords only on save
+        const keywords = localForm.supporting_keywords_raw
+            .split(",")
+            .map(k => k.trim())
+            .filter(k => k.length > 0)
+
+        onSave({
+            title: localForm.title,
+            main_keyword: localForm.main_keyword,
+            article_type: localForm.article_type,
+            supporting_keywords: keywords,
+        })
     }
 
     return (
@@ -131,10 +143,10 @@ const EditForm = memo(function EditForm({
             <div>
                 <label className="text-[10px] text-stone-400 font-medium uppercase mb-1 block">Supporting Keywords</label>
                 <textarea
-                    value={localForm.supporting_keywords.join(", ")}
+                    value={localForm.supporting_keywords_raw}
                     onChange={(e) => setLocalForm(prev => ({
                         ...prev,
-                        supporting_keywords: e.target.value.split(",").map(k => k.trim()).filter(k => k.length > 0)
+                        supporting_keywords_raw: e.target.value
                     }))}
                     className="w-full px-3 py-2 text-xs bg-transparent border rounded-md resize-none"
                     placeholder="keyword 1, keyword 2, keyword 3"
@@ -236,12 +248,14 @@ export const PlanCard = memo(function PlanCard({
                             )}
                         </div>
 
-                        <button
-                            onClick={onStartEdit}
-                            className="cursor-pointer opacity-100 group-hover:opacity-100 transition-all p-2 hover:bg-stone-100 rounded-xl text-stone-400 hover:text-stone-900 border border-transparent hover:border-stone-100"
-                        >
-                            <SquarePen className="w-4 h-4" />
-                        </button>
+                        {item.status !== 'published' && item.status !== 'writing' && (
+                            <button
+                                onClick={onStartEdit}
+                                className="cursor-pointer opacity-100 group-hover:opacity-100 transition-all p-2 hover:bg-stone-100 rounded-xl text-stone-400 hover:text-stone-900 border border-transparent hover:border-stone-100"
+                            >
+                                <SquarePen className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
 
                     {/* Title & Reason */}
@@ -260,7 +274,7 @@ export const PlanCard = memo(function PlanCard({
                     {/* SEO Metrics Bar */}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                         <div className="flex items-center gap-1.5 text-[11px] text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
-                            <span className="font-bold uppercase text-[9px] text-stone-400">Target:</span>
+                            <span className="font-bold uppercase text-[9px] text-stone-400">Main Keyword:</span>
                             <span className="font-bold tracking-tight text-stone-900">{item.main_keyword}</span>
                         </div>
 
@@ -328,7 +342,7 @@ export const PlanCard = memo(function PlanCard({
                                             size="sm"
                                             disabled={!hasCredits}
                                             className={cn(
-                                                "h-9 px-4 text-xs font-bold rounded-lg transition-all active:scale-95",
+                                                "text-xs font-semibold px-4 rounded-lg transition-all active:scale-95",
                                                 !hasCredits
                                                     ? "bg-stone-100 text-stone-400 cursor-not-allowed hover:bg-stone-100 border border-stone-200"
                                                     : "bg-stone-900 text-white hover:bg-stone-800"
