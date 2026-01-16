@@ -546,7 +546,7 @@ export default function ContentPlanPage() {
                                 Generation Failed
                             </h2>
                             <p className="text-sm text-stone-500">
-                                Something went wrong. Please try again.
+                                {"Something went wrong. Please try again."}
                             </p>
                         </div>
                         <Button onClick={() => router.push("/onboarding")} className="w-full">
@@ -560,7 +560,7 @@ export default function ContentPlanPage() {
 
     return (
         <div className="w-full min-h-screen font-sans">
-            <GlobalCard className="w-full shadow-sm rounded-xl border border-stone-200 bg-white">
+            <GlobalCard className="relative flex w-full flex-col w-full rounded-xl border border-stone-100 bg-white">
                 {/* --- Integrated Header --- */}
                 {/* --- Integrated Header --- */}
                 <div className="flex flex-col gap-6 px-5 py-5 border-b border-stone-200/50 bg-stone-50/40 backdrop-blur-md rounded-t-xl sticky top-0 z-10 min-h-[80px]">

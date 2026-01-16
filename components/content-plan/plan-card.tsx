@@ -183,7 +183,7 @@ export const PlanCard = memo(function PlanCard({
     return (
         <div
             className={cn(
-                "relative p-4 rounded-xl border border-l-4 transition-colors flex flex-col h-full bg-white",
+                "relative p-4 rounded-lg border border-l-4 transition-colors flex flex-col h-full bg-white",
                 isUrgent
                     ? "border-stone-400 shadow-sm ring-1 ring-stone-900/5"
                     : "border-stone-200 hover:border-stone-300",
@@ -251,7 +251,7 @@ export const PlanCard = memo(function PlanCard({
                         {item.status !== 'published' && item.status !== 'writing' && (
                             <button
                                 onClick={onStartEdit}
-                                className="cursor-pointer opacity-100 group-hover:opacity-100 transition-all p-2 hover:bg-stone-100 rounded-xl text-stone-400 hover:text-stone-900 border border-transparent hover:border-stone-100"
+                                className="cursor-pointer opacity-100 group-hover:opacity-100 transition-all p-2 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-stone-900 border border-transparent hover:border-stone-100"
                             >
                                 <SquarePen className="w-4 h-4" />
                             </button>
@@ -323,13 +323,13 @@ export const PlanCard = memo(function PlanCard({
                         {item.status === 'writing' ? (
                             <Link
                                 href="/articles"
-                                className="flex items-center gap-2 text-xs font-black text-blue-700 bg-blue-50 border border-blue-100 px-4 py-2 rounded-xl hover:bg-blue-100 transition-all shadow-sm"
+                                className="flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg hover:bg-blue-100 transition-all"
                             >
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                 Generating...
                             </Link>
                         ) : item.status === 'published' ? (
-                            <span className="flex items-center gap-2 text-xs font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-xl shadow-sm">
+                            <span className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-lg">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Published
                             </span>

@@ -685,15 +685,15 @@ export default function ArticleDetailPage() {
                             <TabsContent value="editor" className="m-0 min-h-full p-4 pt-0 max-w-4xl mx-auto focus-visible:ring-0 outline-none">
                                 <div className=" min-h-[calc(100vh-10rem)]">
                                     {article.status === 'completed' ? (
-                                        <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl">
+                                        <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg">
                                             {/* Featured Image Display */}
                                             {article.featured_image_url && (
-                                                <div className="mb-8 relative rounded-xl overflow-hidden group border border-gray-100 shadow-sm">
+                                                <div className="mb-8 relative rounded-lg overflow-hidden group border border-gray-100 shadow-sm">
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
                                                         src={getProxiedImageUrl(article.featured_image_url) || ''}
                                                         alt="Featured"
-                                                        className="w-full max-h-[420px] object-cover"
+                                                        className="w-full max-h-[720px] object-cover"
                                                     />
                                                     <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button
@@ -756,7 +756,7 @@ export default function ArticleDetailPage() {
                                             </div>
 
                                             {article.raw_content && (
-                                                <div className="max-w-2xl mx-auto border rounded-xl p-8 bg-gray-50/50 backdrop-blur-sm">
+                                                <div className="max-w-2xl mx-auto border rounded-lg p-8 bg-gray-50/50 backdrop-blur-sm">
                                                     <div className="flex items-center gap-2 mb-4 text-gray-400">
                                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                                         <p className="text-xs font-medium uppercase tracking-wider">Live Output</p>
@@ -774,7 +774,7 @@ export default function ArticleDetailPage() {
                             </TabsContent>
 
                             <TabsContent value="outline" className="m-0 min-h-full p-4 sm:p-8 max-w-4xl mx-auto focus-visible:ring-0 outline-none">
-                                <div className="bg-white rounded-xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-gray-100 min-h-[calc(100vh-10rem)] p-6 sm:p-10">
+                                <div className="bg-white rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-gray-100 min-h-[calc(100vh-10rem)] p-6 sm:p-10">
                                     <OutlineEditor
                                         initialData={outlineData}
                                         onChange={setOutlineData}
