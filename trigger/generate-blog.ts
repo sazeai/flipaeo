@@ -1195,7 +1195,7 @@ VISUAL APPROACH:
 - Choose a harmonious color palette that fits the topic (AI decides colors)
 - Include minimalist illustrations of people, objects, or abstract shapes relevant to the topic
 - Add floating elements like icons, cards, or geometric shapes for visual interest
-- Background should have a subtle pattern (grid, dots, or gradient) - AI decides what works best
+- Background should have a subtle pattern (grid, dots, or gradient) with a prominent background color i.e. white, green, blue, etc. - You are free to decide based on context of the title.
 
 COMPOSITION:
 - Balanced layout with clear visual hierarchy
