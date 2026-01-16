@@ -135,7 +135,7 @@ ${competitorBrands.map(c => `- ${c.name}${c.url ? ` (${c.url})` : ''}`).join('\n
 RULES:
 - Use EXACT competitor names in comparison articles (e.g., "${brandData.product_name} vs ${competitorBrands[0]?.name || 'Competitor'}")
 - DO NOT use placeholders like "[Generic Competitor Tool]"
-- Create at least 2-3 comparison articles against these competitors
+- Create at least 2-3 comparison articles against these competitors, compititor vs compititor and brand ${brandData.product_name} vs compititor
 `
         : ""
 
@@ -376,7 +376,7 @@ Generate EXACTLY 30 articles distributed as follows (NO EXCEPTIONS):
 - howto: 8 articles (Supporting)
 - commercial: 6 articles (Conversion)
 
-If your output has >20 informational articles, YOU HAVE FAILED. Check your work.
+If your output has >16 informational articles, YOU HAVE FAILED. Check your work.
 
 For each article provide:
 1. title: Compelling blog post title (follow MODERN SEO rules above)
