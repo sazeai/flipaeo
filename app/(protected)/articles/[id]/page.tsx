@@ -250,6 +250,16 @@ export default function ArticleDetailPage() {
             if (editorData) {
                 const markdownContent = editorJsToMarkdown(editorData)
                 updatePayload.raw_content = markdownContent
+
+                // Convert to HTML for publishing
+                let finalHtml = await marked.parse(markdownContent)
+
+                // Convert relative image URLs to absolute URLs (same as copy logic)
+                const baseUrl = window.location.origin
+                finalHtml = finalHtml.replace(/src="(\/api\/images\/[^"]+)"/g, `src="${baseUrl}$1"`)
+                finalHtml = finalHtml.replace(/src="(\/[^"]+\.(?:png|jpg|jpeg|gif|webp))"/gi, `src="${baseUrl}$1"`)
+
+                updatePayload.final_html = finalHtml
             }
 
             if (outlineData) {
