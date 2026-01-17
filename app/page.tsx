@@ -6,6 +6,7 @@ import { Navbar } from '@/components/landing/Navbar';
 import { Hero } from '@/components/landing/Hero';
 import { ProblemSection } from '@/components/landing/ProblemSection';
 import { BenefitsSection } from '@/components/landing/BenefitsSection';
+import { ShowcaseSection } from '@/components/landing/ShowcaseSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { PricingSection } from '@/components/landing/PricingSection';
@@ -31,6 +32,7 @@ export default function Home() {
         {/* Main Content Sections */}
         <ProblemSection />
         <BenefitsSection />
+        <ShowcaseSection />
         <HowItWorksSection />
         <FeaturesSection />
         <PricingSection />

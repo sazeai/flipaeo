@@ -11,7 +11,7 @@ export async function generateImage(prompt: string) {
       num_inference_steps: 8,
       num_images: 1,
       enable_safety_checker: true,
-      output_format: "png",
+      output_format: "webp",
       acceleration: "none"
     },
     logs: true,

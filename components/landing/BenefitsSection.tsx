@@ -1,6 +1,8 @@
 
 import React from 'react';
-import { Zap, Target, FileText, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Zap, Target, FileText, TrendingUp, ArrowRight } from 'lucide-react';
 
 export const BenefitsSection: React.FC = () => {
   return (
@@ -135,6 +137,16 @@ export const BenefitsSection: React.FC = () => {
           </p>
         </div>
 
+      </div>
+
+      {/* CTA Button */}
+      <div className="mt-16">
+        <Link href="/login">
+          <Button className="rounded-none text-lg font-bold px-8 py-6 bg-brand-orange hover:bg-brand-orange/90 text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200">
+            Build My Winning Strategy
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        </Link>
       </div>
     </section>
   );
