@@ -214,93 +214,196 @@ const CitationsGraphic = () => (
 );
 
 const AuthorityPlanGraphic = () => (
-  <div className="flex items-center justify-center gap-2 md:gap-4 w-full">
-    {/* Day 1 */}
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-16 h-20 bg-white border-2 border-black shadow-sm flex flex-col items-center justify-center p-2 relative">
-        <div className="text-[10px] font-bold text-gray-400">DAY 01</div>
-        <div className="w-full h-1 bg-gray-200 my-1"></div>
-        <div className="w-2/3 h-1 bg-gray-200"></div>
-        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#D6F5F2] border-2 border-black rounded-full flex items-center justify-center">
-          <Check className="w-2 h-2" />
+  <div className="relative w-full h-full flex flex-col items-center justify-center p-2">
+    {/* Connecting Lines (SVG) */}
+    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+      {/* Root to Left Branch */}
+      <path d="M50% 35% L30% 60%" stroke="black" strokeWidth="2" fill="none" />
+      {/* Root to Right Branch */}
+      <path d="M50% 35% L70% 60%" stroke="black" strokeWidth="2" fill="none" />
+      {/* Right Branch to Leaf */}
+      <path d="M70% 75% L70% 85%" stroke="black" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+    </svg>
+
+    {/* Level 1: Anchor Article */}
+    <div className="relative z-10 flex flex-col items-center mb-8">
+      <div className="bg-[#D6F5F2] border-2 border-black shadow-neo px-4 py-2 flex items-center gap-2 mb-1">
+        <FileText className="w-4 h-4 text-black" />
+        <span className="font-bold text-xs uppercase">Anchor Article</span>
+      </div>
+      <span className="text-[9px] font-mono bg-black text-white px-1.5 py-0.5">DAY 01: UNLOCKED</span>
+    </div>
+
+    {/* Level 2: Clusters */}
+    <div className="relative z-10 flex w-full justify-between px-8 md:px-16">
+      {/* Left Cluster */}
+      <div className="flex flex-col items-center">
+        <div className="w-24 bg-white border-2 border-black p-2 flex flex-col gap-1 items-center opacity-100">
+          <div className="w-full h-1.5 bg-gray-200"></div>
+          <div className="w-2/3 h-1.5 bg-gray-200"></div>
+          <div className="mt-1 flex items-center gap-1 text-[9px] font-bold text-gray-500">
+            <div className="w-2 h-2 border border-black bg-green-400 rounded-full"></div>
+            Cluster A
+          </div>
         </div>
       </div>
-    </div>
-    {/* Arrow */}
-    <div className="h-0.5 w-8 bg-black"></div>
-    {/* Day 2 */}
-    <div className="flex flex-col items-center gap-2 transform -translate-y-4">
-      <div className="w-16 h-20 bg-[#D6F5F2] border-2 border-black shadow-neo flex flex-col items-center justify-center p-2">
-        <div className="text-[10px] font-bold text-black">DAY 02</div>
-        <div className="w-full h-1 bg-black/10 my-1"></div>
-        <div className="w-2/3 h-1 bg-black/10"></div>
-      </div>
-    </div>
-    {/* Arrow */}
-    <div className="h-0.5 w-8 bg-black"></div>
-    {/* Day 3 */}
-    <div className="flex flex-col items-center gap-2">
-      <div className="w-16 h-20 bg-white border-2 border-black border-dashed flex flex-col items-center justify-center p-2 opacity-50">
-        <div className="text-[10px] font-bold text-gray-400">DAY 03</div>
-        <div className="w-full h-1 bg-gray-200 my-1"></div>
+
+      {/* Right Cluster */}
+      <div className="flex flex-col items-center transform translate-y-2">
+        <div className="w-24 bg-white border-2 border-black p-2 flex flex-col gap-1 items-center shadow-sm">
+          <div className="w-full h-1.5 bg-gray-800"></div>
+          <div className="w-2/3 h-1.5 bg-gray-800"></div>
+          <div className="mt-1 flex items-center gap-1 text-[9px] font-bold">
+            <div className="w-2 h-2 border border-black bg-orange-400 rounded-full"></div>
+            Cluster B
+          </div>
+        </div>
+        {/* Connection to hidden leaf */}
+        <div className="absolute top-full mt-2">
+          <div className="w-8 h-10 border-2 border-black border-dashed bg-gray-50 flex items-center justify-center">
+            <div className="w-3 h-3 text-gray-400">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 );
 
 const AnswerFirstGraphic = () => (
-  <div className="relative w-full max-w-[300px]">
-    {/* Document */}
-    <div className="bg-white border-2 border-black p-6 shadow-neo rotate-2 relative z-10">
-      <div className="w-3/4 h-4 bg-black/10 mb-4"></div>
-      <div className="space-y-2 mb-6">
-        <div className="w-full h-2 bg-gray-200"></div>
-        <div className="w-full h-2 bg-gray-200"></div>
-        <div className="w-2/3 h-2 bg-gray-200"></div>
-      </div>
-      {/* Highlight Box */}
-      <div className="border-2 border-brand-orange bg-orange-50 p-3 relative">
-        <div className="absolute -top-3 -right-3 bg-brand-orange border-2 border-black p-1 rounded-full">
-          <Sparkles className="w-4 h-4 text-black" />
+  <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
+    {/* Blueprint Background */}
+    <div className="absolute inset-0 bg-[#F5F5F5] border-2 border-dashed border-gray-300"></div>
+    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:16px_16px]"></div>
+
+    {/* The Analysis Card */}
+    <div className="relative z-10 w-full max-w-[280px] bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col overflow-hidden">
+
+      {/* Header */}
+      <div className="bg-black text-white px-3 py-2 flex justify-between items-center text-[10px] font-mono tracking-wider">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+          <span>STRUCTURE_ANALYSIS</span>
         </div>
-        <div className="w-full h-2 bg-brand-orange/20 mb-2"></div>
-        <div className="w-1/2 h-2 bg-brand-orange/20"></div>
+        <span className="opacity-70">v2.4.0</span>
       </div>
-    </div>
-    {/* Badge */}
-    <div className="absolute -bottom-4 -left-4 z-20 bg-black text-white px-3 py-1 text-xs font-bold border-2 border-white shadow-lg">
-      STRUCTURE_OPTIMIZED
+
+      {/* Content Body */}
+      <div className="p-4 flex flex-col gap-4">
+
+        {/* Block 1: The Direct Answer */}
+        <div className="relative border-2 border-brand-orange bg-orange-50/50 p-2">
+          {/* Label Overlay */}
+          <div className="absolute -top-2.5 left-2 bg-brand-orange text-black text-[8px] font-bold px-1.5 border border-black">
+            DIRECT_ANSWER_BLOCK
+          </div>
+
+          {/* Skeleton Text */}
+          <div className="flex flex-col gap-1.5 mt-1">
+            <div className="w-full h-1.5 bg-brand-orange/20 rounded-sm"></div>
+            <div className="w-full h-1.5 bg-brand-orange/20 rounded-sm"></div>
+            <div className="w-3/4 h-1.5 bg-brand-orange/20 rounded-sm"></div>
+          </div>
+
+          {/* Metrics */}
+          <div className="mt-2 flex gap-2 border-t border-brand-orange/20 pt-1.5">
+            <div className="flex flex-col">
+              <span className="text-[7px] text-gray-400 font-bold uppercase">Length</span>
+              <span className="text-[9px] font-mono font-bold text-brand-orange">45 Words</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[7px] text-gray-400 font-bold uppercase">NLP Score</span>
+              <span className="text-[9px] font-mono font-bold text-brand-orange">0.99</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Block 2: Supporting Context */}
+        <div className="relative border border-gray-200 bg-gray-50 p-2 opacity-60">
+          <div className="flex flex-col gap-1.5">
+            <div className="w-full h-1.5 bg-gray-300 rounded-sm"></div>
+            <div className="w-full h-1.5 bg-gray-300 rounded-sm"></div>
+            <div className="w-5/6 h-1.5 bg-gray-300 rounded-sm"></div>
+            <div className="w-full h-1.5 bg-gray-300 rounded-sm"></div>
+          </div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 border border-gray-300 px-2 py-0.5 text-[8px] font-mono text-gray-500 shadow-sm">
+            SEMANTIC_CONTEXT
+          </div>
+        </div>
+
+      </div>
+
+      {/* Footer Status */}
+      <div className="bg-gray-50 border-t-2 border-black px-3 py-2 flex items-center justify-between text-[9px] font-bold">
+        <span>READABILITY: GRADE 8</span>
+        <div className="flex items-center gap-1 text-[#95BF47]">
+          <Check className="w-3 h-3" />
+          <span>OPTIMIZED</span>
+        </div>
+      </div>
+
     </div>
   </div>
 );
 
 const CMSGraphic = () => (
-  <div className="flex items-center gap-4">
-    {/* Source */}
-    <div className="w-20 h-24 bg-white border-2 border-black shadow-sm flex flex-col items-center justify-center p-2">
-      <div className="w-8 h-8 bg-black rounded-full mb-2"></div>
-      <div className="w-10 h-1 bg-gray-200"></div>
+  <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
+    {/* Animated Connection Lines */}
+    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 ml-0 md:ml-[72px] -translate-y-6 md:translate-y-0">
+      {/* Source Center: 50% width (150px in 300px box), Top section ~60px down */}
+      {/* Dest Center Left: ~60px, Bottom ~160px */}
+      <path d="M150 70 L80 160" stroke="black" strokeWidth="2" strokeDasharray="6 6" className="animate-[dash_2s_linear_infinite]" />
+      {/* Dest Center Mid: ~150px, Bottom ~160px */}
+      <path d="M150 70 L150 160" stroke="black" strokeWidth="2" strokeDasharray="6 6" className="animate-[dash_2s_linear_infinite]" />
+      {/* Dest Center Right: ~240px, Bottom ~160px */}
+      <path d="M150 70 L220 160" stroke="black" strokeWidth="2" strokeDasharray="6 6" className="animate-[dash_2s_linear_infinite]" />
+    </svg>
+
+    {/* Source Hub (FlipAEO) */}
+    <div className="relative z-10 mb-16 transform -translate-y-2">
+      <div className="w-32 h-12 bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] flex items-center justify-center relative">
+        <span className="font-display font-black text-xl">FlipAEO</span>
+        {/* Source Label */}
+        <div className="absolute -right-3 -top-4 bg-brand-orange text-black border-2 border-black text-[9px] font-bold px-2 py-0.5 transform rotate-6 shadow-neo-sm">
+          SOURCE
+        </div>
+      </div>
     </div>
 
-    {/* Arrow */}
-    <div className="flex flex-col items-center gap-1">
-      <div className="w-12 h-1 bg-black relative">
-        <div className="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-black transform rotate-45"></div>
+    {/* Destination Hubs */}
+    <div className="relative z-10 flex gap-4 md:gap-8 items-end">
+
+      {/* WordPress */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-14 h-14 bg-white border-2 border-black shadow-neo flex items-center justify-center p-2.5 hover:-translate-y-1 transition-transform">
+          <img src="/brands/wordpress.svg" alt="WordPress" className="w-full h-full object-contain" />
+        </div>
+        <span className="font-mono text-[10px] font-bold bg-white border border-black px-1">Wordpress</span>
       </div>
-      <span className="text-[10px] font-bold uppercase bg-green-100 px-1 border border-black">Synced</span>
+
+      {/* Shopify */}
+      <div className="flex flex-col items-center gap-2 -translate-y-4 z-10">
+        <div className="w-16 h-16 bg-[#95BF47]/20 border-2 border-black shadow-neo flex items-center justify-center p-3 hover:-translate-y-1 transition-transform">
+          <img src="/brands/shopify.svg" alt="Shopify" className="w-full h-full object-contain" />
+        </div>
+        <span className="font-mono text-[10px] font-bold bg-white border border-black px-1">Shopify</span>
+      </div>
+
+      {/* Webflow */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-14 h-14 bg-white border-2 border-black shadow-neo flex items-center justify-center p-2.5 hover:-translate-y-1 transition-transform">
+          <img src="/brands/webflow.svg" alt="Webflow" className="w-full h-full object-contain" />
+        </div>
+        <span className="font-mono text-[10px] font-bold bg-white border border-black px-1">Webflow</span>
+      </div>
+
     </div>
 
-    {/* Targets */}
-    <div className="flex flex-col gap-2">
-      <div className="w-32 h-10 bg-gray-100 border-2 border-black flex items-center px-3 gap-2">
-        <div className="w-4 h-4 rounded-full bg-blue-500 border border-black"></div>
-        <span className="text-xs font-bold">WordPress</span>
-      </div>
-      <div className="w-32 h-10 bg-gray-100 border-2 border-black flex items-center px-3 gap-2">
-        <div className="w-4 h-4 rounded-full bg-blue-300 border border-black"></div>
-        <span className="text-xs font-bold">Webflow</span>
-      </div>
-    </div>
+
   </div>
 );
 

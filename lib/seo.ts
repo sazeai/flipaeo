@@ -197,7 +197,6 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
       "Smart internal linking",
       "Real-time research with verified citations",
       "Answer-first content structure for AI visibility",
-      "Google Search Console integration for data-driven planning"
     ],
 
     "author": {

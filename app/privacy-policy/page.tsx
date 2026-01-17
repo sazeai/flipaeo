@@ -143,28 +143,7 @@ export default function PrivacyPolicy() {
                 We do not receive or store your Google password. Google authentication is handled securely through Google's OAuth 2.0 protocol.
               </p>
 
-              <h3 className="text-lg font-semibold mb-2">6.2 Google Search Console Integration</h3>
-              <p className="mb-4">
-                With your explicit consent, FlipAEO accesses your <strong>Google Search Console (GSC)</strong> data in <strong>read-only mode</strong> to power our content planning features. This includes:
-              </p>
-              <ul className="list-disc list-inside pl-5 mb-4">
-                <li><strong>Search queries:</strong> Keywords that drive traffic to your website</li>
-                <li><strong>Page performance data:</strong> Clicks, impressions, CTR, and average position</li>
-              </ul>
-              <p className="mb-4">
-                <strong>Important:</strong> We access GSC data in <strong>read-only mode only</strong>. We cannot modify, delete, or submit any data to your Google Search Console. This data is used solely to:
-              </p>
-              <ul className="list-disc list-inside pl-5 mb-4">
-                <li>Analyze your current search performance</li>
-                <li>Identify content gaps and opportunities</li>
-                <li>Generate personalized content strategies</li>
-                <li>Track the impact of published content over time</li>
-              </ul>
-              <p className="mb-4">
-                You can revoke FlipAEO's access to your Google Search Console at any time through your <a href="https://myaccount.google.com/permissions" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google Account Permissions</a>.
-              </p>
-
-              <h3 className="text-lg font-semibold mb-2">6.3 Google API Services User Data Policy Compliance</h3>
+              <h3 className="text-lg font-semibold mb-2">6.2 Google API Services User Data Policy Compliance</h3>
               <p className="mb-4">
                 FlipAEO's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
               </p>

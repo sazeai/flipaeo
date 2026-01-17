@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
               <nav className="flex flex-col gap-2">
                 <FooterLink href="/#benefits" label="Benefits" />
                 <FooterLink href="/#how-it-works" label="How it Works" />
-                <FooterLink href="/#pricing" label="Pricing" />
+                <FooterLink href="/pricing" label="Pricing" />
               </nav>
             </div>
 

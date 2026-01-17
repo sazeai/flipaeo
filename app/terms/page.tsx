@@ -87,22 +87,6 @@ export default function TermsOfService() {
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Google Services</h2>
-              <p className="mb-4">
-                FlipAEO integrates with Google services to enhance your experience:
-              </p>
-              <ul className="list-disc list-inside pl-5 mb-4">
-                <li><strong>Google Sign-In:</strong> We use Google OAuth for secure authentication. By signing in with Google, you agree to Google's Terms of Service and Privacy Policy.</li>
-                <li><strong>Google Search Console:</strong> With your explicit consent, we access your Google Search Console data in <strong>read-only mode</strong> to analyze your website's search performance and generate personalized content strategies. We cannot modify, delete, or submit any data to your Google Search Console.</li>
-              </ul>
-              <p className="mb-4">
-                You can revoke FlipAEO's access to your Google data at any time through your <a href="https://myaccount.google.com/permissions" className="text-indigo-600">Google Account Permissions</a>.
-              </p>
-              <p>
-                FlipAEO's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-indigo-600">Google API Services User Data Policy</a>, including the Limited Use requirements.
-              </p>
-            </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Limitation of Liability</h2>
