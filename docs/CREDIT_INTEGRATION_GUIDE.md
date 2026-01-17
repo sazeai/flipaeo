@@ -110,7 +110,7 @@ export default function MyToolClient({ userId, requiredCredits }: MyToolClientPr
       {balance < requiredCredits && (
         <p className="text-sm text-red-600">
           You need {requiredCredits - balance} more credits to use this tool.
-          <Link href="/buy-credits" className="underline ml-1">
+          <Link href="/subscribe" className="underline ml-1">
             Buy credits
           </Link>
         </p>
@@ -211,7 +211,7 @@ export function ConditionalFeature({
           This feature requires {requiredCredits} credits.
         </p>
         <Button asChild size="sm">
-          <Link href="/buy-credits">Buy Credits</Link>
+          <Link href="/subscribe">Buy Credits</Link>
         </Button>
       </div>
     )
@@ -254,7 +254,7 @@ export function CreditAwareNavigation({ userId, items }: CreditAwareNavigationPr
         return (
           <Link
             key={item.href}
-            href={hasAccess ? item.href : '/buy-credits'}
+            href={hasAccess ? item.href : '/subscribe'}
             className={cn(
               'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
               hasAccess
@@ -480,7 +480,7 @@ export default function AIWriterClient({ userId }: AIWriterClientProps) {
             {balance < requiredCredits && (
               <p className="text-sm text-red-600">
                 You need {requiredCredits - balance} more credits.
-                <Link href="/buy-credits" className="underline ml-1">
+                <Link href="/subscribe" className="underline ml-1">
                   Buy credits
                 </Link>
               </p>
@@ -794,7 +794,7 @@ export function CreditBalanceWidget({
           
           {showPurchaseButton && (
             <Button asChild size="sm" variant="outline">
-              <Link href="/buy-credits">
+              <Link href="/subscribe">
                 <Plus className="h-4 w-4 mr-1" />
                 Buy
               </Link>
@@ -1122,7 +1122,7 @@ async function isAdmin(userId: string): Promise<boolean> {
 ### 1. Custom Credit Packages
 
 ```typescript
-// app/(protected)/buy-credits/CustomPackageBuilder.tsx
+// app/(protected)/subscribe/CustomPackageBuilder.tsx
 'use client'
 
 import { useState } from 'react'

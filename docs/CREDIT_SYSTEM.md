@@ -286,7 +286,7 @@ export function DodoCheckoutButton({ planId, credits, price }: Props) {
         credits,
         price,
         successUrl: `${window.location.origin}/payment-success`,
-        cancelUrl: `${window.location.origin}/buy-credits`
+        cancelUrl: `${window.location.origin}/subscribe`
       })
     })
     

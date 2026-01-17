@@ -78,7 +78,7 @@ export function HeaderUser({ user, initialCreditBalance }: HeaderUserProps) {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <Link href="/buy-credits" prefetch={false} className="flex items-center">
+              <Link href="/subscribe" prefetch={false} className="flex items-center">
                 <Sparkles className="mr-2 h-4 w-4" />
                 Buy Credits
               </Link>
