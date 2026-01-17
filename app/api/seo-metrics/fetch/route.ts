@@ -26,6 +26,21 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
+        // Check for active subscription (critical - Moz/PageSpeed APIs cost money)
+        const { data: subscription } = await supabase
+            .from("dodo_subscriptions")
+            .select("status")
+            .eq("user_id", user.id)
+            .eq("status", "active")
+            .maybeSingle()
+
+        if (!subscription) {
+            return NextResponse.json({
+                error: "Active subscription required",
+                code: "SUBSCRIPTION_REQUIRED"
+            }, { status: 403 })
+        }
+
         const { domain: rawDomain, brandId, force = false, refreshStrategy = null } = await req.json()
 
         if (!rawDomain) {

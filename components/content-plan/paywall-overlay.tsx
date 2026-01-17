@@ -52,7 +52,7 @@ export function PaywallOverlay({ hiddenCount, categoryName, children }: PaywallO
                         {/* Icon */}
                         <div className="flex justify-center">
                             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-50 to-stone-100 flex items-center justify-center border border-amber-200/50 shadow-xs">
-                                <Lock className="w-5 h-5 text-amber-600" />
+                                <Lock className="w-5 h-5 text-gray-600" />
                             </div>
                         </div>
 
