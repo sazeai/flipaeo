@@ -278,7 +278,29 @@ export function calculateReadingTime(content: string): string {
 // Helper function to extract excerpt from content if not provided
 export function extractExcerpt(content: string, length: number = 160): string {
   if (!content) return ''
-  const textContent = content.replace(/<[^>]*>/g, '') // Strip HTML tags
+  // Strip HTML tags
+  let textContent = content.replace(/<[^>]*>/g, '')
+
+  // Clean up WordPress auto-generated excerpt suffixes BEFORE truncating
+  textContent = textContent
+    .replace(/\[\.\.\.\]/g, '') // Remove [...]
+    .replace(/&hellip;/g, '')   // Remove HTML entity ellipsis
+    .replace(/\s+Read more.*$/i, '') // Remove "Read more" links commonly found
+    .trim()
+
+  // Decode common HTML entities
+  textContent = textContent
+    .replace(/&#8217;/g, "'")   // Right single quote
+    .replace(/&#8216;/g, "'")   // Left single quote
+    .replace(/&#8220;/g, '"')   // Left double quote
+    .replace(/&#8221;/g, '"')   // Right double quote
+    .replace(/&#8211;/g, '–')   // En dash
+    .replace(/&#8212;/g, '—')   // Em dash
+    .replace(/&amp;/g, '&')     // Ampersand
+    .replace(/&nbsp;/g, ' ')    // Non-breaking space
+    .replace(/&quot;/g, '"')    // Quote
+    .replace(/&#039;/g, "'")    // Apostrophe
+
   return textContent.length > length
     ? textContent.substring(0, length).trim() + '...'
     : textContent

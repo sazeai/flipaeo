@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 function transformWordPressPost(post: WordPressPost, index: number) {
   return {
     title: post.title,
-    excerpt: post.excerpt ? extractExcerpt(post.excerpt, 160) : extractExcerpt(post.content, 160),
+    excerpt: post.excerpt ? extractExcerpt(post.excerpt, 160) : "",
     slug: post.slug,
     publishedAt: formatDate(post.date),
     readTime: calculateReadingTime(post.content),
@@ -67,7 +67,7 @@ function BlogPageContent({ blogPosts }: { blogPosts: any[] }) {
     <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
       <Navbar />
 
-      <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
+      <main className="flex-grow flex flex-col items-center w-full pt-12">
         {/* Hero Section */}
         <section className="w-full py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
@@ -132,7 +132,7 @@ export default function BlogPage() {
     <Suspense fallback={
       <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
         <Navbar />
-        <main className="flex-grow flex flex-col items-center w-full pt-20 md:pt-24">
+        <main className="flex-grow flex flex-col items-center w-full pt-12">
           <section className="w-full py-16 px-4">
             <div className="max-w-5xl mx-auto text-center">
               <div className="inline-block bg-brand-orange text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2">
