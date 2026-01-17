@@ -64,6 +64,8 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({
             metrics,
+            status: metrics.status || 'completed',
+            error_message: metrics.error_message || null,
             age_days: ageInDays,
             stale: ageInDays > 30
         })

@@ -36,6 +36,9 @@ interface SEOMetrics {
     fcp_mobile: number
     recommendations_mobile: any[]
     fetched_at: string
+    // Status tracking for background jobs
+    status?: 'pending' | 'running' | 'completed' | 'failed'
+    error_message?: string
 }
 
 interface SEOMetricsDashboardProps {
@@ -311,33 +314,75 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
     const [error, setError] = useState("")
+    const [jobStatus, setJobStatus] = useState<'pending' | 'running' | 'completed' | 'failed' | null>(null)
 
-    // Fetch metrics (single row with all data)
+    // Fetch metrics and check for running jobs
+    const fetchMetrics = async () => {
+        try {
+            const res = await fetch(`/api/seo-metrics?domain=${domain}&brandId=${brandId}`)
+            if (res.ok) {
+                const data = await res.json()
+                if (data && data.metrics) {
+                    setMetrics(data.metrics)
+                    setJobStatus(data.status || 'completed')
+
+                    // If job completed, stop analyzing state
+                    if (data.status === 'completed') {
+                        setAnalyzing(false)
+                        setRefreshing(false)
+                    }
+
+                    // If job failed, show error
+                    if (data.status === 'failed') {
+                        setError(data.error_message || 'Analysis failed')
+                        setAnalyzing(false)
+                        setRefreshing(false)
+                    }
+
+                    return data.status
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load metrics", e)
+        }
+        return null
+    }
+
+    // Initial load
     useEffect(() => {
         if (!brandId) return
 
         async function checkData() {
             setLoading(true)
-            try {
-                const res = await fetch(`/api/seo-metrics?domain=${domain}&brandId=${brandId}`)
-                if (res.ok) {
-                    const data = await res.json()
-                    if (data && data.metrics) {
-                        setMetrics(data.metrics)
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to load metrics", e)
-            } finally {
-                setLoading(false)
+            const status = await fetchMetrics()
+            // If job is running/pending, start polling
+            if (status === 'running' || status === 'pending') {
+                setAnalyzing(true)
             }
+            setLoading(false)
         }
         checkData()
     }, [brandId, domain])
 
+    // Polling effect - poll every 10 seconds while job is running
+    useEffect(() => {
+        if (!analyzing || !brandId) return
+
+        const interval = setInterval(async () => {
+            const status = await fetchMetrics()
+            if (status === 'completed' || status === 'failed') {
+                clearInterval(interval)
+            }
+        }, 10000)
+
+        return () => clearInterval(interval)
+    }, [analyzing, brandId, domain])
+
     // Refresh PageSpeed for specific device
     const handleRefresh = async (strategy?: 'mobile' | 'desktop') => {
         setRefreshing(true)
+        setAnalyzing(true)
+        setError("")
         try {
             const res = await fetch("/api/seo-metrics/fetch", {
                 method: "POST",
@@ -353,12 +398,20 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Refresh failed")
 
-            setMetrics(data.metrics)
-            toast.success(`${strategy || device} metrics updated!`)
+            // If cached data returned, update immediately
+            if (data.cached && data.metrics) {
+                setMetrics(data.metrics)
+                setRefreshing(false)
+                setAnalyzing(false)
+                toast.success(`${strategy || device} metrics updated!`)
+            } else if (data.triggered) {
+                // Job triggered, polling will handle the rest
+                toast.info("Analysis started in background...")
+            }
         } catch (err: any) {
             toast.error(err.message || "Failed to update metrics")
-        } finally {
             setRefreshing(false)
+            setAnalyzing(false)
         }
     }
 
@@ -376,12 +429,18 @@ export function SEOMetricsDashboard({ domain, brandId }: SEOMetricsDashboardProp
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || "Analysis failed")
 
-            setMetrics(data.metrics)
-            toast.success("Analysis complete!")
+            // If cached data returned, update immediately
+            if (data.cached && data.metrics) {
+                setMetrics(data.metrics)
+                setAnalyzing(false)
+                toast.success("Analysis complete!")
+            } else if (data.triggered) {
+                // Job triggered, polling will handle the rest
+                toast.info("Analysis started in background. This may take 1-2 minutes...")
+            }
         } catch (err: any) {
             setError(err.message)
             toast.error("Failed to analyze site")
-        } finally {
             setAnalyzing(false)
         }
     }

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { fetchMozMetrics } from "@/lib/moz"
-import { fetchPageSpeedMetrics } from "@/lib/pagespeed"
-
-export const maxDuration = 60 // 60 second timeout for API calls
+import { tasks } from "@trigger.dev/sdk/v3"
+import { seoHealthTask } from "@/trigger/seo-health"
 
 /**
  * POST /api/seo-metrics/fetch
- * Fetches fresh metrics from Moz + PageSpeed (both mobile & desktop) and stores in database
- * Single-row architecture: one row per domain with all strategies
+ * Triggers SEO health check as a background job via Trigger.dev
+ * Returns immediately - frontend should poll /api/seo-metrics for results
  */
 
 // Helper: Normalize domain to consistent format
@@ -35,140 +33,85 @@ export async function POST(req: NextRequest) {
         }
 
         const domain = normalizeDomain(rawDomain)
-        const fullUrl = `https://${domain}`
 
-        // Fetch existing metrics
-        const { data: existingMetrics } = await supabase
-            .from("seo_metrics")
-            .select("*")
-            .eq("user_id", user.id)
-            .eq("domain", domain)
-            .order("fetched_at", { ascending: false })
-            .limit(1)
-            .single()
+        // Check for cached data if not forcing refresh
+        if (!force) {
+            const { data: existingMetrics } = await supabase
+                .from("seo_metrics")
+                .select("*")
+                .eq("user_id", user.id)
+                .eq("domain", domain)
+                .order("fetched_at", { ascending: false })
+                .limit(1)
+                .single()
 
-        // Check cache (if not forcing refresh)
-        if (!force && existingMetrics) {
-            const fetchedAt = new Date(existingMetrics.fetched_at)
-            const ageInDays = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24)
-
-            if (ageInDays < 7) {
-                return NextResponse.json({
-                    success: true,
-                    metrics: existingMetrics,
-                    cached: true,
-                    message: "Using cached data"
-                })
-            }
-        }
-
-        console.log(`[SEO Metrics] Fetching fresh metrics for ${domain} (force=${force}, refreshStrategy=${refreshStrategy})...`)
-
-        // INTELLIGENT FETCHING
-        // Moz: Only fetch if missing or > 30 days old
-        let shouldFetchMoz = true
-        let cachedMozData = null
-
-        if (existingMetrics && existingMetrics.domain_authority) {
-            const fetchedAt = new Date(existingMetrics.fetched_at)
-            const ageInDays = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24)
-            if (ageInDays < 30) {
-                shouldFetchMoz = false
-                cachedMozData = {
-                    domain_authority: existingMetrics.domain_authority,
-                    page_authority: existingMetrics.page_authority,
-                    linking_root_domains: existingMetrics.linking_root_domains,
-                    external_links: existingMetrics.external_links,
+            if (existingMetrics) {
+                // If currently running, just return status
+                if (existingMetrics.status === 'running') {
+                    return NextResponse.json({
+                        success: true,
+                        triggered: false,
+                        status: 'running',
+                        message: "Analysis already in progress"
+                    })
                 }
-                console.log("[SEO Metrics] Using cached Moz data (< 30 days)")
+
+                // Return cached data if fresh (< 7 days)
+                const fetchedAt = new Date(existingMetrics.fetched_at)
+                const ageInDays = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24)
+
+                if (ageInDays < 7 && existingMetrics.status === 'completed') {
+                    return NextResponse.json({
+                        success: true,
+                        metrics: existingMetrics,
+                        cached: true,
+                        message: "Using cached data"
+                    })
+                }
             }
         }
 
-        // PageSpeed: Fetch both strategies OR just the requested one
-        // If refreshStrategy is specified, only refresh that strategy
-        const shouldFetchDesktop = !refreshStrategy || refreshStrategy === 'desktop'
-        const shouldFetchMobile = !refreshStrategy || refreshStrategy === 'mobile'
+        console.log(`[SEO Metrics] Triggering background job for ${domain}...`)
 
-        // Parallel fetch all APIs
-        const [mozData, desktopData, mobileData] = await Promise.all([
-            shouldFetchMoz ? fetchMozMetrics(fullUrl) : Promise.resolve(null),
-            shouldFetchDesktop ? fetchPageSpeedMetrics(fullUrl, 'desktop') : Promise.resolve(null),
-            shouldFetchMobile ? fetchPageSpeedMetrics(fullUrl, 'mobile') : Promise.resolve(null)
-        ])
-
-        const finalMozData = mozData || cachedMozData
-
-        if (!finalMozData && !desktopData && !mobileData) {
-            return NextResponse.json({ error: "Failed to fetch any metrics" }, { status: 500 })
-        }
-
-        // Build the complete metrics object (merge with existing if partial refresh)
-        const metrics = {
-            user_id: user.id,
-            brand_id: brandId || existingMetrics?.brand_id || null,
-            domain,
-            fetched_at: new Date().toISOString(),
-
-            // Moz metrics
-            domain_authority: finalMozData?.domain_authority ?? existingMetrics?.domain_authority ?? null,
-            page_authority: finalMozData?.page_authority ?? existingMetrics?.page_authority ?? null,
-            linking_root_domains: finalMozData?.linking_root_domains ?? existingMetrics?.linking_root_domains ?? null,
-            external_links: finalMozData?.external_links ?? existingMetrics?.external_links ?? null,
-
-            // Desktop PageSpeed
-            performance_desktop: desktopData?.performance_score ?? existingMetrics?.performance_desktop ?? null,
-            accessibility_desktop: desktopData?.accessibility_score ?? existingMetrics?.accessibility_desktop ?? null,
-            best_practices_desktop: desktopData?.best_practices_score ?? existingMetrics?.best_practices_desktop ?? null,
-            seo_desktop: desktopData?.seo_score ?? existingMetrics?.seo_desktop ?? null,
-            lcp_desktop: desktopData?.lcp_seconds ?? existingMetrics?.lcp_desktop ?? null,
-            cls_desktop: desktopData?.cls ?? existingMetrics?.cls_desktop ?? null,
-            tbt_desktop: desktopData?.tbt_ms ?? existingMetrics?.tbt_desktop ?? null,
-            fcp_desktop: desktopData?.fcp_seconds ?? existingMetrics?.fcp_desktop ?? null,
-            recommendations_desktop: desktopData?.recommendations ?? existingMetrics?.recommendations_desktop ?? [],
-
-            // Mobile PageSpeed
-            performance_mobile: mobileData?.performance_score ?? existingMetrics?.performance_mobile ?? null,
-            accessibility_mobile: mobileData?.accessibility_score ?? existingMetrics?.accessibility_mobile ?? null,
-            best_practices_mobile: mobileData?.best_practices_score ?? existingMetrics?.best_practices_mobile ?? null,
-            seo_mobile: mobileData?.seo_score ?? existingMetrics?.seo_mobile ?? null,
-            lcp_mobile: mobileData?.lcp_seconds ?? existingMetrics?.lcp_mobile ?? null,
-            cls_mobile: mobileData?.cls ?? existingMetrics?.cls_mobile ?? null,
-            tbt_mobile: mobileData?.tbt_ms ?? existingMetrics?.tbt_mobile ?? null,
-            fcp_mobile: mobileData?.fcp_seconds ?? existingMetrics?.fcp_mobile ?? null,
-            recommendations_mobile: mobileData?.recommendations ?? existingMetrics?.recommendations_mobile ?? [],
-        }
-
-        // Upsert to database (single row per user+domain)
-        const { data: savedMetrics, error } = await supabase
+        // Set status to pending before triggering
+        await supabase
             .from("seo_metrics")
-            .upsert(metrics, {
+            .upsert({
+                user_id: user.id,
+                domain,
+                brand_id: brandId || null,
+                status: 'pending',
+                fetched_at: new Date().toISOString()
+            }, {
                 onConflict: "user_id,domain"
             })
-            .select()
-            .single()
 
-        if (error) {
-            console.error("[SEO Metrics] Database error:", error)
-            return NextResponse.json({
-                success: true,
-                metrics,
-                cached: false,
-                warning: "Metrics fetched but failed to save"
-            })
-        }
+        // Trigger the background job
+        const handle = await tasks.trigger<typeof seoHealthTask>(
+            "seo-health-check",
+            {
+                userId: user.id,
+                brandId: brandId || undefined,
+                domain,
+                force,
+                refreshStrategy
+            }
+        )
 
-        console.log(`[SEO Metrics] Saved metrics for ${domain}`)
+        console.log(`[SEO Metrics] Triggered job ${handle.id} for ${domain}`)
 
         return NextResponse.json({
             success: true,
-            metrics: savedMetrics,
-            cached: false
+            triggered: true,
+            jobId: handle.id,
+            status: 'pending',
+            message: "Analysis started. Poll /api/seo-metrics for results."
         })
 
     } catch (error: any) {
         console.error("[SEO Metrics] Error:", error)
         return NextResponse.json(
-            { error: error.message || "Failed to fetch metrics" },
+            { error: error.message || "Failed to trigger analysis" },
             { status: 500 }
         )
     }

@@ -357,3 +357,80 @@ export const dailyContentWatchman = schedules.task({
     },
 })
 
+/**
+ * SEO Health Auto-Refresh Scheduler
+ * 
+ * Runs weekly (every Sunday at 2 AM UTC) to find stale SEO metrics
+ * and trigger background refresh for domains with data > 30 days old.
+ */
+export const seoHealthAutoRefresh = schedules.task({
+    id: "seo-health-auto-refresh",
+    cron: "0 2 * * 0", // Every Sunday at 2:00 AM UTC
+    run: async () => {
+        console.log("🔍 SEO Auto-Refresh: Checking for stale metrics...")
+
+        const supabase = createAdminClient() as any
+
+        // Find metrics older than 30 days
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+        const { data: staleMetrics, error } = await supabase
+            .from("seo_metrics")
+            .select("id, user_id, brand_id, domain, fetched_at, status")
+            .lt("fetched_at", thirtyDaysAgo.toISOString())
+            .neq("status", "running") // Don't re-trigger if already running
+            .neq("status", "pending")
+
+        if (error) {
+            console.error("❌ SEO Auto-Refresh DB Error:", error)
+            return { result: "Failed to fetch stale metrics", error: error.message }
+        }
+
+        if (!staleMetrics || staleMetrics.length === 0) {
+            console.log("✅ SEO Auto-Refresh: All metrics are fresh!")
+            return { result: "No stale metrics found", refreshedCount: 0 }
+        }
+
+        console.log(`📊 SEO Auto-Refresh: Found ${staleMetrics.length} stale domains to refresh`)
+
+        // Import the task dynamically to avoid circular deps
+        const { seoHealthTask } = await import("./seo-health")
+
+        let refreshedCount = 0
+
+        for (const metric of staleMetrics) {
+            try {
+                // Update status to pending
+                await supabase
+                    .from("seo_metrics")
+                    .update({ status: "pending" })
+                    .eq("id", metric.id)
+
+                // Trigger the background task
+                await seoHealthTask.trigger({
+                    userId: metric.user_id,
+                    brandId: metric.brand_id,
+                    domain: metric.domain,
+                    force: true
+                })
+
+                console.log(`🔄 Triggered refresh for ${metric.domain}`)
+                refreshedCount++
+
+                // Small delay to avoid rate limits
+                await new Promise(r => setTimeout(r, 1000))
+
+            } catch (err) {
+                console.error(`Failed to refresh ${metric.domain}:`, err)
+            }
+        }
+
+        console.log(`✅ SEO Auto-Refresh: Triggered ${refreshedCount} refreshes`)
+        return {
+            result: "SEO auto-refresh completed",
+            refreshedCount,
+            totalStale: staleMetrics.length
+        }
+    }
+})
