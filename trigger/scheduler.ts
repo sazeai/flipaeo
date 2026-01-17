@@ -2,6 +2,11 @@ import { schedules } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { generateBlogPost } from "./generate-blog"
 import { adminHasCredits, adminDeductCredits, adminAddCredits } from "@/lib/credits"
+import { PlanRefilledEmail } from "@/lib/emails/templates/plan-refilled"
+import { BillingAlertEmail } from "@/lib/emails/templates/billing-alert"
+
+import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
+import { render } from "@react-email/components"
 
 /**
  * The Watchman - Daily Content Automation Scheduler
@@ -134,6 +139,30 @@ export const dailyContentWatchman = schedules.task({
                         console.error("❌ Failed to save auto-refilled plan:", insertError)
                     } else {
                         console.log(`✅ Successfully auto-refilled content plan for User ${plan.user_id}`)
+
+                        // --- NOTIFICATION: SEND REFILL EMAIL ---
+                        try {
+                            const { data: userRec } = await supabase.auth.admin.getUserById(plan.user_id)
+                            const user = userRec?.user
+
+                            if (user?.email) {
+                                const emailHtml = await render(PlanRefilledEmail({
+                                    articleCount: newPlanItems.length,
+                                    userName: user.user_metadata?.full_name || user.email.split('@')[0] || "there"
+                                }))
+
+                                await resend.emails.send({
+                                    from: EMAIL_FROM,
+                                    to: user.email,
+                                    subject: `Your content plan was auto-refilled! 📅`,
+                                    html: emailHtml,
+                                    replyTo: EMAIL_REPLY_TO
+                                })
+                                console.log(`📧 Refill email sent to ${user.email}`)
+                            }
+                        } catch (e) {
+                            console.error("Failed to send refill email", e)
+                        }
                     }
 
                     // 5. Mark OLD plan as completed
@@ -259,6 +288,62 @@ export const dailyContentWatchman = schedules.task({
                     console.error(`❌ Failed to trigger automation for item ${item.id}`, e)
                     await adminAddCredits(plan.user_id, 1, "Refund: Automation trigger failed")
                 }
+            }
+        }
+
+        // --- DAILY BILLING CHECK (Run at approx 10 AM UTC) ---
+        const currentHour = new Date().getUTCHours()
+        if (currentHour === 10) {
+            console.log("🧾 Watchman: Checking for upcoming billing...")
+            try {
+                const targetDate = new Date()
+                targetDate.setDate(targetDate.getDate() + 5)
+                const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0)).toISOString()
+                const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999)).toISOString()
+
+                // Query dodo_subscriptions
+                // Note: next_billing_date must be added to column via migration
+                const { data: subs } = await supabase
+                    .from("dodo_subscriptions")
+                    .select("*, dodo_pricing_plans(name, price, currency)")
+                    .eq("status", "active")
+                    .gte("next_billing_date", startOfDay)
+                    .lte("next_billing_date", endOfDay)
+
+                if (subs && subs.length > 0) {
+                    console.log(`🧾 Found ${subs.length} subscriptions renewing soon`)
+
+                    for (const sub of subs) {
+                        const plan = (sub.dodo_pricing_plans as any)
+                        try {
+                            // Fetch user email via Admin Auth
+                            const { data: userRec } = await supabase.auth.admin.getUserById(sub.user_id)
+                            const user = userRec?.user
+
+                            if (user?.email) {
+                                const emailHtml = await render(BillingAlertEmail({
+                                    userName: user.user_metadata?.full_name || user.email.split('@')[0],
+                                    billingDate: new Date(sub.next_billing_date).toLocaleDateString(),
+                                    amount: plan ? `${plan.price} ${plan.currency}` : "Subscription Price",
+                                    planName: plan?.name || "Pro Plan"
+                                }))
+
+                                await resend.emails.send({
+                                    from: EMAIL_FROM,
+                                    to: user.email,
+                                    subject: `Upcoming Invoice Reminder 🧾`,
+                                    html: emailHtml,
+                                    replyTo: EMAIL_REPLY_TO
+                                })
+                                console.log(`📧 Billing email sent to ${user.email}`)
+                            }
+                        } catch (err) {
+                            console.error(`Failed to trigger billing email for sub ${sub.id}`, err)
+                        }
+                    }
+                }
+            } catch (billingErr) {
+                console.error("Billing check failed:", billingErr)
             }
         }
 

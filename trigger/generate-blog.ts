@@ -16,6 +16,9 @@ import { getCurrentDateContext } from "@/lib/utils/date-context"
 import { getRelevantInternalLinks } from "@/lib/internal-linking"
 import { saveTopicMemory } from "@/lib/topic-memory"
 import { analyzeArticleCoverage } from "@/lib/coverage/analyzer"
+import { ArticleReadyEmail } from "@/lib/emails/templates/article-ready"
+import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
+import { render } from "@react-email/components"
 
 const cleanAndParse = (text: string) => {
   const clean = text.replace(/```json/g, "").replace(/```/g, "")
@@ -1538,6 +1541,35 @@ OUTPUT: Return ONLY the image generation prompt as plain text. No JSON, no expla
           featured_image_url
         })
         .eq("id", articleId)
+
+      // --- NOTIFICATION: SEND EMAIL ---
+      if (userId) {
+        try {
+          const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId)
+
+          if (user?.email) {
+            console.log(`📧 Sending article ready email to ${user.email}`)
+
+            const emailHtml = await render(ArticleReadyEmail({
+              articleTitle: finalTitle || title || keyword,
+              articleSlug: slug,
+              articleId: articleId,
+              featuredImageUrl: featured_image_url,
+            }))
+
+            await resend.emails.send({
+              from: EMAIL_FROM,
+              to: user.email,
+              subject: `Your article "${finalTitle || title}" is ready 🚀`,
+              html: emailHtml,
+              replyTo: EMAIL_REPLY_TO
+            })
+          }
+        } catch (emailErr) {
+          console.error("Failed to send article ready email:", emailErr)
+          // Non-blocking
+        }
+      }
 
       // --- PHASE 8: UPDATE CONTENT PLAN IF APPLICABLE ---
       if (payload.planId && payload.itemId) {
