@@ -43,6 +43,8 @@ function createAuthHeader(username: string, appPassword: string): string {
  * Prepare HTML content for WordPress:
  * 1. Strip the first H1 (it's sent as post title)
  * 2. Convert HTML to Gutenberg blocks format
+ * 
+ * IMPORTANT: Process code blocks FIRST to prevent them being nested in paragraphs
  */
 export function prepareContentForWordPress(htmlContent: string): string {
     if (!htmlContent) return ''
@@ -50,10 +52,46 @@ export function prepareContentForWordPress(htmlContent: string): string {
     // 1. Remove the first H1 tag (title is sent separately as post title)
     let content = htmlContent.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')
 
-    // 2. Convert HTML elements to Gutenberg blocks
-    // Parse and wrap each element in appropriate block comments
+    // 2. Extract code blocks FIRST and replace with placeholders
+    // This prevents them from being wrapped inside paragraph blocks
+    const codeBlocks: string[] = []
+    content = content.replace(/<pre([^>]*)>\s*<code([^>]*)>([\s\S]*?)<\/code>\s*<\/pre>/gi,
+        (match, preAttrs, codeAttrs, codeContent) => {
+            // Extract language from class if present (e.g., class="language-javascript")
+            const langMatch = codeAttrs.match(/class=["'][^"']*language-(\w+)[^"']*["']/)
+            const language = langMatch ? langMatch[1] : ''
 
-    // Convert headings: <h2>...</h2> → <!-- wp:heading {"level":2} --><h2>...</h2><!-- /wp:heading -->
+            // WordPress code blocks need:
+            // - < and > escaped as &lt; and &gt;
+            // - Quotes as literal " (NOT &quot;)
+            // - Ampersands as literal & (NOT &amp;)
+            // 
+            // The source content may already have escaped entities, so we:
+            // 1. First decode any existing HTML entities
+            // 2. Then only escape < and >
+            let escapedCode = codeContent
+                // First decode any already-escaped entities
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                // Now escape only < and > for WordPress
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+
+            // Create the Gutenberg code block
+            // NOTE: WordPress code blocks do NOT support class on <code> tag - it causes block errors!
+            const codeBlock = `<!-- wp:code -->\n<pre class="wp-block-code"><code>${escapedCode}</code></pre>\n<!-- /wp:code -->`
+
+            // Store it and return placeholder
+            codeBlocks.push(codeBlock)
+            return `\n\n___CODE_BLOCK_${codeBlocks.length - 1}___\n\n`
+        })
+
+    // 3. Now convert other HTML elements to Gutenberg blocks
+
+    // Convert headings
     content = content.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
         '<!-- wp:heading {"level":2} -->\n<h2$1>$2</h2>\n<!-- /wp:heading -->\n\n')
     content = content.replace(/<h3([^>]*)>([\s\S]*?)<\/h3>/gi,
@@ -61,38 +99,46 @@ export function prepareContentForWordPress(htmlContent: string): string {
     content = content.replace(/<h4([^>]*)>([\s\S]*?)<\/h4>/gi,
         '<!-- wp:heading {"level":4} -->\n<h4$1>$2</h4>\n<!-- /wp:heading -->\n\n')
 
-    // Convert paragraphs: <p>...</p> → <!-- wp:paragraph --><p>...</p><!-- /wp:paragraph -->
-    content = content.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi,
-        '<!-- wp:paragraph -->\n<p$1>$2</p>\n<!-- /wp:paragraph -->\n\n')
-
-    // Convert images: <img.../> → <!-- wp:image --><figure><img.../></figure><!-- /wp:image -->
-    content = content.replace(/<img([^>]*)>/gi, (match, attrs) => {
-        // Extract src for image sizing
+    // Convert images (before paragraphs, as images inside <p> need special handling)
+    content = content.replace(/<p[^>]*>\s*<img([^>]*)>\s*<\/p>/gi, (match, attrs) => {
         const srcMatch = attrs.match(/src=["']([^"']*)["']/)
         const altMatch = attrs.match(/alt=["']([^"']*)["']/)
         const src = srcMatch ? srcMatch[1] : ''
         const alt = altMatch ? altMatch[1] : ''
-
         return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->\n\n`
     })
 
-    // Convert unordered lists: <ul>...</ul> → <!-- wp:list --><ul>...</ul><!-- /wp:list -->
+    // Convert standalone images
+    content = content.replace(/<img([^>]*)>/gi, (match, attrs) => {
+        const srcMatch = attrs.match(/src=["']([^"']*)["']/)
+        const altMatch = attrs.match(/alt=["']([^"']*)["']/)
+        const src = srcMatch ? srcMatch[1] : ''
+        const alt = altMatch ? altMatch[1] : ''
+        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->\n\n`
+    })
+
+    // Convert unordered lists
     content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi,
         '<!-- wp:list -->\n<ul$1>$2</ul>\n<!-- /wp:list -->\n\n')
 
-    // Convert ordered lists: <ol>...</ol> → <!-- wp:list {"ordered":true} --><ol>...</ol><!-- /wp:list -->
+    // Convert ordered lists
     content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi,
         '<!-- wp:list {"ordered":true} -->\n<ol$1>$2</ol>\n<!-- /wp:list -->\n\n')
 
-    // Convert blockquotes: <blockquote>...</blockquote> → <!-- wp:quote --><blockquote>...</blockquote><!-- /wp:quote -->
+    // Convert blockquotes
     content = content.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gi,
         '<!-- wp:quote -->\n<blockquote$1>$2</blockquote>\n<!-- /wp:quote -->\n\n')
 
-    // Convert code blocks: <pre><code>...</code></pre> → <!-- wp:code --><pre><code>...</code></pre><!-- /wp:code -->
-    content = content.replace(/<pre([^>]*)><code([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
-        '<!-- wp:code -->\n<pre$1 class="wp-block-code"><code$2>$3</code></pre>\n<!-- /wp:code -->\n\n')
+    // Convert paragraphs LAST (so other elements aren't wrapped)
+    content = content.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi,
+        '<!-- wp:paragraph -->\n<p$1>$2</p>\n<!-- /wp:paragraph -->\n\n')
 
-    // Clean up extra whitespace
+    // 4. Restore code blocks from placeholders
+    for (let i = 0; i < codeBlocks.length; i++) {
+        content = content.replace(`___CODE_BLOCK_${i}___`, codeBlocks[i])
+    }
+
+    // 5. Clean up extra whitespace
     content = content.replace(/\n{3,}/g, '\n\n')
 
     return content.trim()
