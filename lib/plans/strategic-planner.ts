@@ -304,8 +304,6 @@ Before finalizing, verify:
             }
         }
 
-        console.log(`[Strategic Planner] Generated ${planItems.length} articles`)
-        console.log(`[Strategic Planner] Distribution:`, categoryDistribution)
 
         return {
             contentGapAnalysis: result.content_gap_analysis || "",

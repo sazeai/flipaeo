@@ -34,7 +34,6 @@ export async function buildTopicHierarchy(
 ): Promise<TopicHierarchy> {
     const genAI = getGeminiClient()
 
-    console.log(`[Topic Hierarchy] Building hierarchy from ${gapAnalysis.prioritizedOpportunities.length} opportunities...`)
 
     const prompt = `
 You are a content strategist building a TOPIC HIERARCHY for a 30-day content plan.
@@ -142,7 +141,6 @@ OUTPUT (JSON):
             conversion: nodes.filter(n => n.type === "conversion")
         }
 
-        console.log(`[Topic Hierarchy] Built: ${levels.foundation.length} foundation, ${levels.supporting.length} supporting, ${levels.advanced.length} advanced, ${levels.conversion.length} conversion`)
 
         return { nodes, levels }
     } catch (error) {

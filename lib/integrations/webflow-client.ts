@@ -125,11 +125,9 @@ function prepareContentForWebflow(htmlContent: string): string {
 
     // 6. Debug logging
     const listCount = (content.match(/<ul>/gi) || []).length + (content.match(/<ol>/gi) || []).length
-    console.log(`[Webflow] Content prepared: ${content.length} chars, ${listCount} lists found`)
     if (listCount > 0) {
         const firstList = content.match(/<[uo]l>[\s\S]*?<\/[uo]l>/i)
         if (firstList) {
-            console.log('[Webflow] First list preview:', firstList[0].substring(0, 200) + '...')
         }
     }
 
@@ -271,12 +269,9 @@ export async function createCollectionItem(
     // Map image to the configured field
     if (params.imageUrl) {
         const imageField = fieldMapping.image || 'main-image'
-        console.log(`[Webflow] Mapping image to field '${imageField}':`, params.imageUrl)
         fieldData[imageField] = params.imageUrl
     }
 
-    // Log the payload for debugging
-    console.log('[Webflow] Creating item with fields:', JSON.stringify(Object.keys(fieldData), null, 2))
     try {
         // Create as staged item first (not live)
         const response = await webflowFetch(

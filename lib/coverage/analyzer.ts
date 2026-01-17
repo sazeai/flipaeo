@@ -46,7 +46,6 @@ export async function analyzeArticleCoverage(
     const genAI = getGeminiClient()
     const supabase = adminClient ?? createAdminClient()
 
-    console.log(`[Coverage Analyzer] Analyzing article ${articleId} for coverage...`)
 
     const prompt = `
 You are an expert SEO analyst. Analyze the following blog article content and extract the distinct USER QUESTIONS that it meaningfully answers.
@@ -111,11 +110,8 @@ OUTPUT (Strict JSON Array):
         }
 
         if (!Array.isArray(answerUnits) || answerUnits.length === 0) {
-            console.log("[Coverage Analyzer] No answer units extracted.")
             return
         }
-
-        console.log(`[Coverage Analyzer] Extracted ${answerUnits.length} answer units.`)
 
         // Upsert each answer unit into the database
         for (const unit of answerUnits) {
@@ -138,8 +134,6 @@ OUTPUT (Strict JSON Array):
                 console.error(`[Coverage Analyzer] Failed to upsert answer unit "${unit.question}":`, error.message)
             }
         }
-
-        console.log(`[Coverage Analyzer] Successfully saved coverage data for article ${articleId}`)
 
     } catch (error: any) {
         console.error("[Coverage Analyzer] Error analyzing article:", error.message)

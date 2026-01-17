@@ -31,12 +31,9 @@ export async function syncSitemapToInternalLinksAction(
         let sitemapUrls: string[] = []
         let usedSitemapUrl = ""
 
-        console.log(`[Sync Internal Links] Starting sync checks for ${baseUrl}`)
-
         // Try paths sequentially until we find one with URLs
         for (const path of sitemapPaths) {
             const currentUrl = `${baseUrl}${path}`
-            console.log(`[Sync Internal Links] Trying sitemap: ${currentUrl}`)
 
             try {
                 const sitemapper = new Sitemapper({
@@ -48,11 +45,9 @@ export async function syncSitemapToInternalLinksAction(
                 if (sites && sites.length > 0) {
                     sitemapUrls = Array.from(new Set(sites as string[])) // Deduplicate
                     usedSitemapUrl = currentUrl
-                    console.log(`[Sync Internal Links] Found ${sitemapUrls.length} URLs at ${currentUrl}`)
                     break // Stop if we found a working sitemap
                 }
             } catch (e) {
-                console.log(`[Sync Internal Links] Failed to fetch ${currentUrl}:`, e)
             }
         }
 
@@ -71,13 +66,9 @@ export async function syncSitemapToInternalLinksAction(
         const existingUrls = new Set<string>(existingRecords?.map((r: any) => r.url) || [])
         const urlsToAdd = sitemapUrls.filter(url => !existingUrls.has(url))
 
-        console.log(`[Sync Internal Links] ${urlsToAdd.length} new URLs to add`)
-
-        // Extract titles for all URLs (for immediate return)
         const allTitles = sitemapUrls.map(url => extractTitleFromUrl(url))
 
-        // Process new URLs in batches
-        const BATCH_SIZE = 5 // Smaller batch for faster initial sync
+        const BATCH_SIZE = 5
         let syncedCount = 0
 
         for (let i = 0; i < urlsToAdd.length; i += BATCH_SIZE) {
@@ -122,8 +113,6 @@ export async function syncSitemapToInternalLinksAction(
                 }
             }
         }
-
-        console.log(`[Sync Internal Links] Synced ${syncedCount} new links`)
 
         return {
             success: true,

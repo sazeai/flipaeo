@@ -60,7 +60,6 @@ export async function POST(req: NextRequest) {
             featuredImageUrl = `${appUrl}${featuredImageUrl}`
         }
 
-        console.log('Featured image URL for WP:', featuredImageUrl)
 
         // 4. Upload section images to WordPress media library and replace R2 URLs
         const credentials = {
@@ -71,13 +70,11 @@ export async function POST(req: NextRequest) {
 
         let processedContent = article.final_html
         try {
-            console.log('[WordPress Publish] Processing section images...')
             processedContent = await uploadContentImagesToWordPress(
                 credentials,
                 article.final_html,
                 appUrl
             )
-            console.log('[WordPress Publish] Section images processed')
         } catch (imgError) {
             console.error('[WordPress Publish] Section images processing failed:', imgError)
             // Continue with original content - non-blocking

@@ -115,8 +115,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Tavily API key not configured" }, { status: 500 })
         }
 
-        console.log("Starting competitor analysis for:", domain)
-        console.log("Brand context:", brandContext)
 
         const tvly = tavily({ apiKey })
         const client = getGeminiClient()
@@ -192,9 +190,6 @@ Focus on finding similar products, not niche features.
 
         const searchQueries = categoryData.searchQueries || [`best ${categoryData.category || "software"} tools 2024`]
         const distinctFeatures = categoryData.distinctFeatures || []
-
-        console.log("Detected features:", distinctFeatures)
-        console.log("Generated search queries:", searchQueries)
 
         // STEP 2: Execute multiple queries to cover ALL features
         // Cost: ~$0.003 per query, executing 3 queries = ~$0.009 total (very cheap)
@@ -350,7 +345,6 @@ Examples:
             .filter((c: any) => c && c.name && c.name.length < 30)
             .slice(0, 10)
 
-        console.log(`[Analyze Competitors] Extracted ${competitorBrands.length} competitor brands: ${competitorBrands.map((c: any) => c.name).join(', ')}`)
 
         return NextResponse.json({
             competitors,

@@ -73,8 +73,6 @@ async function shopifyFetch(
     const normalizedDomain = normalizeStoreDomain(storeDomain)
     const url = `https://${normalizedDomain}/admin/api/${SHOPIFY_API_VERSION}${endpoint}`
 
-    console.log(`[Shopify] Requesting: ${url}`)
-
     return fetch(url, {
         ...options,
         headers: {
@@ -240,8 +238,6 @@ export async function createArticle(
                 articleData.image.attachment = params.image.attachment
             }
         }
-
-        console.log('[Shopify] Creating article:', { blogId, title: params.title })
 
         const response = await shopifyFetch(
             storeDomain,

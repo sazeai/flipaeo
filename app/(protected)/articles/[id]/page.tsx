@@ -61,13 +61,23 @@ type Article = {
 const getProxiedImageUrl = (url: string | null | undefined): string | null => {
     if (!url) return null
 
-    // Check if it's an old R2 direct URL
+    // Already a proxy URL
+    if (url.startsWith('/api/images/')) return url
+
+    // robustly extract key: find 'featured-images/' and take everything after
+    // This handles R2, S3, custom domains, or any source as long as path structure is preserved
+    const match = url.match(/(featured-images\/.*)/)
+    if (match) {
+        return `/api/images/${match[1]}`
+    }
+
+    // Fallback: Check if it's an old R2 direct URL (legacy support)
     if (url.includes('.r2.cloudflarestorage.com/')) {
         const key = url.split('.r2.cloudflarestorage.com/')[1]
         return `/api/images/${key}`
     }
 
-    // Already a proxy URL or external URL
+    // Return original if we can't proxy it
     return url
 }
 
@@ -748,7 +758,7 @@ export default function ArticleDetailPage() {
                                                 <div className="mb-8 relative rounded-lg overflow-hidden group border border-gray-100 shadow-sm">
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img
-                                                        src={getProxiedImageUrl(article.featured_image_url) || ''}
+                                                        src={article.featured_image_url || ''}
                                                         alt="Featured"
                                                         className="w-full max-h-[720px] object-cover"
                                                     />

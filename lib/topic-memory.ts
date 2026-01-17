@@ -52,7 +52,6 @@ export async function checkTopicDuplication(
         }
 
         if (similarArticles && similarArticles.length > 0) {
-            console.log(`[Topic Memory] Duplicate found for "${topic}" -> "${similarArticles[0].keyword}" (brand: ${brandId})`)
             return {
                 isDuplicate: true,
                 similarArticle: similarArticles[0].keyword
@@ -92,8 +91,6 @@ export async function saveTopicMemory(articleId: string, topic: string, adminCli
             .from("articles")
             .update({ topic_embedding: embedding } as any)
             .eq("id", articleId)
-
-        console.log(`[Topic Memory] Saved embedding for article ${articleId}`)
     } catch (e) {
         console.error("Failed to save topic memory:", e)
     }

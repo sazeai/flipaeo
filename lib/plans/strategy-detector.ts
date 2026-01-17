@@ -75,7 +75,6 @@ export async function detectContentStage(userId: string): Promise<StageDetection
         stage = "maturity"
     }
 
-    console.log(`[Strategy Detector] User ${userId}: ${stage} stage (${totalImpressions} impressions)`)
 
     return {
         stage,

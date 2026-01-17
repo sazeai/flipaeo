@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
 
         // --- BACKFILL TOPIC EMBEDDINGS ---
         if (mode === "topic_embedding" || mode === "both") {
-            console.log("[Backfill] Starting topic_embedding backfill...")
 
             // Fetch all articles without topic_embedding for this user
             const { data: articles, error } = await supabase
@@ -46,8 +45,6 @@ export async function POST(req: NextRequest) {
                 console.error("[Backfill] Failed to fetch articles:", error)
                 return NextResponse.json({ error: error.message }, { status: 500 })
             }
-
-            console.log(`[Backfill] Found ${articles?.length || 0} articles without topic_embedding`)
 
             for (const article of (articles || [])) {
                 try {
@@ -86,7 +83,6 @@ export async function POST(req: NextRequest) {
                         console.error(`[Backfill] Failed to update article ${article.id}:`, updateError)
                         results.topic_embedding.failed++
                     } else {
-                        console.log(`[Backfill] ✅ Saved embedding for: ${article.keyword}`)
                         results.topic_embedding.processed++
                     }
 
@@ -102,13 +98,8 @@ export async function POST(req: NextRequest) {
 
         // --- BACKFILL ANSWER COVERAGE ---
         if (mode === "answer_coverage" || mode === "both") {
-            console.log("[Backfill] Starting answer_coverage backfill...")
-
-            // For answer_coverage, we need to import the analyzer dynamically
-            // to avoid circular dependencies
             const { analyzeArticleCoverage } = await import("@/lib/coverage/analyzer")
 
-            // Fetch all completed articles for this user
             const { data: completedArticles, error } = await supabase
                 .from("articles")
                 .select("id, keyword, raw_content, brand_id, status")
@@ -119,8 +110,6 @@ export async function POST(req: NextRequest) {
                 console.error("[Backfill] Failed to fetch completed articles:", error)
                 return NextResponse.json({ error: error.message }, { status: 500 })
             }
-
-            console.log(`[Backfill] Found ${completedArticles?.length || 0} completed articles`)
 
             for (const article of (completedArticles || [])) {
                 try {
@@ -141,10 +130,8 @@ export async function POST(req: NextRequest) {
                         article.brand_id
                     )
 
-                    console.log(`[Backfill] ✅ Analyzed coverage for: ${article.keyword}`)
                     results.answer_coverage.processed++
 
-                    // Delay to avoid rate limits (LLM call per article)
                     await new Promise(resolve => setTimeout(resolve, 500))
 
                 } catch (e) {
@@ -153,8 +140,6 @@ export async function POST(req: NextRequest) {
                 }
             }
         }
-
-        console.log("[Backfill] Complete!", results)
 
         return NextResponse.json({
             success: true,

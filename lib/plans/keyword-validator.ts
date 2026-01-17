@@ -109,7 +109,6 @@ export async function validateArticleKeywords(
                 const validation = await validateKeyword(article.main_keyword)
 
                 if (!validation.isValid && autoReplace && validation.bestSuggestion) {
-                    console.log(`[Keyword Validator] Replacing "${article.main_keyword}" → "${validation.bestSuggestion}"`)
                     return {
                         ...article,
                         main_keyword: validation.bestSuggestion,

@@ -150,8 +150,6 @@ export function consolidateClusters(
         return articles // No consolidation needed
     }
 
-    console.log(`[Cluster Scheduler] Consolidating ${smallClusters.length} small clusters into larger ones`)
-
     // Merge small clusters into "General" or the largest cluster
     const targetCluster = largeClusters[0]?.cluster || "General"
 

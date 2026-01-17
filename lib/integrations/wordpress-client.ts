@@ -440,8 +440,6 @@ export async function uploadContentImagesToWordPress(
             const urlParts = originalUrl.split('/')
             const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.png'}`
 
-            console.log(`[Section Image Upload] Uploading: ${filename}`)
-
             // Upload to WordPress media library
             const mediaResult = await uploadMedia(credentials, fetchableUrl, filename)
 
@@ -451,10 +449,8 @@ export async function uploadContentImagesToWordPress(
                     new RegExp(escapeRegExp(originalUrl), 'g'),
                     mediaResult.source_url
                 )
-                console.log(`[Section Image Upload] Success: ${mediaResult.source_url}`)
             }
         } catch (error) {
-            console.error(`[Section Image Upload] Failed for ${originalUrl}:`, error)
             // Continue with other images - non-blocking
         }
     }

@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
         }
 
         const planItems: ContentPlanItem[] = existingPlan.plan_data || []
-        console.log(`[GSC Enhance] Found existing plan with ${planItems.length} articles`)
 
         // 4. Fetch GSC Data (Last 30 days) - Query + Page dimension
         const endDate = new Date()
@@ -101,7 +100,6 @@ export async function POST(req: NextRequest) {
             .eq("brand_id", existingPlan.brand_id)
 
         const existingUrls = existingLinks?.map(l => l.url) || []
-        console.log(`[GSC Enhance] Found ${existingUrls.length} existing URLs from sitemap`)
 
         // 6. Get brand name for filtering
         const { data: brand } = await supabase
@@ -114,7 +112,6 @@ export async function POST(req: NextRequest) {
 
         // 7. Process GSC data - this filters out cannibalization risks!
         const gscClusters = processGSCData(gscData.rows || [], brandName, existingUrls)
-        console.log(`[GSC Enhance] Processed ${gscClusters.length} opportunity clusters`)
 
         // 8. Enhance existing plan items with GSC metrics
         const enhancedItems = planItems.map(item => {
@@ -145,7 +142,6 @@ export async function POST(req: NextRequest) {
             )
             .slice(0, 5) // Add up to 5 new articles
 
-        console.log(`[GSC Enhance] Adding ${newOpportunities.length} new opportunity articles`)
 
         // Create new plan items from opportunities
         const newItems: ContentPlanItem[] = newOpportunities.map((opp, index) => ({
@@ -182,8 +178,6 @@ export async function POST(req: NextRequest) {
             console.error("[GSC Enhance] Save error:", updateError)
             return NextResponse.json({ error: "Failed to save enhanced plan" }, { status: 500 })
         }
-
-        console.log(`[GSC Enhance] Complete! Enhanced ${enhancedItems.length} items, added ${newItems.length} new`)
 
         return NextResponse.json({
             success: true,

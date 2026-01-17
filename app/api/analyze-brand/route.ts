@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Tavily API key not configured" }, { status: 500 })
     }
 
-    console.log("Starting Tavily crawl for:", url)
 
     const tvly = tavily({ apiKey })
 

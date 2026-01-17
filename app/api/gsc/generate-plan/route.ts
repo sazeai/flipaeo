@@ -82,7 +82,6 @@ export async function POST(req: NextRequest) {
         const gscData = await gscResponse.json()
         const gscClusters = processGSCData(gscData.rows || [], brandName, existingUrls)
 
-        console.log(`[GSC Plan] Processed ${gscClusters.length} clusters from search data`)
 
         // 4. Build Strategy (Topic Hierarchy)
         // We pass the existingPlan (Blueprint) or seeds to the hierarchy builder
@@ -119,11 +118,9 @@ export async function POST(req: NextRequest) {
             seeds: hierarchySeeds,
             competitorBrands,
             topicHierarchy: hierarchy,
-            gscClusters,
             existingContent: existingContentItems
         })
 
-        console.log(`[GSC Plan] Unified generation complete: ${result.plan.length} articles`)
 
         return NextResponse.json({ plan: result.plan })
 

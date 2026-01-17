@@ -34,32 +34,22 @@ export async function POST(req: NextRequest) {
         }
 
         // --- PHASE 1: SERP Intelligence (NEW) ---
-        console.log("[Content Plan API] Starting Phase 1: SERP Intelligence...")
         const serpData = await gatherSERPIntelligence(seeds, 3) // Analyze top 3 seeds
-        console.log(`[Content Plan API] Phase 1 complete: ${serpData.length} seeds analyzed`)
 
-        // Debug: Log what was passed
-        console.log(`[Content Plan API] Passed competitors: ${passedCompetitorBrands?.length || 0} brands: ${passedCompetitorBrands?.map(c => c.name).join(', ') || 'NONE'}`)
 
         // Extract competitor brands if not passed OR if passed is empty
         const competitorBrands = (passedCompetitorBrands && passedCompetitorBrands.length > 0)
             ? passedCompetitorBrands
             : extractCompetitorBrands(serpData)
-        console.log(`[Content Plan API] Using competitors: ${competitorBrands.map(c => c.name).join(', ')}`)
 
         // --- PHASE 2: Gap Analysis (NEW) ---
-        console.log("[Content Plan API] Starting Phase 2: Gap Analysis...")
         const gapAnalysis = await performGapAnalysis(serpData, brandData, existingContent || [])
-        console.log(`[Content Plan API] Phase 2 complete: ${gapAnalysis.blueOceanTopics.length} blue ocean topics`)
 
         // --- PHASE 3: Topic Hierarchy (NEW) ---
-        console.log("[Content Plan API] Starting Phase 3: Topic Hierarchy...")
         const competitorNames = competitorBrands.map(c => c.name)
         const hierarchy = await buildTopicHierarchy(gapAnalysis, brandData, competitorNames)
-        console.log(`[Content Plan API] Phase 3 complete: ${hierarchy.nodes.length} strategic topics mapped`)
 
         // --- PHASE 4: Generate Strategic Plan ---
-        console.log("[Content Plan API] Starting Phase 4: Plan Generation...")
         const { plan, categoryDistribution } = await generateContentPlan({
             userId: user.id,
             brandId: brandId || null,

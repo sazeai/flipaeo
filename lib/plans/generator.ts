@@ -79,7 +79,6 @@ export async function generateContentPlan({
     const currentDate = `${today.toLocaleDateString('en-US', { month: 'long' })} ${today.getFullYear()}`
 
     // --- STEP 1: FETCH EXISTING COVERAGE ---
-    console.log("[Content Plan] Fetching existing coverage context...")
     const coverageData = await getCoverageContext(userId, brandId)
     const { stronglyAnswered } = summarizeCoverage(coverageData)
 
@@ -88,8 +87,6 @@ export async function generateContentPlan({
     const allCoveredQuestions = [
         ...stronglyAnswered
     ]
-
-    console.log(`[Content Plan] Total covered questions: ${allCoveredQuestions.length}`)
 
     // Build coverage clusters: SATURATED / PARTIAL / EMPTY
     const coverageSection = allCoveredQuestions.length > 0
@@ -468,7 +465,6 @@ For each article provide:
         // Skip if parent question already seen in this plan
         const normalizedPQ = (post.parent_question || "").toLowerCase().trim()
         if (seenParentQuestions.has(normalizedPQ)) {
-            console.log(`[Content Plan] Skipped duplicate parent question: ${post.parent_question}`)
             continue
         }
 
@@ -516,7 +512,6 @@ For each article provide:
         const type = post.article_type || "informational"
         if (type in typeDistribution) typeDistribution[type]++
     }
-    console.log(`[Content Plan] Article Type Distribution:`, typeDistribution)
     const infoPercent = validPosts.length > 0 ? (typeDistribution.informational / validPosts.length) * 100 : 0
     if (infoPercent > 70) {
         console.warn(`[Content Plan] ⚠️ WARNING: ${infoPercent.toFixed(0)}% informational. LLM may have ignored article_type rules.`)
@@ -567,7 +562,6 @@ For each article provide:
 
         // Targeted regeneration for invalid titles (max 1 retry)
         try {
-            console.log("[Content Plan] Attempting to regenerate invalid titles...")
             const fixPrompt = `You must fix these ${titleViolations.length} article titles. Each title violates AEO (Answer Engine Optimization) rules.
 
 CURRENT VIOLATIONS:
@@ -596,7 +590,6 @@ The order must match the violations list above.`
                     if (fixResult.titles[index]) {
                         const oldTitle = post.title
                         post.title = fixResult.titles[index]
-                        console.log(`   ✅ Fixed: "${oldTitle}" → "${post.title}"`)
                     }
                 })
             }
@@ -625,9 +618,6 @@ The order must match the violations list above.`
         }
 
         const totalNeeded = 30 - validPosts.length
-
-        console.log(`[Content Plan] Only ${validPosts.length} articles generated, requesting ${totalNeeded} more...`)
-        console.log(`[Content Plan] Needed by category:`, neededByCategory)
 
         const existingTitles = validPosts.map(p => p.title).join('\n')
 
@@ -693,8 +683,6 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
             const topUpResult = JSON.parse(topUpText)
             const additionalPosts = topUpResult.posts || []
 
-            console.log(`[Content Plan] Top-up generated ${additionalPosts.length} additional articles`)
-
             for (const post of additionalPosts) {
                 if (validPosts.length >= 30) break
                 // Skip duplicates
@@ -707,14 +695,10 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
                     }
                 }
             }
-
-            console.log(`[Content Plan] After top-up: ${validPosts.length} total articles`)
         } catch (topUpError) {
             console.error("[Content Plan] Top-up failed:", topUpError)
         }
     }
-
-    console.log(`[Content Plan] Final Category Distribution:`, categoryDistribution)
 
     // Add metadata and IDs
     const rawItems = validPosts.map((post: any, index: number) => {
@@ -744,8 +728,6 @@ Each article needs: title, main_keyword, supporting_keywords, article_type, clus
     })
 
     // --- STEP 6: STRATEGIC SCHEDULING (NEW) ---
-    console.log("[Content Plan] Applying Cluster-first scheduling...")
-
     // First, consolidate small clusters for better authority
     const consolidated = consolidateClusters(rawItems, 3, 8)
 

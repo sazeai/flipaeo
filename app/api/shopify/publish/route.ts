@@ -71,13 +71,10 @@ export async function POST(req: NextRequest) {
             }
 
             try {
-                console.log(`[Shopify Publish] Fetching image from: ${fetchUrl}`)
                 const imageRes = await fetch(fetchUrl)
                 if (imageRes.ok) {
                     const arrayBuffer = await imageRes.arrayBuffer()
                     featuredImageAttachment = Buffer.from(arrayBuffer).toString('base64')
-                } else {
-                    console.warn(`[Shopify Publish] Failed to fetch image: ${imageRes.status}`)
                 }
             } catch (err) {
                 console.error(`[Shopify Publish] Error fetching image:`, err)
@@ -99,8 +96,6 @@ export async function POST(req: NextRequest) {
         // 5. Process section images - convert R2 URLs to publicly accessible proxy URLs
         let processedContent = article.final_html
         try {
-            console.log('[Shopify Publish] Processing section images...')
-
             // Match all img tags with section-images URLs containing R2 or relative paths
             const imgRegex = /<img[^>]*src=["']([^"']*section-images[^"']*)["'][^>]*>/gi
             const matches = [...processedContent.matchAll(imgRegex)]
@@ -124,9 +119,7 @@ export async function POST(req: NextRequest) {
                     new RegExp(escapeRegExp(originalUrl), 'g'),
                     publicUrl
                 )
-                console.log(`[Shopify Section Image] Replaced: ${originalUrl.split('/').pop()}`)
             }
-            console.log('[Shopify Publish] Section images processed')
         } catch (error) {
             console.error('[Shopify Publish] Section images processing failed:', error)
         }

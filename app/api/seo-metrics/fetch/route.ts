@@ -71,7 +71,6 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        console.log(`[SEO Metrics] Triggering background job for ${domain}...`)
 
         // Set status to pending before triggering
         await supabase
@@ -98,7 +97,6 @@ export async function POST(req: NextRequest) {
             }
         )
 
-        console.log(`[SEO Metrics] Triggered job ${handle.id} for ${domain}`)
 
         return NextResponse.json({
             success: true,

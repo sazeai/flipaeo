@@ -73,13 +73,6 @@ export async function fetchMozMetrics(domain: string): Promise<MozMetrics | null
 
         const result = data.results[0]
 
-        console.log(`[Moz] Fetched metrics for ${cleanDomain}:`, {
-            da: result.domain_authority,
-            pa: result.page_authority,
-            links: result.external_pages_to_root_domain,
-            refDomains: result.root_domains_to_root_domain
-        })
-
         return {
             domain_authority: result.domain_authority ?? 0,
             page_authority: result.page_authority ?? 0,

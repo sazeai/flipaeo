@@ -55,8 +55,6 @@ export async function fetchPageSpeedMetrics(
     const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(fullUrl)}&strategy=${strategy}&${categoryParams}${apiKeyParam}`
 
     try {
-        console.log(`[PageSpeed] Analyzing ${fullUrl} (${strategy})...`)
-
         const response = await fetch(apiUrl)
 
         if (!response.ok) {
@@ -128,13 +126,6 @@ export async function fetchPageSpeedMetrics(
 
             recommendations: recommendations.slice(0, 10) // Limit to 10 recommendations
         }
-
-        console.log(`[PageSpeed] Results for ${fullUrl}:`, {
-            performance: metrics.performance_score,
-            seo: metrics.seo_score,
-            lcp: metrics.lcp_seconds,
-            recommendations: metrics.recommendations.length
-        })
 
         return metrics
     } catch (error) {

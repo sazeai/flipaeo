@@ -482,25 +482,6 @@ export async function POST(req: NextRequest) {
         verified = validPrimary || validTrim
         verifiedBy = validPrimary ? 'manual' : (validTrim ? 'manual-trim' : null)
 
-        // Optional debug diagnostics (does not log raw payload)
-        if ((process.env.DEBUG_DODO_WEBHOOK || '').toLowerCase() === 'true' || process.env.DEBUG_DODO_WEBHOOK === '1') {
-            const hashRaw = (() => { try { return createHash('sha256').update(rawBody).digest('hex') } catch { return '' } })()
-            const hashTrim = rawNoNL !== rawBody ? (() => { try { return createHash('sha256').update(rawNoNL).digest('hex') } catch { return '' } })() : ''
-            console.log('[Dodo Webhook][debug] signature verification', {
-                id: webhookId,
-                ts: webhookTimestamp,
-                hasSecret: Boolean(process.env.DODO_PAYMENTS_WEBHOOK_SECRET || process.env.DODO_PAYMENTS_WEBHOOK_KEY || process.env.DODO_WEBHOOK_SECRET),
-                sigHeaderSource,
-                sigFormat: sigInfo.format,
-                sigProvidedLen: (sigInfo.provided || '').length,
-                bodyLen: rawBody.length,
-                bodySha256: hashRaw,
-                trimmedDifferent: rawNoNL !== rawBody,
-                trimmedBodyLen: rawNoNL.length,
-                trimmedBodySha256: hashTrim,
-                verifiedBy,
-            })
-        }
     }
 
     if (!verified) {

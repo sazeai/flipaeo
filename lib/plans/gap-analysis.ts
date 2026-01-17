@@ -30,7 +30,6 @@ export async function performGapAnalysis(
     const answeredQuestions = aggregateAnsweredQuestions(serpData)
     const missingAngles = aggregateMissingAngles(serpData)
 
-    console.log(`[Gap Analysis] Analyzing: ${coveredTopics.length} topics, ${answeredQuestions.length} questions, ${missingAngles.length} missing angles`)
 
     const prompt = `
 You are a strategic SEO analyst performing a gap analysis.
@@ -101,7 +100,6 @@ OUTPUT (JSON):
         const text = response.text || "{}"
         const parsed = JSON.parse(text.replace(/```json|```/g, ""))
 
-        console.log(`[Gap Analysis] Found: ${parsed.blueOceanTopics?.length || 0} blue ocean, ${parsed.saturatedTopics?.length || 0} saturated`)
 
         return {
             saturatedTopics: parsed.saturatedTopics || [],

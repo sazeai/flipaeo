@@ -125,7 +125,6 @@ export async function checkSitemapDuplication(
         }
 
         if (data && data.length > 0) {
-            console.log(`[Sitemap Dedup] Duplicate found for "${topic}" -> "${data[0].title}" (${data[0].url})`)
             return {
                 isDuplicate: true,
                 similarUrl: data[0].url

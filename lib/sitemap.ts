@@ -8,8 +8,6 @@ export async function fetchSitemapUrls(websiteUrl: string): Promise<string[]> {
     const baseUrl = websiteUrl.replace(/\/$/, '')
     const sitemapUrl = `${baseUrl}/sitemap.xml`
 
-    console.log(`[Sitemap] Fetching from: ${sitemapUrl}`)
-
     const sitemapper = new Sitemapper({
         url: sitemapUrl,
         timeout: 15000, // 15 seconds
@@ -18,7 +16,6 @@ export async function fetchSitemapUrls(websiteUrl: string): Promise<string[]> {
     try {
         const { sites } = await sitemapper.fetch()
         const urls = Array.from(new Set(sites || [])) // Deduplicate
-        console.log(`[Sitemap] Found ${urls.length} URLs`)
         return urls
     } catch (error) {
         console.warn(`[Sitemap] Failed to fetch: ${error}`)
@@ -143,7 +140,6 @@ export async function preseedCoverage(
             return 0
         }
 
-        console.log(`[Sitemap] Pre-seeded ${inserts.length} parent questions as "strong" coverage`)
         return inserts.length
     } catch (error) {
         console.error("[Sitemap] Pre-seed error:", error)

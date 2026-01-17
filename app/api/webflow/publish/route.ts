@@ -73,7 +73,6 @@ export async function POST(req: NextRequest) {
             // If on localhost, we MUST upload the asset to Webflow first because they can't reach us.
             // Even in prod, uploading as an asset is safer/cleaner than hotlinking to our R2 proxy.
             try {
-                console.log(`[Webflow Publish] Fetching image for asset upload: ${fetchUrl}`)
                 const imageRes = await fetch(fetchUrl)
                 if (imageRes.ok) {
                     const arrayBuffer = await imageRes.arrayBuffer()
@@ -89,9 +88,7 @@ export async function POST(req: NextRequest) {
 
                     if (assetResult.url) {
                         featuredImageUrl = assetResult.url
-                        console.log(`[Webflow Publish] Asset uploaded successfully: ${featuredImageUrl}`)
                     } else {
-                        console.warn(`[Webflow Publish] Asset upload failed: ${assetResult.error}`)
                         // Fallback to original URL if not localhost (might work if public)
                         if (isLocalhost) featuredImageUrl = null
                     }
@@ -105,8 +102,6 @@ export async function POST(req: NextRequest) {
         // 4. Process section images - upload to Webflow assets and replace R2 URLs
         let processedContent = article.final_html
         try {
-            console.log('[Webflow Publish] Processing section images...')
-
             // Match all img tags with section-images URLs
             const imgRegex = /<img[^>]*src=["']([^"']*section-images[^"']*)["'][^>]*>/gi
             const matches = [...processedContent.matchAll(imgRegex)]
@@ -126,7 +121,6 @@ export async function POST(req: NextRequest) {
                 }
 
                 try {
-                    console.log(`[Webflow Section Image] Uploading: ${originalUrl.split('/').pop()}`)
                     const imageRes = await fetch(fetchableUrl)
                     if (imageRes.ok) {
                         const arrayBuffer = await imageRes.arrayBuffer()
@@ -145,14 +139,12 @@ export async function POST(req: NextRequest) {
                                 new RegExp(escapeRegExp(originalUrl), 'g'),
                                 assetResult.url
                             )
-                            console.log(`[Webflow Section Image] Success: ${assetResult.url}`)
                         }
                     }
                 } catch (imgErr) {
                     console.error(`[Webflow Section Image] Failed for ${originalUrl}:`, imgErr)
                 }
             }
-            console.log('[Webflow Publish] Section images processed')
         } catch (error) {
             console.error('[Webflow Publish] Section images processing failed:', error)
         }

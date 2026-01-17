@@ -64,8 +64,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: insertError?.message || "Failed to create plan" }, { status: 500 })
         }
 
-        console.log(`[Start Background Plan] Created pending plan: ${plan.id}`)
-
         // Trigger background task - all intelligence gathering happens there
         try {
             const handle = await tasks.trigger<typeof generatePlanTask>(
@@ -79,7 +77,6 @@ export async function POST(req: NextRequest) {
                 }
             )
 
-            console.log(`[Start Background Plan] Triggered task: ${handle.id}`)
 
             return NextResponse.json({
                 success: true,

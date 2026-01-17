@@ -38,7 +38,6 @@ export async function gatherSERPIntelligence(
 
     // Process top seeds (limit to avoid cost overrun)
     const seedsToProcess = seeds.slice(0, maxSeeds)
-    console.log(`[SERP Intelligence] Analyzing ${seedsToProcess.length} seeds...`)
 
     for (const seed of seedsToProcess) {
         try {
@@ -51,7 +50,6 @@ export async function gatherSERPIntelligence(
 
             const rawResults = searchResponse.results || []
             if (rawResults.length === 0) {
-                console.log(`[SERP Intelligence] No results for: ${seed}`)
                 continue
             }
 
@@ -59,7 +57,6 @@ export async function gatherSERPIntelligence(
             const analysis = await analyzeSERPResults(rawResults, seed, genAI)
             results.push(analysis)
 
-            console.log(`[SERP Intelligence] Analyzed "${seed}": ${analysis.topPages.length} pages, coverage: ${analysis.coverageLevel}`)
         } catch (error) {
             console.error(`[SERP Intelligence] Error analyzing "${seed}":`, error)
         }

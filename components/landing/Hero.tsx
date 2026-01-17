@@ -27,7 +27,7 @@ export const Hero: React.FC = () => {
 
       {/* Subtext */}
       <p className="font-sans text-gray-600 text-lg md:text-2xl max-w-3xl mb-12 leading-relaxed font-medium px-4">
-        <span className="font-bold text-black border-b-[3px] border-brand-orange/30">FlipAEO is an Strategic Content Engine for AEO/GEO.</span> We engineer the exact content required to make your brand the #1 citation in AI search results.
+        <span className="font-bold text-black border-b-[3px] border-brand-orange/30">FlipAEO is the Strategic Content Engine for dominating AEO and GEO.</span> We engineer the exact content required to make your brand the #1 citation in AI search results.
       </p>
 
       {/* Actions */}
