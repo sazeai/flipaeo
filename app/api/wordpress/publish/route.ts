@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { publishToWordPress, uploadContentImagesToWordPress } from "@/lib/integrations/wordpress-client"
+import { publishToWordPress, uploadContentImagesToWordPress, prepareContentForWordPress } from "@/lib/integrations/wordpress-client"
 
 export async function POST(req: NextRequest) {
     try {
@@ -82,6 +82,9 @@ export async function POST(req: NextRequest) {
             console.error('[WordPress Publish] Section images processing failed:', imgError)
             // Continue with original content - non-blocking
         }
+
+        // 4b. Prepare content for WordPress (strip H1, convert to Gutenberg blocks)
+        processedContent = prepareContentForWordPress(processedContent)
 
         // 5. Publish to WordPress
         const result = await publishToWordPress(

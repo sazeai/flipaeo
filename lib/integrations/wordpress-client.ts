@@ -40,6 +40,66 @@ function createAuthHeader(username: string, appPassword: string): string {
 }
 
 /**
+ * Prepare HTML content for WordPress:
+ * 1. Strip the first H1 (it's sent as post title)
+ * 2. Convert HTML to Gutenberg blocks format
+ */
+export function prepareContentForWordPress(htmlContent: string): string {
+    if (!htmlContent) return ''
+
+    // 1. Remove the first H1 tag (title is sent separately as post title)
+    let content = htmlContent.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')
+
+    // 2. Convert HTML elements to Gutenberg blocks
+    // Parse and wrap each element in appropriate block comments
+
+    // Convert headings: <h2>...</h2> → <!-- wp:heading {"level":2} --><h2>...</h2><!-- /wp:heading -->
+    content = content.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
+        '<!-- wp:heading {"level":2} -->\n<h2$1>$2</h2>\n<!-- /wp:heading -->\n\n')
+    content = content.replace(/<h3([^>]*)>([\s\S]*?)<\/h3>/gi,
+        '<!-- wp:heading {"level":3} -->\n<h3$1>$2</h3>\n<!-- /wp:heading -->\n\n')
+    content = content.replace(/<h4([^>]*)>([\s\S]*?)<\/h4>/gi,
+        '<!-- wp:heading {"level":4} -->\n<h4$1>$2</h4>\n<!-- /wp:heading -->\n\n')
+
+    // Convert paragraphs: <p>...</p> → <!-- wp:paragraph --><p>...</p><!-- /wp:paragraph -->
+    content = content.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi,
+        '<!-- wp:paragraph -->\n<p$1>$2</p>\n<!-- /wp:paragraph -->\n\n')
+
+    // Convert images: <img.../> → <!-- wp:image --><figure><img.../></figure><!-- /wp:image -->
+    content = content.replace(/<img([^>]*)>/gi, (match, attrs) => {
+        // Extract src for image sizing
+        const srcMatch = attrs.match(/src=["']([^"']*)["']/)
+        const altMatch = attrs.match(/alt=["']([^"']*)["']/)
+        const src = srcMatch ? srcMatch[1] : ''
+        const alt = altMatch ? altMatch[1] : ''
+
+        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->\n\n`
+    })
+
+    // Convert unordered lists: <ul>...</ul> → <!-- wp:list --><ul>...</ul><!-- /wp:list -->
+    content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi,
+        '<!-- wp:list -->\n<ul$1>$2</ul>\n<!-- /wp:list -->\n\n')
+
+    // Convert ordered lists: <ol>...</ol> → <!-- wp:list {"ordered":true} --><ol>...</ol><!-- /wp:list -->
+    content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi,
+        '<!-- wp:list {"ordered":true} -->\n<ol$1>$2</ol>\n<!-- /wp:list -->\n\n')
+
+    // Convert blockquotes: <blockquote>...</blockquote> → <!-- wp:quote --><blockquote>...</blockquote><!-- /wp:quote -->
+    content = content.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gi,
+        '<!-- wp:quote -->\n<blockquote$1>$2</blockquote>\n<!-- /wp:quote -->\n\n')
+
+    // Convert code blocks: <pre><code>...</code></pre> → <!-- wp:code --><pre><code>...</code></pre><!-- /wp:code -->
+    content = content.replace(/<pre([^>]*)><code([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
+        '<!-- wp:code -->\n<pre$1 class="wp-block-code"><code$2>$3</code></pre>\n<!-- /wp:code -->\n\n')
+
+    // Clean up extra whitespace
+    content = content.replace(/\n{3,}/g, '\n\n')
+
+    return content.trim()
+}
+
+
+/**
  * Test WordPress connection by fetching current user
  */
 export async function testConnection(credentials: WordPressCredentials): Promise<{ success: boolean; error?: string; siteName?: string }> {
