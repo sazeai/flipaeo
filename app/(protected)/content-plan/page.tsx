@@ -45,6 +45,7 @@ import { createClient } from "@/utils/supabase/client"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { CalendarView } from "@/components/content-plan/calendar-view"
+import { PaywallOverlay } from "@/components/content-plan/paywall-overlay"
 import {
     Sheet,
     SheetContent,
@@ -631,7 +632,7 @@ export default function ContentPlanPage() {
                         <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
                             {/* Credits Warning */}
                             {!hasCredits && (
-                                <Link href="/pricing" className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-lg border border-red-100 hover:bg-red-100/50 transition-colors">
+                                <Link href="/subscribe" className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-lg border border-red-100 hover:bg-red-100/50 transition-colors">
                                     <Lock className="w-3 h-3" />
                                     <span>Top up</span>
                                 </Link>
@@ -833,20 +834,46 @@ export default function ContentPlanPage() {
 
                                                 {/* Articles Grid */}
                                                 {categoryItems.length > 0 ? (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                        {categoryItems.map((item) => (
-                                                            <PlanCard
-                                                                key={item.id}
-                                                                item={item}
-                                                                isEditing={editingId === item.id}
-                                                                hasCredits={hasCredits}
-                                                                onStartEdit={() => handleStartEdit(item)}
-                                                                onCancelEdit={() => setEditingId(null)}
-                                                                onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
-                                                                onWriteArticle={() => handleWriteArticle(item)}
-                                                            />
-                                                        ))}
-                                                    </div>
+                                                    <>
+                                                        {/* Visible Cards (first 3) */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                                            {categoryItems.slice(0, hasCredits ? categoryItems.length : 3).map((item) => (
+                                                                <PlanCard
+                                                                    key={item.id}
+                                                                    item={item}
+                                                                    isEditing={editingId === item.id}
+                                                                    hasCredits={hasCredits}
+                                                                    onStartEdit={() => handleStartEdit(item)}
+                                                                    onCancelEdit={() => setEditingId(null)}
+                                                                    onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
+                                                                    onWriteArticle={() => handleWriteArticle(item)}
+                                                                />
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Blurred Cards with Paywall (remaining cards when no credits) */}
+                                                        {!hasCredits && categoryItems.length > 3 && (
+                                                            <PaywallOverlay
+                                                                hiddenCount={categoryItems.length - 3}
+                                                                categoryName={categoryConfig.label}
+                                                            >
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+                                                                    {categoryItems.slice(3).map((item) => (
+                                                                        <PlanCard
+                                                                            key={item.id}
+                                                                            item={item}
+                                                                            isEditing={false}
+                                                                            hasCredits={false}
+                                                                            onStartEdit={() => { }}
+                                                                            onCancelEdit={() => { }}
+                                                                            onSaveEdit={() => { }}
+                                                                            onWriteArticle={() => { }}
+                                                                        />
+                                                                    ))}
+                                                                </div>
+                                                            </PaywallOverlay>
+                                                        )}
+                                                    </>
                                                 ) : (
                                                     <div className="text-center py-6 text-stone-400 text-sm border border-dashed border-stone-200 rounded-lg">
                                                         No {categoryConfig.label} yet

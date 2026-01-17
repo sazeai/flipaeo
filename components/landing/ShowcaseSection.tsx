@@ -17,8 +17,8 @@ export const ShowcaseSection: React.FC = () => {
                 <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
                     Don't just take our words.<br />See the output.
                 </h2>
-                <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed">
-                    Real articles, ranking on real domains. This is what you get out of the box.
+                <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl">
+                    Real article, published on real domain without any human touch-up. This is what you get out of the box.
                 </p>
             </div>
 

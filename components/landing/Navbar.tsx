@@ -15,7 +15,7 @@ const links: NavLink[] = [
   { label: 'Benefits', href: '#benefits' },
   { label: 'How it work', href: '#how-it-works' },
   { label: 'The Process', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Pricing', href: '/pricing' },
 ];
 
 export const Navbar: React.FC = () => {
