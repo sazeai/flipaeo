@@ -85,6 +85,9 @@ export default function ArticleDetailPage() {
     const [activeTab, setActiveTab] = useState<string>("editor")
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
     const [isCopied, setIsCopied] = useState(false)
+    const [editableMetaDescription, setEditableMetaDescription] = useState<string>("")
+    const [editableSlug, setEditableSlug] = useState<string>("")
+    const [isSavingMetadata, setIsSavingMetadata] = useState(false)
 
     useEffect(() => {
         if (!id) return
@@ -100,6 +103,8 @@ export default function ArticleDetailPage() {
             if (mounted && data) {
                 setArticle(data as Article)
                 setOutlineData(data.outline)
+                setEditableMetaDescription(data.meta_description || "")
+                setEditableSlug(data.slug || "")
                 setLoading(false)
                 if (data.created_at) {
                     setLastSaved(new Date(data.created_at))
@@ -530,17 +535,57 @@ export default function ArticleDetailPage() {
 
                         <div className="space-y-1">
                             <p className="text-xs text-gray-500">Meta Description</p>
-                            <p className="text-sm font-medium text-gray-900 leading-snug">
-                                {article.meta_description || "Not generated yet"}
-                            </p>
+                            <textarea
+                                value={editableMetaDescription}
+                                onChange={(e) => setEditableMetaDescription(e.target.value)}
+                                placeholder="Enter meta description..."
+                                className="w-full text-sm font-medium text-gray-900 leading-snug bg-gray-50 border border-gray-200 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-300 transition-all"
+                                rows={3}
+                                maxLength={160}
+                            />
+                            <p className="text-xs text-gray-400 text-right">{editableMetaDescription.length}/160</p>
                         </div>
 
                         <div className="space-y-1">
                             <p className="text-xs text-gray-500">URL Slug</p>
-                            <p className="text-sm font-medium text-gray-900 leading-snug font-mono break-all">
-                                {article.slug || "Not generated yet"}
-                            </p>
+                            <input
+                                type="text"
+                                value={editableSlug}
+                                onChange={(e) => setEditableSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-'))}
+                                placeholder="enter-url-slug"
+                                className="w-full text-sm font-medium text-gray-900 leading-snug font-mono bg-gray-50 border border-gray-200 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-gray-300 transition-all"
+                            />
                         </div>
+
+                        <Button
+                            onClick={async () => {
+                                if (!article) return
+                                setIsSavingMetadata(true)
+                                try {
+                                    const { error } = await supabase
+                                        .from("articles")
+                                        .update({
+                                            meta_description: editableMetaDescription,
+                                            slug: editableSlug
+                                        })
+                                        .eq("id", article.id)
+                                    if (error) throw error
+                                    setArticle(prev => prev ? { ...prev, meta_description: editableMetaDescription, slug: editableSlug } : null)
+                                    toast.success("Metadata saved!")
+                                } catch (err) {
+                                    toast.error("Failed to save metadata")
+                                } finally {
+                                    setIsSavingMetadata(false)
+                                }
+                            }}
+                            disabled={isSavingMetadata}
+                            size="sm"
+                            variant="outline"
+                            className="w-full mt-2"
+                        >
+                            {isSavingMetadata ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Save className="w-3 h-3 mr-2" />}
+                            Save Metadata
+                        </Button>
 
                         <div className="space-y-1">
                             <p className="text-xs text-gray-500">Created At</p>
@@ -671,12 +716,14 @@ export default function ArticleDetailPage() {
                                 >
                                     Editor
                                 </TabsTrigger>
+                                {/* Outline tab hidden for now - not useful after article is written
                                 <TabsTrigger
                                     value="outline"
                                     className="cursor-pointer rounded-full px-6 py-1.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm transition-all"
                                 >
                                     Outline
                                 </TabsTrigger>
+                                */}
                             </TabsList>
                         </div>
 
@@ -773,6 +820,7 @@ export default function ArticleDetailPage() {
                                 <div className="h-20" /> {/* Bottom spacer */}
                             </TabsContent>
 
+                            {/* Outline tab content hidden for now - not useful after article is written
                             <TabsContent value="outline" className="m-0 min-h-full p-4 sm:p-8 max-w-4xl mx-auto focus-visible:ring-0 outline-none">
                                 <div className="bg-white rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-gray-100 min-h-[calc(100vh-10rem)] p-6 sm:p-10">
                                     <OutlineEditor
@@ -780,8 +828,9 @@ export default function ArticleDetailPage() {
                                         onChange={setOutlineData}
                                     />
                                 </div>
-                                <div className="h-20" /> {/* Bottom spacer */}
+                                <div className="h-20" />
                             </TabsContent>
+                            */}
                         </div>
                     </Tabs>
                 </div>

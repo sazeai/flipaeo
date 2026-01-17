@@ -1332,8 +1332,8 @@ CRITICAL EXECUTION RULES:
       const slug = slugify(title || outline.title || keyword)
 
       // 2. Generate Meta Description (AI)
-      const seoSystemPrompt = `You are an expert SEO Specialist.
-      Your task is to generate a compelling, natural, Meta Description for a blog post based on given inout outline and keyword.
+      const seoSystemPrompt = `You are an expert SEO Specialist. ${getCurrentDateContext()}
+      Your task is to generate a compelling, natural, Meta Description for a blog post based on given input outline and keyword.
       INPUT:
       Title: ${finalTitle}
       Keyword: ${keyword}
@@ -1343,6 +1343,7 @@ CRITICAL EXECUTION RULES:
       - Compelling, click-worthy, and includes the target keyword naturally.
       - Direct and to the point.
       - No emojis, No special characters i.e. :,;* or No hashtags.
+      - If you reference any year, use the CURRENT year from the date context above. NEVER use 2024 or any past year.
 
       OUTPUT SCHEMA (JSON):
       {
