@@ -10,8 +10,12 @@ export const FAQSection: React.FC = () => {
       answer: "No. Google rewards helpful, authoritative content regardless of how it's produced. Unlike generic AI that hallucinates, our engine performs deep research, cites real sources, and focuses on 'Information Gain'—the exact signals Google's algorithms prioritize."
     },
     {
-      question: "HOW IS THIS DIFFERENT FROM CHATGPT?",
-      answer: "ChatGPT is a chatbot; we are a Strategy Engine. We don't just 'write text'. We analyze top-ranking competitors, map your internal links, ensure accurate citations, and apply your specific Brand Voice DNA. It's the difference between a rough draft and a publish-ready article."
+      question: "HOW IS THIS DIFFERENT FROM OTHER AI BLOG WRITERS?",
+      answer: "Other AI writers are just tools. FlipAEO is a system that grows your SEO muscle over time. Every article we create links back to your previous articles, cites authoritative sources, and strengthens your entire site's authority. The more you publish, the more powerful each new article becomes. It's not just writing—it's a system that grows your SEO muscle over time."
+    },
+    {
+      question: "WHY DOES THE CONTENT FEEL SO HUMAN?",
+      answer: "We built an 'Anti-AI Filter' into every article. It blocks robotic words like 'unleash', 'seamless', and 'cutting-edge'. It forces sentence variety—short punches mixed with longer thoughts. Every paragraph starts with a direct answer, not fluff. And we pull real data from live research, so there's no hallucination. The result? Content that reads like a senior marketer wrote it, not a chatbot."
     },
     {
       question: "DO I NEED TO EDIT THE ARTICLES?",
@@ -19,11 +23,7 @@ export const FAQSection: React.FC = () => {
     },
     {
       question: "DOES IT INTEGRATE WITH MY SITE?",
-      answer: "Yes. We have direct 1-click publishing integrations for WordPress and Webflow. We also support custom webhooks if you have a unique tech stack. Images, formatting, and meta tags are all synced automatically."
-    },
-    {
-      question: "WHAT IF I DON'T LIKE THE OUTPUT?",
-      answer: "You have full control. You can regenerate specific sections or the entire article. Plus, our 'Brand Voice' learning improves with every article you publish, ensuring the AI gets smarter about your specific style over time."
+      answer: "Yes. We have direct 1-click publishing integrations for WordPress, Shopify and Webflow. Images, formatting, and meta tags are all synced automatically."
     },
     {
       question: "CAN I CANCEL IF IT'S NOT FOR ME?",
@@ -37,34 +37,53 @@ export const FAQSection: React.FC = () => {
       question: "WHAT LANGUAGES DO YOU SUPPORT?",
       answer: "Currently, we specialize in high-quality English (US/UK) content to ensure maximum nuance and authority. Multi-language support is on our roadmap for Q4."
     },
-    {
-      question: "WHAT HAPPENS IF I RUN OUT OF CREDITS?",
-      answer: "You can easily top up credits from your dashboard at any time, or upgrade to a higher tier plan for better volume pricing. Unused credits roll over for 30 days."
-    }
+
   ];
 
-  return (
-    <section className="w-full py-24 px-4 flex flex-col items-center">
-      {/* Header */}
-      <div className="flex flex-col items-center text-center mb-16 max-w-3xl">
-        <div className="inline-block bg-[#FAFA9D] border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform rotate-2">
-          <span className="font-display font-black text-xs uppercase tracking-widest">FAQ</span>
-        </div>
-        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
-          DOUBTS ABOUT AI?<br />LET'S CLEAR THEM.
-        </h2>
-        <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed max-w-2xl">
-          We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and authority.
-        </p>
-      </div>
+  // Generate FAQ Schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
 
-      {/* FAQ List */}
-      <div className="w-full max-w-3xl space-y-4">
-        {faqs.map((faq, index) => (
-          <FAQItem key={index} question={faq.question} answer={faq.answer} />
-        ))}
-      </div>
-    </section>
+  return (
+    <>
+      <section className="w-full py-24 px-4 flex flex-col items-center">
+        {/* Header */}
+        <div className="flex flex-col items-center text-center mb-16 max-w-3xl">
+          <div className="inline-block bg-[#FAFA9D] border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform rotate-2">
+            <span className="font-display font-black text-xs uppercase tracking-widest">FAQ</span>
+          </div>
+          <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
+            DOUBTS ABOUT FLIPAEO?<br />LET'S CLEAR THEM.
+          </h2>
+          <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed max-w-2xl">
+            We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and authority.
+          </p>
+        </div>
+
+        {/* FAQ List */}
+        <div className="w-full max-w-3xl space-y-4">
+          {faqs.map((faq, index) => (
+            <FAQItem key={index} question={faq.question} answer={faq.answer} />
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+    </>
   );
 };
 

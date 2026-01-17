@@ -161,6 +161,14 @@ export default async function SubscribePage() {
 
                             {/* Price Block */}
                             <div className="flex flex-col items-center mb-8">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-base text-stone-400 line-through">
+                                        $79/mo
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 to-amber-500 px-2 py-0.5 rounded-full">
+                                        Launch Price
+                                    </span>
+                                </div>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-5xl font-bold tracking-tighter text-stone-900">
                                         {formatPrice(plan.price, plan.currency ?? 'USD')}
@@ -174,12 +182,14 @@ export default async function SubscribePage() {
 
                             {/* Features Grid */}
                             <div className="grid sm:grid-cols-2 gap-y-3 gap-x-6 mb-8 max-w-lg mx-auto text-left">
-                                <FeatureItem text="Deep Research Agent" />
-                                <FeatureItem text="Brand Voice Cloning" />
-                                <FeatureItem text="Auto-Internal Linking" />
-                                <FeatureItem text="Verified Real Citations" />
-                                <FeatureItem text="WordPress/Webflow Sync" />
-                                <FeatureItem text="Cancel anytime" />
+                                <FeatureItem text="30 articles every month" />
+                                <FeatureItem text="Strategic content planning" />
+                                <FeatureItem text="Daily autopilot writing" />
+                                <FeatureItem text="Writes in your brand voice" />
+                                <FeatureItem text="Smart internal & external linking" />
+                                <FeatureItem text="1-click publish to your CMS" />
+                                <FeatureItem text="On-brand cover and blog images" />
+                                <FeatureItem text="Cancel anytime, no lock-in" />
                             </div>
 
                             {/* Button Section */}
