@@ -22,6 +22,10 @@ export const ArticleOutlineSchema = z.object({
         keywords_to_include: z.array(z.string()).max(20),
         // Optional external link to include in this section
         external_link: ExternalLinkSchema.optional(),
+        // Optional: Should this section have an in-content image?
+        needs_image: z.boolean().optional().default(false),
+        // Optional: Type of image if needs_image is true
+        image_type: z.enum(['concept', 'how_to', 'comparison', 'process', 'insight']).optional(),
       })
     )
     .min(1),

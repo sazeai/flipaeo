@@ -199,12 +199,142 @@ const getIntroTemplate = (articleType: ArticleType): string => {
   return INTRO_TEMPLATES[articleType] || INTRO_TEMPLATES.informational
 }
 
+// --- IN-CONTENT IMAGE TEMPLATES (Tested & Working) ---
+const IMAGE_TEMPLATES: Record<string, string> = {
+  concept: `Clean editorial illustration on a white background, 16: 9 ratio.A large [MAIN_VISUAL_ELEMENT] in the center acting like an analysis tool.Around it, four labeled indicators connected with thin lines.
+
+Text labels placed clearly near each indicator:
+    -[LABEL_1]
+    - [LABEL_2]
+    - [LABEL_3]
+    - [LABEL_4]
+
+At the top center, bold heading text:
+    "[SHORT_HEADING_MAX_6_WORDS]"
+
+Flat vector style.Minimal color palette.High clarity text.No gradients.Professional blog illustration.`,
+
+  how_to: `Modern flat illustration on a white background showing [SCENE_DESCRIPTION].On the right side, a vertical checklist panel with check icons.
+
+Checklist text:
+    -[STEP_1]
+    - [STEP_2]
+    - [STEP_3]
+    - [STEP_4]
+
+Top left bold heading text:
+    "[SHORT_HEADING_MAX_6_WORDS]"
+
+Clean sans serif typography.Flat UI style.Clear readable text.`,
+
+  comparison: `Split screen illustration on a white background.Left side labeled "Before" showing[BAD_STATE_DESCRIPTION].Right side labeled "After" showing[GOOD_STATE_DESCRIPTION].
+
+Text labels under each side:
+    - Before
+    - After
+
+Small tags near elements on each side describing the difference.
+
+Top center heading text:
+    "[SHORT_HEADING_MAX_6_WORDS]"
+
+Flat vector style.High contrast.Editorial blog illustration.`,
+
+  process: `Clean infographic style illustration on a white background.A horizontal flow from left to right with 3 - 4 steps connected by arrows.
+
+Text under each step:
+    -[STEP_1_NAME]
+    - [STEP_2_NAME]
+    - [STEP_3_NAME]
+
+Top heading text:
+    "[SHORT_HEADING_MAX_6_WORDS]"
+
+Minimal flat design.Thin arrows.Clean typography.No gradients.`,
+
+  insight: `Editorial style illustration on a white background. [SCENE_WITH_PERSON_OBSERVING].Over the main element, semi- transparent overlays highlight key aspects.
+
+  Overlay labels:
+-[INSIGHT_1]
+  - [INSIGHT_2]
+  - [INSIGHT_3]
+
+Top right heading text:
+"[SHORT_HEADING_MAX_6_WORDS]"
+
+Soft flat vector style.Muted colors.Clean readable text.`
+}
+
+// Generate section image prompt with integrated text safety
+const generateSectionImagePrompt = async (
+  section: { heading: string; instruction_note: string; image_type?: string },
+  articleTitle: string,
+  genAI: any
+): Promise<string> => {
+  const imageType = section.image_type || 'concept'
+  const template = IMAGE_TEMPLATES[imageType] || IMAGE_TEMPLATES.concept
+
+  const prompt = `You are an AI Art Director creating an in -content blog image.
+
+SECTION CONTEXT:
+- Heading: "${section.heading}"
+  - Content Focus: ${section.instruction_note}
+- Article: "${articleTitle}"
+
+IMAGE TYPE: ${imageType.toUpperCase()}
+
+USE THIS TEMPLATE STRUCTURE:
+${template}
+
+TEXT SAFETY RULES(CRITICAL - AI IMAGE MODEL LIMITATION):
+The AI image generator CANNOT accurately render certain words.You MUST rewrite any text to use ONLY safe words.
+
+❌ NEVER USE these word patterns in ANY text:
+- Words ending in: -ries, -aces, -ising, -eling, -ulties
+  - Double consonants mid - word(rk + t, bl + ed, ff + ed)
+    - Technical jargon over 10 letters
+      - Multi - word compound tech phrases
+
+✅ ALWAYS REWRITE using safe alternatives:
+- "directories" → "listings" or "sites"
+  - "marketplaces" → "markets"
+    - "recruiters" → "hiring teams"
+      - "professional" → "pro"
+        - "labeled" → "marked"
+          - "promising" → "claiming"
+            - "optimization" → "boost" or "tips"
+              - "strategies" → "plans" or "tips"
+
+✅ SAFE TEXT RULES:
+- Max 6 words per heading
+  - Max 3 words per label
+    - Use only common 5th - grade vocabulary
+      - Acronyms are safe(AI, SEO, PR, HR, CRM)
+
+YOUR TASK:
+1. Fill in the template placeholders based on the section context
+2. Rewrite any complex words to image - safe alternatives
+3. Keep ALL text labels to max 3 words
+4. Keep heading to max 6 words
+5. Describe visual elements specifically
+
+OUTPUT: Return ONLY the complete image prompt.No explanations.`
+
+  const response = await genAI.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: { responseMimeType: "text/plain" }
+  })
+
+  return response.text || `Clean flat illustration for a blog section about ${section.heading} `
+}
+
 // --- PHASE 2 HELPER: "The Critic" Gap Analysis Prompt ---
 const getCriticGapPrompt = (keyword: string, articleType: ArticleType, broadContext: string) => {
   const strategy = getArticleStrategy(articleType)
 
   return `
-You are a ruthless Research Critic. ${getCurrentDateContext()}
+You are a ruthless Research Critic.${getCurrentDateContext()}
 
 I have gathered initial search results for the keyword: "${keyword}"
 
@@ -212,32 +342,32 @@ YOUR TASK:
 Analyze this research data and identify EXACTLY what is MISSING that we need to write a winning article.
 You MUST find at least 3 gaps - there are ALWAYS gaps in any research.
 
-**ARTICLE TYPE: ${articleType.toUpperCase()}**
-${strategy.research_focus}
+** ARTICLE TYPE: ${articleType.toUpperCase()}**
+  ${strategy.research_focus}
 
 THINK LIKE A CRITIC - Always find gaps:
 - "What SPECIFIC product names are mentioned? Extract them."
-- "I see features, but where is the 2026 pricing?"
-- "They mention customer support, but is it 24/7 or email-only?"
-- "Where are the real user reviews? This is all marketing fluff."
-- "What specific statistics or benchmarks are missing?"
-- "Are there competitor comparisons that should exist but don't?"
-- "What are the actual tool/product names I should research more?"
+  - "I see features, but where is the 2026 pricing?"
+  - "They mention customer support, but is it 24/7 or email-only?"
+  - "Where are the real user reviews? This is all marketing fluff."
+  - "What specific statistics or benchmarks are missing?"
+  - "Are there competitor comparisons that should exist but don't?"
+  - "What are the actual tool/product names I should research more?"
 
-=== INITIAL RESEARCH DATA (Summary) ===
-${broadContext}
+  === INITIAL RESEARCH DATA(Summary) ===
+    ${broadContext}
 
 IMPORTANT RULES:
-1. You MUST return 3-5 targeted queries - NEVER return an empty array
-2. If the data mentions ANY product/tool names, include queries about those specific products
+1. You MUST return 3 - 5 targeted queries - NEVER return an empty array
+2. If the data mentions ANY product / tool names, include queries about those specific products
 3. Be SPECIFIC - not "best CRM" but "Salesforce pricing 2026" or "HubSpot vs Pipedrive user reviews reddit"
 4. Include at least one query for "[keyword] reddit" or "[keyword] reviews" for real user opinions
 
-OUTPUT (Strict JSON):
+OUTPUT(Strict JSON):
 {
   "gap_analysis": string,  // Brief description of what's missing (NEVER say "no gaps")
-  "competitor_names": string[],  // Extract any product/company names mentioned in the research
-  "targeted_queries": string[]  // 3-5 SPECIFIC search queries to fill gaps (REQUIRED)
+    "competitor_names": string[],  // Extract any product/company names mentioned in the research
+      "targeted_queries": string[]  // 3-5 SPECIFIC search queries to fill gaps (REQUIRED)
 }
 `
 }
@@ -247,47 +377,47 @@ const getSynthesisPrompt = (articleType: ArticleType, keyword: string) => {
   const strategy = getArticleStrategy(articleType)
 
   return `
-You are an expert SEO Strategist and Data Analyst. ${getCurrentDateContext()}
+You are an expert SEO Strategist and Data Analyst.${getCurrentDateContext()}
 
 I will provide you with TWO sets of research data:
 1. BROAD LANDSCAPE DATA - General information from top search results
-2. DEEP DIVE DATA - Specific gap-filling information we hunted down
+2. DEEP DIVE DATA - Specific gap - filling information we hunted down
 
 YOUR GOAL:
 Combine these into ONE comprehensive "Detailed Research Brief" that allows us to write a better article than all competitors combined to dominate modern ai search for answer first intent.
 
-**KEYWORD: "${keyword}"**
-**ARTICLE TYPE: ${articleType.toUpperCase()}**
+** KEYWORD: "${keyword}" **
+** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
-${strategy.research_focus}
+  ${strategy.research_focus}
 
 DATA CLEANING RULES:
 1. Ignore UI elements like "Login", "Sign Up", "Footer", "Cookie Policy", "Alt tags".
 2. Focus ONLY on educational content, tutorials, and facts.
 3. PRIORITIZE the Deep Dive data - it contains the specific facts that competitors miss.
 
-OUTPUT REQUIREMENTS (Return strict JSON):
-1. "fact_sheet": Extract hard facts, statistics, dates, and specific steps. MUST include fresh data from Deep Dive.
-2. "content_gap": What is STILL missing after both research phases? This helps the writer know where to add original insight.
-3. "product_matrix": (ONLY for commercial/comparison articles) Product details with REAL pricing if found.
-4. "step_sequence": (ONLY for how-to/tutorial articles) Extract step-by-step sequence.
-5. "prerequisites": (ONLY for how-to/tutorial articles) What the reader needs.
+OUTPUT REQUIREMENTS(Return strict JSON):
+1. "fact_sheet": Extract hard facts, statistics, dates, and specific steps.MUST include fresh data from Deep Dive.
+2. "content_gap": What is STILL missing after both research phases ? This helps the writer know where to add original insight.
+3. "product_matrix": (ONLY for commercial / comparison articles) Product details with REAL pricing if found.
+4. "step_sequence": (ONLY for how - to / tutorial articles) Extract step - by - step sequence.
+5. "prerequisites": (ONLY for how - to / tutorial articles) What the reader needs.
 6. "sources_summary": All sources used.
-7. "authority_links": Extract 3-5 HIGH-QUALITY, non-competitor URLs suitable for citation (e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news, top tier publications website, and any informational blog site from the product niche). These will be used as external links in the article.
+7. "authority_links": Extract 3 - 5 HIGH - QUALITY, non - competitor URLs suitable for citation(e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news, top tier publications website, and any informational blog site from the product niche).These will be used as external links in the article.
 
 JSON SCHEMA:
 {
-  "fact_sheet": string[], 
-  "content_gap": {
+  "fact_sheet": string[],
+    "content_gap": {
     "missing_topics": string[],
-    "outdated_info": string,
-    "user_intent_gaps": string[]
+      "outdated_info": string,
+        "user_intent_gaps": string[]
   },
   "sources_summary": [{ "url": string, "title": string }],
-  "product_matrix": [{ "name": string, "price": string, "pros": string[], "cons": string[], "unique_selling_point": string, "best_for": string }],
-  "step_sequence": [{ "step": number, "title": string, "details": string, "pro_tip": string }],
-  "prerequisites": string[],
-  "authority_links": [{ "url": string, "title": string, "snippet": string }]
+    "product_matrix": [{ "name": string, "price": string, "pros": string[], "cons": string[], "unique_selling_point": string, "best_for": string }],
+      "step_sequence": [{ "step": number, "title": string, "details": string, "pro_tip": string }],
+        "prerequisites": string[],
+          "authority_links": [{ "url": string, "title": string, "snippet": string }]
 }
 `
 }
@@ -307,7 +437,7 @@ const performDeepResearch = async (
   const MAX_TOTAL_CONTEXT = 15000 // total chars for critic phase
 
   // === STEP 1: BROAD LANDSCAPE SEARCH ===
-  const broadQuery = `${keyword} ${supportingKeywords.slice(0, 2).join(' ')}`.trim()
+  const broadQuery = `${keyword} ${supportingKeywords.slice(0, 2).join(' ')} `.trim()
   const broadSearch = await tvly.search(broadQuery, {
     searchDepth: "advanced",
     includeRawContent: "markdown",
@@ -318,7 +448,7 @@ const performDeepResearch = async (
   const rawBroadContext = broadSearch.results.map((r: any) => {
     const content = r.rawContent || r.content || 'No content available'
     const cappedContent = content.slice(0, MAX_CONTENT_PER_SOURCE)
-    return `Source: ${r.title} (${r.url})\nContent: ${cappedContent}${content.length > MAX_CONTENT_PER_SOURCE ? '... [truncated]' : ''}`
+    return `Source: ${r.title} (${r.url}) \nContent: ${cappedContent}${content.length > MAX_CONTENT_PER_SOURCE ? '... [truncated]' : ''} `
   }).join("\n\n---\n\n")
 
   // Cap total context for Critic phase
@@ -328,7 +458,7 @@ const performDeepResearch = async (
   }
 
   console.log(`[Deep Research] Phase 1 Complete: ${broadSearch.results.length} sources extracted`)
-  console.log(`[Deep Research] Context length: ${broadContext.length} characters (capped at ${MAX_TOTAL_CONTEXT})`)
+  console.log(`[Deep Research] Context length: ${broadContext.length} characters(capped at ${MAX_TOTAL_CONTEXT})`)
 
   // === STEP 2: THE CRITIC (Gap Analysis) ===
   console.log(`[Deep Research] Phase 2: The Critic - Analyzing gaps...`)
@@ -355,7 +485,7 @@ const performDeepResearch = async (
       competitor_names: Array.isArray(parsed.competitor_names) ? parsed.competitor_names : []
     }
   } catch (parseError) {
-    console.warn(`[Deep Research] Failed to parse critic response, using fallback queries:`, parseError)
+    console.warn(`[Deep Research] Failed to parse critic response, using fallback queries: `, parseError)
     // Use intelligent fallback queries based on keyword
     criticAnalysis = {
       gap_analysis: "Parse failed - using fallback research queries.",
@@ -365,9 +495,9 @@ const performDeepResearch = async (
   }
   const targetedQueries: string[] = criticAnalysis.targeted_queries || []
 
-  console.log(`[Deep Research] Critic identified gaps:`, criticAnalysis.gap_analysis)
-  console.log(`[Deep Research] Competitor names found:`, (criticAnalysis.competitor_names?.length ?? 0) > 0 ? criticAnalysis.competitor_names : "None")
-  console.log(`[Deep Research] Targeted queries:`, targetedQueries)
+  console.log(`[Deep Research] Critic identified gaps: `, criticAnalysis.gap_analysis)
+  console.log(`[Deep Research] Competitor names found: `, (criticAnalysis.competitor_names?.length ?? 0) > 0 ? criticAnalysis.competitor_names : "None")
+  console.log(`[Deep Research] Targeted queries: `, targetedQueries)
 
   // === STEP 3: SNIPER SEARCH (Fill the Gaps) ===
   let deepContext = ""
@@ -382,7 +512,7 @@ const performDeepResearch = async (
           includeRawContent: "markdown",
           maxResults: 2
         }).catch((err: any) => {
-          console.log(`[Deep Research] Sniper query failed: ${q}`, err.message)
+          console.log(`[Deep Research] Sniper query failed: ${q} `, err.message)
           return { results: [] }
         })
       )
@@ -393,10 +523,10 @@ const performDeepResearch = async (
     deepContext = allDeepResults.map((r: any) => {
       const content = r.rawContent || r.content || 'No content available'
       const cappedContent = content.slice(0, MAX_CONTENT_PER_SOURCE)
-      return `Source (Gap Fill): ${r.title} (${r.url})\nContent: ${cappedContent}`
+      return `Source(Gap Fill): ${r.title} (${r.url}) \nContent: ${cappedContent} `
     }).join("\n\n---\n\n")
 
-    console.log(`[Deep Research] Phase 3 Complete: ${allDeepResults.length} gap-filling sources extracted`)
+    console.log(`[Deep Research] Phase 3 Complete: ${allDeepResults.length} gap - filling sources extracted`)
   }
 
   // === STEP 4: FINAL SYNTHESIS ===
@@ -404,11 +534,11 @@ const performDeepResearch = async (
 
   const synthesisPrompt = getSynthesisPrompt(articleType, keyword)
   const combinedData = `
-=== BROAD LANDSCAPE DATA (Initial Search) ===
-${broadContext}
+  === BROAD LANDSCAPE DATA(Initial Search) ===
+    ${broadContext}
 
-=== DEEP DIVE DATA (Gap-Filling Search) ===
-${deepContext || "No additional gap-filling data was needed."}
+=== DEEP DIVE DATA(Gap - Filling Search) ===
+  ${deepContext || "No additional gap-filling data was needed."}
 
 === CRITIC'S GAP ANALYSIS ===
 ${criticAnalysis.gap_analysis || "No major gaps identified."}
@@ -425,7 +555,7 @@ ${criticAnalysis.gap_analysis || "No major gaps identified."}
     synthesisText += (c as any).text || ""
   }
 
-  console.log(`[Deep Research] Complete! Synthesized comprehensive research brief.`)
+  console.log(`[Deep Research]Complete! Synthesized comprehensive research brief.`)
   // Use self-correcting parser for Zod validation with retry
   return cleanParseAndValidate(synthesisText, CompetitorDataSchema, genAI)
 }
@@ -438,11 +568,11 @@ const generateOutlineSystemPrompt = (keyword: string, styleDNA: any, competitorD
 
   return `
 You are an expert Content Architect and SEO Strategist.
-Your goal is to outline a high-ranking blog post that beats the competition by filling their "Content Gaps".
+Your goal is to outline a high - ranking blog post that beats the competition by filling their "Content Gaps".
 
-**ARTICLE TYPE: ${articleType.toUpperCase()}**
+** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
-INPUT CONTEXT:
+  INPUT CONTEXT:
 1. KEYWORD: "${keyword}"
 2. COMPETITOR & GAP DATA: ${JSON.stringify(competitorData)}
 ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
@@ -455,60 +585,61 @@ NOTE: UAe this brand data as source of supporting context only. Use this for VOI
 Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors.
 3. Don't just list competitors - explain why YOUR approach is different/better
 4. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, it must earn its place naturally and strategically, nothim is random here, evrything needs to be planned.
-` : ''}
+` : ''
+    }
 ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-2 MAX)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
 
 ### ARTICLE REQUIREMENT STRATEGY:
 ${strategy.outline_instruction}
 
 ---
-Before outlining, analyze the "Keyword Intent" to determine the required depth:
+  Before outlining, analyze the "Keyword Intent" to determine the required depth:
 
-1. **The "Quick Answer" Scope** (e.g., "how to reset iphone", "what is x", or commerical intent):
-   - Structure: Short, direct.
+1. ** The "Quick Answer" Scope ** (e.g., "how to reset iphone", "what is x", or commerical intent):
+- Structure: Short, direct.
    - Depth: Mostly H2s, few H3s.
-   - Total Sections: **7-10 sections** are sufficient.
+   - Total Sections: ** 7 - 10 sections ** are sufficient.
    - GOAL: Speed to solution.
 
-2. **The "Comprehensive Guide" Scope** (e.g., "ultimate guide to seo", "best crm software"):
-   - Structure: Deep, nested.
+2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software"):
+- Structure: Deep, nested.
    - Depth: Heavy use of H3s and H4s.
-   - Total Sections: **10-16 sections**.
+   - Total Sections: ** 10 - 16 sections **.
    - GOAL: Exhaustive coverage.
 
-**INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 15-section outline for a 8-section topic.
+** INSTRUCTION:** Adjust your outline length to match the keyword intent.Do not force a 15 - section outline for a 8 - section topic.
 
-## HEADING STYLE PROTOCOL (MANDATORY - READ CAREFULLY)
+## HEADING STYLE PROTOCOL(MANDATORY - READ CAREFULLY)
 
 You must write headers that look like they were written by a HUMAN expert, not an AI.
 
-🚫 **BANNED HEADER PATTERNS (INSTANT FAIL):**
-- NO Colons: "The Evolution: From X to Y" -> FAIL
-- NO Parentheses: "Understanding Authority (The Real Metrics)" -> FAIL
-- NO Metaphors: "Unlocking the Power of..." -> FAIL
-- NO "The Art of..." or "The Future of..."
-- NO "Demystifying X" or "Navigating the Landscape"
+🚫 ** BANNED HEADER PATTERNS(INSTANT FAIL):**
+  - NO Colons: "The Evolution: From X to Y" -> FAIL
+    - NO Parentheses: "Understanding Authority (The Real Metrics)" -> FAIL
+      - NO Metaphors: "Unlocking the Power of..." -> FAIL
+        - NO "The Art of..." or "The Future of..."
+          - NO "Demystifying X" or "Navigating the Landscape"
 
-✅ **REQUIRED HEADER PATTERNS (USE THESE):**
-- **Direct Questions:** "What is a high authority backlink?"
-- **Direct Statements:** "Why 'authority' is more than a DR number"
-- **Vs/Comparison:** "Dofollow vs Nofollow: The real difference"
-- **Action-Oriented:** "How to judge a backlink's authority"
-- **Listicles:** "Quick checks that founders skip"
-- **Outcome-Based:** "What results look like in the first 30 days"
+✅ ** REQUIRED HEADER PATTERNS(USE THESE):**
+- ** Direct Questions:** "What is a high authority backlink?"
+  - ** Direct Statements:** "Why 'authority' is more than a DR number"
+    - ** Vs / Comparison:** "Dofollow vs Nofollow: The real difference"
+      - ** Action - Oriented:** "How to judge a backlink's authority"
+        - ** Listicles:** "Quick checks that founders skip"
+          - ** Outcome - Based:** "What results look like in the first 30 days"
 
-**THE LITMUS TEST:**
-If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
+            ** THE LITMUS TEST:**
+              If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
 If it sounds like a Google Search Query, keep it.
 
-## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
+## HEADING HIERARCHY RULES(CRITICAL FOR SEO - MUST FOLLOW)
 
-**LEVEL DEFINITIONS:**
-- **level: 2 (H2)** = Main topic sections. These are your primary content pillars.
-- **level: 3 (H3)** = Subtopics UNDER an H2 wherever required.
-- **level: 4 (H4)** = Detailed points UNDER an H3 wherever required.
+  ** LEVEL DEFINITIONS:**
+- ** level: 2(H2) ** = Main topic sections.These are your primary content pillars.
+- ** level: 3(H3) ** = Subtopics UNDER an H2 wherever required.
+- ** level: 4(H4) ** = Detailed points UNDER an H3 wherever required.
 
-**STRUCTURE PATTERN (FOLLOW THIS):**
+** STRUCTURE PATTERN(FOLLOW THIS):**
 \`\`\`
 H2: Main Topic A
   H3: Subtopic A.1
@@ -564,6 +695,24 @@ ${JSON.stringify(authorityLinks)}
    - **Tell the writer WHAT data points, facts, or specific "Gap" concepts to cover.**
    - **DO NOT** write style instructions. Only focus on the **Substance**.
 
+## IN-CONTENT IMAGE SELECTION (IMPORTANT):
+For EACH H2 section, decide if an image would ADD VALUE to the content:
+- Set "needs_image": true if the section would benefit from a visual
+- Set "image_type" to one of: "concept" | "how_to" | "comparison" | "process" | "insight"
+
+**RULES:**
+- MAX 3 sections should have needs_image: true
+- ONLY H2 level sections can have images (not H3/H4)
+- Skip list/tip sections (text-heavy, no visual value)
+- PREFER images for: How-to steps, concept explanations, before/after comparisons, process flows
+
+**IMAGE TYPE GUIDE:**
+- "concept": Explaining an idea or mental model with labeled diagram
+- "how_to": Step-by-step with checklist visual
+- "comparison": Before vs after or side-by-side comparison
+- "process": Flow diagram with arrows showing steps
+- "insight": Person observing with overlay labels
+
 ## OUTPUT SCHEMA (Return strict JSON):
 {
   "title": string,
@@ -578,7 +727,9 @@ ${JSON.stringify(authorityLinks)}
       "level": number (2, 3, or 4 - USE ALL THREE LEVELS),
       "instruction_note": string, 
       "keywords_to_include": string[],
-      "external_link": { "url": string, "anchor_context": string } // OPTIONAL - only add if assigning an authority link to this section
+      "external_link": { "url": string, "anchor_context": string }, // OPTIONAL
+      "needs_image": boolean, // true if this section should have an in-content image
+      "image_type": "concept" | "how_to" | "comparison" | "process" | "insight" // REQUIRED if needs_image is true
     }
   ]
 }
@@ -588,6 +739,7 @@ ${JSON.stringify(authorityLinks)}
 - Does this outline solve the specific intent of "${keyword}"?
 - Did you remove unnecessary fluff sections?
 - Did you assign 1-2 external links to relevant sections?
+- Did you mark 2-3 H2 sections with needs_image: true?
 `
 }
 
@@ -1104,6 +1256,42 @@ CRITICAL EXECUTION RULES:
         const headingPattern = new RegExp(`^\\s*#{1,4}\\s*${section.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i')
         const cleanedWriteText = writeText.replace(headingPattern, '').trim()
         currentDraft += `${headingHash} ${section.heading} \n\n${cleanedWriteText} \n\n`
+
+        // --- IN-CONTENT IMAGE GENERATION (if section marked for image) ---
+        if (section.needs_image && section.image_type) {
+          try {
+            console.log(`[Section Image] Generating image for: ${section.heading}`)
+
+            // Generate section-specific image prompt
+            const sectionImagePrompt = await generateSectionImagePrompt(
+              section,
+              finalTitle,
+              genAI
+            )
+
+            // Generate image via Fal.ai
+            const sectionImageResult = await generateImage(sectionImagePrompt) as any
+            const sectionImageUrl = sectionImageResult?.images?.[0]?.url
+
+            if (sectionImageUrl) {
+              // Download and upload to R2
+              const sectionImgResponse = await fetch(sectionImageUrl)
+              const sectionImgBuffer = Buffer.from(await sectionImgResponse.arrayBuffer())
+              const sectionImgFileName = `section-images/${userId}/${brandId}/${articleId}/${Date.now()}.png`
+
+              await putR2Object(sectionImgFileName, sectionImgBuffer)
+              const r2Domain = process.env.R2_PUBLIC_DOMAIN || `${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL}`
+              const sectionImageR2Url = `${r2Domain}/${sectionImgFileName}`
+
+              // Inject image into markdown (after section content)
+              currentDraft += `![${section.heading}](${sectionImageR2Url})\n\n`
+              console.log(`[Section Image] Added image for: ${section.heading}`)
+            }
+          } catch (imgErr) {
+            console.error(`[Section Image] Failed for ${section.heading}:`, imgErr)
+            // Non-blocking - continue without image
+          }
+        }
 
         // Real-time Save
         await supabase
