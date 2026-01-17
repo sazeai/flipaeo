@@ -28,10 +28,10 @@ export const EmailWrapper = ({ previewText, children }: EmailWrapperProps) => {
                 <Container style={container}>
                     <Section style={logoContainer}>
                         <Img
-                            src={`${baseUrl}/logo.png`}
-                            width="150"
+                            src={`${baseUrl}/site-logo.png`}
+                            width="40"
                             height="40"
-                            alt="UnrealShot"
+                            alt="FlipAEO"
                             style={logo}
                         />
                     </Section>
@@ -43,7 +43,7 @@ export const EmailWrapper = ({ previewText, children }: EmailWrapperProps) => {
                     <Section style={footer}>
                         <Hr style={hr} />
                         <Text style={footerText}>
-                            © {new Date().getFullYear()} UnrealShot AI. All rights reserved.
+                            © {new Date().getFullYear()} FlipAEO. All rights reserved.
                         </Text>
                         <Text style={footerText}>
                             <Link href={`${baseUrl}`} style={link}>
