@@ -11,25 +11,25 @@ export const CTASection: React.FC = () => {
 
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform -rotate-1">
-          <span className="font-display font-black text-xs uppercase tracking-widest text-black">Conversion Ready</span>
+          <span className="font-display font-black text-xs uppercase tracking-widest text-black">Limited Launch Offer</span>
         </div>
 
         {/* Headline */}
         <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
-          Start Ranking<br />
-          Stop Guessing.
+          Your Competitors<br />
+          Are Already Ranking.
         </h2>
 
         {/* Description */}
         <p className="font-sans text-black/80 text-lg md:text-xl mb-10 max-w-2xl leading-relaxed font-medium">
-          Get your brand cited in modern AI Search for your category.
+          Every day without strategic content is a day your competitors get cited by AI search instead of you. Start publishing authority-building articles today.
         </p>
 
         {/* Action Button (Direct Conversion) */}
         <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
           <Link href="/subscribe" className="w-full sm:w-auto">
-            <Button variant="secondary" size="md" className="w-full text-sm sm:w-auto h-12 px-10 sm:text-xl border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-white text-black">
-              Get your brand cited
+            <Button variant="secondary" size="md" className="w-full text-sm sm:w-auto h-12 px-10 sm:text-lg border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-white text-black">
+              Start My 30 Articles
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
