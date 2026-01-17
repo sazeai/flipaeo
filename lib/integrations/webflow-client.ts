@@ -38,6 +38,105 @@ interface CreateItemParams {
 }
 
 /**
+ * Prepare HTML content for Webflow Rich Text:
+ * 1. Strip the first H1 (title is sent separately)
+ * 2. Remove ALL attributes from HTML tags (Webflow hates them)
+ * 3. Convert tables to simple text (Webflow Rich Text doesn't support tables)
+ * 4. MINIFY the HTML (Webflow may strip lists if there are newlines inside tags)
+ */
+function prepareContentForWebflow(htmlContent: string): string {
+    if (!htmlContent) return ''
+
+    let content = htmlContent
+
+    // 1. Remove the first H1 tag (title is sent separately as post name)
+    content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')
+
+    // 2. Handle tables BEFORE stripping attributes
+    // Webflow Rich Text doesn't support tables - convert to formatted paragraphs
+    // Each row becomes a paragraph with • separators
+    content = content.replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, (match, tableContent) => {
+        const rows: string[] = []
+        const rowMatches = tableContent.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)
+        let isFirstRow = true
+
+        for (const rowMatch of rowMatches) {
+            const cells: string[] = []
+            const cellMatches = rowMatch[1].matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi)
+
+            for (const cellMatch of cellMatches) {
+                // Strip inner HTML but keep text
+                const cellText = cellMatch[1].replace(/<[^>]+>/g, '').trim()
+                if (cellText) cells.push(cellText)
+            }
+
+            if (cells.length > 0) {
+                const rowText = cells.join(' | ')
+                if (isFirstRow) {
+                    // First row is header - make it bold with underline separator
+                    rows.push(`<p><strong>${rowText}</strong></p>`)
+                    rows.push(`<p>───────────────</p>`)
+                    isFirstRow = false
+                } else {
+                    // Data rows - regular paragraphs
+                    rows.push(`<p>${rowText}</p>`)
+                }
+            }
+        }
+
+        // Return with line breaks to help Webflow recognize paragraph separation
+        return '\n' + rows.join('\n') + '\n'
+    })
+
+    // 3. Strip ALL attributes from HTML tags (but preserve tag structure)
+    // Webflow Rich Text is very strict about this
+    content = content.replace(/<(\w+)([^>\/]*)(\/?)>/g, (match, tagName, attrs, selfClose) => {
+        const tag = tagName.toLowerCase()
+        // Self-closing tags
+        if (selfClose || ['img', 'br', 'hr'].includes(tag)) {
+            // For img, we need to preserve src and alt
+            if (tag === 'img') {
+                const srcMatch = match.match(/src=["']([^"']*)["']/)
+                const altMatch = match.match(/alt=["']([^"']*)["']/)
+                const src = srcMatch ? srcMatch[1] : ''
+                const alt = altMatch ? altMatch[1] : ''
+                return `<img src="${src}" alt="${alt}">`
+            }
+            return `<${tag}>`
+        }
+        return `<${tag}>`
+    })
+
+    // 4. Remove <li><p>...</p></li> pattern - just keep text in li
+    content = content.replace(/<li>\s*<p>([\s\S]*?)<\/p>\s*<\/li>/gi, '<li>$1</li>')
+
+    // 5. MINIFY the HTML but PRESERVE spaces around inline tags
+    // Remove spaces only between BLOCK-level tags, not inline (strong, em, a, span)
+    const blockTags = 'p|h[1-6]|ul|ol|li|div|blockquote|figure|figcaption|table|tr|td|th|thead|tbody'
+    content = content
+        // Remove newlines and tabs
+        .replace(/[\r\n\t]+/g, ' ')
+        // Remove space ONLY between closing and opening BLOCK tags (not inline)
+        .replace(new RegExp(`</(${blockTags})>\\s+<(${blockTags}|/)`, 'gi'), '</$1><$2')
+        // Collapse multiple spaces into single space (preserve single spaces for inline)
+        .replace(/\s{2,}/g, ' ')
+        // Trim
+        .trim()
+
+    // 6. Debug logging
+    const listCount = (content.match(/<ul>/gi) || []).length + (content.match(/<ol>/gi) || []).length
+    console.log(`[Webflow] Content prepared: ${content.length} chars, ${listCount} lists found`)
+    if (listCount > 0) {
+        const firstList = content.match(/<[uo]l>[\s\S]*?<\/[uo]l>/i)
+        if (firstList) {
+            console.log('[Webflow] First list preview:', firstList[0].substring(0, 200) + '...')
+        }
+    }
+
+    return content
+}
+
+/**
  * Make authenticated request to Webflow API
  */
 async function webflowFetch(
@@ -159,25 +258,8 @@ export async function createCollectionItem(
     // Map content to the configured field (default: 'post-body')
     const contentField = fieldMapping.content || 'post-body'
 
-    // Fix for missing lists in Webflow
-    let cleanContent = params.content || ''
-
-    // 1. Remove all class attributes (Webflow rich text doesn't like them)
-    // Handle both single and double quotes
-    cleanContent = cleanContent.replace(/ class=['"][^'"]*['"]/g, '')
-
-    // 2. Ensure robust spacing for lists (Webflow needs newlines to recognize lists)
-    // We strictly wrap UL/OL/LI with newlines to force Webflow to adhere to structure
-    cleanContent = cleanContent
-        .replace(/<ul>/g, '\n\n<ul>\n')
-        .replace(/<\/ul>/g, '\n</ul>\n\n')
-        .replace(/<ol>/g, '\n\n<ol>\n')
-        .replace(/<\/ol>/g, '\n</ol>\n\n')
-        .replace(/<li>/g, '\n<li>')
-        .replace(/<\/li>/g, '</li>\n')
-
-    // 3. Normalize spacing (collapse excessive newlines)
-    cleanContent = cleanContent.replace(/\n{3,}/g, '\n\n')
+    // Prepare content for Webflow (comprehensive sanitization)
+    const cleanContent = prepareContentForWebflow(params.content || '')
 
     fieldData[contentField] = cleanContent
 
@@ -195,15 +277,6 @@ export async function createCollectionItem(
 
     // Log the payload for debugging
     console.log('[Webflow] Creating item with fields:', JSON.stringify(Object.keys(fieldData), null, 2))
-    // console.log('[Webflow] URL:', `/collections/${collectionId}/items`) // Too verbose
-
-    // Log preview of list sections specifically to debug "missing list content"
-    const listMatch = cleanContent.match(/<(ul|ol)>[\s\S]*?<\/\1>/)
-    if (listMatch) {
-        console.log('[Webflow Debug] List detected in content:', listMatch[0].substring(0, 200) + '...')
-    } else {
-        console.log('[Webflow Debug] No lists detected in content.')
-    }
     try {
         // Create as staged item first (not live)
         const response = await webflowFetch(
