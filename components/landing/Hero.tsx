@@ -26,19 +26,19 @@ export const Hero: React.FC = () => {
       </h1>
 
       {/* Subtext */}
-      <p className="font-sans text-gray-600 text-lg md:text-2xl max-w-3xl mb-12 leading-relaxed font-semibold px-4">
+      <p className="font-sans text-gray-600 text-lg md:text-2xl max-w-3xl mb-12 leading-relaxed font-medium px-4">
         <span className="font-bold text-black border-b-[3px] border-brand-orange/30">FlipAEO is the Strategic Content Engine for dominating AEO and GEO.</span> We engineer the exact content required to make your brand the #1 citation in AI search results.
       </p>
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto px-4">
         <Link href="/login">
-          <Button variant="primary" size="lg" className="font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
+          <Button variant="primary" size="lg" className="cursor-pointer font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
             Build My Growth Strategy
           </Button>
         </Link>
         <Link href="#how-it-works">
-          <Button variant="secondary" size="lg" className="font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
+          <Button variant="secondary" size="lg" className="cursor-pointer font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
             See the engine →
           </Button>
         </Link>
