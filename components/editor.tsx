@@ -103,12 +103,25 @@ export default function Editor({ data, markdown, onChange, readOnly, holderId = 
           })
           break
         case 'paragraph':
-          blocks.push({
-            type: 'paragraph',
-            data: {
-              text: parseInline(token.text)
-            }
-          })
+          // Check if this paragraph is just an image
+          const pTokens = (token as any).tokens
+          if (pTokens && pTokens.length === 1 && pTokens[0].type === 'image') {
+            const imgToken = pTokens[0]
+            blocks.push({
+              type: 'simpleImage',
+              data: {
+                url: imgToken.href,
+                caption: imgToken.text || ''
+              }
+            })
+          } else {
+            blocks.push({
+              type: 'paragraph',
+              data: {
+                text: parseInline(token.text)
+              }
+            })
+          }
           break
         case 'list':
           blocks.push({
@@ -159,6 +172,21 @@ export default function Editor({ data, markdown, onChange, readOnly, holderId = 
         case 'space':
           break
         default:
+          // Handle images embedded in paragraphs or standalone
+          if ((token as any).type === 'paragraph' && (token as any).tokens) {
+            // Check if paragraph contains just an image
+            const imgToken = (token as any).tokens.find((t: any) => t.type === 'image')
+            if (imgToken && (token as any).tokens.length === 1) {
+              blocks.push({
+                type: 'simpleImage',
+                data: {
+                  url: imgToken.href,
+                  caption: imgToken.text || ''
+                }
+              })
+              break
+            }
+          }
           if (token.type === 'text' || (token as any).text) {
             // Fallback
           }

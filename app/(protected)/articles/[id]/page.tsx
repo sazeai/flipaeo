@@ -161,16 +161,21 @@ export default function ArticleDetailPage() {
     }, [editorData, article?.raw_content])
 
     const handleCopyMarkdown = async () => {
-        const markdown = getMarkdownContent()
+        let markdown = getMarkdownContent()
         if (!markdown) {
             toast.error("No content to copy")
             return
         }
 
+        // Convert relative image URLs to absolute URLs for external use
+        const baseUrl = window.location.origin
+        markdown = markdown.replace(/!\[(.*?)\]\((\/api\/images\/[^)]+)\)/g, `![$1](${baseUrl}$2)`)
+        markdown = markdown.replace(/!\[(.*?)\]\((\/[^)]+\.(?:png|jpg|jpeg|gif|webp))\)/gi, `![$1](${baseUrl}$2)`)
+
         try {
             await navigator.clipboard.writeText(markdown)
             setIsCopied(true)
-            toast.success("Copied as Markdown")
+            toast.success("Copied as Markdown (with absolute image URLs)")
             setTimeout(() => setIsCopied(false), 2000)
         } catch (err) {
             toast.error("Failed to copy")
@@ -178,11 +183,16 @@ export default function ArticleDetailPage() {
     }
 
     const handleCopyRichText = async () => {
-        const markdown = getMarkdownContent()
+        let markdown = getMarkdownContent()
         if (!markdown) {
             toast.error("No content to copy")
             return
         }
+
+        // Convert relative image URLs to absolute URLs for external use
+        const baseUrl = window.location.origin
+        markdown = markdown.replace(/!\[(.*?)\]\((\/api\/images\/[^)]+)\)/g, `![$1](${baseUrl}$2)`)
+        markdown = markdown.replace(/!\[(.*?)\]\((\/[^)]+\.(?:png|jpg|jpeg|gif|webp))\)/gi, `![$1](${baseUrl}$2)`)
 
         try {
             const html = await marked.parse(markdown)
@@ -193,7 +203,7 @@ export default function ArticleDetailPage() {
                 })
             ])
             setIsCopied(true)
-            toast.success("Copied as Rich Text")
+            toast.success("Copied as Rich Text (with images)")
             setTimeout(() => setIsCopied(false), 2000)
         } catch (err) {
             // Fallback for browsers that don't support ClipboardItem
