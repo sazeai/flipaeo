@@ -9,7 +9,8 @@ import {
     getWordPressConnections,
     addWordPressConnection,
     deleteWordPressConnection,
-    setDefaultConnection
+    setDefaultConnection,
+    updateDefaultCategory
 } from "@/actions/wordpress"
 import {
     getWebflowConnections,
@@ -37,7 +38,13 @@ interface WordPressConnection {
     site_name: string | null
     username: string
     is_default: boolean
+    default_category_id: number | null
     created_at: string
+}
+
+interface WPCategory {
+    id: number
+    name: string
 }
 
 interface WebflowConnection {
@@ -418,15 +425,12 @@ export default function IntegrationsPage() {
                             </form>
                         }
                         renderConnections={wpConnections.map((conn) => (
-                            <ConnectionCard
+                            <WordPressConnectionCard
                                 key={conn.id}
-                                name={conn.site_name || conn.site_url}
-                                subtitle={conn.site_url}
-                                isDefault={conn.is_default}
-                                iconBg="#21759b"
+                                connection={conn}
                                 onSetDefault={() => handleWpSetDefault(conn.id)}
-                                onOpen={() => window.open(conn.site_url, '_blank')}
                                 onDelete={() => handleWpDelete(conn.id)}
+                                onCategoryChange={loadConnections}
                             />
                         ))}
                         emptyText="No WordPress sites connected yet"
@@ -701,12 +705,7 @@ function IntegrationSection({
                         <p className="text-sm text-stone-500">{description}</p>
                     </div>
                 </div>
-                {!showForm && (
-                    <Button onClick={onShowForm} variant="outline" className="h-9 px-3 text-sm">
-                        <Plus className="w-4 h-4 mr-1.5" />
-                        Add Site
-                    </Button>
-                )}
+
             </div>
 
             {showForm && renderForm}
@@ -776,6 +775,132 @@ function ConnectionCard({
                     <Trash2 className="w-4 h-4" />
                 </Button>
             </div>
+        </div>
+    )
+}
+
+// WordPress-specific connection card with category support
+function WordPressConnectionCard({
+    connection,
+    onSetDefault,
+    onDelete,
+    onCategoryChange,
+}: {
+    connection: WordPressConnection
+    onSetDefault: () => void
+    onDelete: () => void
+    onCategoryChange: () => void
+}) {
+    const [expanded, setExpanded] = useState(false)
+    const [categories, setCategories] = useState<WPCategory[]>([])
+    const [loadingCategories, setLoadingCategories] = useState(false)
+    const [savingCategory, setSavingCategory] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(connection.default_category_id)
+
+    const loadCategories = async () => {
+        if (categories.length > 0) return // Already loaded
+        setLoadingCategories(true)
+        try {
+            const res = await fetch('/api/wordpress/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ connectionId: connection.id }),
+            })
+            const data = await res.json()
+            if (data.categories) {
+                setCategories(data.categories)
+            }
+        } catch (err) {
+            console.error('Failed to load categories:', err)
+        }
+        setLoadingCategories(false)
+    }
+
+    const handleExpand = () => {
+        if (!expanded) {
+            loadCategories()
+        }
+        setExpanded(!expanded)
+    }
+
+    const handleCategoryChange = async (categoryId: number | null) => {
+        setSavingCategory(true)
+        setSelectedCategory(categoryId)
+        const result = await updateDefaultCategory(connection.id, categoryId)
+        setSavingCategory(false)
+        if (result.success) {
+            toast.success('Default category updated')
+            onCategoryChange()
+        } else {
+            toast.error(result.error || 'Failed to update category')
+        }
+    }
+
+    return (
+        <div className="bg-white/50 rounded-xl border border-stone-200">
+            <div className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#21759b' }}>
+                        <div className="w-4 h-4 bg-white/30 rounded" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium text-stone-900">{connection.site_name || connection.site_url}</span>
+                            {connection.is_default && (
+                                <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">
+                                    Default
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-sm text-stone-500">{connection.site_url}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleExpand} className="h-8 text-xs">
+                        {expanded ? 'Hide' : 'Settings'}
+                    </Button>
+                    {!connection.is_default && (
+                        <Button variant="ghost" size="sm" onClick={onSetDefault} className="h-8 text-xs">
+                            Set Default
+                        </Button>
+                    )}
+                    <Button variant="ghost" size="sm" onClick={() => window.open(connection.site_url, '_blank')} className="h-8 w-8 p-0">
+                        <ExternalLink className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={onDelete} className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50">
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+                </div>
+            </div>
+
+            {expanded && (
+                <div className="px-4 pb-4 pt-0 border-t border-stone-100">
+                    <div className="pt-4">
+                        <Label className="text-sm font-medium mb-2 block">Default Category</Label>
+                        <p className="text-xs text-stone-500 mb-2">All published articles will be assigned to this category</p>
+                        {loadingCategories ? (
+                            <div className="flex items-center gap-2 text-sm text-stone-500">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Loading categories...
+                            </div>
+                        ) : (
+                            <select
+                                value={selectedCategory || ''}
+                                onChange={(e) => handleCategoryChange(e.target.value ? Number(e.target.value) : null)}
+                                disabled={savingCategory}
+                                className="w-full max-w-xs h-10 px-3 rounded-lg border border-stone-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-900"
+                            >
+                                <option value="">No category (use WordPress default)</option>
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

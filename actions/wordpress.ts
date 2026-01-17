@@ -9,6 +9,7 @@ interface WordPressConnection {
     site_name: string | null
     username: string
     is_default: boolean
+    default_category_id: number | null
     created_at: string
 }
 
@@ -22,7 +23,7 @@ export async function getWordPressConnections(): Promise<{ connections: WordPres
 
     const { data, error } = await supabase
         .from("wordpress_connections")
-        .select("id, site_url, site_name, username, is_default, created_at")
+        .select("id, site_url, site_name, username, is_default, default_category_id, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
 
@@ -140,6 +141,33 @@ export async function setDefaultConnection(connectionId: string): Promise<{ succ
     const { error } = await supabase
         .from("wordpress_connections")
         .update({ is_default: true })
+        .eq("id", connectionId)
+        .eq("user_id", user.id)
+
+    if (error) {
+        return { success: false, error: error.message }
+    }
+
+    return { success: true }
+}
+
+/**
+ * Update default category for a WordPress connection
+ */
+export async function updateDefaultCategory(
+    connectionId: string,
+    categoryId: number | null
+): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { success: false, error: "Not authenticated" }
+    }
+
+    const { error } = await supabase
+        .from("wordpress_connections")
+        .update({ default_category_id: categoryId })
         .eq("id", connectionId)
         .eq("user_id", user.id)
 

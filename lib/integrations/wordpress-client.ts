@@ -23,6 +23,7 @@ interface CreatePostParams {
     slug?: string
     status?: 'draft' | 'publish' | 'pending' | 'private'
     featured_media?: number
+    categories?: number[]  // Category IDs
 }
 
 interface UploadMediaResult {
@@ -140,6 +141,62 @@ export async function uploadMedia(
 }
 
 /**
+ * WordPress Category
+ */
+interface WordPressCategory {
+    id: number
+    name: string
+    slug: string
+    count: number
+}
+
+/**
+ * List all categories from WordPress
+ */
+export async function listCategories(credentials: WordPressCredentials): Promise<{
+    categories: WordPressCategory[]
+    error?: string
+}> {
+    const { siteUrl, username, appPassword } = credentials
+
+    try {
+        const baseUrl = siteUrl.replace(/\/+$/, '')
+        // Fetch up to 100 categories, ordered by name
+        const apiUrl = `${baseUrl}/wp-json/wp/v2/categories?per_page=100&orderby=name`
+
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': createAuthHeader(username, appPassword),
+                'Content-Type': 'application/json',
+            },
+        })
+
+        if (!response.ok) {
+            return {
+                categories: [],
+                error: `Failed to fetch categories: ${response.status}`
+            }
+        }
+
+        const data = await response.json()
+        const categories = data.map((cat: any) => ({
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            count: cat.count || 0,
+        }))
+
+        return { categories }
+    } catch (error: any) {
+        return {
+            categories: [],
+            error: error.message || 'Failed to fetch categories'
+        }
+    }
+}
+
+/**
  * Create a new post in WordPress
  */
 export async function createPost(
@@ -152,20 +209,27 @@ export async function createPost(
         const baseUrl = siteUrl.replace(/\/+$/, '')
         const apiUrl = `${baseUrl}/wp-json/wp/v2/posts`
 
+        const postBody: Record<string, any> = {
+            title: params.title,
+            content: params.content,
+            excerpt: params.excerpt || '',
+            slug: params.slug || '',
+            status: params.status || 'draft',
+            featured_media: params.featured_media || 0,
+        }
+
+        // Add categories if provided
+        if (params.categories && params.categories.length > 0) {
+            postBody.categories = params.categories
+        }
+
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Authorization': createAuthHeader(username, appPassword),
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                title: params.title,
-                content: params.content,
-                excerpt: params.excerpt || '',
-                slug: params.slug || '',
-                status: params.status || 'draft',
-                featured_media: params.featured_media || 0,
-            }),
+            body: JSON.stringify(postBody),
         })
 
         if (!response.ok) {
@@ -205,6 +269,7 @@ export async function publishToWordPress(
         excerpt?: string
         slug?: string
         featuredImageUrl?: string | null
+        categoryId?: number | null  // Default category ID
     },
     publishStatus: 'draft' | 'publish' = 'draft'
 ): Promise<{ success: boolean; post?: WordPressPost; error?: string }> {
@@ -227,5 +292,71 @@ export async function publishToWordPress(
         slug: article.slug,
         status: publishStatus,
         featured_media: featuredMediaId,
+        categories: article.categoryId ? [article.categoryId] : undefined,
     })
+}
+
+/**
+ * Upload all section images from content to WordPress media library
+ * and replace R2 URLs with WordPress media URLs
+ */
+export async function uploadContentImagesToWordPress(
+    credentials: WordPressCredentials,
+    htmlContent: string,
+    appUrl: string
+): Promise<string> {
+    // Match all img tags with section-images URLs
+    const imgRegex = /<img[^>]*src=["']([^"']*section-images[^"']*)["'][^>]*>/gi
+    const matches = [...htmlContent.matchAll(imgRegex)]
+
+    if (matches.length === 0) {
+        return htmlContent // No section images found
+    }
+
+    let processedContent = htmlContent
+
+    for (const match of matches) {
+        const originalUrl = match[1]
+        let fetchableUrl = originalUrl
+
+        // Convert R2 URL to fetchable proxy URL if needed
+        if (originalUrl.includes('.r2.cloudflarestorage.com/')) {
+            const key = originalUrl.split('.r2.cloudflarestorage.com/')[1]
+            fetchableUrl = `${appUrl}/api/images/${key}`
+        } else if (originalUrl.startsWith('/api/images/')) {
+            fetchableUrl = `${appUrl}${originalUrl}`
+        } else if (!originalUrl.startsWith('http')) {
+            fetchableUrl = `${appUrl}/${originalUrl}`
+        }
+
+        try {
+            // Generate filename from URL
+            const urlParts = originalUrl.split('/')
+            const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.png'}`
+
+            console.log(`[Section Image Upload] Uploading: ${filename}`)
+
+            // Upload to WordPress media library
+            const mediaResult = await uploadMedia(credentials, fetchableUrl, filename)
+
+            if (mediaResult) {
+                // Replace R2 URL with WordPress media URL in content
+                processedContent = processedContent.replace(
+                    new RegExp(escapeRegExp(originalUrl), 'g'),
+                    mediaResult.source_url
+                )
+                console.log(`[Section Image Upload] Success: ${mediaResult.source_url}`)
+            }
+        } catch (error) {
+            console.error(`[Section Image Upload] Failed for ${originalUrl}:`, error)
+            // Continue with other images - non-blocking
+        }
+    }
+
+    return processedContent
+}
+
+// Helper to escape special regex characters
+function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

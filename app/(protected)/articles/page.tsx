@@ -156,7 +156,7 @@ export default function ArticlesPage() {
         body: JSON.stringify({
           articleId,
           connectionId: defaultConnection.id,
-          publishStatus: "draft"
+          publishStatus: "publish"
         })
       })
 
@@ -166,7 +166,7 @@ export default function ArticlesPage() {
         throw new Error(result.error || "Failed to publish")
       }
 
-      toast.success(`Published to ${platformNames[platform]} as draft!`, {
+      toast.success(`Published to ${platformNames[platform]}!`, {
         action: result.postUrl || result.articleUrl ? {
           label: "View",
           onClick: () => window.open(result.postUrl || result.articleUrl, "_blank")
@@ -477,76 +477,121 @@ export default function ArticlesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Publish Article</AlertDialogTitle>
             <AlertDialogDescription>
-              Choose where to publish this article. It will be created as a <strong>draft</strong>.
+              Choose where to publish this article. It will be <strong>published directly</strong>.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          {/* Platform selector */}
-          <div className="flex gap-1.5 my-4">
-            {wpConnections.length > 0 && (
-              <button
-                onClick={() => setSelectedPlatform('wordpress')}
-                className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${selectedPlatform === 'wordpress'
-                  ? 'border-[#21759b] bg-[#21759b]/10'
-                  : 'border-stone-200 hover:border-stone-300'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-1.5">
-                  <Image src="/brands/wordpress.svg" alt="WordPress" width={18} height={18} className="shrink-0" />
-                  <span className="font-medium text-xs sm:text-sm truncate">WP</span>
-                </div>
-              </button>
-            )}
-            {wfConnections.length > 0 && (
-              <button
-                onClick={() => setSelectedPlatform('webflow')}
-                className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${selectedPlatform === 'webflow'
-                  ? 'border-[#4353ff] bg-[#4353ff]/10'
-                  : 'border-stone-200 hover:border-stone-300'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-1.5">
-                  <Image src="/brands/webflow.svg" alt="Webflow" width={18} height={18} className="shrink-0" />
-                  <span className="font-medium text-xs sm:text-sm truncate">WF</span>
-                </div>
-              </button>
-            )}
-            {spConnections.length > 0 && (
-              <button
-                onClick={() => setSelectedPlatform('shopify')}
-                className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${selectedPlatform === 'shopify'
-                  ? 'border-[#96bf48] bg-[#96bf48]/10'
-                  : 'border-stone-200 hover:border-stone-300'
-                  }`}
-              >
-                <div className="flex items-center justify-center gap-1.5">
-                  <Image src="/brands/shopify.svg" alt="Shopify" width={18} height={18} className="shrink-0" />
-                  <span className="font-medium text-xs sm:text-sm truncate">SP</span>
-                </div>
-              </button>
-            )}
-          </div>
+          {(() => {
+            // Get the pending article to check its publish status
+            const pendingArticle = articles.find(a => a.id === pendingPublishId)
+            const isPublishedToWP = !!pendingArticle?.wordpress_post_url
+            const isPublishedToWF = !!pendingArticle?.webflow_item_id
+            const isPublishedToSP = !!pendingArticle?.shopify_article_id
 
-          {!hasAnyConnection && (
-            <p className="text-sm text-amber-600">
-              No CMS connected. <Link href="/integrations" className="underline">Connect now</Link>
-            </p>
-          )}
+            // Check if selected platform is already published
+            const isSelectedAlreadyPublished =
+              (selectedPlatform === 'wordpress' && isPublishedToWP) ||
+              (selectedPlatform === 'webflow' && isPublishedToWF) ||
+              (selectedPlatform === 'shopify' && isPublishedToSP)
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={!hasAnyConnection}
-              onClick={() => {
-                if (pendingPublishId) {
-                  handlePublish(pendingPublishId, selectedPlatform)
-                  setPendingPublishId(null)
-                }
-              }}
-            >
-              Publish as Draft
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            // Check if all platforms are published
+            const allPublished =
+              (wpConnections.length === 0 || isPublishedToWP) &&
+              (wfConnections.length === 0 || isPublishedToWF) &&
+              (spConnections.length === 0 || isPublishedToSP)
+
+            return (
+              <>
+                {/* Platform selector */}
+                <div className="flex gap-1.5 my-4">
+                  {wpConnections.length > 0 && (
+                    <button
+                      onClick={() => !isPublishedToWP && setSelectedPlatform('wordpress')}
+                      disabled={isPublishedToWP}
+                      className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${isPublishedToWP
+                          ? 'border-green-300 bg-green-50 cursor-not-allowed opacity-70'
+                          : selectedPlatform === 'wordpress'
+                            ? 'border-[#21759b] bg-[#21759b]/10'
+                            : 'border-stone-200 hover:border-stone-300'
+                        }`}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Image src="/brands/wordpress.svg" alt="WordPress" width={18} height={18} className="shrink-0" />
+                        <span className="font-medium text-xs sm:text-sm truncate">
+                          {isPublishedToWP ? '✓' : 'WP'}
+                        </span>
+                      </div>
+                    </button>
+                  )}
+                  {wfConnections.length > 0 && (
+                    <button
+                      onClick={() => !isPublishedToWF && setSelectedPlatform('webflow')}
+                      disabled={isPublishedToWF}
+                      className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${isPublishedToWF
+                          ? 'border-green-300 bg-green-50 cursor-not-allowed opacity-70'
+                          : selectedPlatform === 'webflow'
+                            ? 'border-[#4353ff] bg-[#4353ff]/10'
+                            : 'border-stone-200 hover:border-stone-300'
+                        }`}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Image src="/brands/webflow.svg" alt="Webflow" width={18} height={18} className="shrink-0" />
+                        <span className="font-medium text-xs sm:text-sm truncate">
+                          {isPublishedToWF ? '✓' : 'WF'}
+                        </span>
+                      </div>
+                    </button>
+                  )}
+                  {spConnections.length > 0 && (
+                    <button
+                      onClick={() => !isPublishedToSP && setSelectedPlatform('shopify')}
+                      disabled={isPublishedToSP}
+                      className={`cursor-pointer flex-1 min-w-0 p-2 sm:p-2.5 rounded-lg border-2 transition-colors ${isPublishedToSP
+                          ? 'border-green-300 bg-green-50 cursor-not-allowed opacity-70'
+                          : selectedPlatform === 'shopify'
+                            ? 'border-[#96bf48] bg-[#96bf48]/10'
+                            : 'border-stone-200 hover:border-stone-300'
+                        }`}
+                    >
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Image src="/brands/shopify.svg" alt="Shopify" width={18} height={18} className="shrink-0" />
+                        <span className="font-medium text-xs sm:text-sm truncate">
+                          {isPublishedToSP ? '✓' : 'SP'}
+                        </span>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                {allPublished && hasAnyConnection && (
+                  <p className="text-sm text-green-600 mb-2">
+                    ✓ Already published to all connected platforms
+                  </p>
+                )}
+
+                {!hasAnyConnection && (
+                  <p className="text-sm text-amber-600">
+                    No CMS connected. <Link href="/integrations" className="underline">Connect now</Link>
+                  </p>
+                )}
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={!hasAnyConnection || isSelectedAlreadyPublished || allPublished}
+                    onClick={() => {
+                      if (pendingPublishId && !isSelectedAlreadyPublished) {
+                        handlePublish(pendingPublishId, selectedPlatform)
+                        setPendingPublishId(null)
+                      }
+                    }}
+                  >
+                    {isSelectedAlreadyPublished ? 'Already Published' : 'Publish'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </>
+            )
+          })()}
         </AlertDialogContent>
       </AlertDialog>
 

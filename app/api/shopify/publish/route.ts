@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { publishToShopify } from "@/lib/integrations/shopify-client"
 
+// Helper to escape special regex characters
+function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export async function POST(req: NextRequest) {
     try {
         const supabase = await createClient()
@@ -88,7 +93,45 @@ export async function POST(req: NextRequest) {
 
         const authorName = profile?.full_name || user.email?.split('@')[0] || 'Admin'
 
-        // 5. Publish to Shopify
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL
+            || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
+        // 5. Process section images - convert R2 URLs to publicly accessible proxy URLs
+        let processedContent = article.final_html
+        try {
+            console.log('[Shopify Publish] Processing section images...')
+
+            // Match all img tags with section-images URLs containing R2 or relative paths
+            const imgRegex = /<img[^>]*src=["']([^"']*section-images[^"']*)["'][^>]*>/gi
+            const matches = [...processedContent.matchAll(imgRegex)]
+
+            for (const match of matches) {
+                const originalUrl = match[1]
+                let publicUrl = originalUrl
+
+                // Convert R2 URL to publicly accessible proxy URL
+                if (originalUrl.includes('.r2.cloudflarestorage.com/')) {
+                    const key = originalUrl.split('.r2.cloudflarestorage.com/')[1]
+                    publicUrl = `${appUrl}/api/images/${key}`
+                } else if (originalUrl.startsWith('/api/images/')) {
+                    publicUrl = `${appUrl}${originalUrl}`
+                } else if (!originalUrl.startsWith('http')) {
+                    publicUrl = `${appUrl}/${originalUrl}`
+                }
+
+                // Replace with public URL
+                processedContent = processedContent.replace(
+                    new RegExp(escapeRegExp(originalUrl), 'g'),
+                    publicUrl
+                )
+                console.log(`[Shopify Section Image] Replaced: ${originalUrl.split('/').pop()}`)
+            }
+            console.log('[Shopify Publish] Section images processed')
+        } catch (error) {
+            console.error('[Shopify Publish] Section images processing failed:', error)
+        }
+
+        // 6. Publish to Shopify
         const result = await publishToShopify(
             {
                 storeDomain: connection.store_domain,
@@ -97,13 +140,13 @@ export async function POST(req: NextRequest) {
             connection.blog_id,
             {
                 title: article.outline?.title || 'Untitled',
-                content: article.final_html,
+                content: processedContent,
                 author: authorName,
                 tags: article.keyword || undefined,
                 featuredImageUrl: null, // We use attachment
                 featuredImageAttachment,
             },
-            true // publishAsDraft
+            false // publish directly (not as draft)
         )
 
         if (!result.success) {

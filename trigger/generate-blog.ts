@@ -1283,8 +1283,8 @@ CRITICAL EXECUTION RULES:
               const r2Domain = process.env.R2_PUBLIC_DOMAIN || `${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL}`
               const sectionImageR2Url = `${r2Domain}/${sectionImgFileName}`
 
-              // Inject image into markdown (after section content)
-              currentDraft += `![${section.heading}](${sectionImageR2Url})\n\n`
+              // Inject image into markdown (after section content) - single newline to prevent blank space
+              currentDraft += `![${section.heading}](${sectionImageR2Url})\n`
               console.log(`[Section Image] Added image for: ${section.heading}`)
             }
           } catch (imgErr) {

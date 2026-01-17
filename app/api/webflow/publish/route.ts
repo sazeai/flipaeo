@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { publishToWebflow } from "@/lib/integrations/webflow-client"
+import { publishToWebflow, uploadAssetToWebflow } from "@/lib/integrations/webflow-client"
+
+// Helper to escape special regex characters
+function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -46,6 +51,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Webflow connection not found" }, { status: 404 })
         }
 
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL
+            || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
         // 3. Get the featured image URL (use proxy if needed)
         let featuredImageUrl = article.featured_image_url
         if (featuredImageUrl) {
@@ -54,12 +62,8 @@ export async function POST(req: NextRequest) {
             // Construct fetchable URL
             if (featuredImageUrl.includes('.r2.cloudflarestorage.com/')) {
                 const key = featuredImageUrl.split('.r2.cloudflarestorage.com/')[1]
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL
-                    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
                 fetchUrl = `${appUrl}/api/images/${key}`
             } else if (featuredImageUrl.startsWith('/api/images/')) {
-                const appUrl = process.env.NEXT_PUBLIC_APP_URL
-                    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
                 fetchUrl = `${appUrl}${featuredImageUrl}`
             }
 
@@ -76,7 +80,6 @@ export async function POST(req: NextRequest) {
                     const buffer = Buffer.from(arrayBuffer)
 
                     // Upload to Webflow Assets
-                    const { uploadAssetToWebflow } = await import("@/lib/integrations/webflow-client")
                     const assetResult = await uploadAssetToWebflow(
                         connection.api_token,
                         connection.site_id,
@@ -95,11 +98,66 @@ export async function POST(req: NextRequest) {
                 }
             } catch (err) {
                 console.error(`[Webflow Publish] Error processing image:`, err)
-                if (isLocalhost) featuredImageUrl = null
+                if (featuredImageUrl?.includes('localhost')) featuredImageUrl = null
             }
         }
 
-        // 3. Publish to Webflow
+        // 4. Process section images - upload to Webflow assets and replace R2 URLs
+        let processedContent = article.final_html
+        try {
+            console.log('[Webflow Publish] Processing section images...')
+
+            // Match all img tags with section-images URLs
+            const imgRegex = /<img[^>]*src=["']([^"']*section-images[^"']*)["'][^>]*>/gi
+            const matches = [...processedContent.matchAll(imgRegex)]
+
+            for (const match of matches) {
+                const originalUrl = match[1]
+                let fetchableUrl = originalUrl
+
+                // Convert R2 URL to fetchable proxy URL
+                if (originalUrl.includes('.r2.cloudflarestorage.com/')) {
+                    const key = originalUrl.split('.r2.cloudflarestorage.com/')[1]
+                    fetchableUrl = `${appUrl}/api/images/${key}`
+                } else if (originalUrl.startsWith('/api/images/')) {
+                    fetchableUrl = `${appUrl}${originalUrl}`
+                } else if (!originalUrl.startsWith('http')) {
+                    fetchableUrl = `${appUrl}/${originalUrl}`
+                }
+
+                try {
+                    console.log(`[Webflow Section Image] Uploading: ${originalUrl.split('/').pop()}`)
+                    const imageRes = await fetch(fetchableUrl)
+                    if (imageRes.ok) {
+                        const arrayBuffer = await imageRes.arrayBuffer()
+                        const buffer = Buffer.from(arrayBuffer)
+
+                        const assetResult = await uploadAssetToWebflow(
+                            connection.api_token,
+                            connection.site_id,
+                            buffer,
+                            `section-${Date.now()}.png`
+                        )
+
+                        if (assetResult.url) {
+                            // Replace R2 URL with Webflow asset URL
+                            processedContent = processedContent.replace(
+                                new RegExp(escapeRegExp(originalUrl), 'g'),
+                                assetResult.url
+                            )
+                            console.log(`[Webflow Section Image] Success: ${assetResult.url}`)
+                        }
+                    }
+                } catch (imgErr) {
+                    console.error(`[Webflow Section Image] Failed for ${originalUrl}:`, imgErr)
+                }
+            }
+            console.log('[Webflow Publish] Section images processed')
+        } catch (error) {
+            console.error('[Webflow Publish] Section images processing failed:', error)
+        }
+
+        // 5. Publish to Webflow
         const result = await publishToWebflow(
             {
                 apiToken: connection.api_token,
@@ -108,7 +166,7 @@ export async function POST(req: NextRequest) {
             },
             {
                 title: article.outline?.title || 'Untitled',
-                content: article.final_html,
+                content: processedContent,
                 slug: article.slug || undefined,
                 excerpt: article.meta_description || undefined,
                 featuredImageUrl,

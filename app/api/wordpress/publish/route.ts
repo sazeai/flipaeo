@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
-import { publishToWordPress } from "@/lib/integrations/wordpress-client"
+import { publishToWordPress, uploadContentImagesToWordPress } from "@/lib/integrations/wordpress-client"
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { articleId, connectionId, publishStatus = 'draft' } = body
+        const { articleId, connectionId, publishStatus = 'publish' } = body
 
         if (!articleId || !connectionId) {
             return NextResponse.json({ error: "Missing articleId or connectionId" }, { status: 400 })
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         // 2. Fetch the WordPress connection
         const { data: connection, error: connectionError } = await supabase
             .from("wordpress_connections")
-            .select("id, site_url, username, app_password")
+            .select("id, site_url, username, app_password, default_category_id")
             .eq("id", connectionId)
             .eq("user_id", user.id)
             .single()
@@ -46,36 +46,53 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "WordPress connection not found" }, { status: 404 })
         }
 
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL
+            || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+
         // 3. Get the featured image URL (use proxy if needed)
         let featuredImageUrl = article.featured_image_url
         if (featuredImageUrl && featuredImageUrl.includes('.r2.cloudflarestorage.com/')) {
             // Convert to proxy URL for fetching
             const key = featuredImageUrl.split('.r2.cloudflarestorage.com/')[1]
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL
-                || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
             featuredImageUrl = `${appUrl}/api/images/${key}`
         } else if (featuredImageUrl && featuredImageUrl.startsWith('/api/images/')) {
             // Already a relative proxy URL - make it absolute
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL
-                || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
             featuredImageUrl = `${appUrl}${featuredImageUrl}`
         }
 
         console.log('Featured image URL for WP:', featuredImageUrl)
 
-        // 4. Publish to WordPress
+        // 4. Upload section images to WordPress media library and replace R2 URLs
+        const credentials = {
+            siteUrl: connection.site_url,
+            username: connection.username,
+            appPassword: connection.app_password,
+        }
+
+        let processedContent = article.final_html
+        try {
+            console.log('[WordPress Publish] Processing section images...')
+            processedContent = await uploadContentImagesToWordPress(
+                credentials,
+                article.final_html,
+                appUrl
+            )
+            console.log('[WordPress Publish] Section images processed')
+        } catch (imgError) {
+            console.error('[WordPress Publish] Section images processing failed:', imgError)
+            // Continue with original content - non-blocking
+        }
+
+        // 5. Publish to WordPress
         const result = await publishToWordPress(
-            {
-                siteUrl: connection.site_url,
-                username: connection.username,
-                appPassword: connection.app_password,
-            },
+            credentials,
             {
                 title: article.outline?.title || 'Untitled',
-                content: article.final_html,
+                content: processedContent,
                 excerpt: article.meta_description || undefined,
                 slug: article.slug || undefined,
                 featuredImageUrl,
+                categoryId: connection.default_category_id || null,
             },
             publishStatus
         )
