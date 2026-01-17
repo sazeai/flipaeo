@@ -177,8 +177,8 @@ export const ProblemSection: React.FC = () => {
         </div>
 
         {/* Headline */}
-        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
-          One-click AI content is<br />quietly killing your growth
+        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
+          One-click AI content is<br />killing your growth
         </h2>
 
         {/* Subtext */}

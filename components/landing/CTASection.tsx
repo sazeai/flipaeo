@@ -15,7 +15,7 @@ export const CTASection: React.FC = () => {
         </div>
 
         {/* Headline */}
-        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
+        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
           Your Competitors<br />
           Are Already Ranking.
         </h2>

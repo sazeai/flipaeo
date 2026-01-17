@@ -17,7 +17,7 @@ export const PricingSection: React.FC = () => {
                 <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
                     <span className="font-display font-bold text-xs uppercase tracking-widest">Simple Pricing</span>
                 </div>
-                <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[0.9] mb-6 uppercase">
+                <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
                     One Plan.<br />Unlimited Potential.
                 </h2>
                 <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl">
