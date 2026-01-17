@@ -45,7 +45,7 @@ export function SubscriptionManagement({
 }: SubscriptionManagementProps) {
   return (
     <div className={cn("w-full text-left", className)}>
-      <Card className="shadow-lg">
+      <Card className="shadow-xs">
         <CardHeader className="px-4 pb-4 sm:px-6 sm:pb-6">
           <CardTitle className="flex items-center gap-2 text-lg sm:gap-3 sm:text-xl">
             <div className="bg-primary/10 ring-primary/20 rounded-lg p-1.5 ring-1 sm:p-2">
@@ -121,14 +121,7 @@ export function SubscriptionManagement({
                   {currentPlan.nextBillingDate}
                 </div>
               </div>
-              <div className="group from-muted to-background/10 border-border/30 hover:border-border/60 rounded-lg border bg-gradient-to-b p-2.5 transition-all duration-200 sm:p-3 md:bg-gradient-to-tr">
-                <span className="text-muted-foreground mb-1 block text-xs sm:text-sm">
-                  Payment method
-                </span>
-                <div className="group-hover:text-primary text-sm font-medium transition-colors duration-200 sm:text-base">
-                  {currentPlan.paymentMethod}
-                </div>
-              </div>
+
             </div>
           </div>
 
