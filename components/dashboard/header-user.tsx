@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { useCreditManager } from "@/lib/credit-manager"
+import { FeatherIcon } from "@/components/icons/feathericon"
+
 
 interface HeaderUserProps {
   user: {
@@ -43,7 +45,7 @@ export function HeaderUser({ user, initialCreditBalance }: HeaderUserProps) {
     <div className="flex items-center gap-3">
       {/* Credit Display */}
       <div className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md">
-        <Coins className="h-4 w-4 text-amber-600" />
+        <span className="flex items-center gap-2"><FeatherIcon size={12} /></span>
         <span className="text-sm font-medium text-foreground">
           {creditBalance.toLocaleString()}
         </span>
@@ -80,7 +82,7 @@ export function HeaderUser({ user, initialCreditBalance }: HeaderUserProps) {
             <DropdownMenuItem>
               <Link href="/subscribe" prefetch={false} className="flex items-center">
                 <Sparkles className="mr-2 h-4 w-4" />
-                Buy Credits
+                Manage Billing
               </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -93,14 +95,15 @@ export function HeaderUser({ user, initialCreditBalance }: HeaderUserProps) {
                 Dashboard
               </Link>
             </DropdownMenuItem>
-
-            <DropdownMenuItem className="cursor-pointer">
-              <BadgeCheck className="mr-2 h-4 w-4" />
-              <Link href="/account" prefetch={false}>Account</Link>
-            </DropdownMenuItem>
-
           </DropdownMenuGroup>
+          <DropdownMenuItem className="cursor-pointer">
+            <Link href="/account" prefetch={false} className="flex items-center">
+              <BadgeCheck className="mr-2 h-4 w-4" />
+              Account
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
+
           <DropdownMenuItem
             onClick={async () => {
               await signOut()

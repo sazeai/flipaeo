@@ -40,7 +40,7 @@ const navSecondary = [
 ]
 
 // Credits Card Component
-function CreditsCard({ userId }: { userId?: string }) {
+function CreditsCard({ userId, isSubscribed, planName }: { userId?: string; isSubscribed?: boolean; planName?: string | null }) {
   const { balance, loading } = useCreditManager(userId || null)
 
   if (loading) {
@@ -62,11 +62,19 @@ function CreditsCard({ userId }: { userId?: string }) {
         <div className="text-xs text-muted-foreground mb-3 flex justify-between">
           <span className="flex items-center gap-2"><FeatherIcon size={12} />Articles</span> <span className="text-amber-600"> {balance.toLocaleString()}</span>
         </div>
-        <Button size="sm" className="w-full bg-black hover:bg-black/90 text-white border-0" asChild>
-          <Link href="/subscribe" prefetch={false}>
-            <Sparkles className="h-3 w-3" /> Subscribe
-          </Link>
-        </Button>
+        {isSubscribed ? (
+          <Button size="sm" variant="outline" className="w-full" asChild>
+            <Link href="/account" prefetch={false}>
+              Manage Billing
+            </Link>
+          </Button>
+        ) : (
+          <Button size="sm" className="w-full bg-black hover:bg-black/90 text-white border-0" asChild>
+            <Link href="/subscribe" prefetch={false}>
+              <Sparkles className="h-3 w-3" /> Subscribe
+            </Link>
+          </Button>
+        )}
       </CardContent>
     </Card>
   )
@@ -74,6 +82,8 @@ function CreditsCard({ userId }: { userId?: string }) {
 
 export function AppSidebar({
   user,
+  isSubscribed,
+  planName,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   user?: {
@@ -82,6 +92,8 @@ export function AppSidebar({
     avatar: string
     id?: string
   }
+  isSubscribed?: boolean
+  planName?: string | null
 }) {
   const userData = user || {
     name: "User",
@@ -142,7 +154,7 @@ export function AppSidebar({
         <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <CreditsCard userId={userData.id} />
+        <CreditsCard userId={userData.id} isSubscribed={isSubscribed} planName={planName} />
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>

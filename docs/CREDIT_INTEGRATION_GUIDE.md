@@ -111,7 +111,7 @@ export default function MyToolClient({ userId, requiredCredits }: MyToolClientPr
         <p className="text-sm text-red-600">
           You need {requiredCredits - balance} more credits to use this tool.
           <Link href="/subscribe" className="underline ml-1">
-            Buy credits
+            Manage Billing
           </Link>
         </p>
       )}
@@ -481,7 +481,7 @@ export default function AIWriterClient({ userId }: AIWriterClientProps) {
               <p className="text-sm text-red-600">
                 You need {requiredCredits - balance} more credits.
                 <Link href="/subscribe" className="underline ml-1">
-                  Buy credits
+                  Manage Billing
                 </Link>
               </p>
             )}

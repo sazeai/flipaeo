@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
-  
+
   // Check if user is authenticated
   const {
     data: { user },
@@ -34,6 +34,18 @@ export default async function DashboardLayout({
 
   // Fetch user's credit balance for header display
   const { balance: creditBalance } = await creditService.getUserCredits(user.id)
+
+  // Fetch subscription status (single query)
+  const { data: subscription } = await supabase
+    .from('dodo_subscriptions')
+    .select('status, dodo_pricing_plans(name)')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  const isSubscribed = !!subscription
+  const planName = (subscription?.dodo_pricing_plans as any)?.name || null
+
   return (
     <div className="protected-scope">
       <NavigationProgress />
@@ -80,44 +92,46 @@ export default async function DashboardLayout({
           })();
         `}
       </Script>
-        <SidebarProvider>
-          <AppSidebar 
-            user={{
-              name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-              email: user.email || '',
-              avatar: user.user_metadata?.avatar_url || "/placeholder-user.jpg",
-              id: user.id,
-            }}
-          />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 justify-between">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator
-                  orientation="vertical"
-                  className="mr-2 data-[orientation=vertical]:h-4"
-                />
-                <DynamicBreadcrumb />
-              </div>
-              <div className="px-4">
-                <HeaderUser
-                  user={{
-                    name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-                    email: user.email || '',
-                    avatar: user.user_metadata?.avatar_url || "/placeholder-user.jpg",
-                    id: user.id,
-                  }}
-                  initialCreditBalance={creditBalance}
-                />
-              </div>
-            </header>
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-              <LoadingProvider>
-                {children}
-              </LoadingProvider>
+      <SidebarProvider>
+        <AppSidebar
+          user={{
+            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+            email: user.email || '',
+            avatar: user.user_metadata?.avatar_url || "/placeholder-user.jpg",
+            id: user.id,
+          }}
+          isSubscribed={isSubscribed}
+          planName={planName}
+        />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 justify-between">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 data-[orientation=vertical]:h-4"
+              />
+              <DynamicBreadcrumb />
             </div>
-          </SidebarInset>
-        </SidebarProvider>
+            <div className="px-4">
+              <HeaderUser
+                user={{
+                  name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+                  email: user.email || '',
+                  avatar: user.user_metadata?.avatar_url || "/placeholder-user.jpg",
+                  id: user.id,
+                }}
+                initialCreditBalance={creditBalance}
+              />
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            <LoadingProvider>
+              {children}
+            </LoadingProvider>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   )
 }

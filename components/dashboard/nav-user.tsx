@@ -86,7 +86,7 @@ export function NavUser({
               <DropdownMenuItem asChild className="cursor-pointer">
                 <Link href="/subscribe" className="flex items-center">
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Buy Credits
+                  Manage Billing
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
