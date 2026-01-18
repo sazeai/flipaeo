@@ -92,6 +92,9 @@ export default async function RootLayout({
         {/* Theme color */}
         <meta name="theme-color" content="#000000" />
 
+        {/* Google Search Console Verification */}
+        <meta name="google-site-verification" content="HFUei7qB8OnXJs9EK9i48sky9Van9zgfcfjZDIHOU_c" />
+
         {/* Organization Schema - Global */}
         <StructuredData
           id="organization-schema"
