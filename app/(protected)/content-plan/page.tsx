@@ -676,7 +676,7 @@ export default function ContentPlanPage() {
                             {plan && (
                                 <Button
                                     onClick={handleToggleAutomation}
-                                    disabled={automationLoading || (!hasCredits && plan.automation_status !== "active")}
+                                    disabled={automationLoading || !isSubscribed || (!hasCredits && plan.automation_status !== "active")}
                                     variant="outline"
                                     size="sm"
                                     className={cn(
