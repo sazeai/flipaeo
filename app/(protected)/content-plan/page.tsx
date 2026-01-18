@@ -732,7 +732,7 @@ export default function ContentPlanPage() {
                                         "text-xs font-bold uppercase tracking-wide transition-colors",
                                         isAnalysisOpen ? "text-amber-900" : "text-stone-500 group-hover:text-amber-900"
                                     )}>
-                                        Strategic Analysis
+                                        Quick Analysis
                                     </h3>
                                 </div>
                                 <div className={cn(
