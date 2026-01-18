@@ -45,6 +45,34 @@ async function getUser() {
 
 async function getLatestSubscription(userId: string) {
     const supabase = await createClient()
+
+    // Priority 1: Look for an active subscription first
+    const { data: activeSub, error: activeError } = await supabase
+        .from('dodo_subscriptions')
+        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+    if (activeError) return null
+    if (activeSub) return activeSub
+
+    // Priority 2: Look for a pending subscription (checkout in progress)
+    const { data: pendingSub, error: pendingError } = await supabase
+        .from('dodo_subscriptions')
+        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
+        .eq('user_id', userId)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+    if (pendingError) return null
+    if (pendingSub) return pendingSub
+
+    // Priority 3: Fall back to most recent subscription (for cancelled/expired states)
     const { data, error } = await supabase
         .from('dodo_subscriptions')
         .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
@@ -52,6 +80,7 @@ async function getLatestSubscription(userId: string) {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
+
     if (error) return null
     return data
 }

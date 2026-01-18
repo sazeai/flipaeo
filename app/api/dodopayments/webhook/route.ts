@@ -557,7 +557,7 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ ok: true, note: 'missing user_id or subscription_id' }, { status: 200 })
             }
 
-            const status = eventType === 'subscription.activated' ? 'active' : 'pending'
+            const status = (eventType === 'subscription.activated' || eventType === 'subscription.active') ? 'active' : 'pending'
             const { planCredits, pricing_plan_id } = await upsertSubscriptionFromEvent(supabase, {
                 user_id: effective_user_id,
                 dodo_subscription_id,

@@ -218,7 +218,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-image: radial-gradient(#ebebeb 1px, transparent 1px);
     background-size: 8px 8px;
     pointer-events: none;
     z-index: 0;
@@ -232,7 +232,7 @@
 
   /* Also add bg-dot-pattern utility class */
   .bg-dot-pattern {
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-image: radial-gradient(#ebebeb 1px, transparent 1px);
     background-size: 8px 8px;
   }
 
@@ -1090,7 +1090,7 @@ input[type="range"].slider::-moz-range-thumb {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-image: radial-gradient(#ebebeb 1px, transparent 1px);
   background-size: 8px 8px;
   pointer-events: none;
   z-index: 0;
@@ -1104,7 +1104,7 @@ input[type="range"].slider::-moz-range-thumb {
 
 /* Also add bg-dot-pattern utility class */
 .bg-dot-pattern {
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-image: radial-gradient(#ebebeb 1px, transparent 1px);
   background-size: 8px 8px;
 }
 

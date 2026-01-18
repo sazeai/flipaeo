@@ -226,7 +226,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
 
         {/* Featured Image */}
         {post.featuredImage?.node?.sourceUrl && (
-          <div className="max-w-4xl mx-auto px-4 relative -mt-6 z-10 w-full">
+          <div className="max-w-5xl mx-auto px-4 relative -mt-6 z-10 w-full">
             <div className="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
               <Image
                 src={post.featuredImage.node.sourceUrl}
