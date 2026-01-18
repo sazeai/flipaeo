@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { defaultSEO } from '@/config/seo'
 import { getAllPostSlugs } from '@/lib/wordpress'
+import { getAllToolSlugs } from '@/lib/tools'
 
 // Regenerate sitemap periodically to auto-include newly published WordPress posts
 export const revalidate = 600 // seconds
@@ -57,7 +58,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
+  // Dynamically include Tools
+  const toolSlugs = await getAllToolSlugs().catch(() => [])
+  const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
+    url: `${baseUrl}/tools/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  // Add main tools page if not already in extraRoutes
+  const toolsIndexPage: MetadataRoute.Sitemap = [{
+    url: `${baseUrl}/tools`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }]
+
   // Note: Protected pages like /blog-writer, /account are intentionally excluded
 
-  return [...staticPages, ...additionalPages, ...blogPages]
+  return [...staticPages, ...additionalPages, ...blogPages, ...toolPages, ...toolsIndexPage]
 }

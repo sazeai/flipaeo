@@ -128,9 +128,9 @@ export const ShowcaseSection: React.FC = () => {
                             </div>
 
                             {/* Visual separation line */}
-                            <div className="w-24 h-1.5 bg-black mb-8"></div>
+                            <div className="w-24 h-1 sm:h-1.5 bg-black mb-8"></div>
 
-                            <div className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 font-bold text-lg border-2 border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_0px_#FFD8A8]">
+                            <div className="inline-flex items-center gap-2 bg-black text-white px-4 sm:px-6 py-1.5 sm:py-3 font-bold text-base sm:text-lg border-2 border-black hover:bg-white hover:text-black transition-all shadow-[4px_4px_0px_0px_#FFD8A8]">
                                 Read Live Article
                                 <ExternalLink className="w-5 h-5" />
                             </div>

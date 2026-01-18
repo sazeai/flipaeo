@@ -22,7 +22,7 @@ const tools = [
         href: "/tools/llms-txt",
         icon: FileText,
         badge: "Popular",
-        badgeColor: "bg-brand-orange text-white",
+        badgeColor: "bg-brand-orange text-black",
     },
     {
         title: "Schema Generator",
@@ -30,16 +30,16 @@ const tools = [
         href: "/tools/schema-generator",
         icon: Code,
         badge: "New",
-        badgeColor: "bg-brand-orange text-white",
+        badgeColor: "bg-brand-orange text-black",
     },
     {
         title: "AI Bot Manager",
         description: "Build robots.txt rules to control which AI bots can crawl your content.",
         href: "/tools/robots-txt",
         icon: Shield,
-        badge: "Coming Soon",
-        badgeColor: "bg-gray-200 text-gray-700",
-        disabled: true,
+        badge: "New",
+        badgeColor: "bg-brand-orange text-black",
+        disabled: false,
     },
 ];
 
@@ -52,7 +52,7 @@ export default function ToolsPage() {
                     <span className="font-display font-bold text-xs uppercase tracking-widest">100% Free • No Sign-up</span>
                 </div>
                 <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-black uppercase leading-tight mb-6">
-                    Free <span className="text-brand-orange">GEO Tools</span>
+                    Free <span className="text-brand-yellow">GEO Tools</span>
                 </h1>
                 <p className="font-sans text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                     Optimize your website for AI search engines like ChatGPT, Perplexity, and Claude.
@@ -77,12 +77,12 @@ export default function ToolsPage() {
                                     <div className="p-3 bg-brand-yellow/20 border-2 border-black rounded-none text-black">
                                         <tool.icon className="h-6 w-6" strokeWidth={2.5} />
                                     </div>
-                                    <span className={`px-3 py-1 text-xs font-bold uppercase border border-black ${tool.badgeColor}`}>
+                                    <span className={`px-3 py-1 text-xs text-black font-bold uppercase border border-black ${tool.badgeColor}`}>
                                         {tool.badge}
                                     </span>
                                 </div>
 
-                                <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-brand-orange transition-colors">
+                                <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-brand-yellow transition-colors">
                                     {tool.title}
                                 </h3>
 
