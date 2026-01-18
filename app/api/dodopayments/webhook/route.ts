@@ -351,6 +351,7 @@ async function updateSubscriptionServiceFields(
     const currentEndRaw =
         subscriptionObj?.current_period_end ??
         subscriptionObj?.current_period_end_at ??
+        subscriptionObj?.next_billing_date ??  // Fallback: DodoPayments uses next_billing_date as period end
         undefined;
 
     const canceledAtRaw =
@@ -616,6 +617,35 @@ export async function POST(req: NextRequest) {
             // Persist next billing date if present
             if (dodo_subscription_id) {
                 await updateSubscriptionServiceFields(supabase, dodo_subscription_id, subscriptionObj, eventType)
+            }
+
+            // Persist payment record for invoice history
+            const paymentObj = data?.payment ?? data
+            const dodo_payment_id = paymentObj?.payment_id || data?.payment_id
+            const paymentAmount = Number(paymentObj?.total_amount ?? data?.total_amount ?? 0)
+            const paymentCurrency = (paymentObj?.currency || data?.currency || 'USD') as string
+            const paymentTimestamp = payload?.timestamp || new Date().toISOString()
+            const paymentPricingPlanId = activeSub?.pricing_plan_id || null
+
+            if (dodo_payment_id && effective_user_id && paymentPricingPlanId) {
+                try {
+                    await supabase.from('dodo_payments').upsert(
+                        [{
+                            dodo_payment_id: String(dodo_payment_id),
+                            user_id: String(effective_user_id),
+                            pricing_plan_id: paymentPricingPlanId,
+                            amount: paymentAmount,
+                            currency: paymentCurrency,
+                            status: 'completed',
+                            credits: planCredits ?? 0,
+                            metadata: { ...(paymentObj || data), payment_timestamp: paymentTimestamp },
+                        }],
+                        { onConflict: 'dodo_payment_id' }
+                    )
+                } catch (paymentErr) {
+                    console.error('Failed to upsert payment record for invoice history:', paymentErr)
+                    // Non-blocking: don't fail the entire webhook for invoice tracking
+                }
             }
         } else if (eventType === 'subscription.cancelled' || eventType === 'subscription.canceled') {
             // Handle cancellation

@@ -57,6 +57,12 @@ interface UsageStats {
 
 export function AccountDashboard({ user, payments, currentCredits, totalCreditsPurchased, subscription }: AccountDashboardProps) {
 
+  const formatCurrency = (amount: number, currency: string = 'USD') => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount)
+  }
 
   const mapStatusToInvoice = (status: string): 'paid' | 'refunded' | 'open' | 'void' => {
     const s = (status || '').toLowerCase()
@@ -74,18 +80,6 @@ export function AccountDashboard({ user, payments, currentCredits, totalCreditsP
     invoiceUrl: p.dodo_payment_id ? `/api/dodopayments/invoices/${encodeURIComponent(p.dodo_payment_id)}` : undefined,
     description: p?.pricing_plan?.name ? `Plan: ${p.pricing_plan.name}` : undefined,
   }))
-
-
-
-
-
-  const formatCurrency = (amount: number, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount)
-  }
-
 
 
   return (
@@ -162,12 +156,6 @@ export function AccountDashboard({ user, payments, currentCredits, totalCreditsP
                   <p className="text-sm text-muted-foreground">
                     Next billing:{' '}
                     {new Date(subscription.next_billing_date).toLocaleString()}
-                  </p>
-                )}
-                {subscription.current_period_end && (
-                  <p className="text-sm text-muted-foreground">
-                    Current period ends:{' '}
-                    {new Date(subscription.current_period_end).toLocaleString()}
                   </p>
                 )}
                 {typeof subscription.cancel_at_period_end === 'boolean' &&

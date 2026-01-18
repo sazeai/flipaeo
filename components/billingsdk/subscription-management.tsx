@@ -30,6 +30,7 @@ export interface SubscriptionManagementProps {
   hideUpdatePlan?: boolean;
   hideCancelDialog?: boolean;
   dateLabel?: string;
+  isPlanEnding?: boolean;
   children?: ReactNode;
 }
 
@@ -41,6 +42,7 @@ export function SubscriptionManagement({
   hideUpdatePlan,
   hideCancelDialog,
   dateLabel,
+  isPlanEnding,
   children,
 }: SubscriptionManagementProps) {
   return (
@@ -113,11 +115,20 @@ export function SubscriptionManagement({
               Billing Information
             </h4>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6">
-              <div className="group from-muted to-background/10 border-border/30 hover:border-border/60 rounded-lg border bg-gradient-to-b p-2.5 transition-all duration-200 sm:p-3 md:bg-gradient-to-tl">
-                <span className="text-muted-foreground mb-1 block text-xs sm:text-sm">
+              <div className={cn(
+                "group from-muted to-background/10 border-border/30 hover:border-border/60 rounded-lg border bg-gradient-to-b p-2.5 transition-all duration-200 sm:p-3 md:bg-gradient-to-tl",
+                isPlanEnding && "border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20"
+              )}>
+                <span className={cn(
+                  "mb-1 block text-xs sm:text-sm",
+                  isPlanEnding ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+                )}>
                   {dateLabel ?? "Next billing date"}
                 </span>
-                <div className="group-hover:text-primary text-sm font-medium transition-colors duration-200 sm:text-base">
+                <div className={cn(
+                  "text-sm font-medium transition-colors duration-200 sm:text-base",
+                  isPlanEnding ? "text-amber-700 dark:text-amber-400" : "group-hover:text-primary"
+                )}>
                   {currentPlan.nextBillingDate}
                 </div>
               </div>

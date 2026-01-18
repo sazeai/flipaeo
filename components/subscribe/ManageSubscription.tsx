@@ -77,6 +77,7 @@ function daysUntil(dateIso?: string): number {
 export default function ManageSubscription({ subscription, plans, userEmail }: ManageSubscriptionProps) {
     const [busy, setBusy] = useState(false)
     const [confirmCancelOpen, setConfirmCancelOpen] = useState(false)
+    const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false)
     const router = useRouter()
     const [localCancelAtPeriodEnd, setLocalCancelAtPeriodEnd] = useState(!!subscription.cancel_at_period_end)
     const [localNextBillingDate, setLocalNextBillingDate] = useState<string | undefined>(subscription.next_billing_date)
@@ -289,6 +290,7 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
                     hideUpdatePlan={true}
                     hideCancelDialog={true}
                     dateLabel={dateLabel}
+                    isPlanEnding={localCancelAtPeriodEnd}
                 >
                     <>
                         {subscription.status === 'active' && !localCancelAtPeriodEnd && (
@@ -303,7 +305,7 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
                         {subscription.status === 'active' && localCancelAtPeriodEnd && (
                             <Button
                                 variant="default"
-                                onClick={onRestore}
+                                onClick={() => setConfirmRestoreOpen(true)}
                                 disabled={busy}
                             >
                                 Restore subscription
@@ -333,6 +335,25 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
                 confirmText="Confirm cancellation"
                 cancelText="Keep subscription"
                 variant="destructive"
+            />
+
+            <ConfirmationDialog
+                isOpen={confirmRestoreOpen}
+                onClose={() => setConfirmRestoreOpen(false)}
+                onConfirm={async () => {
+                    try {
+                        await onRestore()
+                        setConfirmRestoreOpen(false)
+                    } catch (e) {
+                        console.error('Failed to restore subscription', e)
+                        alert('Failed to restore subscription')
+                    }
+                }}
+                title="Restore your subscription?"
+                description="Your subscription will continue and you will be billed on the next billing date. Your access will remain uninterrupted."
+                confirmText="Yes, restore subscription"
+                cancelText="Cancel"
+                variant="default"
             />
 
         </div>
