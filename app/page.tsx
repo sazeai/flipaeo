@@ -14,6 +14,7 @@ import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { CTASection } from '@/components/landing/CTASection';
 import { Footer } from '@/components/landing/Footer';
+import { AICitations } from '@/components/landing/AICitations';
 
 export const metadata: Metadata = commonPageMetadata.home()
 
@@ -37,6 +38,7 @@ export default function Home() {
         <HowItWorksSection />
         <FeaturesSection />
         <FounderNote />
+        <AICitations />
         <PricingSection />
         <FAQSection />
         <CTASection />
