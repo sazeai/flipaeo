@@ -31,53 +31,84 @@ export default function AboutUs() {
         </section>
 
         {/* Content */}
-        <section className="max-w-5xl mx-auto px-4 py-12 w-full">
-          <div className="space-y-8 bg-white border rounded-2xl p-5">
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Our Journey</h2>
-              <p className="text-gray-700">
-                We are a small team of passionate developers and content strategists, self-taught and driven by curiosity. Our journey into tech started through blogging—sharing insights about digital marketing, SEO, and the evolving landscape of search. We spent years watching how algorithms changed and how businesses struggled to keep up.
+        <section className="max-w-4xl mx-auto px-4 py-12 w-full">
+          <div className="space-y-12 bg-white border-2 border-black rounded-lg p-8 md:p-12 shadow-neo">
+
+            {/* Intro */}
+            <div className="prose prose-lg max-w-none">
+              <h2 className="font-display text-3xl font-bold bg-brand-yellow inline-block px-2 border-2 border-black shadow-neo-sm transform -rotate-1 mb-6">The Story of FlipAEO</h2>
+              <h3 className="font-display text-2xl font-bold mt-8 mb-4">From 80k Monthly Traffic to a "Dream SaaS"</h3>
+            </div>
+
+            {/* The Origin */}
+            <div className="relative pl-8 border-l-4 border-black/10">
+              <h2 className="font-display text-2xl font-bold mb-4">The Origin: The Blogger Who Cracked the Code</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                Back in late 2022, long before I wrote a single line of code, I was a blogger in the AI niche. I was obsessed with one thing: <strong>Traffic.</strong>
+              </p>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                In early 2024, I hit a massive milestone. I took a brand new blog from 0 to 80,000 monthly visitors in just 40 days. I wasn't just writing; I was outranking massive competitors with huge budgets.
+              </p>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed">
+                My secret wasn't luck. It was a <strong>specific, repeatable workflow</strong> I had mastered using AI tools like ChatGPT and Gemini. I figured out the exact prompts and structures needed to make AI write content that didn't just "read well"—it dominated search results.
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Shift We Saw Coming</h2>
-              <p className="text-gray-700">
-                Then AI search arrived. ChatGPT, Perplexity, Google AI Overviews—suddenly, the game changed completely. Users stopped clicking through search results. They started asking questions and expecting direct answers. We realized that traditional SEO was no longer enough. The future belonged to brands that could become the source AI systems cite.
+            {/* The Gap */}
+            <div>
+              <h2 className="font-display text-2xl font-bold mb-4">The Gap: The Idea vs. The Skill</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                I knew I had a goldmine. I wanted to turn this manual workflow into a software that anyone could use. I wanted to automate the "expert touch."
+              </p>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed">
+                But there was one problem: I had no background in development. I knew what to build, but I didn't know how to build it.
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">The Birth of FlipAEO</h2>
-              <p className="text-gray-700">
-                That's when FlipAEO was born. We built a Strategic Content Engine designed specifically for Generative Engine Optimization (GEO). Instead of chasing keywords, we reverse-engineer how AI models think—analyzing competitors, identifying visibility gaps, and creating content that AI systems recognize as authoritative.
+            {/* The Journey */}
+            <div className="bg-gray-50 border-2 border-black p-6 md:p-8 shadow-neo-sm">
+              <h2 className="font-display text-2xl font-bold mb-4">The Journey: Learning to Build</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                In October 2024, I stopped just writing and started building. I launched my first SaaS, <a href="https://unrealshot.com" target="_blank" className="underline decoration-2 decoration-brand-yellow hover:bg-brand-yellow font-bold text-black" rel="noreferrer">Unrealshot AI</a>. It grew purely through organic SEO—proving again that my content strategies worked. I built <a href="https://bringback.pro" target="_blank" className="underline decoration-2 decoration-brand-yellow hover:bg-brand-yellow font-bold text-black" rel="noreferrer">BringBack.pro</a>, which is still growing today.
               </p>
-              <p className="text-gray-700 mt-3">
-                FlipAEO doesn't just write articles. It decides what should exist, what comes next, and what actually moves authority forward. Every piece of content is researched, cited, and structured to become the answer—not just another result.
-              </p>
-            </div>
-
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Empowering Entrepreneurs</h2>
-              <p className="text-gray-700">
-                This isn't just about rankings. It's about visibility in the age of AI. We believe every entrepreneur, founder, and content marketer deserves to be found when AI answers questions in their category. FlipAEO makes that possible—automatically, strategically, and at scale.
+              <p className="font-sans text-gray-700 text-lg leading-relaxed">
+                2025 was my "boot camp." I built many products. Most of them failed. But with every failure, I learned the tech. I learned how to structure a database, how to manage servers, and how to turn logic into code.
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">Today and Tomorrow</h2>
-              <p className="text-gray-700">
-                Today, FlipAEO serves ambitious entrepreneurs and content teams worldwide, helping them create 30+ strategic articles per month that build real authority. From automated content planning to 1-click CMS publishing, we handle the heavy lifting so you can focus on what matters—growing your business.
+            {/* The Birth */}
+            <div>
+              <h2 className="font-display text-2xl font-bold mb-4">The Birth of FlipAEO</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                By December 2025, I was finally ready. I dusted off that idea I had been dreaming about for two years: An AI Blog Writer that uses my exact, high-ranking workflow.
               </p>
-              <p className="text-gray-700 mt-3">
-                The post-SEO era is here. We're building the tools to help you win it.
+              <p className="font-sans text-gray-700 text-lg leading-relaxed">
+                I didn't just want a text generator. I wanted to encode my <strong>80k-traffic expertise</strong> into a system. I poured every lesson from my blogging days and every technical skill from my developer days into FlipAEO.
               </p>
             </div>
 
-            <div className="bg-[#F7F5F3] border rounded-2xl p-5">
-              <p className="text-gray-800 font-medium">Thank you for trusting FlipAEO with your content strategy. We're excited to help you become the source AI cites.</p>
-              <p className="text-gray-700 mt-4">Warm regards,<br />The FlipAEO Team</p>
+            {/* The Proof */}
+            <div className="relative pl-8 border-l-4 border-brand-green/50">
+              <h2 className="font-display text-2xl font-bold mb-4">The Proof: Eating My Own Dog Food</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                I didn't just launch it. I tested it. I used FlipAEO to generate content for my other active business, BringBack.pro.
+              </p>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed">
+                I let the system run, posted the articles, and waited. The results were exactly what I hoped for: The traffic spiked. The rankings climbed. The "Wow" moment was real.
+              </p>
             </div>
+
+            {/* Why This Matters */}
+            <div>
+              <h2 className="font-display text-2xl font-bold mb-4">Why This Matters to You</h2>
+              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+                FlipAEO isn't a tool built by a corporation guessing what SEOs need. It is a tool built by a blogger who needed it, built by a founder who uses it, and designed for entrepreneurs who want results—not just content.
+              </p>
+              <p className="font-display text-xl font-bold mt-8 uppercase tracking-wide">
+                Welcome to the post-SEO era.
+              </p>
+            </div>
+
           </div>
         </section>
 
