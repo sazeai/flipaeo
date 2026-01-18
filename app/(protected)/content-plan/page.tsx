@@ -46,6 +46,7 @@ import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { CalendarView } from "@/components/content-plan/calendar-view"
 import { PaywallOverlay } from "@/components/content-plan/paywall-overlay"
+import { useSubscription } from "@/contexts/subscription-context"
 import {
     Sheet,
     SheetContent,
@@ -164,6 +165,10 @@ export default function ContentPlanPage() {
     // Credit gating - use centralized credit manager
     const { balance: creditBalance } = useCreditManager(userId)
     const hasCredits = creditBalance > 0
+
+    // Subscription-based gating - subscribers never see paywall
+    const { isSubscribed } = useSubscription()
+    const MAX_FREE_ENABLED_CARDS = 2  // Free users can only interact with first 2 cards in first category
 
     useEffect(() => {
         // Fetch current user for credit tracking
@@ -788,7 +793,7 @@ export default function ContentPlanPage() {
                         <>
                             {viewMode === "strategy" ? (
                                 <div className="space-y-8">
-                                    {Object.entries(ARTICLE_CATEGORY_CONFIG).map(([categoryKey, categoryConfig]) => {
+                                    {Object.entries(ARTICLE_CATEGORY_CONFIG).map(([categoryKey, categoryConfig], categoryIndex) => {
                                         // Get items for this category
                                         const categoryItems = filteredPlan.filter(
                                             item => item.article_category === categoryKey
@@ -799,6 +804,23 @@ export default function ContentPlanPage() {
 
                                         const CategoryIcon = categoryConfig.icon
                                         const completedCount = categoryItems.filter(i => i.status === 'published').length
+
+                                        // FREE USER GATING LOGIC:
+                                        // - First category (index 0): show first 2 cards enabled, rest paywalled
+                                        // - Other categories: fully paywalled
+                                        // SUBSCRIBER LOGIC: Never paywalled, button state controlled by hasCredits
+                                        const isFirstCategory = categoryIndex === 0
+                                        const freeUserEnabledCount = isFirstCategory ? MAX_FREE_ENABLED_CARDS : 0
+
+                                        // Determine how many cards to show enabled
+                                        // Subscribers: all cards shown, button enabled/disabled by hasCredits
+                                        // Free users: only first N cards in first category
+                                        const enabledCardsCount = isSubscribed
+                                            ? categoryItems.length
+                                            : freeUserEnabledCount
+
+                                        // Should we show paywall for this category?
+                                        const showPaywall = !isSubscribed && categoryItems.length > enabledCardsCount
 
                                         return (
                                             <section key={categoryKey}>
@@ -835,30 +857,35 @@ export default function ContentPlanPage() {
                                                 {/* Articles Grid */}
                                                 {categoryItems.length > 0 ? (
                                                     <>
-                                                        {/* Visible Cards (first 3) */}
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                            {categoryItems.slice(0, hasCredits ? categoryItems.length : 3).map((item) => (
-                                                                <PlanCard
-                                                                    key={item.id}
-                                                                    item={item}
-                                                                    isEditing={editingId === item.id}
-                                                                    hasCredits={hasCredits}
-                                                                    onStartEdit={() => handleStartEdit(item)}
-                                                                    onCancelEdit={() => setEditingId(null)}
-                                                                    onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
-                                                                    onWriteArticle={() => handleWriteArticle(item)}
-                                                                />
-                                                            ))}
-                                                        </div>
+                                                        {/* Enabled Cards */}
+                                                        {enabledCardsCount > 0 && (
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                                                {categoryItems.slice(0, enabledCardsCount).map((item) => (
+                                                                    <PlanCard
+                                                                        key={item.id}
+                                                                        item={item}
+                                                                        isEditing={editingId === item.id}
+                                                                        hasCredits={hasCredits}
+                                                                        onStartEdit={() => handleStartEdit(item)}
+                                                                        onCancelEdit={() => setEditingId(null)}
+                                                                        onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
+                                                                        onWriteArticle={() => handleWriteArticle(item)}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        )}
 
-                                                        {/* Blurred Cards with Paywall (remaining cards when no credits) */}
-                                                        {!hasCredits && categoryItems.length > 3 && (
+                                                        {/* Paywalled Cards (free users only, subscribers never see this) */}
+                                                        {showPaywall && (
                                                             <PaywallOverlay
-                                                                hiddenCount={categoryItems.length - 3}
+                                                                hiddenCount={categoryItems.length - enabledCardsCount}
                                                                 categoryName={categoryConfig.label}
                                                             >
-                                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
-                                                                    {categoryItems.slice(3).map((item) => (
+                                                                <div className={cn(
+                                                                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
+                                                                    enabledCardsCount > 0 && "mt-5"
+                                                                )}>
+                                                                    {categoryItems.slice(enabledCardsCount).map((item) => (
                                                                         <PlanCard
                                                                             key={item.id}
                                                                             item={item}

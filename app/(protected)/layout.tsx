@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { LoadingProvider } from "@/components/loading-provider"
+import { SubscriptionProvider } from "@/contexts/subscription-context"
 import { NavigationProgress } from "@/components/navigation-progress"
 import { createClient } from "@/utils/supabase/server"
 import { creditService } from "@/lib/credits"
@@ -126,9 +127,11 @@ export default async function DashboardLayout({
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <LoadingProvider>
-              {children}
-            </LoadingProvider>
+            <SubscriptionProvider isSubscribed={isSubscribed} planName={planName}>
+              <LoadingProvider>
+                {children}
+              </LoadingProvider>
+            </SubscriptionProvider>
           </div>
         </SidebarInset>
       </SidebarProvider>

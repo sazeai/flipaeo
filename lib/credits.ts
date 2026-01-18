@@ -175,11 +175,11 @@ export class CreditService {
   }
 
   /**
-   * Initialize credits for a new user
+   * Initialize credits for a new user (grants FREE_TIER_CREDITS by default)
    */
   async initializeUserCredits(
     userId: string,
-    initialCredits: number = 0
+    initialCredits: number = 2  // Default: 2 free credits for new users
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const supabase = await this.getClient()

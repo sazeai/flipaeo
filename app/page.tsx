@@ -9,6 +9,7 @@ import { BenefitsSection } from '@/components/landing/BenefitsSection';
 import { ShowcaseSection } from '@/components/landing/ShowcaseSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
+import { FounderNote } from '@/components/landing/FounderNote';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import { CTASection } from '@/components/landing/CTASection';
@@ -35,6 +36,7 @@ export default function Home() {
         <ShowcaseSection />
         <HowItWorksSection />
         <FeaturesSection />
+        <FounderNote />
         <PricingSection />
         <FAQSection />
         <CTASection />
