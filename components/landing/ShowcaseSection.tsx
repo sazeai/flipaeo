@@ -48,14 +48,14 @@ export const ShowcaseSection: React.FC = () => {
     return (
         <section className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
             {/* Header */}
-            <div className="flex flex-col items-center text-center mb-16 max-w-3xl relative z-10">
+            <div className="flex flex-col items-center text-center mb-16 max-w-4xl relative z-10">
                 <div className="inline-flex items-center gap-2 bg-brand-yellow border-2 border-black px-4 py-1 mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse border border-black" />
                     <span className="font-display font-black text-xs uppercase tracking-widest text-black">Live Proof</span>
                 </div>
                 <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
-                    Real output.<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-black">Zero edits.</span>
+                    SEE REAL EXAMPLES OF BLOGS<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-black">WRITTEN BY OUR AI</span>
                 </h2>
                 <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed">
                     See what our AI writes when you're not looking. Full articles published on real domains, completely untouched by human editors.
