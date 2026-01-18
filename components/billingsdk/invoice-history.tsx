@@ -130,24 +130,36 @@ export function InvoiceHistory({
                   {statusBadge(inv.status)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs"
-                    onClick={() =>
-                      inv.invoiceUrl
-                        ? window.open(
-                            inv.invoiceUrl,
-                            "_blank",
-                            "noopener,noreferrer",
-                          )
-                        : onDownload?.(inv.id)
-                    }
-                    aria-label={`Download invoice ${inv.id}`}
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Download
-                  </Button>
+                  {inv.invoiceUrl ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() =>
+                        window.open(
+                          inv.invoiceUrl,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                      aria-label={`Download invoice ${inv.id}`}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs opacity-50 cursor-not-allowed"
+                      disabled
+                      title="No invoice available for $0 payments"
+                      aria-label="Invoice not available"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      N/A
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

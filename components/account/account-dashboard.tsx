@@ -72,14 +72,21 @@ export function AccountDashboard({ user, payments, currentCredits, totalCreditsP
     return 'open'
   }
 
-  const invoices: InvoiceItem[] = (payments || []).map((p) => ({
-    id: String(p.dodo_payment_id || p.id),
-    date: new Date(p.created_at).toISOString().slice(0, 10),
-    amount: formatCurrency(Number(p.amount ?? 0), p.currency || 'USD'),
-    status: mapStatusToInvoice(p.status),
-    invoiceUrl: p.dodo_payment_id ? `/api/dodopayments/invoices/${encodeURIComponent(p.dodo_payment_id)}` : undefined,
-    description: p?.pricing_plan?.name ? `Plan: ${p.pricing_plan.name}` : undefined,
-  }))
+  // NOTE: $0 payments (e.g. 100% discount) don't have invoices in Dodo Payments
+  // See: https://docs.dodopayments.com/miscellaneous/faq (Q73)
+  const invoices: InvoiceItem[] = (payments || []).map((p) => {
+    const paymentAmount = Number(p.amount ?? 0)
+    const hasInvoice = p.dodo_payment_id && paymentAmount > 0
+
+    return {
+      id: String(p.dodo_payment_id || p.id),
+      date: new Date(p.created_at).toISOString().slice(0, 10),
+      amount: formatCurrency(paymentAmount, p.currency || 'USD'),
+      status: mapStatusToInvoice(p.status),
+      invoiceUrl: hasInvoice ? `/api/dodopayments/invoices/${encodeURIComponent(p.dodo_payment_id!)}` : undefined,
+      description: p?.pricing_plan?.name ? `Plan: ${p.pricing_plan.name}` : undefined,
+    }
+  })
 
 
   return (

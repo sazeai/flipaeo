@@ -338,7 +338,7 @@ export default function OnboardingPage() {
                                                                 ease: "easeInOut"
                                                             }}
                                                         >
-                                                            <Globe2 className="w-4 h-4 text-white" />
+                                                            <Globe className="w-4 h-4 text-white" />
                                                         </motion.div>
                                                         {analyzing ? "Analyzing..." : "Analyze"}
                                                     </Button>
