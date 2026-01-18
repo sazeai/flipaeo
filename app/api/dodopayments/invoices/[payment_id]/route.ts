@@ -16,7 +16,7 @@ import { getDodoClient } from '@/lib/dodopayments-server'
  * - Dodo Invoice PDF: https://docs.dodopayments.com/api-reference/payments/get-invoice
  *   GET /invoices/payments/{payment_id}
  */
-export async function GET(_req: NextRequest, ctx: { params: { payment_id: string } }) {
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ payment_id: string }> }) {
     try {
         const supabase = await createClient()
         const {
@@ -27,7 +27,8 @@ export async function GET(_req: NextRequest, ctx: { params: { payment_id: string
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const rawParam = ctx?.params?.payment_id || ''
+        const params = await ctx.params
+        const rawParam = params?.payment_id || ''
         const payment_id = decodeURIComponent(rawParam)
 
         if (!payment_id) {
