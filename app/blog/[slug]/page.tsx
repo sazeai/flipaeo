@@ -185,7 +185,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
                 </div>
               </div>
 
-              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-black text-black leading-tight uppercase">{post.title}</h1>
+              <h1 className="font-display text-3xl md:text-4xl lg:text-6xl font-black text-black leading-tight uppercase">{post.title}</h1>
 
               {cleanedExcerpt && (
                 <p className="text-lg text-gray-600 leading-relaxed">{cleanedExcerpt}</p>
