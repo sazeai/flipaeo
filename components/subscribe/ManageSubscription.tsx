@@ -105,7 +105,12 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
             yearlyPrice: String((p.price ?? 0) * 12),
             buttonText: 'Select',
             features: [
-                { name: p.credits ? `Includes ${p.credits} credits / mo` : 'Standard features', icon: 'check' },
+                { name: p.credits ? `${p.credits} Human-like articles per month` : 'AI-generated articles', icon: 'check' },
+                { name: 'Automated content strategy', icon: 'check' },
+                { name: 'CMS integration', icon: 'check' },
+                { name: 'On-brand AI images', icon: 'check' },
+                { name: 'Smart internal linking', icon: 'check' },
+                { name: 'Real-time research with citations', icon: 'check' },
                 { name: 'Cancel anytime', icon: 'check' },
             ],
         }))
@@ -264,7 +269,7 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
 
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+        <div className="mx-auto flex w-full flex-col gap-8">
 
 
             {/* Subscription Management (Plan change + Cancel dialog) */}

@@ -33,7 +33,7 @@ FlipAEO transforms how businesses approach content marketing in the age of AI se
 
 ## Pricing
 
-**All-in-One Plan: $59/month**
+**All-in-One Plan: $49/month**
 - 30 AI-generated articles per month
 - Automated content strategy
 - CMS integration (WordPress, Webflow, Shopify)

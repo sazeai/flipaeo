@@ -64,7 +64,7 @@ function CreditsCard({ userId, isSubscribed, planName }: { userId?: string; isSu
         </div>
         {isSubscribed ? (
           <Button size="sm" variant="outline" className="w-full" asChild>
-            <Link href="/account" prefetch={false}>
+            <Link href="/subscribe" prefetch={false}>
               Manage Billing
             </Link>
           </Button>

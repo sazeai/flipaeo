@@ -21,7 +21,7 @@ const planFeatures = [
 
 const faqs = [
   {
-    question: "WHAT'S INCLUDED IN THE $59/MONTH PLAN?",
+    question: "WHAT'S INCLUDED IN THE $49/MONTH PLAN?",
     answer: "You get 30 AI-generated articles per month, automated content strategy, CMS integration, on-brand AI images, smart internal linking, and priority support. Everything you need to dominate AI search."
   },
   {
@@ -44,7 +44,7 @@ const faqs = [
 
 const comparisonData = {
   traditional: [
-    { aspect: "Cost", traditional: "$500–$2000+ per article (agencies)", flipaeo: "$59/month for 30 articles" },
+    { aspect: "Cost", traditional: "$500–$2000+ per article (agencies)", flipaeo: "$49/month for 30 articles" },
     { aspect: "Research Quality", traditional: "Varies by writer/agency", flipaeo: "Multi-stage AI research with real citations" },
     { aspect: "Turnaround Time", traditional: "Days to weeks per article", flipaeo: "Minutes to hours" },
     { aspect: "Strategy", traditional: "Separate strategist required", flipaeo: "Built-in 30-day content planning" },

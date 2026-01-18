@@ -134,7 +134,7 @@ export const pageSEO = {
     robots: 'noindex, nofollow',
   },
   pricing: {
-    title: 'Pricing - FlipAEO | $59/month for 30 AI Articles',
+    title: 'Pricing - FlipAEO | $49/month for 30 AI Articles',
     description: 'Simple, transparent pricing for FlipAEO. One plan with everything you need: 30 AI-generated articles/month, automated content strategy, CMS integration, and priority support. 14-day money-back guarantee.',
     keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost', 'article generation pricing'],
   },

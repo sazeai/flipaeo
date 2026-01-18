@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { GlobalCard } from "@/components/ui/global-card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, CreditCard } from "lucide-react";
@@ -47,7 +47,7 @@ export function SubscriptionManagement({
 }: SubscriptionManagementProps) {
   return (
     <div className={cn("w-full text-left", className)}>
-      <Card className="shadow-xs">
+      <GlobalCard contentClassName="p-4 sm:p-6">
         <CardHeader className="px-4 pb-4 sm:px-6 sm:pb-6">
           <CardTitle className="flex items-center gap-2 text-lg sm:gap-3 sm:text-xl">
             <div className="bg-primary/10 ring-primary/20 rounded-lg p-1.5 ring-1 sm:p-2">
@@ -179,7 +179,7 @@ export function SubscriptionManagement({
             </div>
           </div>
         </CardContent>
-      </Card>
+      </GlobalCard>
     </div>
   );
 }

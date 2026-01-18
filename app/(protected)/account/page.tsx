@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { AccountDashboard } from '@/components/account/account-dashboard'
 import FeedbackForm from "@/components/FeedbackForm"
+import { GlobalCard } from '@/components/ui/global-card'
 
 export default async function AccountPage() {
   const supabase = await createClient()
@@ -85,22 +86,24 @@ export default async function AccountPage() {
     ?.reduce((sum, payment) => sum + payment.credits, 0) || 0
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Account</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your profile, view payment history, and track your credits
-        </p>
-      </div>
+    <div className="container mx-auto">
+      <GlobalCard contentClassName="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Account</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your profile, view payment history, and track your credits
+          </p>
+        </div>
 
-      <AccountDashboard
-        user={user}
-        payments={payments || []}
-        currentCredits={credits?.credits || 0}
-        totalCreditsPurchased={totalCreditsPurchased}
-        subscription={subscription}
-      />
-      <FeedbackForm userId={user.id} />
+        <AccountDashboard
+          user={user}
+          payments={payments || []}
+          currentCredits={credits?.credits || 0}
+          totalCreditsPurchased={totalCreditsPurchased}
+          subscription={subscription}
+        />
+        <FeedbackForm userId={user.id} />
+      </GlobalCard>
     </div>
   )
 }

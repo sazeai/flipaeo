@@ -465,7 +465,7 @@ export const commonPageMetadata = {
 
   pricing: () => generateMetadata({
     title: 'Pricing Plans',
-    description: 'Simple, transparent pricing for FlipAEO. One plan with 30 AI articles/month, automated content strategy, CMS integration. $59/month with 14-day money-back guarantee.',
+    description: 'Simple, transparent pricing for FlipAEO. One plan with 30 AI articles/month, automated content strategy, CMS integration. $49/month with 14-day money-back guarantee.',
     canonical: '/pricing',
     keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost'],
   }),
