@@ -24,8 +24,10 @@ export interface UpdatePlanDialogProps {
   plans: Plan[];
   triggerText: string;
   onPlanChange: (planId: string) => void;
+  onPlanChange: (planId: string) => void;
   className?: string;
   title?: string;
+  customTrigger?: React.ReactNode;
 }
 
 const easing = [0.4, 0, 0.2, 1] as const;
@@ -37,6 +39,7 @@ export function UpdatePlanDialog({
   className,
   title,
   triggerText,
+  customTrigger,
 }: UpdatePlanDialogProps) {
   const [isYearly, setIsYearly] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | undefined>(
@@ -65,7 +68,7 @@ export function UpdatePlanDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>{triggerText || "Update Plan"}</Button>
+        {customTrigger || <Button>{triggerText || "Update Plan"}</Button>}
       </DialogTrigger>
       <DialogContent
         className={cn(

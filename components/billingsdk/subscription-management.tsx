@@ -10,6 +10,7 @@ import { GlobalCard } from "@/components/ui/global-card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, CreditCard } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { CurrentPlan } from "@/lib/billingsdk-config";
 import { cn } from "@/lib/utils";
 import {
@@ -47,136 +48,104 @@ export function SubscriptionManagement({
 }: SubscriptionManagementProps) {
   return (
     <div className={cn("w-full text-left", className)}>
-      <GlobalCard contentClassName="p-4 sm:p-6">
-        <CardHeader className="px-4 pb-4 sm:px-6 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-lg sm:gap-3 sm:text-xl">
-            <div className="bg-primary/10 ring-primary/20 rounded-lg p-1.5 ring-1 sm:p-2">
-              <CreditCard className="text-primary h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            Current Subscription
-          </CardTitle>
-          <CardDescription className="text-sm sm:text-base">
+      <GlobalCard contentClassName="p-0">
+        <CardHeader className="border-b px-6 py-4">
+          <div className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            <CardTitle className="text-xl font-bold">Current Subscription</CardTitle>
+          </div>
+          <CardDescription>
             Manage your billing and subscription settings
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6 px-4 sm:space-y-8 sm:px-6">
-          {/* Current Plan Details with highlighted styling */}
-          <div className="from-muted/30 via-muted/20 to-muted/30 border-border/50 relative overflow-hidden rounded-xl border bg-gradient-to-r p-3 sm:p-4">
-            <div className="relative">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-                <div className="w-full">
-                  <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold sm:text-xl">
-                        {currentPlan.plan.title} Plan
-                      </h3>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant={
-                          currentPlan.status === "active"
-                            ? "default"
-                            : "outline"
-                        }
-                        className="bg-primary/90 hover:bg-primary border-0 text-xs font-medium shadow-sm sm:text-sm"
-                      >
-                        {currentPlan.type === `monthly`
-                          ? `${currentPlan.plan.currency}${currentPlan.plan.monthlyPrice}/month`
-                          : currentPlan.type === `yearly`
-                            ? `${currentPlan.plan.yearlyPrice}/year`
-                            : `${currentPlan.price}`}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="border-border/60 bg-background/50 text-xs shadow-sm backdrop-blur-sm sm:text-sm"
-                      >
-                        {currentPlan.status}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <p className="text-muted-foreground relative z-10 text-xs sm:text-sm">
-                      {currentPlan.plan.description}
-                    </p>
-                  </div>
+        <CardContent className="space-y-6 p-6">
+          {/* Active Plan Section - Structural, Monochrome */}
+          <div className="rounded-lg border bg-muted/20 p-6">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight">
+                  {currentPlan.plan.title} Plan
+                </h3>
+                <div className="mt-2 flex items-center gap-2">
+                  <Badge variant="outline" className="text-sm font-medium uppercase tracking-wide">
+                    {currentPlan.status}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {currentPlan.type === `monthly`
+                      ? `${currentPlan.plan.currency}${currentPlan.plan.monthlyPrice}/month`
+                      : currentPlan.type === `yearly`
+                        ? `${currentPlan.plan.yearlyPrice}/year`
+                        : `${currentPlan.price}`}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  {currentPlan.plan.description}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:items-end">
+                <div className="text-right">
+                  <span className="block text-xs font-medium uppercase text-muted-foreground">
+                    {dateLabel ?? "Next billing date"}
+                  </span>
+                  <span className="text-lg font-medium">
+                    {currentPlan.nextBillingDate}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <Separator className="via-border my-4 bg-gradient-to-r from-transparent to-transparent sm:my-6" />
-
-          <div className="space-y-3 sm:space-y-4">
-            <h4 className="flex items-center gap-2 text-base font-medium sm:text-lg">
-              <div className="bg-muted ring-border/50 rounded-md p-1 ring-1 sm:p-1.5">
-                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-              </div>
-              Billing Information
+          <div>
+            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Included Features
             </h4>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6">
-              <div className={cn(
-                "group from-muted to-background/10 border-border/30 hover:border-border/60 rounded-lg border bg-gradient-to-b p-2.5 transition-all duration-200 sm:p-3 md:bg-gradient-to-tl",
-                isPlanEnding && "border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20"
-              )}>
-                <span className={cn(
-                  "mb-1 block text-xs sm:text-sm",
-                  isPlanEnding ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
-                )}>
-                  {dateLabel ?? "Next billing date"}
-                </span>
-                <div className={cn(
-                  "text-sm font-medium transition-colors duration-200 sm:text-base",
-                  isPlanEnding ? "text-amber-700 dark:text-amber-400" : "group-hover:text-primary"
-                )}>
-                  {currentPlan.nextBillingDate}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {currentPlan.plan.features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 rounded-md border p-3 hover:bg-muted/50"
+                >
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full border">
+                    <div className="h-2.5 w-2.5 rounded-full bg-foreground" />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {feature.name}
+                  </span>
                 </div>
-              </div>
-
+              ))}
             </div>
           </div>
 
-          <Separator className="via-border my-4 bg-gradient-to-r from-transparent to-transparent sm:my-6" />
-
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             {children ? (
               <>{children}</>
             ) : (
               <>
                 {!hideUpdatePlan && (
                   <UpdatePlanDialog
-                    className="mx-0 shadow-lg transition-all duration-200 hover:shadow-xl"
                     {...updatePlan}
+                    customTrigger={
+                      <Button variant="outline" className="w-full sm:w-auto">
+                        {updatePlan.triggerText || "Change Plan"}
+                      </Button>
+                    }
                   />
                 )}
 
                 {!hideCancelDialog && (
                   <CancelSubscriptionDialog
-                    className="mx-0 shadow-lg transition-all duration-200 hover:shadow-xl"
                     {...cancelSubscription}
+                    customTrigger={
+                      <Button variant="ghost" className="w-full sm:w-auto hover:bg-destructive/10 hover:text-destructive">
+                        {cancelSubscription.triggerButtonText || "Cancel Subscription"}
+                      </Button>
+                    }
                   />
                 )}
               </>
             )}
-          </div>
-
-          <div className="pt-4 sm:pt-6">
-            <h4 className="mb-3 text-base font-medium sm:mb-4 sm:text-lg">
-              Current Plan Features
-            </h4>
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              {currentPlan.plan.features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="group border-border/80 hover:border-primary/30 hover:bg-primary/5 flex items-center gap-2 rounded-lg border p-2 transition-all duration-200 sm:p-2"
-                >
-                  <div className="bg-primary group-hover:bg-primary h-1 w-1 flex-shrink-0 rounded-full transition-all duration-200 group-hover:scale-125 sm:h-1.5 sm:w-1.5"></div>
-                  <span className="text-muted-foreground group-hover:text-foreground text-xs transition-colors duration-200 sm:text-sm">
-                    {feature.name}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </CardContent>
       </GlobalCard>

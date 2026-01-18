@@ -35,6 +35,7 @@ export interface CancelSubscriptionDialogProps {
   onKeepSubscription?: (planId: string) => Promise<void> | void;
   onDialogClose?: () => void;
   className?: string;
+  customTrigger?: React.ReactNode;
 }
 
 export function CancelSubscriptionDialog({
@@ -56,6 +57,7 @@ export function CancelSubscriptionDialog({
   onKeepSubscription,
   onDialogClose,
   className,
+  customTrigger,
 }: CancelSubscriptionDialogProps) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -141,9 +143,11 @@ export function CancelSubscriptionDialog({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline">
-          {triggerButtonText || "Cancel Subscription"}
-        </Button>
+        {customTrigger || (
+          <Button variant="outline">
+            {triggerButtonText || "Cancel Subscription"}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent
         className={cn(
