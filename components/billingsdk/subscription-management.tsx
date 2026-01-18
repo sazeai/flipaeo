@@ -95,6 +95,37 @@ export function SubscriptionManagement({
                 </div>
               </div>
             </div>
+
+            {/* Action Buttons - Moved Inside for Prominence */}
+            <div className="mt-6 flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
+              {children ? (
+                <>{children}</>
+              ) : (
+                <>
+                  {!hideUpdatePlan && (
+                    <UpdatePlanDialog
+                      {...updatePlan}
+                      customTrigger={
+                        <Button variant="default" className="w-full sm:w-auto font-semibold shadow-sm">
+                          {updatePlan.triggerText || "Change Plan"}
+                        </Button>
+                      }
+                    />
+                  )}
+
+                  {!hideCancelDialog && (
+                    <CancelSubscriptionDialog
+                      {...cancelSubscription}
+                      customTrigger={
+                        <Button variant="outline" className="w-full sm:w-auto hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30">
+                          {cancelSubscription.triggerButtonText || "Cancel Subscription"}
+                        </Button>
+                      }
+                    />
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           <div>
@@ -116,36 +147,6 @@ export function SubscriptionManagement({
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-            {children ? (
-              <>{children}</>
-            ) : (
-              <>
-                {!hideUpdatePlan && (
-                  <UpdatePlanDialog
-                    {...updatePlan}
-                    customTrigger={
-                      <Button variant="outline" className="w-full sm:w-auto">
-                        {updatePlan.triggerText || "Change Plan"}
-                      </Button>
-                    }
-                  />
-                )}
-
-                {!hideCancelDialog && (
-                  <CancelSubscriptionDialog
-                    {...cancelSubscription}
-                    customTrigger={
-                      <Button variant="ghost" className="w-full sm:w-auto hover:bg-destructive/10 hover:text-destructive">
-                        {cancelSubscription.triggerButtonText || "Cancel Subscription"}
-                      </Button>
-                    }
-                  />
-                )}
-              </>
-            )}
           </div>
         </CardContent>
       </GlobalCard>
