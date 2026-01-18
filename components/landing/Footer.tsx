@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from './Logo';
-import { Twitter, Mail } from 'lucide-react';
+import { Twitter, Mail, X } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
 
           {/* Right: Social Icons */}
           <div className="flex items-center gap-4">
-            <SocialIcon href="https://twitter.com/flipaeo" icon={<Twitter className="w-5 h-5" />} />
+            <SocialIcon href="https://x.com/flipaeo" icon={<X className="w-5 h-5" />} />
             <SocialIcon href="mailto:support@flipaeo.com" icon={<Mail className="w-5 h-5" />} />
           </div>
 

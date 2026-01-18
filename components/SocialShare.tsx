@@ -15,7 +15,7 @@ export function SocialShare({ url, title }: SocialShareProps) {
   const share = (platform: "facebook" | "twitter" | "linkedin") => {
     const urls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-      twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+      twitter: `https://x.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
       linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
     }
     window.open(urls[platform], "_blank", "width=600,height=400")

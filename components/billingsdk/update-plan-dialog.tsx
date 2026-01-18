@@ -24,7 +24,6 @@ export interface UpdatePlanDialogProps {
   plans: Plan[];
   triggerText: string;
   onPlanChange: (planId: string) => void;
-  onPlanChange: (planId: string) => void;
   className?: string;
   title?: string;
   customTrigger?: React.ReactNode;

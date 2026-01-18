@@ -54,16 +54,24 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Check if the user is authenticated
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Protected routes - these require authentication
-  const protectedRoutes = ['/content-plan', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account']
+  // Protected routes - ONLY these require authentication
+  const protectedRoutes = ['/content-plan', '/seo-health', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account', '/api/webhooks', '/api']
   const isProtectedRoute = protectedRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
   )
+
+  // Only run auth check for protected routes or login page
+  const needsAuthCheck = isProtectedRoute || request.nextUrl.pathname === '/login'
+
+  if (!needsAuthCheck) {
+    // All other routes skip auth entirely - no getUser() call
+    return response
+  }
+
+  // Check if the user is authenticated (only for routes that need it)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // If accessing protected routes and not authenticated, redirect to login
   if (isProtectedRoute && !user) {
