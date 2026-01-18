@@ -54,11 +54,26 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Protected routes - ONLY these require authentication
-  const protectedRoutes = ['/content-plan', '/seo-health', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account', '/api/webhooks', '/api']
-  const isProtectedRoute = protectedRoutes.some(route =>
+  // Public API routes that don't require authentication
+  // - csrf-token: needed for login form before user is authenticated
+  // - auth: OAuth callbacks during authentication flow
+  // - dodopayments/webhook: external webhook with its own signature verification
+  // - images: public image proxy for blog featured images
+  const publicApiRoutes = [
+    '/api/csrf-token',
+    '/api/auth',
+    '/api/dodopayments/webhook',
+    '/api/images',
+  ]
+  const isPublicApiRoute = publicApiRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
   )
+
+  // Protected routes - ONLY these require authentication
+  const protectedRoutes = ['/content-plan', '/seo-health', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account', '/api']
+  const isProtectedRoute = protectedRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  ) && !isPublicApiRoute // Exclude public API routes from protection
 
   // Only run auth check for protected routes or login page
   const needsAuthCheck = isProtectedRoute || request.nextUrl.pathname === '/login'
