@@ -112,7 +112,7 @@ export const ShowcaseSection: React.FC = () => {
 
             {/* CTA */}
             <div className="mt-16 relative z-10">
-                <Link href="/dashboard">
+                <Link href="/login">
                     <Button
                         variant="primary"
                         size="lg"

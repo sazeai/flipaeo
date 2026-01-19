@@ -63,7 +63,7 @@ export const EmailWrapper = ({ previewText, children }: EmailWrapperProps) => {
 
 // Styles
 const main = {
-    backgroundColor: "#f6f9fc",
+    backgroundColor: "#ffffff",
     fontFamily:
         '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
 };
@@ -74,8 +74,6 @@ const container = {
     padding: "20px 0 48px",
     marginBottom: "64px",
     maxWidth: "600px",
-    borderRadius: "8px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
 };
 
 const logoContainer = {

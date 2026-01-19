@@ -19,7 +19,7 @@ export const PlanRefilledEmail = ({
     articleCount = 30,
     userName,
 }: PlanRefilledEmailProps) => {
-    const dashboardUrl = `${baseUrl}/dashboard`;
+    const dashboardUrl = `${baseUrl}/content-plan`;
     const previewText = `Your content plan for the next month is ready.`;
 
     return (
@@ -54,41 +54,42 @@ export const PlanRefilledEmail = ({
 
 // Styles
 const h1 = {
-    color: "#333",
+    color: "#1a1a1a",
     fontSize: "24px",
-    fontWeight: "bold",
+    fontWeight: "600",
     textAlign: "center" as const,
-    margin: "30px 0",
+    margin: "24px 0 32px",
+    lineHeight: "32px",
 };
 
 const text = {
-    color: "#333",
+    color: "#4a4a4a",
     fontSize: "16px",
     lineHeight: "26px",
+    margin: "16px 0",
 };
 
 const card = {
-    backgroundColor: "#f0fdf4", // Light green background
-    borderRadius: "8px",
-    padding: "24px",
     textAlign: "center" as const,
-    margin: "24px 0",
-    border: "1px solid #bbf7d0",
+    margin: "32px 0",
+    padding: "24px 0",
 };
 
 const statNumber = {
-    color: "#166534",
-    fontSize: "36px",
-    fontWeight: "bold",
+    color: "#1a1a1a",
+    fontSize: "48px",
+    fontWeight: "700",
     margin: "0",
+    lineHeight: "1",
 };
 
 const statLabel = {
-    color: "#166534",
+    color: "#6b7280",
     fontSize: "14px",
     textTransform: "uppercase" as const,
-    letterSpacing: "1px",
-    marginTop: "8px",
+    letterSpacing: "1.5px",
+    marginTop: "12px",
+    fontWeight: "500",
 };
 
 const actionSection = {
@@ -97,15 +98,16 @@ const actionSection = {
 };
 
 const button = {
-    backgroundColor: "#000000",
-    borderRadius: "6px",
-    color: "#fff",
-    fontSize: "16px",
-    fontWeight: "bold",
+    backgroundColor: "#1a1a1a",
+    borderRadius: "8px",
+    color: "#ffffff",
+    fontSize: "15px",
+    fontWeight: "600",
     textDecoration: "none",
     textAlign: "center" as const,
     display: "inline-block",
-    padding: "12px 24px",
+    padding: "14px 32px",
 };
 
 export default PlanRefilledEmail;
+
