@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         message: "Feedback submitted successfully",
-        id: data.id 
+        id: data.id
       },
       { status: 201 }
     );

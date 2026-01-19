@@ -113,8 +113,33 @@ export function prepareContentForWordPress(htmlContent: string): string {
         return `\n\n___TABLE_BLOCK_${tableBlocks.length - 1}___\n\n`
     })
 
-    // 3. Now convert other HTML elements to Gutenberg blocks
+    // 3. Extract images and replace with placeholders (to prevent double-wrapping)
+    const imageBlocks: string[] = []
 
+    // Helper function to create WordPress image block
+    const createImageBlock = (attrs: string): string => {
+        const srcMatch = attrs.match(/src=["']([^"']*)["']/)
+        const altMatch = attrs.match(/alt=["']([^"']*)["']/)
+        const src = srcMatch ? srcMatch[1] : ''
+        const alt = altMatch ? altMatch[1] : ''
+        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->`
+    }
+
+    // Extract images wrapped in <p> tags first
+    content = content.replace(/<p[^>]*>\s*<img([^>]*)>\s*<\/p>/gi, (match, attrs) => {
+        const placeholder = `___IMAGE_BLOCK_${imageBlocks.length}___`
+        imageBlocks.push(createImageBlock(attrs))
+        return placeholder
+    })
+
+    // Extract standalone images (not already processed)
+    content = content.replace(/<img([^>]*)>/gi, (match, attrs) => {
+        const placeholder = `___IMAGE_BLOCK_${imageBlocks.length}___`
+        imageBlocks.push(createImageBlock(attrs))
+        return placeholder
+    })
+
+    // 4. Now convert other HTML elements to Gutenberg blocks
 
     // Convert headings
     content = content.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
@@ -123,24 +148,6 @@ export function prepareContentForWordPress(htmlContent: string): string {
         '<!-- wp:heading {"level":3} -->\n<h3$1>$2</h3>\n<!-- /wp:heading -->\n\n')
     content = content.replace(/<h4([^>]*)>([\s\S]*?)<\/h4>/gi,
         '<!-- wp:heading {"level":4} -->\n<h4$1>$2</h4>\n<!-- /wp:heading -->\n\n')
-
-    // Convert images (before paragraphs, as images inside <p> need special handling)
-    content = content.replace(/<p[^>]*>\s*<img([^>]*)>\s*<\/p>/gi, (match, attrs) => {
-        const srcMatch = attrs.match(/src=["']([^"']*)["']/)
-        const altMatch = attrs.match(/alt=["']([^"']*)["']/)
-        const src = srcMatch ? srcMatch[1] : ''
-        const alt = altMatch ? altMatch[1] : ''
-        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->\n\n`
-    })
-
-    // Convert standalone images
-    content = content.replace(/<img([^>]*)>/gi, (match, attrs) => {
-        const srcMatch = attrs.match(/src=["']([^"']*)["']/)
-        const altMatch = attrs.match(/alt=["']([^"']*)["']/)
-        const src = srcMatch ? srcMatch[1] : ''
-        const alt = altMatch ? altMatch[1] : ''
-        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->\n\n`
-    })
 
     // Convert unordered lists
     content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi,
@@ -166,6 +173,11 @@ export function prepareContentForWordPress(htmlContent: string): string {
     // 4b. Restore table blocks from placeholders
     for (let i = 0; i < tableBlocks.length; i++) {
         content = content.replace(`___TABLE_BLOCK_${i}___`, tableBlocks[i])
+    }
+
+    // 4c. Restore image blocks from placeholders
+    for (let i = 0; i < imageBlocks.length; i++) {
+        content = content.replace(`___IMAGE_BLOCK_${i}___`, imageBlocks[i])
     }
 
     // 5. Clean up extra whitespace

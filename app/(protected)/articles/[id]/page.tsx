@@ -439,7 +439,7 @@ export default function ArticleDetailPage() {
 
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-gray-50">
+            <div className="flex h-screen items-center justify-center bg-gray-50 rounded-lg">
                 <div className="flex flex-col items-center gap-4">
                     <CustomSpinner className="w-10 h-10" />
                     <p className="text-gray-500 font-medium">Loading Editor...</p>
@@ -450,7 +450,7 @@ export default function ArticleDetailPage() {
 
     if (!article) {
         return (
-            <div className="flex h-screen items-center justify-center bg-gray-50">
+            <div className="flex h-screen items-center justify-center bg-gray-50 rounded-lg">
                 <div className="text-center space-y-4">
                     <h2 className="text-2xl font-bold text-gray-900">Article Not Found</h2>
                     <p className="text-gray-500">The article you are looking for does not exist or has been deleted.</p>
