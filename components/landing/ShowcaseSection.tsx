@@ -1,9 +1,23 @@
+'use client';
+
 import React from 'react';
 import { ExternalLink, Video, Ghost, Search, Camera, ArrowUpRight, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/landing/Button';
 import { cn } from '@/lib/utils';
+
+// Track showcase article clicks in Google Analytics
+const trackShowcaseClick = (article: { domain: string; title: string; href: string }) => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'showcase_article_click', {
+            event_category: 'engagement',
+            event_label: article.domain,
+            article_title: article.title,
+            article_url: article.href,
+        });
+    }
+};
 
 interface ArticleProps {
     title: string;
@@ -69,6 +83,7 @@ export const ShowcaseSection: React.FC = () => {
                         key={index}
                         href={article.href}
                         target="_blank"
+                        onClick={() => trackShowcaseClick(article)}
                         className="group relative flex flex-col bg-white border-2 border-black p-8 transition-all duration-200 hover:-translate-y-1 hover:translate-x-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none"
                     >
                         <div className="flex items-center justify-between mb-8">
