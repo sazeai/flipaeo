@@ -89,7 +89,32 @@ export function prepareContentForWordPress(htmlContent: string): string {
             return `\n\n___CODE_BLOCK_${codeBlocks.length - 1}___\n\n`
         })
 
+    // 2b. Extract TABLE elements and replace with placeholders
+    // Tables may be wrapped in <p> tags from the markdown parser - we need to handle this
+    const tableBlocks: string[] = []
+
+    // First, handle tables that are incorrectly wrapped in <p> tags
+    content = content.replace(/<p[^>]*>\s*(<table[\s\S]*?<\/table>)\s*<\/p>/gi, '$1')
+
+    // Now extract all tables and convert to WordPress Gutenberg table blocks
+    content = content.replace(/<table([\s\S]*?)<\/table>/gi, (match, tableContent) => {
+        // Clean up inline styles - WordPress prefers class-based styling
+        let cleanTable = match
+            // Remove inline styles from table and cells
+            .replace(/\s+style="[^"]*"/gi, '')
+            // Add WordPress table classes
+            .replace(/<table/i, '<table class="has-fixed-layout"')
+
+        // Create the Gutenberg table block
+        const tableBlock = `<!-- wp:table -->\n<figure class="wp-block-table">${cleanTable}</figure>\n<!-- /wp:table -->`
+
+        // Store it and return placeholder
+        tableBlocks.push(tableBlock)
+        return `\n\n___TABLE_BLOCK_${tableBlocks.length - 1}___\n\n`
+    })
+
     // 3. Now convert other HTML elements to Gutenberg blocks
+
 
     // Convert headings
     content = content.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
@@ -136,6 +161,11 @@ export function prepareContentForWordPress(htmlContent: string): string {
     // 4. Restore code blocks from placeholders
     for (let i = 0; i < codeBlocks.length; i++) {
         content = content.replace(`___CODE_BLOCK_${i}___`, codeBlocks[i])
+    }
+
+    // 4b. Restore table blocks from placeholders
+    for (let i = 0; i < tableBlocks.length; i++) {
+        content = content.replace(`___TABLE_BLOCK_${i}___`, tableBlocks[i])
     }
 
     // 5. Clean up extra whitespace
