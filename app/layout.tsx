@@ -112,6 +112,14 @@ export default async function RootLayout({
           src={`https://www.googletagmanager.com/gtag/js?id=G-FFT0K6XLCB`}
           strategy="afterInteractive"
         />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FFT0K6XLCB');
+          `}
+        </Script>
       </head>
       <body className="font-sans antialiased public-headings">
         <ErrorBoundary>
