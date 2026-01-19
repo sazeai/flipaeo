@@ -27,11 +27,9 @@ import {
     Tag,
     Play,
     Pause,
-    LayoutGrid,
     Layers,
     Award,
     Waypoints,
-    Calendar as CalendarIcon,
     MousePointer2,
     ChevronDown,
 } from "lucide-react"
@@ -44,16 +42,8 @@ import { useCreditManager } from "@/lib/credit-manager"
 import { createClient } from "@/utils/supabase/client"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
-import { CalendarView } from "@/components/content-plan/calendar-view"
 import { PaywallOverlay } from "@/components/content-plan/paywall-overlay"
 import { useSubscription } from "@/contexts/subscription-context"
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet"
 
 // --- Minimal Design System Configuration ---
 
@@ -157,8 +147,7 @@ export default function ContentPlanPage() {
     const [automationLoading, setAutomationLoading] = useState(false)
     const [showAutomationModal, setShowAutomationModal] = useState(false)
     const [missedCount, setMissedCount] = useState(0)
-    const [viewMode, setViewMode] = useState<"strategy" | "calendar">("strategy")
-    const [selectedItem, setSelectedItem] = useState<ContentPlanItem | null>(null)
+
 
     const [userId, setUserId] = useState<string | null>(null)
 
@@ -643,33 +632,6 @@ export default function ContentPlanPage() {
                                 </Link>
                             )}
 
-                            {/* View Switcher */}
-                            <div className="flex items-center p-1 bg-stone-100/50 border border-stone-200/50 rounded-xl">
-                                <button
-                                    onClick={() => setViewMode("strategy")}
-                                    className={cn(
-                                        "cursor-pointer p-1.5 rounded-lg transition-all",
-                                        viewMode === "strategy"
-                                            ? "bg-white text-stone-900 shadow-sm ring-1 ring-stone-200"
-                                            : "text-stone-400 hover:text-stone-600"
-                                    )}
-                                    title="List View"
-                                >
-                                    <LayoutGrid className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode("calendar")}
-                                    className={cn(
-                                        "cursor-pointer p-1.5 rounded-lg transition-all",
-                                        viewMode === "calendar"
-                                            ? "bg-white text-stone-900 shadow-sm ring-1 ring-stone-200"
-                                            : "text-stone-400 hover:text-stone-600"
-                                    )}
-                                    title="Calendar View"
-                                >
-                                    <CalendarIcon className="w-4 h-4" />
-                                </button>
-                            </div>
 
 
                             {/* Auto-Refill Button (Clean) */}
@@ -791,306 +753,174 @@ export default function ContentPlanPage() {
                         </div>
                     ) : (
                         <>
-                            {viewMode === "strategy" ? (
-                                <div className="space-y-8">
-                                    {Object.entries(ARTICLE_CATEGORY_CONFIG).map(([categoryKey, categoryConfig], categoryIndex) => {
-                                        // Get items for this category
-                                        const categoryItems = filteredPlan.filter(
-                                            item => item.article_category === categoryKey
-                                        )
+                            <div className="space-y-8">
+                                {Object.entries(ARTICLE_CATEGORY_CONFIG).map(([categoryKey, categoryConfig], categoryIndex) => {
+                                    // Get items for this category
+                                    const categoryItems = filteredPlan.filter(
+                                        item => item.article_category === categoryKey
+                                    )
 
-                                        // Skip empty sections when filtering by status
-                                        if (categoryItems.length === 0 && filter !== 'all') return null
+                                    // Skip empty sections when filtering by status
+                                    if (categoryItems.length === 0 && filter !== 'all') return null
 
-                                        const CategoryIcon = categoryConfig.icon
-                                        const completedCount = categoryItems.filter(i => i.status === 'published').length
+                                    const CategoryIcon = categoryConfig.icon
+                                    const completedCount = categoryItems.filter(i => i.status === 'published').length
 
-                                        // FREE USER GATING LOGIC:
-                                        // - First category (index 0): show first 2 cards enabled (can write), rest paywalled
-                                        // - Other categories (1,2,3): show first 3 cards visible but DISABLED, rest paywalled
-                                        // SUBSCRIBER LOGIC: Never paywalled, button state controlled by hasCredits
-                                        const isFirstCategory = categoryIndex === 0
+                                    // FREE USER GATING LOGIC:
+                                    // - First category (index 0): show first 2 cards enabled (can write), rest paywalled
+                                    // - Other categories (1,2,3): show first 3 cards visible but DISABLED, rest paywalled
+                                    // SUBSCRIBER LOGIC: Never paywalled, button state controlled by hasCredits
+                                    const isFirstCategory = categoryIndex === 0
 
-                                        // Cards per row (for showing one full row in other categories)
-                                        const CARDS_PER_ROW = 3
+                                    // Cards per row (for showing one full row in other categories)
+                                    const CARDS_PER_ROW = 3
 
-                                        // Enabled cards: only first category gets writing ability
-                                        const freeUserEnabledCount = isFirstCategory ? MAX_FREE_ENABLED_CARDS : 0
+                                    // Enabled cards: only first category gets writing ability
+                                    const freeUserEnabledCount = isFirstCategory ? MAX_FREE_ENABLED_CARDS : 0
 
-                                        // Visible cards: first category uses enabledCount, others show full first row
-                                        const freeUserVisibleCount = isFirstCategory
-                                            ? MAX_FREE_ENABLED_CARDS
-                                            : CARDS_PER_ROW
+                                    // Visible cards: first category uses enabledCount, others show full first row
+                                    const freeUserVisibleCount = isFirstCategory
+                                        ? MAX_FREE_ENABLED_CARDS
+                                        : CARDS_PER_ROW
 
-                                        // Determine how many cards to show (not paywalled)
-                                        const visibleCardsCount = isSubscribed
-                                            ? categoryItems.length
-                                            : freeUserVisibleCount
+                                    // Determine how many cards to show (not paywalled)
+                                    const visibleCardsCount = isSubscribed
+                                        ? categoryItems.length
+                                        : freeUserVisibleCount
 
-                                        // Determine how many cards have write enabled
-                                        const enabledCardsCount = isSubscribed
-                                            ? categoryItems.length
-                                            : freeUserEnabledCount
+                                    // Determine how many cards have write enabled
+                                    const enabledCardsCount = isSubscribed
+                                        ? categoryItems.length
+                                        : freeUserEnabledCount
 
-                                        // Should we show paywall for this category?
-                                        const showPaywall = !isSubscribed && categoryItems.length > visibleCardsCount
+                                    // Should we show paywall for this category?
+                                    const showPaywall = !isSubscribed && categoryItems.length > visibleCardsCount
 
-                                        return (
-                                            <section key={categoryKey}>
-                                                {/* Section Header */}
-                                                {/* Section Header */}
-                                                <div className="flex items-start justify-between gap-4 mb-6 mt-2 px-1">
-                                                    <div className="flex gap-3">
-                                                        <div className={cn(
-                                                            "w-8 h-8 rounded-md flex items-center justify-center shrink-0 mt-0.5 border",
-                                                            categoryConfig.bgColor,
-                                                            categoryConfig.color
-                                                        )}>
-                                                            <CategoryIcon className="w-4 h-4" />
-                                                        </div>
-                                                        <div className="space-y-1">
-                                                            <h2 className="text-sm font-bold text-stone-900 tracking-tight flex items-center gap-2">
-                                                                {categoryConfig.label}
-                                                            </h2>
-                                                            <p className="text-[11px] text-stone-500 max-w-md leading-relaxed">
-                                                                <span className="font-semibold text-stone-400">Why: </span>
-                                                                {categoryConfig.tagline}
-                                                            </p>
-                                                        </div>
+                                    return (
+                                        <section key={categoryKey}>
+                                            {/* Section Header */}
+                                            {/* Section Header */}
+                                            <div className="flex items-start justify-between gap-4 mb-6 mt-2 px-1">
+                                                <div className="flex gap-3">
+                                                    <div className={cn(
+                                                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0 mt-0.5 border",
+                                                        categoryConfig.bgColor,
+                                                        categoryConfig.color
+                                                    )}>
+                                                        <CategoryIcon className="w-4 h-4" />
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={cn(
-                                                            "text-[10px] font-bold px-2 py-1 rounded-md bg-stone-100/50 text-stone-400 border border-stone-100/50"
-                                                        )}>
-                                                            {completedCount} / {categoryConfig.targetCount} Published
-                                                        </div>
+                                                    <div className="space-y-1">
+                                                        <h2 className="text-sm font-bold text-stone-900 tracking-tight flex items-center gap-2">
+                                                            {categoryConfig.label}
+                                                        </h2>
+                                                        <p className="text-[11px] text-stone-500 max-w-md leading-relaxed">
+                                                            <span className="font-semibold text-stone-400">Why: </span>
+                                                            {categoryConfig.tagline}
+                                                        </p>
                                                     </div>
                                                 </div>
-
-                                                {/* Articles Grid */}
-                                                {categoryItems.length > 0 ? (
-                                                    <>
-                                                        {/* Visible Cards (may include enabled + disabled-but-visible) */}
-                                                        {visibleCardsCount > 0 && (
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                                {categoryItems.slice(0, visibleCardsCount).map((item, itemIndex) => {
-                                                                    // Determine if this card's write button should be enabled
-                                                                    // Subscribers: all cards follow hasCredits
-                                                                    // Free users: only first N cards in FIRST category can write
-                                                                    const canWrite = isSubscribed
-                                                                        ? hasCredits
-                                                                        : (itemIndex < enabledCardsCount && hasCredits)
-
-                                                                    return (
-                                                                        <PlanCard
-                                                                            key={item.id}
-                                                                            item={item}
-                                                                            isEditing={editingId === item.id}
-                                                                            hasCredits={canWrite}
-                                                                            onStartEdit={() => handleStartEdit(item)}
-                                                                            onCancelEdit={() => setEditingId(null)}
-                                                                            onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
-                                                                            onWriteArticle={() => handleWriteArticle(item)}
-                                                                        />
-                                                                    )
-                                                                })}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Paywalled Cards (free users only, subscribers never see this) */}
-                                                        {showPaywall && (
-                                                            <PaywallOverlay
-                                                                hiddenCount={categoryItems.length - visibleCardsCount}
-                                                                categoryName={categoryConfig.label}
-                                                            >
-                                                                <div className={cn(
-                                                                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
-                                                                    visibleCardsCount > 0 && "mt-5"
-                                                                )}>
-                                                                    {categoryItems.slice(visibleCardsCount).map((item) => (
-                                                                        <PlanCard
-                                                                            key={item.id}
-                                                                            item={item}
-                                                                            isEditing={false}
-                                                                            hasCredits={false}
-                                                                            onStartEdit={() => { }}
-                                                                            onCancelEdit={() => { }}
-                                                                            onSaveEdit={() => { }}
-                                                                            onWriteArticle={() => { }}
-                                                                        />
-                                                                    ))}
-                                                                </div>
-                                                            </PaywallOverlay>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <div className="text-center py-6 text-stone-400 text-sm border border-dashed border-stone-200 rounded-lg">
-                                                        No {categoryConfig.label} yet
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn(
+                                                        "text-[10px] font-bold px-2 py-1 rounded-md bg-stone-100/50 text-stone-400 border border-stone-100/50"
+                                                    )}>
+                                                        {completedCount} / {categoryConfig.targetCount} Published
                                                     </div>
-                                                )}
-                                            </section>
-                                        )
-                                    })}
+                                                </div>
+                                            </div>
 
-                                    {/* Uncategorized Section (for legacy plans without article_category) */}
-                                    {filteredPlan.filter(item => !item.article_category).length > 0 && (
-                                        <section>
-                                            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-stone-100">
-                                                <Layout className="w-4 h-4 text-stone-400" />
-                                                <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
-                                                    Legacy / Uncategorized
-                                                </h2>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                {filteredPlan
-                                                    .filter(item => !item.article_category)
-                                                    .map((item) => (
-                                                        <PlanCard
-                                                            key={item.id}
-                                                            item={item}
-                                                            isEditing={editingId === item.id}
-                                                            hasCredits={hasCredits}
-                                                            onStartEdit={() => handleStartEdit(item)}
-                                                            onCancelEdit={() => setEditingId(null)}
-                                                            onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
-                                                            onWriteArticle={() => handleWriteArticle(item)}
-                                                        />
-                                                    ))}
-                                            </div>
+                                            {/* Articles Grid */}
+                                            {categoryItems.length > 0 ? (
+                                                <>
+                                                    {/* Visible Cards (may include enabled + disabled-but-visible) */}
+                                                    {visibleCardsCount > 0 && (
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                                            {categoryItems.slice(0, visibleCardsCount).map((item, itemIndex) => {
+                                                                // Determine if this card's write button should be enabled
+                                                                // Subscribers: all cards follow hasCredits
+                                                                // Free users: only first N cards in FIRST category can write
+                                                                const canWrite = isSubscribed
+                                                                    ? hasCredits
+                                                                    : (itemIndex < enabledCardsCount && hasCredits)
+
+                                                                return (
+                                                                    <PlanCard
+                                                                        key={item.id}
+                                                                        item={item}
+                                                                        isEditing={editingId === item.id}
+                                                                        hasCredits={canWrite}
+                                                                        onStartEdit={() => handleStartEdit(item)}
+                                                                        onCancelEdit={() => setEditingId(null)}
+                                                                        onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
+                                                                        onWriteArticle={() => handleWriteArticle(item)}
+                                                                    />
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Paywalled Cards (free users only, subscribers never see this) */}
+                                                    {showPaywall && (
+                                                        <PaywallOverlay
+                                                            hiddenCount={categoryItems.length - visibleCardsCount}
+                                                            categoryName={categoryConfig.label}
+                                                        >
+                                                            <div className={cn(
+                                                                "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
+                                                                visibleCardsCount > 0 && "mt-5"
+                                                            )}>
+                                                                {categoryItems.slice(visibleCardsCount).map((item) => (
+                                                                    <PlanCard
+                                                                        key={item.id}
+                                                                        item={item}
+                                                                        isEditing={false}
+                                                                        hasCredits={false}
+                                                                        onStartEdit={() => { }}
+                                                                        onCancelEdit={() => { }}
+                                                                        onSaveEdit={() => { }}
+                                                                        onWriteArticle={() => { }}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </PaywallOverlay>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="text-center py-6 text-stone-400 text-sm border border-dashed border-stone-200 rounded-lg">
+                                                    No {categoryConfig.label} yet
+                                                </div>
+                                            )}
                                         </section>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="px-2">
-                                    <CalendarView
-                                        items={filteredPlan}
-                                        onItemClick={(item) => setSelectedItem(item)}
-                                    />
-                                </div>
-                            )}
+                                    )
+                                })}
 
-                            {/* --- Article Detail Sheet --- */}
-                            <Sheet open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
-                                <SheetContent className="sm:max-w-md border-l border-stone-200 p-0 overflow-y-auto">
-                                    {selectedItem && (
-                                        <div className="flex flex-col h-full">
-                                            <div className="p-6 border-b border-stone-100 bg-stone-50/50">
-                                                <SheetHeader className="space-y-1">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <span className={cn(
-                                                            "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm",
-                                                            selectedItem.status === 'published' ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
-                                                                selectedItem.status === 'writing' ? "bg-blue-50 text-blue-700 border-blue-100 animate-pulse" :
-                                                                    "bg-stone-50 border border-stone-200 text-stone-600 font-bold"
-                                                        )}>
-                                                            {selectedItem.status === 'pending' ? 'Planned Article' : selectedItem.status}
-                                                        </span>
-                                                        <span className="text-[11px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full border border-stone-200/50">
-                                                            {new Date(selectedItem.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                                        </span>
-                                                    </div>
-                                                    <SheetTitle className="text-xl font-bold text-stone-900 leading-tight">
-                                                        {selectedItem.title}
-                                                    </SheetTitle>
-                                                    <SheetDescription className="text-stone-500 italic text-xs leading-relaxed">
-                                                        {selectedItem.reason}
-                                                    </SheetDescription>
-                                                </SheetHeader>
-                                            </div>
-
-                                            <div className="p-6 space-y-8">
-                                                {/* Core Strategy */}
-                                                <div className="space-y-4">
-                                                    <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
-                                                        <Target className="w-3 h-3" />
-                                                        Strategic Foundation
-                                                    </h3>
-                                                    <div className={cn("grid gap-3", (selectedItem.gsc_impressions ?? 0) > 0 ? "grid-cols-2" : "grid-cols-1")}>
-                                                        {/* Impact - Only show if we have real GSC data */}
-                                                        {(selectedItem.gsc_impressions ?? 0) > 0 && (
-                                                            <div className="p-3 rounded-xl border border-stone-100 bg-white shadow-sm">
-                                                                <p className="text-[10px] text-stone-400 font-medium mb-1">Impact</p>
-                                                                <p className="text-sm font-bold text-stone-900">{selectedItem.impact || 'Medium'}</p>
-                                                            </div>
-                                                        )}
-                                                        <div className="p-3 rounded-xl border border-stone-100 bg-white shadow-sm">
-                                                            <p className="text-[10px] text-stone-400 font-medium mb-1">Category</p>
-                                                            <p className="text-sm font-bold text-stone-900">{selectedItem.article_category || 'General'}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* SEO Data - Only show if we have REAL GSC data (impressions > 0) */}
-                                                {(selectedItem.gsc_impressions ?? 0) > 0 && (
-                                                    <div className="space-y-4">
-                                                        <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
-                                                            <BarChart3 className="w-3 h-3" />
-                                                            SEO Metrics
-                                                        </h3>
-                                                        <div className="space-y-3">
-                                                            <div className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-100">
-                                                                <div className="flex items-center gap-2">
-                                                                    <Search className="w-4 h-4 text-stone-400" />
-                                                                    <span className="text-sm font-medium text-stone-700">Primary Keyword</span>
-                                                                </div>
-                                                                <span className="text-sm font-bold text-stone-900">{selectedItem.main_keyword}</span>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-3 gap-3">
-                                                                <div className="p-3 text-center">
-                                                                    <p className="text-[10px] text-stone-400 font-medium mb-1">Impressions</p>
-                                                                    <p className="text-sm font-bold text-stone-900">{selectedItem.gsc_impressions?.toLocaleString() || '-'}</p>
-                                                                </div>
-                                                                <div className="p-3 text-center">
-                                                                    <p className="text-[10px] text-stone-400 font-medium mb-1">Current Pos</p>
-                                                                    <p className="text-sm font-bold text-stone-900">{selectedItem.gsc_position?.toFixed(1) || '-'}</p>
-                                                                </div>
-                                                                <div className="p-3 text-center">
-                                                                    <p className="text-[10px] text-stone-400 font-medium mb-1">CTR</p>
-                                                                    <p className="text-sm font-bold text-stone-900">{selectedItem.gsc_ctr ? `${selectedItem.gsc_ctr.toFixed(1)}%` : '-'}</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Keywords */}
-                                                <div className="space-y-4">
-                                                    <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
-                                                        <Tag className="w-3 h-3" />
-                                                        Semantic Keywords
-                                                    </h3>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {selectedItem.supporting_keywords.map(kw => (
-                                                            <span key={kw} className="px-2 py-1 rounded-md bg-stone-100 border border-stone-200 text-[11px] font-medium text-stone-600">
-                                                                {kw}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-auto p-6 border-t border-stone-100 bg-white">
-                                                <Button
-                                                    onClick={() => {
-                                                        setSelectedItem(null)
-                                                        handleWriteArticle(selectedItem)
-                                                    }}
-                                                    disabled={!hasCredits || selectedItem.status === 'published'}
-                                                    className="w-full h-12 rounded-xl bg-stone-900 text-white font-bold text-sm shadow-xl active:scale-[0.98] transition-all"
-                                                >
-                                                    {selectedItem.status === 'published' ? 'Article Published' :
-                                                        selectedItem.status === 'writing' ? 'View Article' :
-                                                            'Write Article Now'}
-                                                </Button>
-                                                <p className="text-center text-[10px] text-stone-400 mt-3 font-medium uppercase tracking-tight">
-                                                    {hasCredits ? 'Cost: 1 Content Pass' : 'No Passes Available'}
-                                                </p>
-                                            </div>
+                                {/* Uncategorized Section (for legacy plans without article_category) */}
+                                {filteredPlan.filter(item => !item.article_category).length > 0 && (
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-stone-100">
+                                            <Layout className="w-4 h-4 text-stone-400" />
+                                            <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                                                Legacy / Uncategorized
+                                            </h2>
                                         </div>
-                                    )}
-                                </SheetContent>
-                            </Sheet>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                            {filteredPlan
+                                                .filter(item => !item.article_category)
+                                                .map((item) => (
+                                                    <PlanCard
+                                                        key={item.id}
+                                                        item={item}
+                                                        isEditing={editingId === item.id}
+                                                        hasCredits={hasCredits}
+                                                        onStartEdit={() => handleStartEdit(item)}
+                                                        onCancelEdit={() => setEditingId(null)}
+                                                        onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
+                                                        onWriteArticle={() => handleWriteArticle(item)}
+                                                    />
+                                                ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
                         </>
                     )}
                 </div>
