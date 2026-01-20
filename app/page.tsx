@@ -32,9 +32,9 @@ export default function Home() {
         </div>
 
         {/* Main Content Sections */}
-        <ProblemSection />
         <ShowcaseSection />
         <AICitations />
+        <ProblemSection />
         <BenefitsSection />
         <HowItWorksSection />
         <FeaturesSection />

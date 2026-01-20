@@ -153,7 +153,7 @@ export default function PricingPage() {
                       <span className="font-sans font-bold text-gray-400 line-through text-lg decoration-2 decoration-red-500 mb-1">$79 original price</span>
                       <div className="flex items-start gap-1">
                         <span className="font-sans font-bold text-2xl mt-2">$</span>
-                        <span className="font-display font-black text-7xl md:text-8xl tracking-tighter leading-none">59</span>
+                        <span className="font-display font-black text-7xl md:text-8xl tracking-tighter leading-none">49</span>
                       </div>
                       <span className="font-sans font-bold text-black/40 text-sm uppercase tracking-wider mt-2">Per Month</span>
                     </div>
@@ -323,7 +323,7 @@ export default function PricingPage() {
               "description": "Strategic Content Engine for Generative Engine Optimization. 30 articles/month with automated strategy, CMS integration, and AI-powered research.",
               "offers": {
                 "@type": "Offer",
-                "price": 59,
+                "price": 49,
                 "priceCurrency": "USD"
               }
             }
