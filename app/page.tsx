@@ -33,12 +33,12 @@ export default function Home() {
 
         {/* Main Content Sections */}
         <ProblemSection />
-        <BenefitsSection />
         <ShowcaseSection />
+        <AICitations />
+        <BenefitsSection />
         <HowItWorksSection />
         <FeaturesSection />
         <FounderNote />
-        <AICitations />
         <PricingSection />
         <FAQSection />
         <CTASection />
