@@ -69,7 +69,7 @@ Make sure all required fields are present and have the correct types.
 `
 
     const fixResponse = await genAI.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       config: { responseMimeType: "application/json" },
       contents: [{ role: "user", parts: [{ text: fixPrompt }] }]
     })
@@ -324,7 +324,7 @@ YOUR TASK:
 OUTPUT: Return ONLY the complete image prompt.No explanations.`
 
   const response = await genAI.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: { responseMimeType: "text/plain" }
   })
@@ -468,7 +468,7 @@ const performDeepResearch = async (
 
   const criticPrompt = getCriticGapPrompt(keyword, articleType, broadContext)
   const criticResp = await genAI.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     config: { responseMimeType: "application/json" },
     contents: [{ role: "user", parts: [{ text: criticPrompt }] }]
   })
@@ -548,7 +548,7 @@ ${criticAnalysis.gap_analysis || "No major gaps identified."}
 `
 
   const synthesisStream = await genAI.models.generateContentStream({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     config: {},
     contents: [{ role: "user", parts: [{ text: synthesisPrompt + "\n\n" + combinedData }] }]
   })
@@ -1244,7 +1244,7 @@ CRITICAL EXECUTION RULES:
         ]
 
         const writeStream = await genAI.models.generateContentStream({
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           config: writeConfig,
           contents: writeContents
         })
@@ -1357,7 +1357,7 @@ CRITICAL EXECUTION RULES:
       let meta_description = ""
       try {
         const seoResponse = await genAI.models.generateContent({
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           config: seoConfig,
           contents: seoContents
         })
@@ -1481,7 +1481,7 @@ OUTPUT: Return ONLY the image generation prompt as plain text. No JSON, no expla
         const imagePromptContents = [{ role: "user", parts: [{ text: imagePromptSystem }] }]
 
         const imagePromptResponse = await genAI.models.generateContent({
-          model: "gemini-2.0-flash",
+          model: "gemini-2.5-flash",
           config: imagePromptConfig,
           contents: imagePromptContents
         })
