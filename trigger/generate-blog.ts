@@ -901,7 +901,7 @@ ${styleDNA}
 
 
 
-### 5. ARTICLE STRATEGY (${articleType.toUpperCase()})
+### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
 ${introStrategy}
 ${brandContextSection}
 
@@ -943,10 +943,14 @@ You MUST include an external hyperlink in this section.
 - **Format:** [anchor text](url) (Markdown)
 - **Rule:** Link a Noun/Entity/Stat. Do NOT link a verb.
 - **Rule:** Make sure its a part of running paragraph, not forced.
+- **Rule:** ⛔️ PROHIBITED: Do NOT bold the anchor text. Links are already visually distinct. [**text**](url) is BANNED.
+- **Constraint:** Anchor text must be SHORT (2-5 words max). Do not link full sentences.
 **ANCHOR TEXT RULES:**
 1. **LOWERCASE ONLY:** The anchor text must be lowercase to flow with the sentence (unless it's a proper noun).
    - ❌ Bad: "...read our guide on [The Best AI Tools]."
    - ✅ Good: "...read our guide on [the best AI tools]."
+   - ⛔️ NO BOLD: [**text**](url) -> [text](url)
+
 `
   }
 
@@ -964,7 +968,9 @@ You MUST include an internal link to our own content in this section.
 1. **⛔️ PROHIBITED:** NEVER, EVER use the "Target Page Title" as the anchor text.
 2. **✅ REQUIREMENT:** You MUST write a brand new, natural phrase that fits the sentence structure.
 3. **LOWERCASE ONLY:** The anchor text must be lowercase (unless it's a proper noun).
-4. **FLOW IS KING:** The sentence must be grammatically correct even if the link was removed.
+4. **NO BOLDING:** Do not put **bold** stars inside the link syntax.
+5. **FLOW IS KING:** The sentence must be grammatically correct even if the link was removed.
+
 
 **EXAMPLES:**
 ❌ Bad (Using Title): "You should read (How Internal Linking Boosts SEO)[url]."
@@ -1000,7 +1006,8 @@ ${linkInstruction}
 **Before you output, run this check on your own writing:**
 1.  **WALL OF TEXT CHECK:** Is there a paragraph longer than 3 lines? **SPLIT IT.**
 2.  **SCANNABILITY CHECK:** Did I use a bullet list for complex items? **DO IT.**
-3.  **BOLD CHECK:** Did I bold key numbers (**57%**, **$10k**)?
+3.  **BOLD CHECK:** Did I bold key numbers (**57%**, **$10k**)? (EXCEPTION: Do NOT bold if it is inside a Link).
+
 4.  **VOICE CHECK:** Did I use "It is important to note"? **DELETE IT.**
 
 ### ⚡️ STRUCTURAL OVERRIDES (THE "SNIPPET" LAYER)
