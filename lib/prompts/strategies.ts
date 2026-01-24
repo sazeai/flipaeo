@@ -59,7 +59,7 @@ TITLE RULES (MANDATORY):
 5. Write as a single flowing sentence
 
 GOOD EXAMPLES:
-- "How to Restore Old Photos with AI in 2024"
+- "How to Restore Old Photos with AI in 2026"
 - "What Is AI Photo Restoration and How It Works"
 - "AI Photo Restoration Explained for Beginners"
 - "Complete Guide to AI Photo Restoration"
@@ -124,10 +124,10 @@ TITLE RULES (MANDATORY):
 5. Write as a single flowing sentence
 
 GOOD EXAMPLES:
-- "Best Free AI Photo Restoration Tools in 2024"
+- "Best Free AI Photo Restoration Tools in 2026"
 - "7 AI Photo Restoration Apps Compared and Reviewed"
 - "Top AI Tools for Old Photo Restoration"
-- "AI Photo Restoration Tools Worth Trying in 2024"
+- "AI Photo Restoration Tools Worth Trying in 2026"
 
 BAD EXAMPLES (DO NOT USE):
 - "AI Tools Tested: Here's The Winner" (colon)

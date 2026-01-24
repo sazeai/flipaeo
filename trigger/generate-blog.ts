@@ -107,21 +107,12 @@ const AUTHENTIC_WRITING_RULES = `
   - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that screams when the server drops."
   - **Rule:** Use visceral, specific, or slightly "gritty" analogies.
 
-### 2. THE "ANTI-WALL-OF-TEXT" PROTOCOL (VISUAL SCANNABILITY)
-*These rules exist to make the content scannable. Failure to follow these makes the article unreadable.*
+### 2. STRUCTURAL ARCHITECTURE (VISUAL PHYSICS)
+*These rules ensure the content is scannable and citation-ready. LLM prefers rich data, not heavy walls of text*
 
-- **STRICT PARAGRAPH LIMIT:** HARD limit of **3 lines maximum**. If a paragraph hits line 4, you MUST hit "Enter" and split it. No exceptions.
-- **VISUAL RHYTHM:**
-  - Use **Bullet Points** and **Markdown Tables** ONLY when you have dense data or a list of 3+ items.
-  - Do NOT force lists where a sentence works better. Avoid "List Jargon". 
-  - *Good:* A table comparing 3 pricing tiers.
-  - *Bad:* A bullet list for a simple 5-word sentence.
-- **NO EMOJIS:** Absolutely **NO emojis** in the body text. Zero. 
-- **BOLDING FREQUENCY:** Bold **key concepts** or **data points** (e.g., **$50/month**, **Error 503**). NEVER bold an entire sentence.
-
-### 3. PATTERN INTERRUPTS (THE "WAKE UP" CALLS)
-- **"THE VERDICT" / "THE TRUTH":** Use these sub-headers to deliver a final, decisive opinion after a complex explanation.
-- **"BAD VS GOOD":** When explaining a concept, explicitly show the wrong way vs the right way using a simple comparison format (e.g., "❌ Wrong: ..." / "✅ Right: ...").
+- **THE "ANSWER-FIRST" PROTOCOL:** The FIRST sentence under every H2 header must be a direct, standalone answer to the header's premise. (e.g., If H2 is "What is CAC?", Sentence 1 must be "CAC is...").
+- **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
+- **BOLDING FREQUENCY (MANDATORY):** You MUST bold at least **one key phrase per section** using **double asterisks**. Bold: statistics (e.g., **47% faster**), key terms (e.g., **token limits**), or warnings (e.g., **do not skip this step**). Never bold an entire sentence.
 
 ### 4. ENTITY SALIENCE (SUBJECT-FIRST SYNTAX)
 - **ACTIVE VOICE ONLY:** The Target Entity must be the **Grammatical Subject**.
@@ -133,17 +124,36 @@ const AUTHENTIC_WRITING_RULES = `
 - **"ACCORDING TO" SYNTAX:** Explicitly name sources. "According to the **2025 State of AI Report**..."
 - **Constraint:** Do NOT cite competitors. Cite Neutral Super-Authorities.
 
-### 6. RHYTHM & SUBSTANCE
-- **BURSTINESS:** Mix short fragments (5 words) with complex sentences (20 words).
-- **NON-ROUND NUMBERS:** Use **14.8%** instead of "15%". Precision = Trust.
-- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context.
+### 6. RHYTHM & VOICE (THE HUMAN PULSE)
+*These rules break the "robotic" cadence of AI generation.*
 
-### 7. PERSPECTIVE & ENGAGEMENT
-- **OWN THE PERSPECTIVE:** Use "I" (Founder) or "We" (Agency).
-- **SUBJECTIVE OPINION:** "I found x surprisingly snappy..."
-- **AVOID PASSIVE VOICE:** Say "You should..." or "I recommend...".
-- **THE "NEXT STEP" CLOSING:** Don't summarize; tell the reader exactly what to do next.
+- **BURSTINESS (SENTENCE VARIANCE):**
+  - **Constraint:** You generally write long sentences. Stop it.
+  - **The Mix:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7-10 words).
+  - **Example:** "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server."
+- **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
+- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
 
+### 7. SUBSTANCE & AUTHORITY (THE "INFORMATION GAIN" SIGNAL)
+*These rules ensure the content ranks in AI Search (AEO).*
+
+- **ENTITY DENSITY:** Prioritize specific Named Entities over general nouns.
+- *Bad:* "Use a fast Javascript framework." -> *Good:* "Use **Next.js 14** or **Astro**."
+- **THE "UNIQUE DATA" INJECTION:** Every section must cite a specific number, benchmark, or law. If proprietary data isn't available.
+- **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" is better than "saves time."
+- **DEFINITION OWNERSHIP:** When defining a term, use this syntax: *"[Term] is [Definition] that helps [Audience] achieve [Outcome]."*
+- **ADMIT LIMITATIONS (THE "HARD TRUTH"):** Every SaaS/Strategy has a catch. Mention it.
+- *Example:* "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." (This builds massive E-E-A-T).
+
+
+### 8. PERSPECTIVE & ENGAGEMENT
+*These rules create trust and drive action.*
+
+- **OWN THE PERSPECTIVE:** - If writing as a Founder, use "I" and "My team."
+  - If writing as an Agency, use "We" and "Our clients."
+- **SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests, but it struggled with [X]."
+- **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend...".
+- **THE "NEXT STEP" CLOSING:** AI summarizes. Humans give orders. Don't summarize; tell the reader exactly what to do next.
 **Note** If you fail to follow the 'Answer-First' or 'Vocabulary Blacklist' rules, the output is considered a failure.
 `
 
@@ -161,17 +171,25 @@ GOAL: Write a "Definition Stack" opening.
    - *Header:* "**Key Takeaways:**"
 3. **The Context (Paragraph 2):**
    - Now you can add the "Human Hook" or specific context.
+**DYNAMIC STARTING STYLES (Pick ONE randomly):**
+- **The "Data Anomaly" Start:** Start with a specific, non-rounded number or a weird trend you noticed in a dashboard.
+  *Example:* "I was looking at a client's crawl logs last Tuesday and noticed that 42% of their new pages weren't even being touched by the Bing bot. It wasn't a sitemap error; it was something else entirely."
+- **The "Boring Technical" Start:** Start with a specific setting, a line of code, or a mundane requirement that people miss.
+  *Example:* "Most [Topic] configurations fail because of a single checkbox in the [Specific Menu]. It’s a tiny detail, but if it’s off, none of the high-level strategy matters."
+- **The "Middle of the Meeting" Start:** Start as if you are answering a question someone just asked you.
+  *Example:* "People keep asking if [Topic] is still worth the effort in 2026. The answer isn't a simple yes or no—it depends entirely on how you're handling [Specific Sub-task]."
 
 **NEGATIVE CONSTRAINTS:**
-- NO "In this article..."
-- NO "Have you ever wondered..."
+- NO "The rules have changed."
+- NO "In the world of [Topic]."
+- NO "Many people think X, but Y." (This is the most common AI pattern).
 `,
 
   commercial: `
 GOAL: Write a "Recommendation Stack" opening.
 **MANDATORY STRUCTURE (THE GOLDEN ORDER):**
 1. **The Bridge Answer (Paragraph 1):**
-   - Give the bottom-line recommendation immediately.
+   - Give the bottom-line recommendation immediately.(you are free to make it up to two paragraphs as per requirement)
    - **Length:** 40-60 words.
    - *Example:* "The best CRM for small agencies is **HubSpot** due to its free tier, while **Salesforce** is required for enterprise scale. For sheer automation speed, **Pipedrive** wins."
 2. **The "At A Glance" Table:**
@@ -180,12 +198,14 @@ GOAL: Write a "Recommendation Stack" opening.
    - "Choosing the wrong one costs you..."
 
 **NEGATIVE CONSTRAINTS:**
-- NO "Choosing software is hard."
-- NO "Top 10 lists."
+- NO "Choosing the right tool is a journey."
+- NO "Top 10 Best [Topic] in 2026."
+- NO "Our expert team has evaluated..."
 `,
 
   howto: `
-GOAL: Write a "Process Stack" opening.
+GOAL: Write an "In-the-Trenches" opening.
+Start at the moment of peak frustration—the point where most people give up.
 **MANDATORY STRUCTURE (THE GOLDEN ORDER):**
 1. **The Bridge Answer (Paragraph 1):**
    - Summary of the solution + Time/Difficulty.
@@ -196,6 +216,11 @@ GOAL: Write a "Process Stack" opening.
    - *Header:* "**Prerequisites:**"
 3. **The Warning (Paragraph 2):**
    - "If you skip step 2, you will crash the server."
+
+**NEGATIVE CONSTRAINTS:**
+- NO "Have you ever wanted to learn how to..."
+- NO "In this guide, we will walk you through..."
+- NO "Getting started with [Topic] is easy."
 `
 }
 
@@ -578,18 +603,19 @@ Your goal is to outline a high - ranking blog post that beats the competition by
 ** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
   INPUT CONTEXT:
-1. KEYWORD: "${keyword}"
-2. COMPETITOR & GAP DATA: ${JSON.stringify(competitorData)}
-${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
+1. MAIN KEYWORD WE ARE FOCUSING ON: "${keyword}"
+2. COMPETITOR & GAP DATA: "${JSON.stringify(competitorData)}"
+3. ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
 - Brand: ${brandDetails.product_name}
 - Type: ${brandDetails.product_identity?.literally || 'Product/Service'}
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
 - Features: ${brandDetails.features?.join(', ') || 'N/A'}
+- UVP: ${brandDetails.unique_value_proposition}
 
-NOTE: Use this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question in best way possible.
-Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors.
-3. Don't just list competitors - explain why YOUR approach is different/better
-4. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, it must earn its place naturally and strategically, nothim is random here, evrything needs to be planned.
+NOTE: Use this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question with research backed data and fulfilling user intent.
+Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors, in comparison tables for features or anything else.
+4. Don't just list competitors - explain why YOUR approach is different/better
+5. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, if you do this its called spamming. So, it must earn its place naturally and strategically, nothing is random here, everything needs to be planned.
 ` : ''
     }
 ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-2 MAX)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
@@ -609,10 +635,10 @@ ${strategy.outline_instruction}
 2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software"):
 - Structure: Deep, nested.
    - Depth: Heavy use of H3s and H4s.
-   - Total Sections: ** 10 - 16 sections **.
+   - Total Sections: ** 10 - 15 sections **.
    - GOAL: Exhaustive coverage.
 
-** INSTRUCTION:** Adjust your outline length to match the keyword intent.Do not force a 15 - section outline for a 8 - section topic.
+** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 15 - section outline for a 8 - section topic.
 
 ## HEADING STYLE PROTOCOL(MANDATORY - READ CAREFULLY)
 
@@ -658,7 +684,7 @@ H2: Main Topic B
 \`\`\`
 
 **HIERARCHY REQUIREMENTS:**
-1. NEVER have all sections at level 2. This is WRONG and hurts SEO.
+1. NEVER have all sections at level 2. This is WRONG and hurts SEO/AEO/GEO.
 2. Aim for at least 60% of sections to be level 3 or 4.
 3. Use level 4 (H4) for lists, comparisons, step details, or deep dives.
 4. The sections array should be FLAT but with levels indicating hierarchy.
@@ -798,7 +824,7 @@ ${upcomingSections || "(This is the last section)"}
 
 **WHEN TO MENTION BRAND (Natural contexts):**
 - When establishing authority in the intro (once)
-- When comparing to competitors in a features/comparison section
+- When comparing to competitors in a features/comparison section/tables
 - When the section is SPECIFICALLY about your product's approach
 - In a call-to-action at the end
 
@@ -834,26 +860,31 @@ Before mentioning the brand, check the CONTEXT section in your prompt.
 ### 6. INTRO STRATEGY (ADAPT TO ARTICLE TYPE: ${articleType.toUpperCase()})
 
 ${articleType === 'informational' ? `**INFORMATIONAL ARTICLE:**
-- **The "Hook"**: Start with a surprising statistic, a contrarian take, or a "Hard Truth" about the topic.
+- **The "Hook"**: Lead with the direct answer in sentences 1-2 in a surprising statistic, a contrarian take, or a "Hard Truth" about the topic.
 - **The "Bridge"**: Explain *why* this matters right now (urgency).
-- **The "Promise"**: "In this guide, I'll show you X, Y, and the exact steps to Z."` : ''}
+- Then provide brief context
+- Example: "A reunion hug video is created by uploading two photos to an AI generator. The process takes 2-3 minutes. Here's exactly how it works..."` : ''}
+
 
 ${articleType === 'commercial' ? `**COMMERCIAL ARTICLE:**
-- **The "Pain"**: Describe the specific frustration the user feels right now.
+- **The "Pain"**: Lead with the key insight or recommendation, Describe the specific frustration the user feels right now.
 - **The "Agitation"**: "It’s not just annoying; it’s costing you time/money."
-- **The "Solution"**: Introduce the fix immediately. "That's why we built [Product]..."` : ''}
+- **The "Solution"**: Introduce the fix immediately. "That's why we built [Product]..."
+- Can include brief emotional context if relevant to the problem
+- Example: "After testing 7 AI video tools, [Product] offers the best balance of quality and privacy. Here's what I found..."` : ''}
 
 ${articleType === 'comparison' ? `**COMPARISON ARTICLE:**
-- **The "Decision Paralysis"**: Acknowledge that X and Y look identical on paper.
-- **The "Differentiator"**: "But for [specific user], the choice is actually simple."
-- **The "Preview"**: "Here is the honest breakdown..."` : ''}
+- Lead with the key differentiator
+- Be fair and objective in tone
+- Example: "The main difference between X and Y is [key factor]. Here's a detailed breakdown..."` : ''}
+
 
 ${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
 - **The "End State"**: Describe the completed result first. "By the end of this, you’ll have a fully functional..."
 - **The "Warning"**: "Most people mess up step 3. Pay attention there."
 - **The "Prerequisites"**: List them fast.` : ''}
 
-**BANNED OPENERS (IMMEDIATE REJECTION):**
+**Everything which gives below mentioned vibes are BANNED OPENERS (IMMEDIATE REJECTION OF SUCH WORDS):**
 - ❌ "In today's fast-paced digital landscape..."
 - ❌ "Have you ever wondered...?"
 - ❌ "Let's dive in..."
@@ -869,20 +900,24 @@ You are an expert Blog Writer who knows the autneticity rules for modern ai sear
 ${globalMap}
 
 ### 1. THE CODE OF AUTHENTICITY (NON-NEGOTIABLE)
-**We write for HUMANS, not just algorithms. If you sound like a robot, you fail.**
-${AUTHENTIC_WRITING_RULES}
+**We write for HUMANS, not just algorithms. If you sound like a robot or violate these formatting constraints, the article will fail.**
+"${AUTHENTIC_WRITING_RULES}"
 
-### 2. WRITING STYLE & VOICE OF BRAND (FOLLOW PRECISELY)
-${styleDNA}
+### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
+"${styleDNA}"
 
-### 3. THE "ANTI-FLUFF" PROTOCOL (COMPETITOR TRANSFORMATION)
+### 3. STRATEGY & MINDSET
+- **Goal:** Rank #1 on Google and get cited by ai LLMs by being more specific, helpful, and "human" than the competition to answer the user's question.
+- **Method:** High information density, low word count. Every sentence must earn its place.
+
+### 4. THE "ANTI-FLUFF" PROTOCOL (COMPETITOR TRANSFORMATION)
 **How to handle data and citations to maximize OUR authority without risking plagiarism:**
 
 1. **NEVER CITE COMPETITORS:**
    - Scan the source/fact. Is it a rival Agency, SaaS tool, or "SEO Guru"?
    - **IF YES:** Do NOT cite them by name.
    - *Technique:* Rephrase the finding as a general industry pattern.
-     - ❌ Bad: "According to Koanthic, 68% of sites..."
+     - ❌ Bad: "According to [XYZ competitor], 68% of sites..."
      - ✅ Good: "It is widely observed across the industry that **over 60% of sites**..." (Generalization).
      - ✅ Best: "In our own client audits, we frequently see that **most new sites**..." (Qualitative First-Party).
 
@@ -894,10 +929,6 @@ ${styleDNA}
 3. **THE "FIRST-PARTY" PRIORITY:**
    - Whenever possible, prioritize insights derived from our own tool/platform over external reports.
    - Use phrases like "Our platform handles this by..." or "We built [Brand Name] to solve this specific issue..."
-
-### 4. STRATEGY & MINDSET
-*   **Goal:** Rank #1 by being the **most useful, scannable, and distinct** answer on the internet.
-*   **Method:** High information density, low word count. Every sentence must earn its place.
 
 
 
