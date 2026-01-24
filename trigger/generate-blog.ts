@@ -590,7 +590,7 @@ ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
 - Features: ${brandDetails.features?.join(', ') || 'N/A'}
 
-NOTE: UAe this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question in best way possible.
+NOTE: Use this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question in best way possible.
 Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors.
 3. Don't just list competitors - explain why YOUR approach is different/better
 4. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, it must earn its place naturally and strategically, nothim is random here, evrything needs to be planned.
@@ -875,7 +875,30 @@ ${AUTHENTIC_WRITING_RULES}
 ### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
 ${styleDNA}
 
-### 3. STRATEGY & MINDSET
+### 3. THE "COMPETITOR EXCLUSION" PROTOCOL (SMART CITATIONS)
+**How to handle data and citations to maximize OUR authority without risking plagiarism:**
+
+1. **NEVER CITE COMPETITORS:**
+   - Scan the source/fact. Is it a rival Agency, SaaS tool, or "SEO Guru"?
+   - **IF YES:** Do NOT cite them by name.
+   - *Technique:* Rephrase the finding as a general industry pattern.
+     - ❌ Bad: "According to Koanthic, 68% of sites..."
+     - ✅ Good: "It is widely observed across the industry that **over 60% of sites**..." (Generalization).
+     - ✅ Best: "In our own client audits, we frequently see that **most new sites**..." (Qualitative First-Party).
+
+2. **ALWAYS CITE "SUPER-AUTHORITIES":**
+   - Is the source a Neutral Giant? (e.g., Google, Microsoft, Statista, Gartner, W3C, Government bodies).
+   - **IF YES:** Keep the citation. It builds E-E-A-T.
+   - *Example:* "As confirmed by **Google's John Mueller**..." or "Data from **Statista** shows..."
+
+3. **THE "FIRST-PARTY" PRIORITY:**
+   - Whenever possible, prioritize insights derived from our own tool/platform over external reports.
+   - Use phrases like "Our platform handles this by..." or "We built [Brand Name] to solve this specific issue..."
+
+4. **VISUAL LOGIC:** - If you describe a complex concept (Knowledge Graph, Flowchart, Process), you MUST insert a visual placeholder tag on its own line:
+   - Format: \`> **[VISUAL REQUEST]:** [Describe the diagram needed here to explain the concept]\`
+
+### 4. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google and be cited by modern ai search engine by being more specific, helpful, and "human" than the competition to answer the user's question.
 
 
@@ -936,7 +959,12 @@ You MUST include an internal link to our own content in this section.
 - **URL:** ${currentSection.internal_link.url}
 - **Context:** "${currentSection.internal_link.anchor_context}"
 - **Format:** [anchor text](url) (Markdown)
-- **Rule:** Integrate it naturally. e.g., "For more on X, read our guide on [Guide Name]." OR Link the relevant keyword directly.
+
+**ANCHOR TEXT RULES (CRITICAL):**
+1. **LOWERCASE ONLY:** The anchor text MUST be lowercase (e.g., "read our [guide on seo]") unless it is a proper noun (e.g., "FlipAEO").
+2. **NATURAL FLOW:** Do NOT say "Click here" or "Read this article." weave it into the sentence syntax.
+   - ❌ Bad: "You can learn more in our [AI SEO Guide]."
+   - ✅ Good: "This is why [ai seo strategies] are replacing traditional keyword stuffing."
 `
   }
 
@@ -974,17 +1002,24 @@ ${linkInstruction}
 
 
 ### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
-1. **RESET YOUR TONE:** Do not just copy the tone of the previous text. Re-read the "Style DNA" and "Golden Rules" in the system prompt.
-2. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Each section must start with a direct natural answer to the outline heading.Do NOT use an intro sentence like "Now let's talk about [Heading]."
-3. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
-4. **TRANSITION:** dont use words like "Furthermore" or "In addition" in the text above, **do NOT use them again.** Find a logical way to transition (e.g., "The bigger issue is...", "This fails because...").
+1. **RESET YOUR TONE:** Do not just copy the tone of the previous text.
+2. **NO FLUFF:** Start the section with a hard fact or a direct opinion.
+3. **DEPTH:** Explain the *nuance*, not just the instruction.
+
+### ⚡️ STRUCTURAL OVERRIDES (THE "SNIPPET" LAYER)
+**Check the Heading type:**
+- IF heading starts with "How to", "Steps to", or implies a process:
+  - **YOU MUST USE AN ORDERED LIST (<ol>).**
+  - Do NOT write a paragraph. Break the steps down immediately.
+- IF heading implies a comparison ("Vs", "Difference"):
+  - **YOU MUST USE A MARKDOWN TABLE.**
 
 ### ⛔️ EXECUTION CHECKLIST (READ THIS LAST)
 **Before generating, verify:**
-1. **VISUALS:** Will I include a Bullet List or a 1-sentence paragraph? (Required).
-2. **NO FLUFF:** Am I starting with a direct fact/opinion? (No "Let's explore").
-3. **BOLDING (MANDATORY):** You MUST bold at least ONE key phrase per section using **double asterisks**. Example: "This reduces load time by **47%**" or "The real issue is **token limits**".
-4. **ASYMMETRY:** Am I mixing short (5 words) and long (25 words) sentences?
+1. **VISUALS:** Did I insert a placeholder for complex concepts? (e.g. ![Chart: Description])
+2. **LINKS:** Are all anchor texts lowercase?
+3. **BOLDING:** Did I bold **one key stat**?
+4. **ASYMMETRY:** Am I mixing short and long sentences?
 
 ### DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
 
