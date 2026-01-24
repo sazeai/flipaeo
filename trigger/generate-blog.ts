@@ -107,48 +107,43 @@ const AUTHENTIC_WRITING_RULES = `
   - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that screams when the server drops."
   - **Rule:** Use visceral, specific, or slightly "gritty" analogies.
 
-### 2. THE "RAG-READY" ARCHITECTURE (VECTOR OPTIMIZATION)
-*These rules ensure the content is chunkable for LLM retrieval.*
+### 2. THE "ANTI-WALL-OF-TEXT" PROTOCOL (VISUAL SCANNABILITY)
+*These rules exist to make the content scannable. Failure to follow these makes the article unreadable.*
 
-- **THE "BRIDGE ANSWER" PROTOCOL (THE 60-WORD RULE):** - The FIRST <p> tag immediately following ANY header (H2/H3) must be a **Direct "Answer Vector"**.
-  - **Length:** 40–60 words maximum.
-  - **Content:** Dense definition or direct solution. No fluff.
-  - *Bad:* "When looking at pricing, it depends..."
-  - *Good:* "The price ranges from **$50 to $100**. The Pro version costs **$150** and includes API access."
+- **STRICT PARAGRAPH LIMIT:** HARD limit of **3 lines maximum**. If a paragraph hits line 4, you MUST hit "Enter" and split it. No exceptions.
+- **VISUAL RHYTHM:**
+  - Use **Bullet Points** and **Markdown Tables** ONLY when you have dense data or a list of 3+ items.
+  - Do NOT force lists where a sentence works better. Avoid "List Jargon". 
+  - *Good:* A table comparing 3 pricing tiers.
+  - *Bad:* A bullet list for a simple 5-word sentence.
+- **NO EMOJIS:** Absolutely **NO emojis** in the body text. Zero. 
+- **BOLDING FREQUENCY:** Bold **key concepts** or **data points** (e.g., **$50/month**, **Error 503**). NEVER bold an entire sentence.
 
-- **THE "DATA STRUCTURE" MANDATE:**
-  - **Comparisons = Tables:** If you compare >2 items (prices, pros/cons, features), you MUST use a Markdown Table.
-  - **Processes = Ordered Lists:** If explaining a sequence, use \`<ol>\`.
-  - **Features = Unordered Lists:** If listing components, use \`<ul>\`.
-  - *Why:* LLMs parse tables/lists as structured data rows; paragraphs lose the connection.
+### 3. PATTERN INTERRUPTS (THE "WAKE UP" CALLS)
+- **"THE VERDICT" / "THE TRUTH":** Use these sub-headers to deliver a final, decisive opinion after a complex explanation.
+- **"BAD VS GOOD":** When explaining a concept, explicitly show the wrong way vs the right way using a simple comparison format (e.g., "❌ Wrong: ..." / "✅ Right: ...").
 
-- **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
-- **BOLDING FREQUENCY (MANDATORY):** You MUST bold at least **one key phrase per section** using **double asterisks**. Bold: statistics (e.g., **47% faster**), key terms (e.g., **token limits**), or warnings (e.g., **do not skip this step**). Never bold an entire sentence.
+### 4. ENTITY SALIENCE (SUBJECT-FIRST SYNTAX)
+- **ACTIVE VOICE ONLY:** The Target Entity must be the **Grammatical Subject**.
+  - *Bad:* "Efficiency is improved by [Tool]..."
+  - *Good:* "**[Tool]** improves efficiency by..."
+- **LEXICAL DENSITY:** Minimize "Function Words". Maximize "Content Words" (Nouns, Verbs, Numbers).
 
-### 3. ENTITY SALIENCE (SUBJECT-FIRST SYNTAX)
-- **ACTIVE VOICE ONLY:** The Target Entity must be the **Grammatical Subject** of the sentence.
-  - *Bad:* "Efficiency is improved by [Tool]..." (Passive).
-  - *Good:* "**[Tool]** improves efficiency by..." (Active).
-- **LEXICAL DENSITY:** Minimize "Function Words" (the, of, and). Maximize "Content Words" (Nouns, Verbs, Numbers).
+### 5. CITATION AUTHORITY (PERPLEXITY REDUCTION)
+- **"ACCORDING TO" SYNTAX:** Explicitly name sources. "According to the **2025 State of AI Report**..."
+- **Constraint:** Do NOT cite competitors. Cite Neutral Super-Authorities.
 
-### 4. CITATION AUTHORITY (PERPLEXITY REDUCTION)
-- **"ACCORDING TO" SYNTAX:** When citing a fact, explicitly name the source in the text to increase confidence scores.
-  - *Format:* "According to the **2025 State of AI Report**, 60% of searches..."
-  - **Constraint:** Do NOT cite competitors. Cite Neutral Super-Authorities (Google, Gartner, Statista) or use "Our internal data."
-
-### 5. RHYTHM & SUBSTANCE
+### 6. RHYTHM & SUBSTANCE
 - **BURSTINESS:** Mix short fragments (5 words) with complex sentences (20 words).
 - **NON-ROUND NUMBERS:** Use **14.8%** instead of "15%". Precision = Trust.
-- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
+- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context.
 
-### 6. PERSPECTIVE & ENGAGEMENT
-*These rules create trust and drive action.*
+### 7. PERSPECTIVE & ENGAGEMENT
+- **OWN THE PERSPECTIVE:** Use "I" (Founder) or "We" (Agency).
+- **SUBJECTIVE OPINION:** "I found x surprisingly snappy..."
+- **AVOID PASSIVE VOICE:** Say "You should..." or "I recommend...".
+- **THE "NEXT STEP" CLOSING:** Don't summarize; tell the reader exactly what to do next.
 
-- **OWN THE PERSPECTIVE:** - If writing as a Founder, use "I" and "My team."
-  - If writing as an Agency, use "We" and "Our clients."
-- **SUBJECTIVE OPINION:** Instead of "The tool is effective," use "I found the tool surprisingly snappy during high-traffic tests, but it struggled with [X]."
-- **AVOID PASSIVE VOICE:** Never say "It is recommended that..." Say "You should..." or "I recommend...".
-- **THE "NEXT STEP" CLOSING:** AI summarizes. Humans give orders. Don't summarize; tell the reader exactly what to do next.
 **Note** If you fail to follow the 'Answer-First' or 'Vocabulary Blacklist' rules, the output is considered a failure.
 `
 
@@ -839,26 +834,30 @@ Before mentioning the brand, check the CONTEXT section in your prompt.
 ### 6. INTRO STRATEGY (ADAPT TO ARTICLE TYPE: ${articleType.toUpperCase()})
 
 ${articleType === 'informational' ? `**INFORMATIONAL ARTICLE:**
-- Lead with the direct answer in sentences 1-2
-- Then provide brief context
-- Example: "A reunion hug video is created by uploading two photos to an AI generator. The process takes 2-3 minutes. Here's exactly how it works..."` : ''}
+- **The "Hook"**: Start with a surprising statistic, a contrarian take, or a "Hard Truth" about the topic.
+- **The "Bridge"**: Explain *why* this matters right now (urgency).
+- **The "Promise"**: "In this guide, I'll show you X, Y, and the exact steps to Z."` : ''}
 
 ${articleType === 'commercial' ? `**COMMERCIAL ARTICLE:**
-- Lead with the key insight or recommendation
-- Can include brief emotional context if relevant to the problem
-- Example: "After testing 7 AI video tools, [Product] offers the best balance of quality and privacy. Here's what I found..."` : ''}
+- **The "Pain"**: Describe the specific frustration the user feels right now.
+- **The "Agitation"**: "It’s not just annoying; it’s costing you time/money."
+- **The "Solution"**: Introduce the fix immediately. "That's why we built [Product]..."` : ''}
 
 ${articleType === 'comparison' ? `**COMPARISON ARTICLE:**
-- Lead with the key differentiator
-- Be fair and objective in tone
-- Example: "The main difference between X and Y is [key factor]. Here's a detailed breakdown..."` : ''}
+- **The "Decision Paralysis"**: Acknowledge that X and Y look identical on paper.
+- **The "Differentiator"**: "But for [specific user], the choice is actually simple."
+- **The "Preview"**: "Here is the honest breakdown..."` : ''}
 
 ${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
-- Lead with what they'll achieve
-- Brief setup of prerequisites
-- Example: "By the end of this guide, you'll be able to [outcome]. You'll need [prerequisites]..."` : ''}
+- **The "End State"**: Describe the completed result first. "By the end of this, you’ll have a fully functional..."
+- **The "Warning"**: "Most people mess up step 3. Pay attention there."
+- **The "Prerequisites"**: List them fast.` : ''}
 
-**AVOID IN ALL TYPES:**
+**BANNED OPENERS (IMMEDIATE REJECTION):**
+- ❌ "In today's fast-paced digital landscape..."
+- ❌ "Have you ever wondered...?"
+- ❌ "Let's dive in..."
+- ❌ "Imagine a world where..."
 - ❌ "Imagine..." or "Picture this..." as openers
 - ❌ Rhetorical questions that delay the answer
 - ❌ Multiple paragraphs before getting to the point
@@ -869,14 +868,14 @@ You are an expert Blog Writer who knows the autneticity rules for modern ai sear
 
 ${globalMap}
 
-### 1. THE LAW (NON-NEGOTIABLE WRITING RULES)
-**If you violate these formatting constraints, the article fails. because we are writing article for a brand to be cited by modern ai search engine. aand they hate any rootic fluff, based on research we have buitl these rules which are to be followed.**
+### 1. THE CODE OF AUTHENTICITY (NON-NEGOTIABLE)
+**We write for HUMANS, not just algorithms. If you sound like a robot, you fail.**
 ${AUTHENTIC_WRITING_RULES}
 
-### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
+### 2. WRITING STYLE & VOICE OF BRAND (FOLLOW PRECISELY)
 ${styleDNA}
 
-### 3. THE "COMPETITOR EXCLUSION" PROTOCOL (SMART CITATIONS)
+### 3. THE "ANTI-FLUFF" PROTOCOL (COMPETITOR TRANSFORMATION)
 **How to handle data and citations to maximize OUR authority without risking plagiarism:**
 
 1. **NEVER CITE COMPETITORS:**
@@ -897,24 +896,28 @@ ${styleDNA}
    - Use phrases like "Our platform handles this by..." or "We built [Brand Name] to solve this specific issue..."
 
 ### 4. STRATEGY & MINDSET
-- **Goal:** Rank #1 on Google and be cited by modern ai search engine by being more specific, helpful, and "human" than the competition to answer the user's question.
+*   **Goal:** Rank #1 by being the **most useful, scannable, and distinct** answer on the internet.
+*   **Method:** High information density, low word count. Every sentence must earn its place.
 
 
 
-### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
+### 5. ARTICLE STRATEGY (${articleType.toUpperCase()})
 ${introStrategy}
 ${brandContextSection}
 
-### 6. THE "DATA STRUCTURE" PREFERENCE (JSON-LD MIRRORING)
-*Why it works: LLMs understand data best when it looks like a database row.*
+### 6. THE "VISUAL RHYTHM" MANDATE (SCANNABILITY)
+*The formatting is as important as the text.*
 
-**FORMATTING RULES:**
-1. **THE TABLE RULE (MANDATORY):** - If a paragraph contains **>3 numerical comparisons** or compares Features/Pros/Cons, you MUST convert it to a **Markdown Table**.
+1.  **THE TABLE RULE:** If you equate/compare >2 items (features, pros/cons, prices), you **MUST** use a Markdown Table.
+    *   *Why:* Tables are "Knowledge Graphs" for AI, and "Skimmable" for humans.
+ If a paragraph contains **>3 numerical comparisons** or compares Features/Pros/Cons, you **MUST** convert it to a **Markdown Table**.
    - *Why:* Paragraphs lose the row/column relationship in vector space. Tables preserve it.
-   
-2. **THE LIST RULE:** - **Ordered Lists (<ol>):** MANDATORY for any "Step-by-Step" or "Process" content.
-   - **Unordered Lists (<ul>):** MANDATORY for "Features", "Components", or "Benefits".
-   
+
+2.  **THE LIST RULE:**
+    *   **Processes:** Use Ordered Lists (\`<ol>\`).
+    *   **Components:** Use Unordered Lists (\`<ul>\`).
+    *   *Constraint:* Do NOT write a list where a simple comma-separated sentence works better. Lists are for *complex* items.
+
 3. **BOLDED ENTITIES:** - **Bold** the specific Named Entity (e.g., "**$29/mo**", "**Next.js**", "**HubSpot**").
    - This acts as an "Attention Anchor" for the AI parser.
 
@@ -972,32 +975,20 @@ You MUST include an internal link to our own content in this section.
   }
 
   return `
-### BEFORE YOU WRITE - CHECK THE CONTEXT to insure smooth flow of article.
+### BEFORE YOU WRITE - CHECK THE CONTEXT to ensure smooth flow of article.
 
 ### CONTEXT SNOWBALL
 Read this to ensure continuity and **AVOID REPETITION**.
-Do NOT define concepts that are already defined here.
-Do NOT repeat the same "transition phrases" used here.
 "${previousFullText}".
 
-this is just soem of the text from the article so you can get the idea of the article for the transistion.
-
-1. **BRAND CHECK:** Scan the context - how many times has the brand name been mentioned?
-   - If 0-1 times → OK to mention if contextually relevant
-   - If 2+ times → Use "we/our tool/our platform" instead of brand name
-   - If mentioned in the immediately previous section → DO NOT mention again
-
-2. **REPETITION CHECK:** Have similar points already been made?
-   - Don't repeat privacy/security claims if already covered
-   - Don't re-introduce features already explained
-   - Build on what's written, don't duplicate themes
-
-3. **FLOW CHECK:** Does this section connect naturally to the previous one?
+1.  **BRAND CHECK:** If brand was just mentioned, do NOT mention it again. Use "we".
+2.  **REPETITION CHECK:** Do NOT define concepts already defined. Do NOT re-state the "problem".
+3.  **FLOW CHECK:** Connect smoothly to the previous paragraph.
 
 ---
 
 ### YOUR TASK: WRITE SECTION "${currentSection.heading}"
-**GOAL:** specific, high-burstiness content.
+**GOAL:** High-density, skimmable, "human" content.
 
 **CONTENT REQUIREMENTS:**
 ${currentSection.instruction_note}
@@ -1005,11 +996,12 @@ ${currentSection.instruction_note}
 **KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
 ${linkInstruction}
 
-
-### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
-1. **RESET YOUR TONE:** Do not just copy the tone of the previous text.
-2. **NO FLUFF:** Start the section with a hard fact or a direct opinion.
-3. **DEPTH:** Explain the *nuance*, not just the instruction.
+### ⛔️ STYLE GUARDRAILS (VISUAL RHYTHM CHECK)
+**Before you output, run this check on your own writing:**
+1.  **WALL OF TEXT CHECK:** Is there a paragraph longer than 3 lines? **SPLIT IT.**
+2.  **SCANNABILITY CHECK:** Did I use a bullet list for complex items? **DO IT.**
+3.  **BOLD CHECK:** Did I bold key numbers (**57%**, **$10k**)?
+4.  **VOICE CHECK:** Did I use "It is important to note"? **DELETE IT.**
 
 ### ⚡️ STRUCTURAL OVERRIDES (THE "SNIPPET" LAYER)
 **Check the Heading type:**
@@ -1019,35 +1011,13 @@ ${linkInstruction}
 - IF heading implies a comparison ("Vs", "Difference"):
   - **YOU MUST USE A MARKDOWN TABLE.**
 
-### ⛔️ EXECUTION CHECKLIST (READ THIS LAST)
-**Before generating, verify:**
-1. **VISUALS:** Did I insert a placeholder for complex concepts? (e.g. ![Chart: Description])
-2. **LINKS:** Are all anchor texts lowercase?
-3. **BOLDING:** Did I bold **one key stat**?
-4. **ASYMMETRY:** Am I mixing short and long sentences?
-
-### DEPTH & THOROUGHNESS REQUIREMENTS (CRITICAL)
-
-**DO NOT write thin, surface-level content.** Each section must be SUBSTANTIVE:
-
-- Don't just state facts - explain why they matter to the reader
-- Include actionable steps, examples, or implementation details
-- Compare, contrast, or provide background so readers fully understand
-- Anticipate what the reader might ask next and address it
+### AUTHORITY POSITIONING
+State facts confidently.
+*   ❌ THIN: "Using automation saves time."
+*   ✅ DEEP: "Automation cuts submission time from **40+ hours** to **2-3 hours**. Each manual submission requires filling **15-20 fields**. Automation handles this in the background, freeing up **37 hours** for product development."
 
 **START WRITING the body content for "${currentSection.heading}" NOW (Direct Markdown):**
-
-⚠️ **DO NOT include the section heading (e.g., "## ${currentSection.heading}") - the system adds it automatically. Start directly with the first paragraph of content.**
-
-### AUTHORITY POSITIONING
-**Authority Positioning:** State facts confidently based on research. For YOUR product, use "We built..." or "Our tool...". For competitors, use "According to reviews..." or "Users report...".
-
-**EXAMPLES:**
-❌ THIN: "Use automation to save time. It makes the process faster."
-✅ DEEP: "Automation cuts submission time from 40+ hours to 2-3 hours. Each manual submission requires filling 15-20 fields, waiting for page loads, and handling CAPTCHAs. Automation handles all of this in the background while you focus on building your product. The ROI is clear - those 37 saved hours could be spent on customer development or product iteration."
-
-❌ THIN: "Our tool helps with this."
-✅ DEEP: "We built our platform specifically to solve the directory submission problem. Other one-click tools spray your listing everywhere, we analyze each directory for relevance to your niche. This means you get higher-quality backlinks that actually improve your domain rating."
+⚠️ **DO NOT include the section heading. Start directly with the content.**
 `
 }
 
