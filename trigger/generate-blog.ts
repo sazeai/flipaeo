@@ -896,9 +896,6 @@ ${styleDNA}
    - Whenever possible, prioritize insights derived from our own tool/platform over external reports.
    - Use phrases like "Our platform handles this by..." or "We built [Brand Name] to solve this specific issue..."
 
-4. **VISUAL LOGIC:** - If you describe a complex concept (Knowledge Graph, Flowchart, Process), you MUST insert a visual placeholder tag on its own line:
-   - Format: \`> **[VISUAL REQUEST]:** [Describe the diagram needed here to explain the concept]\`
-
 ### 4. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google and be cited by modern ai search engine by being more specific, helpful, and "human" than the competition to answer the user's question.
 
