@@ -955,16 +955,22 @@ You MUST include an external hyperlink in this section.
     linkInstruction += `
 ### MANDATORY INTERNAL LINK REQUIREMENT
 You MUST include an internal link to our own content in this section.
-- **Target Page:** "${currentSection.internal_link.title}"
+- **Target Page Title:** "${currentSection.internal_link.title}"
 - **URL:** ${currentSection.internal_link.url}
-- **Context:** "${currentSection.internal_link.anchor_context}"
+- **Linking Context:** ${currentSection.internal_link.anchor_context}
 - **Format:** [anchor text](url) (Markdown)
 
-**ANCHOR TEXT RULES (CRITICAL):**
-1. **LOWERCASE ONLY:** The anchor text MUST be lowercase (e.g., "read our [guide on seo]") unless it is a proper noun (e.g., "FlipAEO").
-2. **NATURAL FLOW:** Do NOT say "Click here" or "Read this article." weave it into the sentence syntax.
-   - ❌ Bad: "You can learn more in our [AI SEO Guide]."
-   - ✅ Good: "This is why [ai seo strategies] are replacing traditional keyword stuffing."
+**ANCHOR TEXT RULES (CRITICAL - DO NOT FAIL):**
+1. **⛔️ PROHIBITED:** NEVER, EVER use the "Target Page Title" as the anchor text.
+2. **✅ REQUIREMENT:** You MUST write a brand new, natural phrase that fits the sentence structure.
+3. **LOWERCASE ONLY:** The anchor text must be lowercase (unless it's a proper noun).
+4. **FLOW IS KING:** The sentence must be grammatically correct even if the link was removed.
+
+**EXAMPLES:**
+❌ Bad (Using Title): "You should read (How Internal Linking Boosts SEO)[url]."
+❌ Bad (Click Here): "For more info on SEO, (click here)[url]."
+✅ GOOD (Contextual): "This is why (internal linking strategies)[url] are vital for growth."
+✅ GOOD (Contextual): "Most experts agree that (strategic link placement)[url] signals authority."
 `
   }
 
