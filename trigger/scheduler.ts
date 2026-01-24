@@ -434,3 +434,65 @@ export const seoHealthAutoRefresh = schedules.task({
         }
     }
 })
+
+/**
+ * Sitemap Sync Scheduler
+ * 
+ * Runs every 3 days at 3:00 AM UTC to keep internal link database fresh.
+ * Triggers the sync-internal-links task for all brands that have a sitemap configured.
+ */
+export const sitemapSyncScheduler = schedules.task({
+    id: "sitemap-sync-scheduler",
+    cron: "0 3 */3 * *", // At 03:00 on every 3rd day-of-month
+    run: async () => {
+        console.log("🗺️ Sitemap Scheduler: Starting batch sync...")
+
+        const supabase = createAdminClient() as any
+
+        // Fetch all brands with a sitemap
+        const { data: brands, error } = await supabase
+            .from("brands")
+            .select("id, user_id, sitemap")
+            .not("sitemap", "is", null)
+            .neq("sitemap", "")
+
+        if (error) {
+            console.error("❌ Sitemap Scheduler DB Error:", error)
+            return { result: "Failed to fetch brands", error: error.message }
+        }
+
+        if (!brands || brands.length === 0) {
+            console.log("😴 Sitemap Scheduler: No brands with sitemaps found.")
+            return { result: "No brands to sync", count: 0 }
+        }
+
+        console.log(`📋 Sitemap Scheduler: Found ${brands.length} brands to sync.`)
+
+        // Dynamic import to avoid circular deps
+        const { syncInternalLinks } = await import("./sync-links")
+
+        let triggeredCount = 0
+
+        for (const brand of brands) {
+            try {
+                await syncInternalLinks.trigger({
+                    userId: brand.user_id,
+                    brandId: brand.id,
+                    sitemapUrl: brand.sitemap
+                })
+                triggeredCount++
+                // Tiny delay just to be polite to the queueing system
+                await new Promise(r => setTimeout(r, 100))
+            } catch (err) {
+                console.error(`❌ Failed to trigger sync for brand ${brand.id}:`, err)
+            }
+        }
+
+        console.log(`✅ Sitemap Scheduler: Triggered ${triggeredCount} sync jobs.`)
+        return {
+            result: "Sitemap sync batch triggered",
+            triggeredCount,
+            totalBrands: brands.length
+        }
+    }
+})
