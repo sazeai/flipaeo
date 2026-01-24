@@ -968,9 +968,9 @@ You MUST include an internal link to our own content in this section.
 
 **EXAMPLES:**
 ❌ Bad (Using Title): "You should read (How Internal Linking Boosts SEO)[url]."
-❌ Bad (Click Here): "For more info on SEO, (click here)[url]."
-✅ GOOD (Contextual): "This is why (internal linking strategies)[url] are vital for growth."
-✅ GOOD (Contextual): "Most experts agree that (strategic link placement)[url] signals authority."
+❌ Bad (Click Here): "For more info on SEO, [click here](url)."
+✅ GOOD (Contextual): "This is why [internal linking strategies](url) are vital for growth."
+✅ GOOD (Contextual): "Most experts agree that [strategic link placement](url) signals authority."
 `
   }
 
