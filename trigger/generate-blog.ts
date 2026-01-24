@@ -679,15 +679,25 @@ I have provided a list of "Authority Links" from our research:
 ${JSON.stringify(authorityLinks)}
 
 **YOUR TASK:** 
-- Select exactly 1-2 of these links that add the most value (e.g., a statistic, a definition, official documentation).
-- Assign them to the MOST relevant sections using the "external_link" field.
+- Select **EXACTLY A TOTAL OF 2 LINKS** (if available) for the entire article.
+- Assign "external_link" to the 2 most relevant sections.
+- **Rule:** If the authority links list is empty or irrelevant, you may skip this. But if valid links exist, you MUST use 2.
 
 **EXTERNAL LINKING RULES:**
-1. Do NOT put all links in one section. Distribute them across different sections.
-2. Do NOT force a link if it doesn't fit naturally. 1-2 links total for the whole article is enough.
-3. The "anchor_context" must explain to the writer *why* to include this link (what fact or concept it verifies).
-4. Prefer links to statistics, definitions, or official docs over generic articles.
-5. If no authority links are suitable, leave the "external_link" field empty for all sections.
+1. Do not clump links. Spread them out.
+2. The "anchor_context" is critical—it tells the writer *why* to cite this.
+3. Prefer citations for Specific Data/Stats or Definitions.
+
+## INTERNAL LINKING STRATEGY (DISTRIBUTOR MODEL)
+
+I have provided a list of "Internal Links" from our site:
+${internalLinks.length > 0 ? internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n') : "No internal links available."}
+
+**YOUR TASK:**
+- Review the pool and select **MAXIMUM 3 LINKS** that are highly relevant.
+- Assign them to the most appropriate sections using the "internal_link" field.
+- **Rule:** If the pool is empty or nothing fits, SKIP it. Do not force it.
+- **Rule:** Distribute them. Never more than 1 internal link per section.
 
 ---
 
@@ -740,6 +750,7 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
       "instruction_note": string, 
       "keywords_to_include": string[],
       "external_link": { "url": string, "anchor_context": string }, // OPTIONAL
+      "internal_link": { "url": string, "title": string, "anchor_context": string }, // OPTIONAL
       "needs_image": boolean, // true if this section should have an in-content image
       "image_type": "concept" | "how_to" | "comparison" | "process" | "insight" // REQUIRED if needs_image is true
     }
@@ -756,7 +767,7 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 }
 
 
-const generateWritingSystemPrompt = (styleDNA: string, outline: any, currentSectionIndex: number, brandDetails: any = null, internalLinks: any[] = [], articleType: string = 'informational') => {
+const generateWritingSystemPrompt = (styleDNA: string, outline: any, currentSectionIndex: number, brandDetails: any = null, articleType: string = 'informational') => {
   // styleDNA is now a paragraph describing the writing style
 
   // --- GLOBAL ARTICLE MAP (THE MAP) ---
@@ -867,22 +878,7 @@ ${styleDNA}
 ### 3. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google and be cited by modern ai search engine by being more specific, helpful, and "human" than the competition to answer the user's question.
 
-${internalLinks.length > 0 ? `
-### 4. INTERNAL LINKING RULES (CRITICAL)
-You have access to the following internal links from our site:
-${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}
 
-**YOUR TASK:**
-Scan the "Story So Far" context. Has the link "${internalLinks[0]?.url}" already been used?
-- **IF YES:** DO NOT use it again.
-- **IF NO:** Insert it naturally.
-
-**ANCHOR TEXT RULES:**
-1. **LOWERCASE ONLY:** The anchor text must be lowercase to flow with the sentence (unless it's a proper noun).
-   - ❌ Bad: "...read our guide on [The Best AI Tools]."
-   - ✅ Good: "...read our guide on [the best AI tools]."
-2. **NO REPETITION:** Never link the same URL twice in the whole article.
-` : ''}
 
 ### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
 ${introStrategy}
@@ -907,24 +903,41 @@ Return **Markdown** formatted text.
 const generateWritingUserPrompt = (previousFullText: string, currentSection: any) => {
   // Build the Link Instruction Block if section has an assigned external link
   let linkInstruction = ""
+
+  // 1. External Link (Citation)
   if (currentSection.external_link) {
-    linkInstruction = `
-### MANDATORY CITATION REQUIREMENT
+    linkInstruction += `
+### MANDATORY CITATION REQUIREMENT (EXTERNAL)
 You MUST include an external hyperlink in this section.
 - **URL:** ${currentSection.external_link.url}
 - **Context:** Used to verify "${currentSection.external_link.anchor_context}"
-- **Format:** Use markdown link syntax: [anchor text](url)
-- **STRICT ANCHOR RULES:**
-  1. **NOUNS ONLY:** Link the *Entity* (e.g., "Gartner"), the *Report Name* (e.g., "2026 SEO Study"), or the *Data* (e.g., "50% drop").
-  2. **NO VERBS:** NEVER link words like "predicts," "says," "found," or "shows."
-  3. **NATURAL FLOW:** The link must not interrupt the reading flow.
+- **Format:** [anchor text](url) (Markdown)
+- **Rule:** Link a Noun/Entity/Stat. Do NOT link a verb.
+- **Rule:** Make sure its a part of running paragraph, not forced.
+**ANCHOR TEXT RULES:**
+1. **LOWERCASE ONLY:** The anchor text must be lowercase to flow with the sentence (unless it's a proper noun).
+   - ❌ Bad: "...read our guide on [The Best AI Tools]."
+   - ✅ Good: "...read our guide on [the best AI tools]."
+`
+  }
+
+  // 2. Internal Link (Cross-Reference)
+  if (currentSection.internal_link) {
+    linkInstruction += `
+### MANDATORY INTERNAL LINK REQUIREMENT
+You MUST include an internal link to our own content in this section.
+- **Target Page:** "${currentSection.internal_link.title}"
+- **URL:** ${currentSection.internal_link.url}
+- **Context:** "${currentSection.internal_link.anchor_context}"
+- **Format:** [anchor text](url) (Markdown)
+- **Rule:** Integrate it naturally. e.g., "For more on X, read our guide on [Guide Name]." OR Link the relevant keyword directly.
 `
   }
 
   return `
-### BEFORE YOU WRITE - CHECK THE CONTEXT
+### BEFORE YOU WRITE - CHECK THE CONTEXT to insure smooth flow of article.
 
-### THE STORY SO FAR (CONTEXT SNOWBALL)
+### CONTEXT SNOWBALL
 Read this to ensure continuity and **AVOID REPETITION**.
 Do NOT define concepts that are already defined here.
 Do NOT repeat the same "transition phrases" used here.
@@ -953,12 +966,10 @@ ${currentSection.instruction_note}
 **KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
 ${linkInstruction}
 
-### ⛔️ CRITICAL STYLE OVERRIDE (READ THIS LAST)
-**The draft above serves as *context only*. Do NOT mimic its "safe" tone if it sounds robotic.**
 
 ### ⛔️ STYLE GUARDRAILS (DO NOT FAIL)
 1. **RESET YOUR TONE:** Do not just copy the tone of the previous text. Re-read the "Style DNA" and "Golden Rules" in the system prompt.
-2. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Do NOT use an intro sentence like "Now let's talk about [Heading]."
+2. **NO FLUFF:** Start the section with a hard fact or a direct opinion. Each section must start with a direct natural answer to the outline heading.Do NOT use an intro sentence like "Now let's talk about [Heading]."
 3. **DEPTH:** If you are explaining a step, explain the *nuance*, not just the instruction. (e.g., "Don't just click save; check the log first because...")
 4. **TRANSITION:** dont use words like "Furthermore" or "In addition" in the text above, **do NOT use them again.** Find a logical way to transition (e.g., "The bigger issue is...", "This fails because...").
 
@@ -1203,7 +1214,7 @@ export const generateBlogPost = task({
       // 4.1 Write Intro (The Hook) - Separately
       // Only write intro if not resuming (startIndex === 0)
       if (startIndex === 0 && outline.intro) {
-        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, -1, brandDetails, internalLinks, articleType)
+        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, -1, brandDetails, articleType)
         const introTemplate = getIntroTemplate(articleType)
         const userPrompt = generateWritingUserPrompt(currentDraft, {
           heading: "Introduction / Hook (COLD OPEN)",
@@ -1259,7 +1270,7 @@ CRITICAL EXECUTION RULES:
           .update({ current_step_index: i + 1, status: "writing" })
           .eq("id", articleId)
 
-        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, i, brandDetails, internalLinks, articleType)
+        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, i, brandDetails, articleType)
         // THE BRIDGE: Only pass last 2000 chars to prevent "Echo Chamber" repetition
         const userPrompt = generateWritingUserPrompt(currentDraft.slice(-2000), section)
 
