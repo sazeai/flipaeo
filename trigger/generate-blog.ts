@@ -97,6 +97,12 @@ const AUTHENTIC_WRITING_RULES = `
   - **Adjectives:** Seamless, Robust, Cutting-edge, Game-changing, Revolutionary, Vital, Crucial, Unparalleled, Tapestry, Realm, Literal/Literally.
 - **BANNED STARTERS (NO FLUFF):** - Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
   - **Rule:** Never start a section with "In this section, we will..." Start immediately with the core insight.
+- **BANNED TRANSITIONS (THE "AI TIC" LIST):**
+  - **Stop asking:** "The bigger issue?", "The catch?", "So, what's the fix?"
+  - **Stop saying:** "It's not just X, it's Y." (Unless you have a specific data point).
+  - **Rule:** Make the statement directly. 
+    - *Bad:* "The bigger issue? It's about visibility."
+    - *Good:* "Crucially, this is a visibility problem."
 - **CORPORATE METAPHOR BAN:**
   - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that screams when the server drops."
   - **Rule:** Use visceral, specific, or slightly "gritty" analogies.
@@ -693,9 +699,12 @@ ${JSON.stringify(authorityLinks)}
 3. **Structure:** Create a logical flow FOLLOWING the TYPE-SPECIFIC STRATEGY above.
    - **MANDATORY:** You MUST create specific sections that address the "missing_topics" identified in the Competitor Data.
    - **USER INTENT:** Ensure the structure answers the specific questions users are asking.
-4. **Instruction Notes:** 
-   - For EACH section, write a "Content Focus" note.
-   - **Tell the writer WHAT data points, facts, or specific "Gap" concepts to cover.**
+4. **Instruction Notes (THE DATA DISTRIBUTION RULE):**
+   - You have a "Fact Sheet" in the input. You must DISTRIBUTE these facts into the most relevant sections.
+   - **Constraint:** Do not be vague. Do not say "Include data."
+   - **Requirement:** You must COPY the specific number/stat from the Fact Sheet into the instruction_note.
+   - *Example:* "Explain the traffic drop. CITE DATA: 'Gartner predicts 50% drop by 2028' (from Fact Sheet)."
+   - **Rule:** Do not reuse the same fact in multiple sections. Assign it to the ONE best spot.
    - **DO NOT** write style instructions. Only focus on the **Substance**.
 
 ## IN-CONTENT IMAGE SELECTION (IMPORTANT):
@@ -747,8 +756,28 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 }
 
 
-const generateWritingSystemPrompt = (styleDNA: string, factSheet: any, brandDetails: any = null, internalLinks: any[] = [], articleType: string = 'informational') => {
+const generateWritingSystemPrompt = (styleDNA: string, outline: any, currentSectionIndex: number, brandDetails: any = null, internalLinks: any[] = [], articleType: string = 'informational') => {
   // styleDNA is now a paragraph describing the writing style
+
+  // --- GLOBAL ARTICLE MAP (THE MAP) ---
+  const completedSectionsList = currentSectionIndex < 0 ? [] : outline.sections.slice(0, currentSectionIndex)
+  const upcomingSectionsList = currentSectionIndex < 0 ? outline.sections : outline.sections.slice(currentSectionIndex + 1)
+
+  const completedSections = completedSectionsList.map((s: any) => `- [COMPLETED] ${s.heading}`).join('\n')
+  const upcomingSections = upcomingSectionsList.map((s: any) => `- [UPCOMING] ${s.heading}`).join('\n')
+
+  const globalMap = `
+### 0. GLOBAL ARTICLE MAP (YOUR GPS)
+You are writing ONE specific section in a larger article.
+DO NOT repeat what is already done. DO NOT steal thunder from what is coming.
+
+**PREVIOUSLY COVERED (Do not repeat):**
+${completedSections || "(This is the first section)"}
+
+**COMING NEXT (Do not cover these topics):**
+${upcomingSections || "(This is the last section)"}
+`
+
   // Build brand context section with contextual guidelines
   let brandContextSection = ""
   if (brandDetails) {
@@ -826,29 +855,33 @@ ${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
   return `
 You are an expert Blog Writer. You are NOT an AI assistant. You are a Subject Matter Expert (SME). ${getCurrentDateContext()}
 
-### 1. THE LAW (NON-NEGOTIABLE RULES)
-**If you violate these formatting constraints, the article fails.**
+${globalMap}
+
+### 1. THE LAW (NON-NEGOTIABLE WRITING RULES)
+**If you violate these formatting constraints, the article fails. because we are writing article for a brand to be cited by modern ai search engine. aand they hate any rootic fluff, based on research we have buitl these rules which are to be followed.**
 ${AUTHENTIC_WRITING_RULES}
 
 ### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
 ${styleDNA}
 
 ### 3. STRATEGY & MINDSET
-- **Goal:** Rank #1 on Google by being more specific, helpful, and "human" than the competition to answer the user's question.
-
-### 4. THE GOLDEN RULES (ANTI-ROBOT PROTOCOLS)
-${AUTHENTIC_WRITING_RULES}
+- **Goal:** Rank #1 on Google and be cited by modern ai search engine by being more specific, helpful, and "human" than the competition to answer the user's question.
 
 ${internalLinks.length > 0 ? `
-### 5. INTERNAL LINKING RULES (CRITICAL)
+### 4. INTERNAL LINKING RULES (CRITICAL)
 You have access to the following internal links from our site:
 ${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}
 
 **YOUR TASK:**
-Select and insert **exactly 1-2** of these internal links naturally into the article draft.
-- Use descriptive, SEO-friendly anchor text.
-- Do NOT use generic text like "click here".
-- Embed them where they add genuine value to the reader.
+Scan the "Story So Far" context. Has the link "${internalLinks[0]?.url}" already been used?
+- **IF YES:** DO NOT use it again.
+- **IF NO:** Insert it naturally.
+
+**ANCHOR TEXT RULES:**
+1. **LOWERCASE ONLY:** The anchor text must be lowercase to flow with the sentence (unless it's a proper noun).
+   - ❌ Bad: "...read our guide on [The Best AI Tools]."
+   - ✅ Good: "...read our guide on [the best AI tools]."
+2. **NO REPETITION:** Never link the same URL twice in the whole article.
 ` : ''}
 
 ### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
@@ -856,15 +889,12 @@ ${introStrategy}
 ${brandContextSection}
 
 ### 6. DATA & EVIDENCE STRATEGY (CRITICAL)
-we have aalyzed the web for fresh data for this article, i am giving you the fact-sheet below. 
-**MANDATORY RULE:** If a fact below is relevant to this section you are writing, you MUST use those facts in best possible way to make the section ready to answer.
+**MANDATORY RULE:** You must use the data provided in the "CONTENT REQUIREMENTS" section of the User Prompt.
 - Use a **Markdown Table** if comparing features.
 - Use a **Bullet List** if listing specs.
 - **Bold** any specific numbers or percentages.
 - **Do NOT bury** numbers in the middle of long paragraphs. Make them "scannable."
 - If comparing [Competitor] vs [Brand], ALWAYS use a "Comparison Table".
-
-${JSON.stringify(factSheet)}
 
 ### 6. OUTPUT FORMAT
 Return **Markdown** formatted text. 
@@ -884,10 +914,10 @@ You MUST include an external hyperlink in this section.
 - **URL:** ${currentSection.external_link.url}
 - **Context:** Used to verify "${currentSection.external_link.anchor_context}"
 - **Format:** Use markdown link syntax: [anchor text](url)
-- **CONSTRAINT:** The anchor text MUST be natural conversation part of a running sentence, NOT a forceful spammy keyword.
-   - ❌ BAD: "Check out our [best ai photo restoration tool]."
-   - ✅ GOOD: "We designed [our restoration engine] to handle this specific texture."
-   - ✅ GOOD: "According to [this 2026 study], pixel degradation..."
+- **STRICT ANCHOR RULES:**
+  1. **NOUNS ONLY:** Link the *Entity* (e.g., "Gartner"), the *Report Name* (e.g., "2026 SEO Study"), or the *Data* (e.g., "50% drop").
+  2. **NO VERBS:** NEVER link words like "predicts," "says," "found," or "shows."
+  3. **NATURAL FLOW:** The link must not interrupt the reading flow.
 `
   }
 
@@ -1173,7 +1203,7 @@ export const generateBlogPost = task({
       // 4.1 Write Intro (The Hook) - Separately
       // Only write intro if not resuming (startIndex === 0)
       if (startIndex === 0 && outline.intro) {
-        const systemPrompt = generateWritingSystemPrompt(styleDNA, factSheet, brandDetails, internalLinks, articleType)
+        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, -1, brandDetails, internalLinks, articleType)
         const introTemplate = getIntroTemplate(articleType)
         const userPrompt = generateWritingUserPrompt(currentDraft, {
           heading: "Introduction / Hook (COLD OPEN)",
@@ -1229,17 +1259,16 @@ CRITICAL EXECUTION RULES:
           .update({ current_step_index: i + 1, status: "writing" })
           .eq("id", articleId)
 
-        const systemPrompt = generateWritingSystemPrompt(styleDNA, factSheet, brandDetails, internalLinks, articleType)
-        const userPrompt = generateWritingUserPrompt(currentDraft.slice(-3000), section) // Passing last 3000 chars for context to save tokens, or full draft if feasible. Blueprint says "Entire Draft", but context limits apply. Gemini 2.0 Flash has 1M context, so full draft is fine.
-        // Actually, let's pass full draft if it's 1M context.
-        const userPromptFull = generateWritingUserPrompt(currentDraft, section)
+        const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, i, brandDetails, internalLinks, articleType)
+        // THE BRIDGE: Only pass last 2000 chars to prevent "Echo Chamber" repetition
+        const userPrompt = generateWritingUserPrompt(currentDraft.slice(-2000), section)
 
         // Using Gemini 2.0 Flash for Speed & Context
         const writeConfig = {}
         const writeContents = [
           {
             role: "user",
-            parts: [{ text: systemPrompt + "\n" + userPromptFull }],
+            parts: [{ text: systemPrompt + "\n" + userPrompt }],
           },
         ]
 
