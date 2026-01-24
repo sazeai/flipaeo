@@ -884,13 +884,19 @@ ${styleDNA}
 ${introStrategy}
 ${brandContextSection}
 
-### 6. DATA & EVIDENCE STRATEGY (CRITICAL)
-**MANDATORY RULE:** You must use the data provided in the "CONTENT REQUIREMENTS" section of the User Prompt.
-- Use a **Markdown Table** if comparing features.
-- Use a **Bullet List** if listing specs.
-- **Bold** any specific numbers or percentages.
-- **Do NOT bury** numbers in the middle of long paragraphs. Make them "scannable."
-- If comparing [Competitor] vs [Brand], ALWAYS use a "Comparison Table".
+### 6. THE "STRUCTURED EVIDENCE" LAYER (CITATION OPTIMIZATION)
+*Why it works: LLMs excel at reading structured data. Content with tables is cited 30% more often.*
+
+**FORMATTING RULES:**
+1. **TABLES (HIGHEST PRIORITY):** 
+   - ANY comparison, pricing, feature set, or Pros/Cons MUST be a Markdown Table. 
+   - Do NOT write paragraphs for side-by-side data.
+2. **BULLETED LISTS:** 
+   - Use for specs, requirements, or steps.
+   - Never write a list as a comma-separated sentence.
+3. **BOLDED ENTITIES:** 
+   - **Bold** the specific entity or number (e.g., "**$29/mo**", "**Next.js**").
+   - This acts as an anchor for AI parsers.
 
 ### 6. OUTPUT FORMAT
 Return **Markdown** formatted text. 
