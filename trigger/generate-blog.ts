@@ -95,6 +95,7 @@ const AUTHENTIC_WRITING_RULES = `
 - **VOCABULARY BLACKLIST:** These are the words that sounds ai written when you use them every start of a paragraph, we have to get rid of them and use natural talk. 
   - **Verbs:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster, Delve, Dive.
   - **Adjectives:** Seamless, Robust, Cutting-edge, Game-changing, Revolutionary, Vital, Crucial, Unparalleled, Tapestry, Realm, Literal/Literally.
+- **Correction Protocol:** If you need these meanings, use simple, punchy words. (e.g., instead of "utilize", use "use"; instead of "facilitate", use "help").
 - **BANNED STARTERS (NO FLUFF):** Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
   - **Rule:** Never start a section with "In this section, we will..." Start immediately with the core insight.
 - **LOW PRIORITY TRANSITIONS (THE "AI TIC" LIST):** if you use them again and again... it sounds forcefull and spammy.. use only when you think this makes sense and will improve redability.
@@ -126,7 +127,12 @@ const AUTHENTIC_WRITING_RULES = `
 
 ### 6. RHYTHM & VOICE (THE HUMAN PULSE)
 *These rules break the "robotic" cadence of AI generation.*
-
+- **SENTENCE VARIANCE (THE MIX):**
+  - **Constraint:** Do not write three sentences of the same length in a row.
+  - **The Pattern:** Mix "Staccato" (3-5 words) with "Flow" (15+ words).
+  - *Example:* "It failed. (Staccato) We spent weeks optimizing the database, only to realize the latency was actually coming from the DNS lookup. (Flow)"
+- **NON-STANDARD SYNTAX:** Start sentences with "And," "But," or "Because."
+- **NATURAL DIGRESSIONS:** Include brief asides in parentheses. "(This implies you have access to the API key, which isn't always given.)"
 - **BURSTINESS (SENTENCE VARIANCE):**
   - **Constraint:** You generally write long sentences. Stop it.
   - **The Mix:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7-10 words).
