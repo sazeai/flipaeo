@@ -204,7 +204,14 @@ export default function Editor({ data, markdown, onChange, readOnly, holderId = 
   // Helper to parse inline markdown (bold, italic) to HTML tags
   const parseInline = (text: string): string => {
     // marked.parseInline returns a string with HTML tags
-    return marked.parseInline(text) as string
+    let html = marked.parseInline(text) as string
+
+    // Convert strong -> b, em -> i for better EditorJS compatibility
+    html = html
+      .replace(/<strong\b[^>]*>([\s\S]*?)<\/strong>/gi, '<b>$1</b>')
+      .replace(/<em\b[^>]*>([\s\S]*?)<\/em>/gi, '<i>$1</i>')
+
+    return html
   }
 
   // Helper for list items (recursive for nested lists if we were building that structure manually)

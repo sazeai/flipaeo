@@ -85,18 +85,36 @@ function convertHtmlToMarkdown(html: string): string {
     if (!html) return ""
 
     return html
-        // Replace bold tags
-        .replace(/<b>(.*?)<\/b>/g, '**$1**')
-        .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
-        // Replace italic tags
-        .replace(/<i>(.*?)<\/i>/g, '_$1_')
-        .replace(/<em>(.*?)<\/em>/g, '_$1_')
-        // Replace links
-        .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/g, '[$2]($1)')
+        // Replace bold tags (b, strong) with attribute support and multiline support
+        .replace(/<b\b[^>]*>([\s\S]*?)<\/b>/gi, '**$1**')
+        .replace(/<strong\b[^>]*>([\s\S]*?)<\/strong>/gi, '**$1**')
+
+        // Replace italic tags (i, em)
+        .replace(/<i\b[^>]*>([\s\S]*?)<\/i>/gi, '_$1_')
+        .replace(/<em\b[^>]*>([\s\S]*?)<\/em>/gi, '_$1_')
+
+        // Replace underline (u) - keep as HTML or markdown if you prefer (MD doesn't support underline standardly)
+        // keeping as HTML for now, but handling attributes
+        .replace(/<u\b[^>]*>([\s\S]*?)<\/u>/gi, '<u>$1</u>')
+
+        // Replace strikethrough (s, strike, del) -> ~~text~~
+        .replace(/<s\b[^>]*>([\s\S]*?)<\/s>/gi, '~~$1~~')
+        .replace(/<strike\b[^>]*>([\s\S]*?)<\/strike>/gi, '~~$1~~')
+        .replace(/<del\b[^>]*>([\s\S]*?)<\/del>/gi, '~~$1~~')
+
+        // Replace inline code (code) -> `text`
+        .replace(/<code\b[^>]*>([\s\S]*?)<\/code>/gi, '`$1`')
+
+        // Replace mark -> <mark>text</mark> (preserve HTML but handle attrs)
+        .replace(/<mark\b[^>]*>([\s\S]*?)<\/mark>/gi, '<mark>$1</mark>')
+
+        // Replace links - make sure to capture href even if other attributes exist
+        // Note: This regex tries to find href anywhere in the tag
+        .replace(/<a\s+(?:[^>]*?\s+)?href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)')
+
         // Replace line breaks
-        .replace(/<br\s*\/?>/g, '\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+
         // Replace encoded spaces
-        .replace(/&nbsp;/g, ' ')
-    // Remove other HTML tags but keep content
-    // .replace(/<[^>]*>/g, '') // Optional: might be too aggressive if we want to preserve some other tags
+        .replace(/&nbsp;/gi, ' ')
 }

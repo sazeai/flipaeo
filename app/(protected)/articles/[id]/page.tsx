@@ -489,56 +489,57 @@ export default function ArticleDetailPage() {
                             </div>
                         </div>
 
-                        {/* Readability Score */}
-                        <div className="bg-gray-50 p-3 rounded-lg border">
-                            <div className="flex items-center justify-between mb-2">
-                                <p className="text-xs text-gray-500">Readability Score</p>
-                                <Badge
-                                    variant="outline"
-                                    className={`text-xs ${stats.readabilityScore >= 50 ? 'bg-green-50 text-green-700 border-green-200' :
-                                        stats.readabilityScore >= 30 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                            'bg-red-50 text-red-700 border-red-200'
-                                        }`}
-                                >
-                                    {stats.readabilityLabel}
-                                </Badge>
-                            </div>
-                            <div className="flex items-end gap-2">
-                                <span className="text-2xl font-bold text-gray-900">{stats.readabilityScore}</span>
-                                <span className="text-xs text-gray-400 mb-1">/ 100</span>
-                            </div>
-                            <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full transition-all ${stats.readabilityScore >= 50 ? 'bg-green-500' :
-                                        stats.readabilityScore >= 30 ? 'bg-yellow-500' :
-                                            'bg-red-500'
-                                        }`}
-                                    style={{ width: `${stats.readabilityScore}%` }}
-                                />
-                            </div>
-                        </div>
+                        {/* <div className="bg-gray-50 p-3 rounded-lg border">
+        <div className="flex items-center justify-between mb-2">
+            <p className="text-xs text-gray-500">Readability Score</p>
+            <Badge
+                variant="outline"
+                className={`text-xs ${stats.readabilityScore >= 50 ? 'bg-green-50 text-green-700 border-green-200' :
+                    stats.readabilityScore >= 30 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                        'bg-red-50 text-red-700 border-red-200'
+                    }`}
+            >
+                {stats.readabilityLabel}
+            </Badge>
+        </div>
+        <div className="flex items-end gap-2">
+            <span className="text-2xl font-bold text-gray-900">{stats.readabilityScore}</span>
+            <span className="text-xs text-gray-400 mb-1">/ 100</span>
+        </div>
+        <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div
+                className={`h-full rounded-full transition-all ${stats.readabilityScore >= 50 ? 'bg-green-500' :
+                    stats.readabilityScore >= 30 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                    }`}
+                style={{ width: `${stats.readabilityScore}%` }}
+            />
+        </div>
+    </div>
 
-                        {/* Keyword Density */}
-                        <div className="bg-gray-50 p-3 rounded-lg border">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs text-gray-500">Keyword Density</p>
-                                <Badge
-                                    variant="outline"
-                                    className={`text-xs ${stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'bg-green-50 text-green-700 border-green-200' :
-                                        stats.keywordDensity > 0 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                            'bg-gray-100 text-gray-500 border-gray-200'
-                                        }`}
-                                >
-                                    {stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'Optimal' :
-                                        stats.keywordDensity > 2.5 ? 'High' :
-                                            stats.keywordDensity > 0 ? 'Low' : 'N/A'}
-                                </Badge>
-                            </div>
-                            <div className="flex items-end gap-1 mt-1">
-                                <span className="text-xl font-bold text-gray-900">{stats.keywordDensity}%</span>
-                                <span className="text-xs text-gray-400 mb-0.5">of content</span>
-                            </div>
-                        </div>
+    <div className="bg-gray-50 p-3 rounded-lg border">
+        <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-500">Keyword Density</p>
+            <Badge
+                variant="outline"
+                className={`text-xs ${stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'bg-green-50 text-green-700 border-green-200' :
+                    stats.keywordDensity > 0 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                        'bg-gray-100 text-gray-500 border-gray-200'
+                    }`}
+            >
+                {stats.keywordDensity >= 1 && stats.keywordDensity <= 2.5 ? 'Optimal' :
+                    stats.keywordDensity > 2.5 ? 'High' :
+                        stats.keywordDensity > 0 ? 'Low' : 'N/A'}
+            </Badge>
+        </div>
+        <div className="flex items-end gap-1 mt-1">
+            <span className="text-xl font-bold text-gray-900">{stats.keywordDensity}%</span>
+            <span className="text-xs text-gray-400 mb-0.5">of content</span>
+        </div>
+    </div> 
+*/}
+
+
                     </div>
 
                     <Separator />
