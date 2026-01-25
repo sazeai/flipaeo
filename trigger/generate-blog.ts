@@ -92,19 +92,19 @@ const AUTHENTIC_WRITING_RULES = `
 ### 1. CRITICAL: NEGATIVE CONSTRAINTS (THE "ANTI-AI" FILTER)
 *Violation of these rules results in immediate failure.*
 
-- **VOCABULARY BLACKLIST:**
+- **VOCABULARY BLACKLIST:** These are the words that sounds ai written when you use them every start of a paragraph, we have to get rid of them and use natural talk. 
   - **Verbs:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster, Delve, Dive.
   - **Adjectives:** Seamless, Robust, Cutting-edge, Game-changing, Revolutionary, Vital, Crucial, Unparalleled, Tapestry, Realm, Literal/Literally.
-- **BANNED STARTERS (NO FLUFF):** - Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
+- **BANNED STARTERS (NO FLUFF):** Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
   - **Rule:** Never start a section with "In this section, we will..." Start immediately with the core insight.
-- **BANNED TRANSITIONS (THE "AI TIC" LIST):**
-  - **Stop asking:** "The bigger issue?", "The catch?", "So, what's the fix?"
+- **LOW PRIORITY TRANSITIONS (THE "AI TIC" LIST):** if you use them again and again... it sounds forcefull and spammy.. use only when you think this makes sense and will improve redability.
+  - **Stop asking again and again:** "The bigger issue?", "The catch?", "So, what's the fix?" 
   - **Stop saying:** "It's not just X, it's Y." (Unless you have a specific data point).
   - **Rule:** Make the statement directly. 
     - *Bad:* "The bigger issue? It's about visibility."
-    - *Good:* "Crucially, this is a visibility problem."
+    - *Good:* "Crucially, this is a visibility problem." (use single standalone sentence for this)
 - **CORPORATE METAPHOR BAN:**
-  - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that screams when the server drops."
+  - **Replace:** "It's like a digital butler." -> **Use:** "It's a 24/7 ping-machine that emails when the server drops."
   - **Rule:** Use visceral, specific, or slightly "gritty" analogies.
 
 ### 2. STRUCTURAL ARCHITECTURE (VISUAL PHYSICS)
@@ -139,8 +139,6 @@ const AUTHENTIC_WRITING_RULES = `
 
 - **ENTITY DENSITY:** Prioritize specific Named Entities over general nouns.
 - *Bad:* "Use a fast Javascript framework." -> *Good:* "Use **Next.js 14** or **Astro**."
-- **THE "UNIQUE DATA" INJECTION:** Every section must cite a specific number, benchmark, or law. If proprietary data isn't available.
-- **QUANTIFY EVERYTHING:** Use numbers that aren't round. "Saves 14 hours a month" is better than "saves time."
 - **DEFINITION OWNERSHIP:** When defining a term, use this syntax: *"[Term] is [Definition] that helps [Audience] achieve [Outcome]."*
 - **ADMIT LIMITATIONS (THE "HARD TRUTH"):** Every SaaS/Strategy has a catch. Mention it.
 - *Example:* "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." (This builds massive E-E-A-T).
@@ -1034,12 +1032,26 @@ ${currentSection.instruction_note}
 ${linkInstruction}
 
 ### ⛔️ STYLE GUARDRAILS (VISUAL RHYTHM CHECK)
-**Before you output, run this check on your own writing:**
-1.  **WALL OF TEXT CHECK:** Is there a paragraph longer than 3 lines? **SPLIT IT.**
-2.  **SCANNABILITY CHECK:** Did I use a bullet list for complex items? **DO IT.**
-3.  **BOLD CHECK:** Did I bold key numbers (**57%**, **$10k**)? (EXCEPTION: Do NOT bold if it is inside a Link).
+### CORE DIRECTIVES
+1.  **Kill the "Wall of Text":** Never output more than 3 paragraphs in a row without a visual break (sub-header, bullet list, quote, or table).
+2.  **The "Heartbeat" Rhythm:** content must mimic human speech patterns.
+    * Mix short, punchy sentences (3-7 words) with longer, descriptive sentences.
+    * Vary paragraph length. Some paragraphs should be deep dives (4-5 lines); others should be single-line "punch" paragraphs for emphasis.
+3.  **Data Visualization:**
+    * IF the input contains comparison data, budget splits, or technical specs -> YOU MUST convert this into a Markdown Table. Do not write it out in sentences.
+    * IF the input contains a series of steps or features -> Convert to a bulleted or numbered list.
 
-4.  **VOICE CHECK:** Did I use "It is important to note"? **DELETE IT.**
+### FORMATTING TOOLKIT
+Use these elements aggressively to break up the text:
+* **Bold (**text**):** Use for key concepts or "bottom line" statements. Do not bold entire sentences; bold the *keywords*.
+* **Blockquotes (>):** Use for the single most important takeaway, a surprising statistic, or a "Rule of Thumb."
+* **Lists:** Use bullet points for features/benefits. Use numbered lists for steps/processes.
+* **Tables:** Use for "If this, then that" logic or numerical data.
+* 
+* ### NEGATIVE CONSTRAINTS (WHAT TO AVOID)
+* **No Symmetry:** Do not write 5 paragraphs of exactly the same length.
+* **No Fluff:** Do not use generic AI transitions like "In conclusion," "Moreover," "In the dynamic landscape of..." Start sentences directly with the subject or verb.
+* **No Passive Voice:** Use active verbs. (e.g., "The data shows X," not "It is shown by the data that X").
 
 ### ⚡️ STRUCTURAL OVERRIDES (THE "SNIPPET" LAYER)
 **Check the Heading type:**
@@ -1050,12 +1062,12 @@ ${linkInstruction}
   - **YOU MUST USE A MARKDOWN TABLE.**
 
 ### AUTHORITY POSITIONING
-State facts confidently.
+State facts confidently from the provided instructions notes for wiritng the section.
 *   ❌ THIN: "Using automation saves time."
 *   ✅ DEEP: "Automation cuts submission time from **40+ hours** to **2-3 hours**. Each manual submission requires filling **15-20 fields**. Automation handles this in the background, freeing up **37 hours** for product development."
 
 **START WRITING the body content for "${currentSection.heading}" NOW (Direct Markdown):**
-⚠️ **DO NOT include the section heading. Start directly with the content.**
+⚠️ **DO NOT include the section heading, system already adds it. Start directly with the content.**
 `
 }
 
