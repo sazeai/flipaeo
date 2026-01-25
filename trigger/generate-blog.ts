@@ -92,16 +92,16 @@ const AUTHENTIC_WRITING_RULES = `
 ### 1. CRITICAL: NEGATIVE CONSTRAINTS (THE "ANTI-AI" FILTER)
 *Violation of these rules results in immediate failure.*
 
-- **VOCABULARY BLACKLIST:** These are the words that sounds ai written when you use them every start of a paragraph, we have to get rid of them and use natural talk. 
+- **VOCABULARY BLACKLIST:** These are the words that sounds ai fluff when you use them every start of a paragraph. we have to get rid of them and use natural talk. 
   - **Verbs:** Unleash, Unlock, Elevate, Harness, Empower, Revolutionize, Navigate, Foster, Delve, Dive.
   - **Adjectives:** Seamless, Robust, Cutting-edge, Game-changing, Revolutionary, Vital, Crucial, Unparalleled, Tapestry, Realm, Literal/Literally.
-- **Correction Protocol:** If you need these meanings, use simple, punchy words. (e.g., instead of "utilize", use "use"; instead of "facilitate", use "help").
+- **Correction Protocol:** If you need these words, use simple, punchy words. (e.g., instead of "utilize", use "use"; instead of "facilitate", use "help").
 - **BANNED STARTERS (NO FLUFF):** Never start with: "In today's digital landscape", "Let's dive in", "Let's explore", "Let's be honest", "Imagine a world where", "In this comprehensive guide", "It is worth noting."
   - **Rule:** Never start a section with "In this section, we will..." Start immediately with the core insight.
-- **LOW PRIORITY TRANSITIONS (THE "AI TIC" LIST):** if you use them again and again... it sounds forcefull and spammy.. use only when you think this makes sense and will improve redability.
-  - **Stop asking again and again:** "The bigger issue?", "The catch?", "So, what's the fix?" 
-  - **Stop saying:** "It's not just X, it's Y." (Unless you have a specific data point).
-  - **Rule:** Make the statement directly. 
+- **LOW PRIORITY TRANSITIONS (THE "AI TIC" LIST):** if you use them again and again... it sounds spammy.. use only when you think this makes sense and will improve redability.
+  - "The bigger issue?", "The catch?", "So, what's the fix?" 
+  - "It's not just X, it's Y." (Unless you have a specific data point).
+  - Make the statement directly. 
     - *Bad:* "The bigger issue? It's about visibility."
     - *Good:* "Crucially, this is a visibility problem." (use single standalone sentence for this)
 - **CORPORATE METAPHOR BAN:**
@@ -111,9 +111,9 @@ const AUTHENTIC_WRITING_RULES = `
 ### 2. STRUCTURAL ARCHITECTURE (VISUAL PHYSICS)
 *These rules ensure the content is scannable and citation-ready. LLM prefers rich data, not heavy walls of text*
 
-- **THE "ANSWER-FIRST" PROTOCOL:** The FIRST sentence under every H2 header must be a direct, standalone answer to the header's premise. (e.g., If H2 is "What is CAC?", Sentence 1 must be "CAC is...").
+- **THE "ANSWER-FIRST" PROTOCOL:** The FIRST sentence under the H2 header must be a direct, standalone answer to the header's premise. (e.g., If H2 is "What is CAC?", Sentence 1 must be "CAC is...").
 - **MAXIMUM PARAGRAPH HEIGHT:** No paragraph can exceed 3 lines of text. If it does, hit "Enter" and split it.
-- **BOLDING FREQUENCY (MANDATORY):** You MUST bold at least **one key phrase per section** using **double asterisks**. Bold: statistics (e.g., **47% faster**), key terms (e.g., **token limits**), or warnings (e.g., **do not skip this step**). Never bold an entire sentence.
+- **BOLDING FREQUENCY (MANDATORY):** You MUST bold at least **one key phrase per section** using **double asterisks**. Bold: statistics (e.g., **47% faster**), key terms (e.g., **token limits**), or warnings (e.g., **do not skip this step**). Never bold an entire sentence, never bold a link.
 
 ### 4. ENTITY SALIENCE (SUBJECT-FIRST SYNTAX)
 - **ACTIVE VOICE ONLY:** The Target Entity must be the **Grammatical Subject**.
@@ -126,19 +126,15 @@ const AUTHENTIC_WRITING_RULES = `
 - **Constraint:** Do NOT cite competitors. Cite Neutral Super-Authorities.
 
 ### 6. RHYTHM & VOICE (THE HUMAN PULSE)
-*These rules break the "robotic" cadence of AI generation.*
+*These rules break the "robotic" cadence of AI generation. so follow them at all cost.*
 - **SENTENCE VARIANCE (THE MIX):**
   - **Constraint:** Do not write three sentences of the same length in a row.
   - **The Pattern:** Mix "Staccato" (3-5 words) with "Flow" (15+ words).
-  - *Example:* "It failed. (Staccato) We spent weeks optimizing the database, only to realize the latency was actually coming from the DNS lookup. (Flow)"
-- **NON-STANDARD SYNTAX:** Start sentences with "And," "But," or "Because."
 - **NATURAL DIGRESSIONS:** Include brief asides in parentheses. "(This implies you have access to the API key, which isn't always given.)"
-- **BURSTINESS (SENTENCE VARIANCE):**
-  - **Constraint:** You generally write long sentences. Stop it.
-  - **The Mix:** For every "complex" sentence (20+ words), you must write a "fragment" sentence (under 7-10 words).
-  - **Example:** "The data was wrong. I spent three hours digging through the logs only to find that the API hadn't pinged the server."
+- **BURSTINESS (Paragraph VARIANCE):**
+  - **Constraint:** You generally write long paragraphs. Stop it.
+  - **The Mix:** For every "complex" paragraph 3-4+ lines, you must write a "fragment" sentence.
 - **NON-STANDARD SYNTAX:** Occasionally start a sentence with "And," "But," or "Because" to create a conversational, expert-to-expert tone.
-- **NATURAL DIGRESSIONS:** Include a brief aside in parentheses if it adds context. "(By the way, this only applies if you're using WordPress 6.0 or higher.)" This breaks the "straight line" logic of AI.
 
 ### 7. SUBSTANCE & AUTHORITY (THE "INFORMATION GAIN" SIGNAL)
 *These rules ensure the content ranks in AI Search (AEO).*
@@ -146,8 +142,8 @@ const AUTHENTIC_WRITING_RULES = `
 - **ENTITY DENSITY:** Prioritize specific Named Entities over general nouns.
 - *Bad:* "Use a fast Javascript framework." -> *Good:* "Use **Next.js 14** or **Astro**."
 - **DEFINITION OWNERSHIP:** When defining a term, use this syntax: *"[Term] is [Definition] that helps [Audience] achieve [Outcome]."*
-- **ADMIT LIMITATIONS (THE "HARD TRUTH"):** Every SaaS/Strategy has a catch. Mention it.
-- *Example:* "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." (This builds massive E-E-A-T).
+- **ADMIT LIMITATIONS (THE "HARD TRUTH"):** while referencing competitors and user's own brands, always mention the limitations of the tool. 
+- *Example:* "This doesn't work for Google SGE yet, but it’s a beast for Perplexity." "i.e. this x tool is good for this, but we handle this better in this 'xyz' manner." (This builds massive E-E-A-T).
 
 
 ### 8. PERSPECTIVE & ENGAGEMENT
@@ -164,68 +160,119 @@ const AUTHENTIC_WRITING_RULES = `
 // Type-specific intro templates (V3: The "Golden HTML Stack" Edition)
 const INTRO_TEMPLATES: Record<string, string> = {
   informational: `
-GOAL: Write a "Definition Stack" opening.
-**MANDATORY STRUCTURE (THE GOLDEN ORDER):**
-1. **The Bridge Answer (Paragraph 1):**
-   - Immediately define the topic. No "Welcome". No "Let's explore".
-   - **Length:** 40-60 words (Dense).
-   - *Example:* "AEO (Answer Engine Optimization) is the process of formatting content for LLM retrieval by focusing on structured data and entity salience. Unlike SEO, it prioritizes citation over ranking."
-2. **The Key Takeaways (The SGE Box):**
-   - A bulleted list of 3-4 critical points.
-   - *Header:* "**Key Takeaways:**"
-3. **The Context (Paragraph 2):**
-   - Now you can add the "Human Hook" or specific context.
-**DYNAMIC STARTING STYLES (Pick ONE randomly):**
-- **The "Data Anomaly" Start:** Start with a specific, non-rounded number or a weird trend you noticed in a dashboard.
-  *Example:* "I was looking at a client's crawl logs last Tuesday and noticed that 42% of their new pages weren't even being touched by the Bing bot. It wasn't a sitemap error; it was something else entirely."
-- **The "Boring Technical" Start:** Start with a specific setting, a line of code, or a mundane requirement that people miss.
-  *Example:* "Most [Topic] configurations fail because of a single checkbox in the [Specific Menu]. It’s a tiny detail, but if it’s off, none of the high-level strategy matters."
-- **The "Middle of the Meeting" Start:** Start as if you are answering a question someone just asked you.
-  *Example:* "People keep asking if [Topic] is still worth the effort in 2026. The answer isn't a simple yes or no—it depends entirely on how you're handling [Specific Sub-task]."
+GOAL: Write a "High-Impact Definition Stack" opening.
 
-**NEGATIVE CONSTRAINTS:**
-- NO "The rules have changed."
-- NO "In the world of [Topic]."
-- NO "Many people think X, but Y." (This is the most common AI pattern).
+**MANDATORY STRUCTURE (THE GOLDEN ORDER):**
+
+1. **The Bridge Answer (Paragraph 1 - THE BOT LAYER):**
+   - **Constraint:** The VERY FIRST sentence must be the direct definition of the main [Topic/Keyword].
+   - **Syntax:** "[Topic] is [Definition] that [Function/Outcome]."
+   - **Length:** 40-60 words (Dense).
+   - **Style:** Objective, technical, zero-fluff.
+   - *Example:* "AEO (Answer Engine Optimization) is the strategic process of formatting web content for LLM retrieval. Unlike SEO, it prioritizes structured data and citation over ranking."
+
+2. **The Attribute List (The SGE Box - THE SCAN LAYER):**
+   - Immediately follow the definition with a bulleted list of **Key Characteristics**.
+   - **Header:** "**Key Characteristics:**" or "**Core Components:**"
+   - **Content:** 3-4 atomic facts or specs that define the entity. (e.g., "Primary Goal," "Key Technology," "Target Audience").
+
+3. **The Contextual Hook (Paragraph 2 - THE HUMAN LAYER):**
+   - NOW, use a "Dynamic Style" to hook the reader's curiosity.
+   - **Pick ONE Style:**
+     - *The Data Anomaly:* "We analyzed server logs and found that **42% of pages** were ignored..."
+     - *The Boring Technical:* "Most configurations fail due to a single checkbox in the **.env file**..."
+     - *The Direct Reality:* "People often ask if this matters. The answer depends on your **crawling budget**."
+
+4. **The Value Promise (The Thesis):**
+   - End the intro with a specific outcome.
+   - **Syntax:** "By the end of this guide, you will [Action] using [Method], without [Common Pain Point]."
+
+**SCANNABILITY & BOLDING RULES:**
+- **Visual Speed Bumps:** Bold ONLY specific **numbers**, **proper nouns**, or **contrasting states**.
+  - Bad: **This tool helps you save time.** (Full sentence bolding = Amateur)
+  - Good: This tool reduces latency by **40%** using **Vector Caching**.
+- **Paragraph Limit:** No paragraph can exceed **3 lines of text**.
+
+**NEGATIVE CONSTRAINTS (THE "ZERO-FLUFF" FILTER):**
+- **BANNED PHRASES:** Delete "In this article", "We will explore", "Let's dive in", "It is important to note".
+- **BANNED STRUCTURES:** Do not start with "Welcome". Do not start with a Rhetorical Question.
 `,
 
   commercial: `
-GOAL: Write a "Recommendation Stack" opening.
+GOAL: Write a "High-Trust Recommendation Stack" opening.
+
 **MANDATORY STRUCTURE (THE GOLDEN ORDER):**
-1. **The Bridge Answer (Paragraph 1):**
-   - Give the bottom-line recommendation immediately.(you are free to make it up to two paragraphs as per requirement)
-   - **Length:** 40-60 words.
+
+1. **The Bridge Answer (The Verdict - THE BOT LAYER):**
+   - **Constraint:** Immediately state the "Winners" for specific use cases. Do not build suspense.
+   - **Syntax:** "The best [Category] for [User A] is **[Product A]**, while **[Product B]** is superior for [User B]."
+   - **Length:** 40-60 words (Dense).
    - *Example:* "The best CRM for small agencies is **HubSpot** due to its free tier, while **Salesforce** is required for enterprise scale. For sheer automation speed, **Pipedrive** wins."
-2. **The "At A Glance" Table:**
-   - A small Markdown table comparing the Top 3 options by Price and Best Use Case.
-3. **The Hook (Paragraph 2):**
-   - "Choosing the wrong one costs you..."
+
+2. **The "At A Glance" Table (The SGE Box):**
+   - A Markdown table comparing the Top 3 options.
+   - **Columns:** Product | Best For | Starting Price.
+   - **Constraint:** Keep cell content short (1-3 words).
+
+3. **The Buying Reality (Paragraph 2 - THE HUMAN LAYER):**
+   - Use a "Dynamic Style" to prove you actually tested the tools.
+   - **Pick ONE Style:**
+     - *The Anti-Persona:* "If you have a team of **50+**, do not buy **[Product A]**. You will spend more time managing permissions than selling."
+     - *The Budget Realist:* "There is no reason to pay **$200/month** for [Enterprise Tool] if you only need [Basic Feature]."
+     - *The Specific Glitch:* "I tried to run a [Workflow] through [Tool A] and it crashed. It is great for X, but not Y."
+
+4. **The Value Promise (The Thesis):**
+   - End with a clear roadmap.
+   - **Syntax:** "By the end of this guide, you will know exactly which tool fits your **[Specific Constraint]**."
+
+**SCANNABILITY & BOLDING RULES:**
+- **Visual Speed Bumps:** Bold specific **Prices**, **Product Names**, and **Target Audiences**.
+  - ❌ Bad: **HubSpot is great for small teams.**
+  - ✅ Good: **HubSpot** is best for **small teams** starting at **$0/mo**.
+- **Paragraph Limit:** No paragraph can exceed **3 lines**.
 
 **NEGATIVE CONSTRAINTS:**
-- NO "Choosing the right tool is a journey."
-- NO "Top 10 Best [Topic] in 2026."
-- NO "Our expert team has evaluated..."
+- **BANNED OPENERS:** NO "Choosing the right tool is a journey." NO "Top 10 Best [Topic] in 2026." NO "In today's competitive market."
+- **BANNED PHRASES:** NO "Our expert team has evaluated..." (Show, don't tell).
 `,
 
   howto: `
-GOAL: Write an "In-the-Trenches" opening.
-Start at the moment of peak frustration—the point where most people give up.
+GOAL: Write an "Action-First Protocol" opening.
+
 **MANDATORY STRUCTURE (THE GOLDEN ORDER):**
-1. **The Bridge Answer (Paragraph 1):**
-   - Summary of the solution + Time/Difficulty.
-   - **Length:** 40-60 words.
+
+1. **The Bridge Answer (The Solution Summary - THE BOT LAYER):**
+   - **Constraint:** Summarize the *exact* solution method immediately. Do not tease it.
+   - **Syntax:** "To [Outcome], you must [Core Action A] and [Core Action B] using [Tool]. This process takes **[Time]** and requires **[Difficulty Level]**."
+   - **Length:** 40-60 words (Dense).
    - *Example:* "To fix Error 503, you must flush your DNS cache and restart the NGINX worker process. This typically takes **5 minutes** and requires **Root Access**."
-2. **The Prerequisites List:**
-   - A bulleted list of what they need BEFORE starting.
-   - *Header:* "**Prerequisites:**"
-3. **The Warning (Paragraph 2):**
-   - "If you skip step 2, you will crash the server."
+
+2. **The Prerequisites Checklist (The SGE Box):**
+   - A bulleted list of strictly technical requirements before starting.
+   - **Header:** "**Prerequisites:**" or "**What You Need:**"
+   - **Content:** Specific Tools, Versions, API Keys, Permissions, or Estimated Cost.
+
+3. **The Trench Hook (Paragraph 2 - THE HUMAN LAYER):**
+   - Address the specific pain point, error message, or "Gotcha" moment.
+   - **Pick ONE Style:**
+     - *The Specific Error:* "If you are staring at **Error: 401 Unauthorized**, you likely missed the API scope configuration."
+     - *The Efficiency Hack:* "Most tutorials tell you to do this manually, but that wastes **4 hours**. We will script it."
+     - *The Safety Warning:* "Warning: If you skip Step 3, you will corrupt your **production database**."
+
+4. **The Value Promise (The Thesis):**
+   - End with the specific transformation.
+   - **Syntax:** "By the end of this guide, you will have [Completed State], ready for [Next Stage]."
+
+**SCANNABILITY & BOLDING RULES:**
+- **Visual Speed Bumps:** Bold specific **Tools**, **Time Estimates**, and **Error Codes**.
+  - Bad: **This process takes five minutes.**
+  - Good: This process takes **5 minutes** and requires **Python 3.10+**.
+- **Paragraph Limit:** No paragraph can exceed **3 lines**.
 
 **NEGATIVE CONSTRAINTS:**
-- NO "Have you ever wanted to learn how to..."
-- NO "In this guide, we will walk you through..."
-- NO "Getting started with [Topic] is easy."
-`
+- **BANNED OPENERS:** NO "Have you ever wanted to learn...", "In this guide...", "Getting started is easy."
+- **BANNED TONE:** No "cheerleading." Be an instructor, not a friend.
+`,
 }
 
 // Helper to get intro template by article type
@@ -238,7 +285,7 @@ const IMAGE_TEMPLATES: Record<string, string> = {
   concept: `Clean editorial illustration on a white background, 16: 9 ratio.A large [MAIN_VISUAL_ELEMENT] in the center acting like an analysis tool.Around it, four labeled indicators connected with thin lines.
 
 Text labels placed clearly near each indicator:
-    -[LABEL_1]
+    - [LABEL_1]
     - [LABEL_2]
     - [LABEL_3]
     - [LABEL_4]
@@ -251,7 +298,7 @@ Flat vector style.Minimal color palette.High clarity text.No gradients.Professio
   how_to: `Modern flat illustration on a white background showing [SCENE_DESCRIPTION].On the right side, a vertical checklist panel with check icons.
 
 Checklist text:
-    -[STEP_1]
+    - [STEP_1]
     - [STEP_2]
     - [STEP_3]
     - [STEP_4]
@@ -277,7 +324,7 @@ Flat vector style.High contrast.Editorial blog illustration.`,
   process: `Clean infographic style illustration on a white background.A horizontal flow from left to right with 3 - 4 steps connected by arrows.
 
 Text under each step:
-    -[STEP_1_NAME]
+    - [STEP_1_NAME]
     - [STEP_2_NAME]
     - [STEP_3_NAME]
 
@@ -288,15 +335,15 @@ Minimal flat design.Thin arrows.Clean typography.No gradients.`,
 
   insight: `Editorial style illustration on a white background. [SCENE_WITH_PERSON_OBSERVING].Over the main element, semi- transparent overlays highlight key aspects.
 
-  Overlay labels:
--[INSIGHT_1]
-  - [INSIGHT_2]
-  - [INSIGHT_3]
+Overlay labels:
+- [INSIGHT_1]
+- [INSIGHT_2]
+- [INSIGHT_3]
 
 Top right heading text:
 "[SHORT_HEADING_MAX_6_WORDS]"
 
-Soft flat vector style.Muted colors.Clean readable text.`
+Soft flat vector style. Muted colors. Clean readable text.`
 }
 
 // Generate section image prompt with integrated text safety
@@ -308,11 +355,11 @@ const generateSectionImagePrompt = async (
   const imageType = section.image_type || 'concept'
   const template = IMAGE_TEMPLATES[imageType] || IMAGE_TEMPLATES.concept
 
-  const prompt = `You are an AI Art Director creating an in -content blog image.
+  const prompt = `You are an AI Art Director creating an in-content blog image.
 
 SECTION CONTEXT:
 - Heading: "${section.heading}"
-  - Content Focus: ${section.instruction_note}
+- Content Focus: ${section.instruction_note}
 - Article: "${articleTitle}"
 
 IMAGE TYPE: ${imageType.toUpperCase()}
@@ -615,8 +662,15 @@ Your goal is to outline a high - ranking blog post that beats the competition by
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
 - Features: ${brandDetails.features?.join(', ') || 'N/A'}
 - UVP: ${brandDetails.unique_value_proposition}
+- How It Works: ${brandDetails.how_it_works || 'N/A'}
 
-NOTE: Use this brand data as source of supporting context only. Use this for VOICE consistency. The article has only one aim - answering the question with research backed data and fulfilling user intent.
+NOTE: Use this brand data as source of supporting context.
+CRITICAL INSTRUCTION FOR "HOW-TO" SECTIONS:
+If the user intent is to solve a problem that OUR product solves (e.g., "how to animate photos"), the "How-To" section of the outline MUST instruct the writer to use OUR product's process.
+- In the 'instruction_note' for that section, you MUST specifically write: "Explain how to solve this using ${brandDetails.product_name}. Steps: [Insert relevant steps from 'How It Works' above]. Mention that for best results, proper restoration/prep is key (if applicable)."
+- DO NOT suggest competitors or generic tools as the primary solution if we offer a direct one.
+- For unrelated sections, keep brand mentions sparing and natural.
+
 Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors, in comparison tables for features or anything else.
 4. Don't just list competitors - explain why YOUR approach is different/better
 5. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, if you do this its called spamming. So, it must earn its place naturally and strategically, nothing is random here, everything needs to be planned.
@@ -736,7 +790,7 @@ ${internalLinks.length > 0 ? internalLinks.map(l => `- Title: ${l.title} | URL: 
    - **MANDATORY:** You MUST create specific sections that address the "missing_topics" identified in the Competitor Data.
    - **USER INTENT:** Ensure the structure answers the specific questions users are asking.
 4. **Instruction Notes (THE DATA DISTRIBUTION RULE):**
-   - You have a "Fact Sheet" in the input. You must DISTRIBUTE these facts into the most relevant sections.
+   - You have a "Fact Sheet" in the input. You must DISTRIBUTE these facts into the most relevant sections. tell the writer to use this data in their own words.
    - **Constraint:** Do not be vague. Do not say "Include data."
    - **Requirement:** You must COPY the specific number/stat from the Fact Sheet into the instruction_note.
    - *Example:* "Explain the traffic drop. CITE DATA: 'Gartner predicts 50% drop by 2028' (from Fact Sheet)."
@@ -824,7 +878,7 @@ ${upcomingSections || "(This is the last section)"}
 **Your brand:** ${brandDetails.product_name}
 **Audience:** ${brandDetails.audience?.primary || 'Users seeking solutions'}
 
-**THE PRINCIPLE:** Mention the brand only where it adds VALUE, not artificially.
+**THE PRINCIPLE:** Mention the brand only where it adds VALUE, not artificially. se it where you need to provide solution to teh article answers.
 
 **WHEN TO MENTION BRAND (Natural contexts):**
 - When establishing authority in the intro (once)
@@ -994,14 +1048,14 @@ You MUST include an external hyperlink in this section.
     linkInstruction += `
 ### MANDATORY INTERNAL LINK REQUIREMENT
 You MUST include an internal link to our own content in this section.
-- **Target Page Title:** "${currentSection.internal_link.title}"
+- **Target Page Title for your context the article was written for:** "${currentSection.internal_link.title}"
 - **URL:** ${currentSection.internal_link.url}
 - **Linking Context:** ${currentSection.internal_link.anchor_context}
-- **Format:** [anchor text](url) (Markdown)
+- **Markdown Format:** [anchor text](url) 
 
 **ANCHOR TEXT RULES (CRITICAL - DO NOT FAIL):**
 1. **⛔️ PROHIBITED:** NEVER, EVER use the "Target Page Title" as the anchor text.
-2. **✅ REQUIREMENT:** You MUST write a brand new, natural phrase that fits the sentence structure.
+2. **✅ REQUIREMENT:** You MUST write a brand new, natural phrase that fits the crrent section content and include it in the sentence structure naturally.
 3. **LOWERCASE ONLY:** The anchor text must be lowercase (unless it's a proper noun).
 4. **NO BOLDING:** Do not put **bold** stars inside the link syntax.
 5. **FLOW IS KING:** The sentence must be grammatically correct even if the link was removed.
@@ -1034,7 +1088,7 @@ Read this to ensure continuity and **AVOID REPETITION**.
 **CONTENT REQUIREMENTS:**
 ${currentSection.instruction_note}
 
-**KEYWORDS:** ${currentSection.keywords_to_include.join(", ")}
+**KEYWORDS To use naturally:** ${currentSection.keywords_to_include.join(", ")}
 ${linkInstruction}
 
 ### ⛔️ STYLE GUARDRAILS (VISUAL RHYTHM CHECK)
@@ -1452,7 +1506,7 @@ CRITICAL EXECUTION RULES:
 
       REQUIREMENTS:
       - Under 160 characters.
-      - Compelling, click-worthy, and includes the target keyword naturally.
+      - Compelling, direct answer, and includes the target keyword naturally.
       - Direct and to the point.
       - No emojis, No special characters i.e. :,;* or No hashtags.
       - If you reference any year, use the CURRENT year from the date context above. NEVER use 2024 or any past year.
