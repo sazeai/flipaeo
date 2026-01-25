@@ -721,12 +721,12 @@ You must write headers that look like they were written by a HUMAN expert, not a
               If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
 If it sounds like a Google Search Query, keep it.
 
-## HEADING HIERARCHY RULES(CRITICAL FOR SEO - MUST FOLLOW)
+## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
 
-  ** LEVEL DEFINITIONS:**
-- ** level: 2(H2) ** = Main topic sections.These are your primary content pillars.
-- ** level: 3(H3) ** = Subtopics UNDER an H2 wherever required.
-- ** level: 4(H4) ** = Detailed points UNDER an H3 wherever required.
+**LEVEL DEFINITIONS:**
+- **level: 2 (H2)** = Main topic pillars. Wide scope.
+- **level: 3 (H3)** = Specific sub-concepts. Narrower scope.
+- **level: 4 (H4)** = Granular details, lists, steps, specific features. Deep scope.
 
 ** STRUCTURE PATTERN(FOLLOW THIS):**
 \`\`\`
@@ -740,16 +740,24 @@ H2: Main Topic B
   H3: Subtopic B.1
   H3: Subtopic B.2
 \`\`\`
+**THE "DEPTH" MANDATE:**
+1. **NO WALLS OF TEXT:** We are writing for the scroll-heavy mobile web.
+2. **AGGRESSIVE FRAGMENTATION:** Break big ideas down.
+   - ❌ Bad: One H2 with 500 words.
+   - ✅ Good: One H2 with three H3s and two H4s.
 
-**HIERARCHY REQUIREMENTS:**
-1. NEVER have all sections at level 2. This is WRONG and hurts SEO/AEO/GEO.
-2. Aim for at least 60% of sections to be level 3 or 4.
-3. Use level 4 (H4) for lists, comparisons, step details, or deep dives.
-4. The sections array should be FLAT but with levels indicating hierarchy.
-5. **Nesting is Optional:** If an H2 topic is simple, do NOT force H3s under it.
-6. **The 60/40 Rule:** Only use deep nesting (H3/H4) for complex sections (like "How-To Steps" or "Detailed Features").
-7. Maintain a consistent voice while ensuring the content is logically organized for both humans and search engines.
-8. If internal links are provided, plan where 1-2 of them would naturally fit in the outline.
+**HIERARCHY REQUIREMENTS (STRICT):**
+1. **The 60% Rule:** AT LEAST 60% of your sections MUST be level 3 or 4.
+2. **The H4 Mandate:** You MUST use H4s for:
+   - Specific steps in a process
+   - Detailed feature breakdowns
+   - Pros/Cons lists
+   - Comparisons
+   - "Why this matters" deep dives
+3. **NEVER** have back-to-back H2s without at least one H3 in between (unless it's a very simple transition).
+4. **Structure:** The output sections array is flat, but the logic is nested.
+5. **Depth over Breadth:** Prefer fewer H2s with more depth (H3/H4) over many shallow H2s.
+6. **Internal Link Placement:** If internal links are provided, identify 1-2 sub-sections (H3/H4) where they strictly fit.
 
 ---
 
@@ -826,7 +834,7 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
     {
       "id": number (1-based index, sequential),
       "heading": string,
-      "level": number (2, 3, or 4 - USE ALL THREE LEVELS),
+      "level": number (2, 3, or 4 - PRIORITIZE 3 AND 4),
       "instruction_note": string, 
       "keywords_to_include": string[],
       "external_link": { "url": string, "anchor_context": string }, // OPTIONAL
@@ -838,7 +846,8 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 }
 
 **FINAL CHECK:** Before outputting, verify that:
-- You have H2, H3, AND H4 levels in your outline
+- You have adhered to the 60% rule (majority of sections are H3/H4)
+- You have broken down complex topics into H4 lists/steps
 - Does this outline solve the specific intent of "${keyword}"?
 - Did you remove unnecessary fluff sections?
 - Did you assign 1-2 external links to relevant sections?
