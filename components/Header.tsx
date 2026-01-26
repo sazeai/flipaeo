@@ -7,7 +7,7 @@ const NavItem = ({ label, active = false }: { label: string; active?: boolean })
   <button
     className={`
       h-full px-6 flex items-center text-sm mono-force tracking-tight border-l border-ink hover:bg-paper transition-colors relative group
-      ${active ? 'bg-signal text-white hover:bg-orange-600' : ''}
+      ${active ? 'bg-signal text-white hover:bg-brand-600' : ''}
     `}
   >
     {label}

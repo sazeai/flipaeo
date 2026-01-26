@@ -182,7 +182,7 @@ export default async function SubscribePage() {
                                 <span className="text-base text-stone-400 line-through">
                                     $79/mo
                                 </span>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 to-amber-500 px-2 py-0.5 rounded-full">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-brand-500 to-amber-500 px-2 py-0.5 rounded-full">
                                     Launch Price
                                 </span>
                             </div>

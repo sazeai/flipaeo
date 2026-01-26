@@ -1,96 +1,135 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Logo } from './Logo';
-import { Button } from './Button';
-import { Menu, X } from 'lucide-react';
+import React from 'react';
+import { Menu, X, ArrowRight } from 'lucide-react';
+import Button from './Button';
 import Link from 'next/link';
-
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-const links: NavLink[] = [
-  { label: 'Benefits', href: '#benefits' },
-  { label: 'How it work', href: '#how-it-works' },
-  { label: 'The Process', href: '#features' },
-  { label: 'Pricing', href: '/pricing' },
-];
+import Image from 'next/image';
 
 export const Navbar: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   return (
-    <nav className="w-full max-w-7xl mx-auto px-4 py-6 flex items-center justify-between relative !z-50">
-      {/* Logo */}
-      <div className="flex-shrink-0">
-        <Logo />
-      </div>
+    <nav className="max-w-6xl mx-auto sticky top-3 z-50 w-full px-4 md:px-8 flex justify-center">
+      {/* 
+          Outer Shell 
+          - Pure white background to match page
+          - Subtle border and shadow for lift
+        */}
+      <div className="
+          relative w-full
+          bg-white
+          border border-stone-300/50
+          
+          rounded-[15px] p-1
+          transition-all duration-300
+        ">
 
-      {/* Desktop Nav */}
-      <div className="hidden md:flex items-center gap-8">
-        {links.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            className="font-sans font-semibold text-black hover:text-gray-600 transition-colors"
-          >
-            {link.label}
-          </a>
-        ))}
-      </div>
+        {/* 
+             Inner Core
+             - Light gray background for contrast
+          */}
+        <div className="
+              w-full bg-stone-100/50 backdrop-blur-sm
+              rounded-[12px] px-2 sm:px-5 py-2 sm:py-2 
+              flex items-center justify-between  border border-stone-100
+          ">
 
-      {/* CTA Button Desktop */}
-      <div className="hidden md:block">
-        <Link href="/login">
-          <Button variant="primary" size="sm" className="cursor-pointer text-sm font-bold px-5 py-2.5">
-            Start Ranking
-          </Button>
-        </Link>
-      </div>
-
-      {/* Mobile Menu Toggle */}
-      <button
-        className="md:hidden p-2"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        {isMobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
-      </button>
-
-      {/* Mobile Nav Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 min-h-screen z-50 bg-white flex flex-col animate-in fade-in duration-200">
-          {/* Header with Logo and Close Button */}
-          <div className="w-full max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
-            <Logo />
-            <button
-              className="p-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <X className="w-8 h-8" />
-            </button>
+          <div className="flex items-center gap-2 group">
+            <Link href="/" className="flex items-center gap-2">
+              <Image src="/site-logo.png" alt="Logo" width={36} height={36} />
+              <span className="font-bold text-2xl tracking-tight text-stone-900 leading-none pb-1">
+                FlipAEO
+              </span>
+            </Link>
           </div>
 
-          {/* Links Container */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-8">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="font-display font-black text-4xl uppercase text-black hover:text-brand-yellow hover:scale-105 transition-all"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.label}
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-stone-600">
+            <a href="#how-it-works" className="hover:text-stone-900 transition-colors">How it works</a>
+            <span className="text-stone-300">•</span>
+            <a href="#benefits" className="hover:text-stone-900 transition-colors">Benefits</a>
+            <span className="text-stone-300">•</span>
+            <a href="#features" className="hover:text-stone-900 transition-colors">Features</a>
+            <span className="text-stone-300">•</span>
+            <a href="#pricing" className="hover:text-stone-900 transition-colors">Pricing</a>
+          </div>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+
+            {/* Social/Tool Icons (Desktop only) */}
+            <div className="hidden sm:flex items-center gap-2 pr-2 border-r border-stone-200/50 mr-1">
+
+              <Link href="https://x.com/flipaeo">
+                <button className="
+                          cursor-pointer group relative w-9 h-10 flex items-center justify-center 
+                          bg-white border border-gray-300 rounded-lg text-stone-700
+                          shadow-tactile-gray
+                          active:translate-y-[2px] active:shadow-tactile-gray-active
+                          transition-all duration-150 ease-out
+                      ">
+                  {/* X / Twitter Icon */}
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </button>
+              </Link>
+            </div>
+
+            {/* CTA Button */}
+            <Link href="/content-plan">
+              <button
+                id="nav-cta-btn"
+                className="
+                       cursor-pointer flex items-center gap-2.5
+                       bg-white
+                       border border-gray-300
+                       shadow-tactile-gray
+                       active:translate-y-[2px] active:shadow-tactile-gray-active
+                       px-2 sm:px-5 pt-1 sm:pt-2 pb-2 sm:pb-3 rounded-lg
+                       transition-all duration-150 ease-out
+                     ">
+                <span className="text-gray-600 font-semibold text-xs sm:text-sm">Start Ranking in AI</span>
+              </button>
+            </Link>
+            {/* Mobile Menu Toggle (only visible on mobile) */}
+
+            <button
+              className="
+                          cursor-pointer lg:hidden
+                          flex items-center justify-center
+                          px-1.5 pt-1.5 pb-2
+                          bg-white
+                          border border-gray-300
+                          shadow-tactile-gray
+                          active:translate-y-[2px] active:shadow-tactile-gray-active
+                          rounded-lg
+                          text-stone-600
+                          transition-all duration-150
+                      "
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={13} /> : <Menu size={13} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="absolute top-24 left-4 right-4 bg-white rounded-2xl shadow-2xl border border-stone-100 p-2 z-40 flex flex-col animate-in fade-in slide-in-from-top-2 origin-top lg:hidden">
+          <div className="bg-stone-50 rounded-xl p-2 flex flex-col gap-1">
+            {['How it works', 'Benefits', 'Features', 'Pricing'].map((item) => (
+              <a key={item} href="#" className="cursor-pointer px-4 py-3 rounded-lg hover:bg-white hover:shadow-sm text-stone-600 font-medium text-base transition-all">
+                {item}
               </a>
             ))}
           </div>
-
-          {/* Footer Button */}
-          <div className="p-8 pb-12 w-full max-w-md mx-auto">
+          <div className="p-2 mt-1">
             <Link href="/login">
-              <Button variant="primary" size="lg" fullWidth onClick={() => setIsMobileMenuOpen(false)} className="cursor-pointer py-6 text-xl uppercase tracking-widest">
-                Start Ranking
+              <Button className="w-full justify-center bg-stone-900 text-brand-50 shadow-none rounded-lg py-3">
+                Start Ranking Now
               </Button>
             </Link>
           </div>

@@ -1,88 +1,114 @@
 import React from 'react';
-import { Button } from './Button';
-import { ArrowRight, Sparkles, Star } from 'lucide-react';
+import Button from './Button';
 import Link from 'next/link';
 
-export const Hero: React.FC = () => {
+
+export default function Hero() {
+
   return (
-    <div className="flex flex-col items-center text-center max-w-5xl mx-auto pt-6 md:pt-10 relative z-10">
+    <section className="relative w-full max-w-5xl mx-auto px-6 py-12 md:pt-24 md:pb-12 flex flex-col items-center text-center">
 
-      {/* Background Glow (Subtle) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-brand-orange/5 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+      {/* Decorative Star/Crosshair Left */}
+      <div className="absolute sm:top-1/4 left-4 md:left-0 text-stone-400 ">
+        <svg width="51" height="50" viewBox="0 0 51 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 1V20" stroke="black" strokeLinecap="round" />
+          <path d="M26 30V49" stroke="black" strokeLinecap="round" />
+          <path d="M50 25L31 25" stroke="black" strokeLinecap="round" />
+          <path d="M21 25L0.999999 25" stroke="black" strokeLinecap="round" />
+          <path d="M37.5 36.5L28.1847 27.1847" stroke="black" strokeLinecap="round" />
+          <path d="M23.3164 22.3154L14.0011 13.0001" stroke="black" strokeLinecap="round" />
+          <path d="M14 36.5L23.3153 27.1847" stroke="black" strokeLinecap="round" />
+          <path d="M28.1836 22.3154L37.4989 13.0001" stroke="black" strokeLinecap="round" />
+        </svg>
 
-      {/* Badge */}
-      <div className="inline-flex items-center justify-center bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1.5 transform -rotate-2 mb-8 hover:rotate-0 transition-transform duration-300 cursor-default">
-        <span className="font-display font-bold uppercase tracking-wider text-sm">
-          THE POST-SEO ERA
-        </span>
       </div>
 
-      {/* Headline */}
-      <h1 className="font-display font-black text-5xl md:text-6xl lg:text-[6rem] leading-[0.9] tracking-tighter mb-8 text-black uppercase">
-        Don’t just rank<br />
-        <span className="text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black">
-          Be the Source AI cites
-        </span>
+      {/* Decorative Star Right */}
+      <div className="absolute sm:top-1/3 right-4 md:right-0 text-stone-800  animate-pulse">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M12 17V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M21 12H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M7 12H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+          <path d="M18.364 5.63605L16.95 7.05005" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M5.63604 18.364L7.05004 16.95" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M18.364 18.364L16.95 16.95" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M5.63604 5.63605L7.05004 7.05005" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+
+      </div>
+
+      {/* Availability Badge */}
+      <div className="inline-flex items-center gap-2 px-4 pt-1.5 pb-2 rounded-full border border-brand-400 bg-white text-stone-900 text-[11px] font-normal mb-6 shadow-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-brand-500">
+          <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" stroke="none" />
+        </svg>
+        <span>THE POST-SEO ERA</span>
+      </div>
+
+      {/* Main Headline */}
+      <h1 className="font-serif text-4xl md:text-7xl lg:text-8xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
+        Don’t just rank <br />
+        <span className="italic font-light">Be the Source AI cites</span>
       </h1>
 
-      {/* Subtext */}
-      <p className="font-sans text-gray-600 text-lg md:text-2xl max-w-3xl mb-12 leading-relaxed font-medium px-4">
-        <span className="font-bold text-black border-b-[3px] border-brand-orange/30">FlipAEO is the Strategic Content Engine for dominating AEO and GEO.</span> We engineer the exact content required to make your brand the #1 citation in AI search results.
+      {/* Subheadline */}
+      <p className="font-sans text-lg md:text-xl text-stone-500 max-w-2xl leading-snug mb-6 px-2">
+        FlipAEO is the Strategic Content Engine for dominating AEO and GEO. We engineer the exact content required to
+        <strong className="text-black font-normal">{" "}make your brand the #1 citation in AI search results.</strong>
       </p>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-12 w-full sm:w-auto px-4">
+      {/* CTA Button Container */}
+      <div className="relative group z-10">
         <Link href="/login">
-          <Button variant="primary" size="lg" className="cursor-pointer font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
+          <Button variant="primary" className="text-brand-600">
             Build My Growth Strategy
           </Button>
         </Link>
-        <Link href="#how-it-works">
-          <Button variant="secondary" size="lg" className="cursor-pointer font-semibold w-full sm:w-auto px-6 py-3 text-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all border-2 border-black">
-            See the engine →
-          </Button>
-        </Link>
+
+
       </div>
 
-      {/* SOCIAL PROOF / TRUST SIGNALS */}
-      <div className="flex flex-col items-center gap-4 animate-fade-in-up">
-
-        {/* Avatar Stack + Rating - Minimal Layout */}
-        <div className="flex items-center gap-4">
-
-          {/* Avatar Stack */}
-          <div className="flex -space-x-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="w-10 h-10 rounded-full border-2 border-black bg-white overflow-hidden hover:-translate-y-0.5 transition-transform">
-                <img
-                  src={`https://api.dicebear.com/7.x/notionists/svg?seed=${i + 42}`}
-                  alt="User"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Rating & Count */}
-          <div className="flex flex-col items-start">
-            <div className="flex gap-0.5">
-              {[1, 2, 3, 4, 5].map(s => (
-                <Star key={s} className="w-4 h-4 text-brand-orange fill-brand-orange" />
-              ))}
-            </div>
-            <span className="font-display font-semibold text-sm uppercase tracking-wide text-black">
-              90+ Articles created
-            </span>
+      {/* Testimonial */}
+      <div className="mt-8 flex flex-col items-center gap-4 animate-fade-in-up">
+        <p className="text-stone-600 font-normal text-center max-w-xl italic text-[12px] leading-relaxed px-4">
+          “The output quality is honestly great. I’ve already started using it for both of my SaaS products. It’s rare to find a tool this production-ready so early.”
+        </p>
+        <div className="flex items-center gap-3 mt-2">
+          <img
+            src="/brands/krzysztof.webp"
+            alt="Krzysztof profile picture"
+            className="w-6 h-6 rounded-full object-cover border border-stone-200"
+          />
+          <div className="text-sm text-stone-500">
+            <span className="font-semibold text-stone-900">Krzysztof </span>, Founder at LaunchDirectories
           </div>
         </div>
-
-        {/* Micro-Copy - Simple Text */}
-        <p className="font-mono text-xs text-gray-500 tracking-wide">
-          Cancel anytime <span className="text-black mx-1">·</span> 14-day guarantee
-        </p>
-
       </div>
 
-    </div>
+      {/* "Human" Break Element */}
+      <div className="absolute bottom-0 right-4 lg:-right-2 translate-y-1/2 flex flex-col items-center md:rotate-6 pointer-events-none ">
+        <p className="font-hand text-base md:text-lg text-stone-500 mb-2 w-40 text-center leading-none">
+          See real examples of blogs written by our AI
+        </p>
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] text-stone-700 ml-8">
+          <path
+            d="M20,20 Q60,10 60,60"
+            strokeWidth="2"
+            fill="none"
+            markerEnd="url(#arrowhead)"
+          />
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+
+
+    </section>
   );
 };

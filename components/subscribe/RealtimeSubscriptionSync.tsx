@@ -34,7 +34,7 @@ export default function RealtimeSubscriptionSync({ userId }: { userId?: string }
     const maxRefreshes = 10 // Safety limit
 
     // Debounced refresh - prevents rapid-fire refreshes
-    const debouncedRefresh = useDebounce(() => {
+    const refresh = useCallback(() => {
         if (refreshCountRef.current >= maxRefreshes) {
             console.warn('[SubscriptionSync] Max refresh limit reached, stopping')
             return
@@ -43,7 +43,9 @@ export default function RealtimeSubscriptionSync({ userId }: { userId?: string }
         try {
             router.refresh()
         } catch { }
-    }, 1000) // 1 second debounce
+    }, [router])
+
+    const debouncedRefresh = useDebounce(refresh, 1000) // 1 second debounce
 
     useEffect(() => {
         if (!userId) return

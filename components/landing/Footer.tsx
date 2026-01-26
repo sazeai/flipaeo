@@ -1,84 +1,109 @@
-
 import React from 'react';
+import { X, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { Logo } from './Logo';
-import { Twitter, Mail, X } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="w-full bg-[#D6F5F2] border-t-2 border-black py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Main Footer Content */}
-        <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-8">
+    <footer className="w-full px-4 md:px-6 pb-8 flex justify-center z-10 relative mb-2">
+      {/* 
+        Outer Shell - Exactly Matching Navbar Aesthetic 
+        Navbar: border border-stone-300/50 rounded-[15px] p-1
+      */}
+      <div className="
+        relative w-full max-w-[1126px]
+        bg-white
+        border border-stone-300/50
+        rounded-[15px] p-1
+        shadow-xs
+      ">
+        {/* 
+           Inner Core - Exactly Matching Navbar Aesthetic
+           Navbar: bg-stone-100/50 backdrop-blur-sm rounded-[12px] border border-stone-100
+        */}
+        <div className="
+            w-full bg-stone-100/50 backdrop-blur-sm
+            rounded-[12px] px-6 py-12 md:p-12 lg:p-16
+            border border-stone-100
+            relative overflow-hidden
+        ">
 
-          {/* Left: Logo & Description */}
-          <div className="flex-shrink-0 max-w-xs">
-            <Logo />
-            <p className="font-sans text-sm text-gray-600 mt-4">
-              Strategic Content Engine for Generative Engine Optimization. Win the AI search race.
+          <div className="relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-24 mb-16">
+
+            {/* Brand Column */}
+            <div className="lg:w-1/3 flex flex-col items-start gap-6">
+              <div className="flex items-center gap-2">
+                <span className="font-serif font-bold text-2xl tracking-tight text-stone-900 leading-none">
+                  FlipAEO
+                </span>
+              </div>
+
+              <p className="font-sans text-stone-500 text-sm leading-relaxed max-w-sm">
+                The first strategic content engine designed to reverse-engineer AI search models. Win the answer, not just the link.
+              </p>
+
+
+            </div>
+
+            {/* Navigation Columns */}
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+
+
+
+              {/* Company */}
+              <div className="flex flex-col gap-4">
+                <h4 className="font-serif text-lg text-stone-900 font-medium">Company</h4>
+                <nav className="flex flex-col gap-3">
+                  <Link href="/about" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">About Us</Link>
+                  <Link href="/blog" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Blog</Link>
+                  <Link href="mailto:support@flipaeo.com" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Contact</Link>
+                </nav>
+              </div>
+
+              {/* Legal */}
+              <div className="flex flex-col gap-4">
+                <h4 className="font-serif text-lg text-stone-900 font-medium">Legal</h4>
+                <nav className="flex flex-col gap-3">
+                  <Link href="/privacy-policy" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Privacy Policy</Link>
+                  <Link href="/terms" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Terms of Service</Link>
+                  <Link href="/refund-policy" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Refund Policy</Link>
+
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="relative z-10 pt-8 border-t border-stone-200/60 flex flex-col md:flex-row items-center justify-between gap-6">
+            <p className="font-sans text-sm text-stone-400">
+              © {currentYear} FlipAEO. All rights reserved.
             </p>
-          </div>
 
-          {/* Center: Navigation Links */}
-          <div className="flex flex-wrap gap-12">
-            {/* Product Links */}
-            <div>
-              <h4 className="font-display font-bold text-sm uppercase tracking-wide mb-4">Product</h4>
-              <nav className="flex flex-col gap-2">
-                <FooterLink href="/#benefits" label="Benefits" />
-                <FooterLink href="/#how-it-works" label="How it Works" />
-                <FooterLink href="/pricing" label="Pricing" />
-              </nav>
-            </div>
-
-            {/* Legal Links */}
-            <div>
-              <h4 className="font-display font-bold text-sm uppercase tracking-wide mb-4">Legal</h4>
-              <nav className="flex flex-col gap-2">
-                <FooterLink href="/privacy-policy" label="Privacy Policy" />
-                <FooterLink href="/terms" label="Terms of Service" />
-                <FooterLink href="/refund-policy" label="Refund Policy" />
-              </nav>
-            </div>
-
-            {/* Company Links */}
-            <div>
-              <h4 className="font-display font-bold text-sm uppercase tracking-wide mb-4">Company</h4>
-              <nav className="flex flex-col gap-2">
-                <FooterLink href="/about" label="About Us" />
-                <FooterLink href="/blog" label="Blog" />
-                <FooterLink href="mailto:support@flipaeo.com" label="Contact" />
-              </nav>
+            {/* Socials */}
+            <div className="flex items-center gap-4">
+              <Link
+                href="https://x.com/flipaeo"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X (Twitter)"
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-stone-400 hover:bg-brand-50 hover:text-brand-600 border border-stone-200 hover:border-brand-200 transition-all duration-300"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </Link>
+              <Link
+                href="mailto:support@flipaeo.com"
+                aria-label="Email"
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-stone-400 hover:bg-brand-50 hover:text-brand-600 border border-stone-200 hover:border-brand-200 transition-all duration-300"
+              >
+                <Mail className="w-4 h-4" />
+              </Link>
             </div>
           </div>
-
-          {/* Right: Social Icons */}
-          <div className="flex items-center gap-4">
-            <SocialIcon href="https://x.com/flipaeo" icon={<X className="w-5 h-5" />} />
-            <SocialIcon href="mailto:support@flipaeo.com" icon={<Mail className="w-5 h-5" />} />
-          </div>
-
-        </div>
-
-        {/* Bottom: Copyright */}
-        <div className="border-t-2 border-black/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-sans text-sm text-gray-600">
-            © {new Date().getFullYear()} FlipAEO. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>
   );
-};
-
-const FooterLink: React.FC<{ href: string; label: string }> = ({ href, label }) => (
-  <Link href={href} className="font-sans text-sm text-gray-600 hover:text-black hover:underline decoration-2 underline-offset-4 transition-colors">
-    {label}
-  </Link>
-);
-
-const SocialIcon: React.FC<{ href: string; icon: React.ReactNode }> = ({ href, icon }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-brand-yellow border-2 border-black rounded-full flex items-center justify-center hover:-translate-y-1 hover:shadow-neo-sm transition-all duration-200 text-black">
-    {icon}
-  </a>
-);
+}

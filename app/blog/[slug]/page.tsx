@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Navbar } from "@/components/landing/Navbar"
 import { Footer } from "@/components/landing/Footer"
 import BlogContentRenderer from "@/components/blog-content-renderer"
+import AuthorCard from "@/components/author-card"
 import ShareButton from "@/components/share-button"
 import { Calendar, Clock, ArrowLeft, User } from "lucide-react"
 import Link from "next/link"
@@ -126,9 +127,10 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
     datePublished: post.date,
     dateModified: post.modified,
     author: {
-      '@type': 'Organization',
-      name: 'FlipAEO',
-      url: defaultSEO.siteUrl
+      '@type': 'Person',
+      name: post.author.node.name,
+      description: post.author.node.description || "Founder of FlipAEO. I’ve scaled multiple SaaS and blogs using content SEO. Sharing what I’ve learned about ranking and growth—no fluff, just what actually works.",
+      url: `${defaultSEO.siteUrl}/blog` // Ideally this would be an author profile page
     },
     publisher: {
       '@type': 'Organization',
@@ -154,7 +156,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
   }
 
   return (
-    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
@@ -166,7 +168,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
         <section className="w-full py-12 px-4 ">
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
-              <Link href="/blog" className="inline-flex items-center text-sm font-bold uppercase tracking-wide text-black hover:text-brand-orange transition-colors">
+              <Link href="/blog" className="inline-flex items-center text-sm font-semibold text-stone-600 hover:text-stone-900 transition-colors">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Blog
               </Link>
@@ -174,24 +176,24 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
 
             <div className="space-y-6">
               <div className="flex flex-wrap items-center gap-4 text-sm">
-                <span className="bg-brand-yellow text-black border-2 border-black px-3 py-1 font-bold uppercase">{category}</span>
-                <div className="flex items-center gap-2 text-gray-600">
+                <span className="bg-stone-100 text-stone-700 border border-stone-200 px-3 py-1 font-medium rounded-full">{category}</span>
+                <div className="flex items-center gap-2 text-stone-500 font-medium">
                   <Calendar className="w-4 h-4" />
                   <span>{publishedDate}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2 text-stone-500 font-medium">
                   <Clock className="w-4 h-4" />
                   <span>{readTime}</span>
                 </div>
               </div>
 
-              <h1 className="font-display text-3xl md:text-4xl lg:text-6xl font-black text-black leading-tight uppercase">{post.title}</h1>
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-stone-900 leading-tight">{post.title}</h1>
 
               {cleanedExcerpt && (
-                <p className="text-lg text-gray-600 leading-relaxed">{cleanedExcerpt}</p>
+                <p className="text-lg text-stone-600 leading-relaxed font-sans">{cleanedExcerpt}</p>
               )}
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 py-4 border-t border-b border-stone-100">
                 <div className="flex items-center gap-3">
                   {post.author.node.avatar?.url ? (
                     <Image
@@ -202,13 +204,13 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
                       className="rounded-full border-2 border-black"
                     />
                   ) : (
-                    <div className="w-10 h-10 bg-brand-yellow border-2 border-black rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-black" />
+                    <div className="w-11 h-11 bg-stone-100 border border-stone-200 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-stone-400" />
                     </div>
                   )}
                   <div>
-                    <p className="font-bold text-black">{post.author.node.name}</p>
-                    <p className="text-sm text-gray-600">Author</p>
+                    <p className="font-semibold text-stone-900">{post.author.node.name}</p>
+                    <p className="text-xs text-stone-500 font-medium uppercase tracking-wide">Author</p>
                   </div>
                 </div>
 
@@ -227,7 +229,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
         {/* Featured Image */}
         {post.featuredImage?.node?.sourceUrl && (
           <div className="max-w-5xl mx-auto px-4 relative -mt-6 z-10 w-full">
-            <div className="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <div className="bg-white overflow-hidden rounded-lg">
               <Image
                 src={post.featuredImage.node.sourceUrl}
                 alt={post.featuredImage.node.altText || post.title}
@@ -241,8 +243,17 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
         )}
 
         {/* Article Content */}
-        <div className="max-w-4xl mx-auto px-4 mt-8 w-full pb-16">
-          <BlogContentRenderer content={post.content} />
+        <div className="max-w-4xl mx-auto px-4 w-full pb-24">
+          <div className="md:p-8 ">
+            <BlogContentRenderer content={post.content} />
+
+            <AuthorCard
+              name={post.author.node.name}
+              avatar={post.author.node.avatar?.url || ""}
+              role="Content Expert"
+              bio={post.author.node.description || undefined}
+            />
+          </div>
         </div>
       </main>
 

@@ -26,46 +26,67 @@ export default function BlogCard({
   return (
     <article className="group h-full">
       <Link href={`/blog/${slug}`} className="block h-full">
-        <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 h-full flex flex-col">
-          {/* Image */}
-          <div className="relative h-56 border-b-2 border-black overflow-hidden bg-gray-100">
-            <img
-              src={image || "/placeholder.svg"}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-4 left-4">
-              <span className="bg-brand-yellow text-black border-2 border-black px-2 py-1 text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                {category}
-              </span>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6 flex flex-col flex-grow">
-            <div className="flex items-center text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider gap-4">
-              <div className="flex items-center">
-                <Calendar className="w-3 h-3 mr-1.5" />
-                <span>{publishedAt}</span>
+        <div className="
+          relative h-full flex flex-col
+          bg-white
+          border border-stone-300/50
+          rounded-[15px] p-1
+        ">
+          <div className="
+            relative h-full flex flex-col
+            w-full bg-stone-100/50 backdrop-blur-sm
+            rounded-[12px]
+            border border-stone-100
+            overflow-hidden
+          ">
+            {/* Image */}
+            <div className="relative h-56 border-b border-stone-100 overflow-hidden bg-stone-100 group-hover:opacity-95 transition-opacity">
+              <img
+                src={image || "/placeholder.svg"}
+                alt={title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute top-4 left-4">
+                <span className="
+                  bg-white/90 backdrop-blur-sm
+                  text-stone-800
+                  border border-stone-200/50
+                  px-3 py-1
+                  text-xs font-semibold uppercase tracking-wider
+                  rounded-full
+                  shadow-sm
+                ">
+                  {category}
+                </span>
               </div>
-              <div className="flex items-center">
-                <Clock className="w-3 h-3 mr-1.5" />
-                <span>{readTime}</span>
-              </div>
             </div>
 
-            <h2 className="font-display font-black text-2xl text-black mb-3 uppercase leading-none group-hover:text-gray-700 transition-colors">
-              {title}
-            </h2>
+            {/* Content */}
+            <div className="p-6 sm:p-8 flex flex-col flex-grow">
+              <div className="flex items-center text-xs font-semibold text-stone-500 mb-4 uppercase tracking-wide gap-4">
+                <div className="flex items-center">
+                  <Calendar className="w-3.5 h-3.5 mr-1.5 text-stone-400" />
+                  <span>{publishedAt}</span>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="w-3.5 h-3.5 mr-1.5 text-stone-400" />
+                  <span>{readTime}</span>
+                </div>
+              </div>
 
-            <p className="text-gray-600 mb-6 leading-relaxed line-clamp-3 text-sm font-medium flex-grow">
-              {excerpt}
-            </p>
+              <h2 className="font-display font-bold text-2xl text-stone-900 mb-3 leading-tight group-hover:text-brand-600 transition-colors">
+                {title}
+              </h2>
 
-            <div className="pt-4 border-t-2 border-black/5 mt-auto">
-              <div className="flex items-center text-black font-bold uppercase text-sm tracking-widest group-hover:text-brand-orange transition-colors">
-                <span>Read Article</span>
-                <ArrowRight className="w-4 h-4 ml-2 stroke-[3px] group-hover:translate-x-1 transition-transform" />
+              <p className="text-stone-600 mb-6 leading-relaxed line-clamp-3 text-sm font-normal flex-grow">
+                {excerpt}
+              </p>
+
+              <div className="pt-4 mt-auto">
+                <div className="flex items-center text-stone-900 font-semibold text-sm group-hover:text-brand-600 transition-colors">
+                  <span>Read Article</span>
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             </div>
           </div>

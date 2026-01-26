@@ -9,6 +9,7 @@ interface WordPressPost {
   author: {
     node: {
       name: string
+      description?: string
       avatar: {
         url: string
       }
@@ -65,6 +66,7 @@ const GET_POSTS_QUERY = `
         author {
           node {
             name
+            description
             avatar {
               url
             }
@@ -107,6 +109,7 @@ const GET_POST_BY_SLUG_QUERY = `
       author {
         node {
           name
+          description
           avatar {
             url
           }
@@ -307,3 +310,18 @@ export function extractExcerpt(content: string, length: number = 160): string {
 }
 
 export type { WordPressPost }
+
+// Transform WordPress post to blog card format
+export function transformWordPressPost(post: WordPressPost, index: number = 0) {
+  return {
+    title: post.title,
+    excerpt: post.excerpt ? extractExcerpt(post.excerpt, 160) : "",
+    slug: post.slug,
+    publishedAt: formatDate(post.date),
+    readTime: calculateReadingTime(post.content),
+    category: post.categories.nodes[0]?.name || "General",
+    image: post.featuredImage?.node?.sourceUrl || "/placeholder.svg?height=400&width=600&text=Blog+Post",
+    featured: index === 0, // First post is featured
+    author: post.author.node.name,
+  }
+}

@@ -43,7 +43,7 @@ export const plans: Plan[] = [
       {
         name: "Comments",
         icon: "check",
-        iconColor: "text-orange-500",
+        iconColor: "text-brand-500",
       },
       {
         name: "Notifications",
@@ -81,7 +81,7 @@ export const plans: Plan[] = [
       {
         name: "Comments",
         icon: "check",
-        iconColor: "text-orange-500",
+        iconColor: "text-brand-500",
       },
       {
         name: "Notifications",
@@ -118,7 +118,7 @@ export const plans: Plan[] = [
       {
         name: "Comments",
         icon: "check",
-        iconColor: "text-orange-500",
+        iconColor: "text-brand-500",
       },
       {
         name: "Notifications",

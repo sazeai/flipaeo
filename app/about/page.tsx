@@ -4,8 +4,7 @@ import { Footer } from '@/components/landing/Footer'
 import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
-import Link from 'next/link'
-import { Button } from "@/components/ui/button"
+
 
 export const metadata: Metadata = generateMetadata({
   title: 'About Us',
@@ -16,13 +15,13 @@ export const metadata: Metadata = generateMetadata({
 
 export default function AboutUs() {
   return (
-    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col overflow-x-hidden font-sans bg-stone-50/50">
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-12">
         {/* Hero */}
         <section className="w-full py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
+            <div className="inline-block bg-stone-100 text-stone-800 border border-stone-200 rounded-full px-4 py-1.5 mb-6 text-sm font-medium tracking-wide">
               <span className="font-display font-bold text-xs uppercase tracking-widest">About Us</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">About FlipAEO</h1>
@@ -32,27 +31,25 @@ export default function AboutUs() {
 
         {/* Content */}
         <section className="max-w-4xl mx-auto px-4 py-12 w-full">
-          <div className="space-y-12 bg-white border-2 border-black rounded-lg p-8 md:p-12 shadow-neo">
+          <div className="space-y-12 p-8 md:p-12">
 
             {/* Intro */}
             <div className="prose prose-lg max-w-none">
-              <h2 className="font-display text-3xl font-bold bg-brand-yellow inline-block px-2 border-2 border-black shadow-neo-sm transform -rotate-1 mb-6">The Story of FlipAEO</h2>
+              <h2 className="font-display text-3xl font-bold text-stone-900 mb-6">The Story of FlipAEO</h2>
               <h3 className="font-display text-2xl font-bold mt-8 mb-4">From 80k Monthly Traffic to a "Dream SaaS"</h3>
             </div>
 
             {/* The Origin */}
-            <div className="relative pl-8 border-l-4 border-black/10">
-              <h2 className="font-display text-2xl font-bold mb-4">The Origin: The Blogger Who Cracked the Code</h2>
-              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
-                Back in late 2022, long before I wrote a single line of code, I was a blogger in the AI niche. I was obsessed with one thing: <strong>Traffic.</strong>
-              </p>
-              <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
-                In early 2024, I hit a massive milestone. I took a brand new blog from 0 to 80,000 monthly visitors in just 40 days. I wasn't just writing; I was outranking massive competitors with huge budgets.
-              </p>
-              <p className="font-sans text-gray-700 text-lg leading-relaxed">
-                My secret wasn't luck. It was a <strong>specific, repeatable workflow</strong> I had mastered using AI tools like ChatGPT and Gemini. I figured out the exact prompts and structures needed to make AI write content that didn't just "read well"—it dominated search results.
-              </p>
-            </div>
+            <h2 className="font-display text-2xl font-bold mb-4">The Origin: The Blogger Who Cracked the Code</h2>
+            <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+              Back in late 2022, long before I wrote a single line of code, I was a blogger in the AI niche. I was obsessed with one thing: <strong>Traffic.</strong>
+            </p>
+            <p className="font-sans text-gray-700 text-lg leading-relaxed mb-4">
+              In early 2024, I hit a massive milestone. I took a brand new blog from 0 to 80,000 monthly visitors in just 40 days. I wasn't just writing; I was outranking massive competitors with huge budgets.
+            </p>
+            <p className="font-sans text-gray-700 text-lg leading-relaxed">
+              My secret wasn't luck. It was a <strong>specific, repeatable workflow</strong> I had mastered using AI tools like ChatGPT and Gemini. I figured out the exact prompts and structures needed to make AI write content that didn't just "read well"—it dominated search results.
+            </p>
 
             {/* The Gap */}
             <div>

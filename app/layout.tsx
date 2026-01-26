@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Instrument_Serif, Inter_Tight, Bricolage_Grotesque, Space_Grotesk } from "next/font/google"
+import { Inter, Instrument_Serif, Inter_Tight, Bricolage_Grotesque, Space_Grotesk, Playfair_Display, Caveat } from "next/font/google"
 import "./globals.css"
 import { Suspense } from "react"
 import ErrorBoundary from "@/components/error-boundary"
@@ -18,6 +18,20 @@ import Script from "next/script"
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+  preload: true,
+})
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair-display",
+  display: "swap",
+  preload: true,
+})
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
   display: "swap",
   preload: true,
 })
@@ -54,6 +68,8 @@ const spaceGrotesk = Space_Grotesk({
   preload: true,
 })
 
+const FINE_NOISE_SVG = `data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E`;
+
 
 export const metadata: Metadata = generateMetadata()
 
@@ -64,7 +80,7 @@ export default async function RootLayout({
 }>) {
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${instrumentSerif.variable} ${interTight.variable} ${bricolage.variable} ${spaceGrotesk.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable} ${caveat.variable} ${instrumentSerif.variable} ${interTight.variable} ${bricolage.variable} ${spaceGrotesk.variable} antialiased`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -134,7 +150,11 @@ export default async function RootLayout({
           `}
         </Script>
       </head>
-      <body className="font-sans antialiased public-headings">
+      <body className="font-sans antialiased public-headings" style={{
+        backgroundImage: `url("${FINE_NOISE_SVG}")`,
+        backgroundRepeat: 'repeat',
+      }}>
+
         <ErrorBoundary>
           <Suspense fallback={null}>
             {children}

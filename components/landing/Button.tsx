@@ -1,46 +1,69 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  fullWidth?: boolean;
-  icon?: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'glass';
+  hasShortcut?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  size = 'md',
-  fullWidth = false,
+const Button: React.FC<ButtonProps> = ({
   children,
+  variant = 'primary',
+  hasShortcut = false,
   className = '',
-  icon,
   ...props
 }) => {
 
-  const baseStyles = "inline-flex items-center justify-center font-display font-bold border-2 border-black transition-all duration-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed";
+  if (variant === 'primary') {
+    return (
+      <button
+        id="primary-cta-btn"
+        className={`
+          cursor-pointer group relative inline-flex items-center gap-3 px-8 py-3.5 
+          bg-gradient-to-b from-brand-300 to-brand-400 
+          text-brand-900 font-normal text-lg rounded-lg
+          transition-all duration-200 ease-in-out
+          shadow-hero hover:-translate-y-0.5
+          active:translate-y-[1px] active:shadow-hero-active
+          border border-brand-400
+          ${className}
+        `}
+        style={{ WebkitTextStrokeWidth: '0.2px' }}
+        {...props}
+      >
+        <span>{children}</span>
+        {hasShortcut && (
+          <div className="hidden sm:flex items-center justify-center w-6 h-6 bg-brand-200/50 rounded border border-brand-600/20 text-xs font-bold uppercase text-brand-900/70">
+            B
+          </div>
+        )}
+      </button>
+    );
+  }
 
-  const variants = {
-    primary: "bg-brand-yellow text-black shadow-neo hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]",
-    secondary: "bg-white text-black shadow-neo hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]",
-    outline: "bg-transparent text-black border-black hover:bg-gray-50",
-    ghost: "bg-transparent border-transparent shadow-none hover:bg-gray-100/50 font-medium font-sans",
-  };
-
-  const sizes = {
-    sm: "text-sm px-3 py-1.5",
-    md: "text-base px-6 py-3",
-    lg: "text-lg px-8 py-4",
-  };
-
-  const widthClass = fullWidth ? 'w-full' : '';
+  if (variant === 'glass') {
+    return (
+      <button
+        className={`
+          px-4 py-2 rounded-full text-sm font-medium
+          text-brand-600 hover:text-stone-900
+          hover:bg-stone-100/50 transition-colors
+          ${className}
+        `}
+        {...props}
+      >
+        {children}
+      </button>
+    )
+  }
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
+      className={`px-6 py-3 rounded-lg font-medium transition-colors ${className}`}
       {...props}
     >
       {children}
-      {icon && <span className="ml-2">{icon}</span>}
     </button>
   );
 };
+
+export default Button;

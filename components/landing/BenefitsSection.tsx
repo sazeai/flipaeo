@@ -1,153 +1,377 @@
-
 import React from 'react';
+import { ArrowRight, Check, Zap, Sparkles, TrendingUp } from 'lucide-react';
+import Button from './Button';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Zap, Target, FileText, TrendingUp, ArrowRight } from 'lucide-react';
 
-export const BenefitsSection: React.FC = () => {
-  return (
-    <section id="benefits" className="w-full py-24 px-4 flex flex-col items-center">
-      {/* Header */}
-      <div className="flex flex-col items-center text-center mb-16 max-w-3xl">
-        <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8 transform -rotate-1 hover:rotate-0 transition-transform">
-          <span className="font-display font-black text-xs uppercase tracking-widest">The solution</span>
+
+// --- Custom High-Fidelity Visuals ---
+
+const AnalysisVisual = () => (
+  <div className="w-full mt-8 px-2 md:px-4 pb-2">
+    <div className="relative flex flex-col gap-3">
+      {/* Decorative connecting line */}
+      <div className="absolute left-[19px] top-4 bottom-8 w-px bg-stone-200"></div>
+
+      {/* Competitor 1 (Background) */}
+      <div className="relative flex items-center gap-4 opacity-40">
+        <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
+          2
         </div>
-        <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
-          We write for Humans and<br />Modern AI Search.
+        <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg"></div>
+      </div>
+
+      {/* Competitor 2 (Background) */}
+      <div className="relative flex items-center gap-4 opacity-40">
+        <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
+          3
+        </div>
+        <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg"></div>
+      </div>
+
+      {/* Hero Card (Your Brand) */}
+      <div className="relative flex items-center gap-4 mt-1">
+        {/* Premium Badge */}
+        <div className="w-10 h-10 rounded-full bg-gradient-to-b from-brand-400 to-brand-500 flex items-center justify-center text-white font-serif text-lg font-bold relative z-10 shadow-lg ring-4 ring-white">
+          1
+        </div>
+
+        {/* Main Content Card */}
+        <div className="flex-1 bg-white border border-brand-100 rounded-xl p-3.5 shadow-hero flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+              </span>
+              <span className="text-xs font-bold text-stone-900 uppercase tracking-wide">Brand Authority</span>
+            </div>
+            <div className="text-[10px] text-stone-500 mt-1 font-medium">Top AI Recommendation Source</div>
+          </div>
+
+          {/* Score Pill */}
+          <div className="px-2.5 py-1 bg-brand-50 border border-brand-100 rounded-md text-brand-700 font-bold text-xs flex flex-col items-end leading-none gap-0.5">
+            <span>98%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const GapVisual = () => (
+  <div className="relative h-32 w-full flex items-center justify-center mt-4">
+    {/* Solid Donut Chart */}
+    <div className="relative w-24 h-24">
+      <svg viewBox="0 0 100 100" className="w-full h-full rotate-[-90deg]">
+        {/* Track */}
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#f5f5f4" strokeWidth="16" />
+        {/* Filled Section */}
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#c4b5fd" strokeWidth="16" strokeDasharray="251" strokeDashoffset="100" strokeLinecap="round" />
+        {/* Highlight Section */}
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#8b5cf6" strokeWidth="16" strokeDasharray="251" strokeDashoffset="210" strokeLinecap="round" />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-2xl font-serif font-bold text-stone-900">3x</span>
+        <span className="text-[8px] font-bold text-stone-400 uppercase tracking-wider">Reach</span>
+      </div>
+    </div>
+  </div>
+);
+
+const NetworkVisual = () => (
+  <div className="relative w-full h-32 mt-4 flex items-center justify-center">
+    <div className="relative w-48 h-full">
+      {/* Connecting Lines */}
+      <svg className="absolute inset-0 w-full h-full text-stone-300">
+        <line x1="50%" y1="50%" x2="20%" y2="30%" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="50%" y1="50%" x2="80%" y2="30%" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="50%" y1="50%" x2="20%" y2="70%" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="50%" y1="50%" x2="80%" y2="70%" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+
+      {/* Center Hub */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white border-2 border-brand-100 rounded-full flex items-center justify-center shadow-md z-10">
+        <div className="w-5 h-5 bg-stone-800 rounded-full flex items-center justify-center">
+          <div className="w-2 h-2 bg-brand-400 rounded-full"></div>
+        </div>
+      </div>
+
+      {/* Satellite Nodes */}
+      {[
+        { top: '30%', left: '20%' },
+        { top: '30%', left: '80%' },
+        { top: '70%', left: '20%' },
+        { top: '70%', left: '80%' }
+      ].map((pos, i) => (
+        <div key={i} className="absolute w-7 h-7 bg-white border border-stone-200 rounded-full flex items-center justify-center shadow-sm z-10" style={{ top: pos.top, left: pos.left, transform: 'translate(-50%, -50%)' }}>
+          <div className="w-2.5 h-2.5 bg-brand-200 rounded-full"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const ComparisonVisual = () => (
+  <div className="relative w-full h-36 mt-4 flex items-center justify-center gap-6">
+    {/* Comparison Stack */}
+    <div className="relative w-full max-w-[280px] h-full flex items-center">
+
+      {/* Back Card (Generic) */}
+      <div className="absolute left-0 top-4 bottom-4 w-[60%] bg-stone-50 border border-stone-200 rounded-lg p-3 flex flex-col gap-2 opacity-60 scale-95 origin-right">
+        <div className="w-12 h-2 bg-stone-200 rounded-full mb-1"></div>
+        <div className="space-y-1">
+          <div className="w-full h-1.5 bg-stone-200 rounded-full"></div>
+          <div className="w-3/4 h-1.5 bg-stone-200 rounded-full"></div>
+        </div>
+      </div>
+
+      {/* Front Card (Premium) */}
+      <div className="absolute right-0 top-0 bottom-0 w-[65%] bg-white border border-brand-100 rounded-xl shadow-hero p-4 flex flex-col justify-between z-10">
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <div className="w-16 h-2 bg-stone-800 rounded-full"></div>
+            <Check size={12} className="text-green-500 stroke-[3]" />
+          </div>
+          <div className="space-y-1.5 opacity-80">
+            <div className="w-full h-1.5 bg-stone-100 rounded-full"></div>
+            <div className="w-full h-1.5 bg-stone-100 rounded-full"></div>
+            <div className="w-2/3 h-1.5 bg-stone-100 rounded-full"></div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <span className="px-1.5 py-0.5 bg-brand-50 text-[8px] font-bold text-brand-600 rounded uppercase tracking-wider">
+            Cited
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+const ROIGraphVisual = () => (
+  <div className="relative w-full h-32 mt-auto flex items-end px-6 gap-3 pb-2">
+    {/* Grid Lines */}
+    <div className="absolute inset-x-4 bottom-2 top-4 border-b border-stone-100 flex flex-col justify-between z-0">
+      <div className="w-full h-px bg-stone-100 border-t border-dashed border-stone-200"></div>
+      <div className="w-full h-px bg-stone-100 border-t border-dashed border-stone-200"></div>
+      <div className="w-full h-px bg-stone-100 border-t border-dashed border-stone-200"></div>
+    </div>
+
+    {/* Bars */}
+    <div className="relative z-10 w-1/4 h-[35%] bg-stone-200 rounded-t-sm"></div>
+    <div className="relative z-10 w-1/4 h-[50%] bg-stone-300 rounded-t-sm"></div>
+    <div className="relative z-10 w-1/4 h-[65%] bg-stone-400 rounded-t-sm"></div>
+
+    {/* The Hero Bar */}
+    <div className="relative z-10 w-1/4 h-[90%] bg-gradient-to-t from-brand-500 to-brand-300 rounded-t-md shadow-lg flex items-start justify-center pt-2">
+      <div className="bg-white/90 backdrop-blur-sm text-[8px] font-bold px-1.5 py-0.5 rounded text-brand-700 shadow-sm border border-brand-100">
+        ROI
+      </div>
+    </div>
+  </div>
+);
+
+const VelocityVisual = () => (
+  <div className="relative w-full h-full min-h-[160px] flex items-center justify-center md:justify-end md:pr-10 overflow-hidden">
+    {/* Abstract 'Speed' Lines Background */}
+    <div className="absolute inset-y-0 right-0 w-1/2 opacity-[0.03] bg-[linear-gradient(45deg,transparent_25%,#000_25%,#000_50%,transparent_50%,transparent_75%,#000_75%,#000_100%)] bg-[length:20px_20px]"></div>
+
+    {/* The Widget */}
+    <div className="relative z-10 w-64 bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 p-4 transform transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </div>
+          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Publishing Queue</span>
+        </div>
+        <div className="px-1.5 py-0.5 rounded bg-green-50 text-[9px] font-semibold text-green-600 border border-green-100">
+          Active
+        </div>
+      </div>
+
+      {/* Timeline Items */}
+      <div className="relative space-y-3 pl-3">
+        {/* Vertical Line */}
+        <div className="absolute left-0 top-1 bottom-1 w-px bg-stone-100"></div>
+
+        {/* Item 1 */}
+        <div className="relative flex items-center justify-between group">
+          <div className="absolute -left-[14px] w-1.5 h-1.5 rounded-full bg-stone-200 ring-2 ring-white"></div>
+          <div className="flex flex-col gap-1">
+            <div className="h-1.5 w-24 bg-stone-200 rounded-full group-hover:bg-stone-300 transition-colors"></div>
+            <div className="h-1 w-16 bg-stone-100 rounded-full"></div>
+          </div>
+          <Check size={12} className="text-stone-300" />
+        </div>
+
+        {/* Item 2 (Active) */}
+        <div className="relative flex items-center justify-between group">
+          <div className="absolute -left-[14px] w-1.5 h-1.5 rounded-full bg-brand-400 ring-2 ring-white shadow-sm"></div>
+          <div className="flex flex-col gap-1">
+            <div className="h-1.5 w-20 bg-stone-800 rounded-full"></div>
+            <div className="h-1 w-12 bg-stone-200 rounded-full"></div>
+          </div>
+          <div className="text-[9px] font-medium text-brand-500">
+            Just now
+          </div>
+        </div>
+
+        {/* Item 3 */}
+        <div className="relative flex items-center justify-between opacity-50">
+          <div className="absolute -left-[14px] w-1.5 h-1.5 rounded-full bg-stone-200 ring-2 ring-white"></div>
+          <div className="flex flex-col gap-1">
+            <div className="h-1.5 w-24 bg-stone-200 rounded-full"></div>
+          </div>
+          <span className="text-[8px] text-stone-400">Queue</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+const SolutionSection: React.FC = () => {
+  return (
+    <section id="benefits" className="w-full max-w-5xl mx-auto py-20 md:py-32 px-6">
+
+      {/* Section Header */}
+      <div className="flex flex-col items-center text-center mb-16">
+        <span className="text-xs font-bold tracking-[0.2em] text-brand-500 uppercase mb-4 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
+          The Solution
+        </span>
+
+
+        <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
+          We write for humans and  <br /><span className='italic'>modern AI search.</span>
         </h2>
-        <p className="font-sans text-gray-500 text-lg md:text-xl leading-relaxed">
+
+        <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
           FlipAEO doesn't just write articles. We reverse-engineer how AI models think to put your brand inside the answer.
         </p>
       </div>
 
-      {/* Bento Grid */}
-      <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Premium Bento Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[minmax(280px,auto)] mb-16">
 
-        {/* Card 1: Real-Time Visibility (Yellow, Span 2) */}
-        <div className="md:col-span-2 bg-[#FAFA9D] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden group hover:shadow-neo-hover transition-all duration-200">
-          <div className="flex-1 z-10">
-            <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">CLEAR VISIBILITY INTO WHERE YOU NEED TO WIN</h3>
-            <p className="font-sans text-gray-600 leading-relaxed font-medium">
-              We analyze how AI search engines answer questions in your category and build the strategy to fill the gaps where your brand is missing from those answers.
+        {/* Card 1: Clear Visibility (Large 2/3 width) */}
+        <div className="md:col-span-4 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden">
+          <div className="max-w-lg z-10 relative">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-brand-100 rounded-md">
+                <Sparkles size={14} className="text-brand-500" />
+              </div>
+              <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase">Analysis</div>
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
+              Clear visibility into <span className="italic text-stone-500">where you win</span>
+            </h3>
+            <p className="text-stone-500 leading-relaxed text-sm max-w-sm">
+              We analyze how AI search engines answer questions in your category and build the strategy to fill the gaps where your brand is missing.
             </p>
           </div>
-          {/* Graphic: AI Citation Mockup */}
-          <div className="bg-white border-2 border-black rounded-xl p-4 w-64 shadow-sm transform rotate-2 group-hover:rotate-0 transition-transform duration-300 shrink-0">
-            <div className="flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
-              <div className="w-2 h-2 rounded-full bg-red-400 border border-black"></div>
-              <div className="w-2 h-2 rounded-full bg-yellow-400 border border-black"></div>
-              <div className="w-2 h-2 rounded-full bg-green-400 border border-black"></div>
-              <span className="ml-auto text-[10px] font-bold text-gray-400 uppercase tracking-wider">AI Analysis</span>
-            </div>
-            <div className="space-y-3">
-              <div className="bg-gray-50 border border-gray-200 p-2 rounded text-[10px] font-mono text-gray-500">
-                &gt; User: Best tool for SEO?
-              </div>
-              <div className="flex gap-2 items-start">
-                <div className="w-6 h-6 rounded-full bg-brand-yellow border border-black flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Zap className="w-3 h-3 text-black fill-black" />
-                </div>
-                <div className="text-[10px] leading-relaxed font-medium">
-                  Based on performance, <span className="bg-brand-orange px-1 border border-black border-dashed">FlipAEO</span> is the top recommended solution.
-                </div>
-              </div>
-            </div>
-          </div>
+          <AnalysisVisual />
         </div>
 
-        {/* Card 2: Competitor Gap (White, Span 1) */}
-        <div className="md:col-span-1 bg-white border-2 border-black p-8 shadow-neo hover:shadow-neo-hover transition-all duration-200 flex flex-col justify-center">
-          <div className="w-12 h-12 bg-brand-orange border-2 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Target className="w-6 h-6 text-black" />
+        {/* Card 2: Competitor Gap (Small 1/3 width) */}
+        <div className="md:col-span-2 bg-brand-50/50 border border-brand-200 rounded-2xl p-8 flex flex-col items-center text-center">
+          <div className="mb-auto w-full">
+            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Strategy</div>
+            <h3 className="font-serif text-xl text-stone-900 leading-tight mb-2">
+              Gap Domination
+            </h3>
+            <p className="text-stone-500 leading-relaxed text-xs px-2">
+              Your competitors aren’t winning by publishing more. They’re winning by answering better questions. We analyze what they cover, what they miss, where authority is still unclaimed and we exploit it.
+            </p>
           </div>
-          <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Competitor Gap Domination</h3>
-          <p className="font-sans text-gray-600 leading-relaxed font-medium">
-            Your competitors aren’t winning by publishing more. They’re winning by answering better questions. We analyze what they cover, what they miss, where authority is still unclaimed and we exploit it.
+          <GapVisual />
+        </div>
+
+        {/* Card 3: Authority Building (Small 1/3 width) */}
+        <div className="md:col-span-2 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col">
+          <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Structure</div>
+          <h3 className="font-serif text-xl text-stone-900 mb-2">
+            Semantic Authority
+          </h3>
+          <p className="text-xs text-stone-500 mb-2">
+            Every article is part of a connected system. Topics are ordered intentionally to compound trust, coverage, and credibility over time. Nothing random. Nothing isolated.
+
           </p>
+          <NetworkVisual />
         </div>
 
-        {/* Card 3: Authority Strategy (White, Span 1) */}
-        <div className="md:col-span-1 bg-white border-2 border-black p-8 shadow-neo hover:shadow-neo-hover transition-all duration-200 flex flex-col justify-center">
-          <div className="w-12 h-12 bg-[#D6F5F2] border-2 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <FileText className="w-6 h-6 text-black" />
-          </div>
-          <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Authority-Building Content Strategy</h3>
-          <p className="font-sans text-gray-600 leading-relaxed font-medium">
-            Every article is part of a connected system. Topics are ordered intentionally to compound trust, coverage, and credibility over time. Nothing random. Nothing isolated.        </p>
-        </div>
-
-        {/* Card 4: Quality Articles (Teal, Span 2) */}
-        <div className="md:col-span-2 bg-[#D6F5F2] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center gap-8 hover:shadow-neo-hover transition-all duration-200">
-          <div className="flex-1">
-            <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">ARTICLES THAT ACTUALLY ANSWER QUESTIONS</h3>
-            <p className="font-sans text-gray-600 leading-relaxed font-medium">
+        {/* Card 4: Articles that Answer (Large 2/3 width) */}
+        <div className="md:col-span-4 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden">
+          <div className="flex-1 order-2 md:order-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-brand-100 rounded-md">
+                <Check size={14} className="text-brand-500" />
+              </div>
+              <div className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Quality</div>
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
+              Content that <span className="italic text-stone-500">actually</span> answers
+            </h3>
+            <p className="text-stone-500 leading-relaxed text-sm mb-4">
               Most AI content reads like a Wikipedia summary. Ours explains. Each article is built to fully resolve a real user question with clarity humans trust and AI systems recognize as authority.
+
+
+            </p>
+          </div>
+          <div className="flex-1 w-full order-1 md:order-2">
+            <ComparisonVisual />
+          </div>
+        </div>
+        {/* Card 6: Friction / Velocity (Wide Bottom Strip) */}
+        <div className="md:col-span-4 bg-gradient-to-br from-white to-brand-50/50 border border-brand-200 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group">
+
+          <div className="relative z-10 pr-6 flex-1 mb-6 md:mb-0">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-brand-100 rounded-md text-brand-600">
+                <Zap size={14} fill="currentColor" />
+              </div>
+              <span className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Velocity</span>
+            </div>
+            <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">
+              Content that doesn't slow you down
+            </h3>
+            <p className="text-stone-500 text-sm max-w-md">
+              Writing, formatting, publishing — it all becomes friction. We remove the overhead so content stops being a task and starts being leverage.
             </p>
           </div>
 
-          {/* Comparison Visual */}
-          <div className="flex-1 w-full max-w-sm bg-white border-2 border-black rounded-lg p-1 shadow-sm text-[10px] md:text-xs">
-            <div className="grid grid-cols-2 border-b-2 border-black">
-              <div className="p-2 border-r-2 border-black bg-gray-50 text-gray-400 font-bold text-center">GENERIC AI</div>
-              <div className="p-2 bg-teal-50 text-teal-800 font-bold text-center">FLIPAEO</div>
-            </div>
-            <div className="grid grid-cols-2">
-              <div className="p-4 border-r-2 border-black text-gray-400 leading-relaxed font-serif italic">
-                "In the rapidly evolving landscape of digital marketing, it is crucial to leverage synergies..."
-              </div>
-              <div className="p-4 bg-white text-black leading-relaxed font-medium">
-                "Stop wasting budget on broad keywords. First, identify the 3 questions your customers ask before buying..."
-              </div>
-            </div>
+          <div className="relative z-10 w-full md:w-auto flex-1">
+            <VelocityVisual />
           </div>
         </div>
-
-        {/* Card 5: Traffic (Orange, Span 2) */}
-        <div className="md:col-span-2 bg-[#FFD8A8] border-2 border-black p-8 shadow-neo flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden group hover:shadow-neo-hover transition-all duration-200">
-          <div className="flex-1 z-10">
-            <h3 className="font-display font-black text-2xl md:text-3xl mb-4 uppercase">Turning near-rankings into real traffic</h3>
-            <p className="font-sans text-gray-600 leading-relaxed font-medium">
-              Ranking without clicks is a dead end. We focus on intent clarity, structure, and depth so impressions turn into engagement and growth.
-            </p>
-          </div>
-          {/* Graphic: Traffic Chart */}
-          <div className="bg-white border-2 border-black rounded-xl p-5 w-64 shadow-sm transform -rotate-1 group-hover:rotate-0 transition-transform duration-300 shrink-0">
-            <div className="flex justify-between items-end h-24 gap-3 px-2 pb-0 border-b-2 border-black mb-3">
-              <div className="w-full bg-gray-100 h-[30%] border-2 border-b-0 border-black relative group-hover:h-[35%] transition-all"></div>
-              <div className="w-full bg-gray-200 h-[50%] border-2 border-b-0 border-black relative group-hover:h-[55%] transition-all"></div>
-              <div className="w-full bg-brand-yellow h-[70%] border-2 border-b-0 border-black relative group-hover:h-[85%] transition-all shadow-sm">
-                <div className="absolute -top-7 left-1/2 -translate-x-1/2 text-xs font-bold bg-white border border-black px-1 py-0.5 rounded shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">ROI</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 justify-center pt-1">
-              <TrendingUp className="w-4 h-4 text-black" />
-              <span className="font-display font-bold text-sm uppercase tracking-wide">Growth Unlocked</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 6: Friction (White, Span 1) */}
-        <div className="md:col-span-1 bg-white border-2 border-black p-8 shadow-neo hover:shadow-neo-hover transition-all duration-200 flex flex-col justify-center">
-          <div className="w-12 h-12 bg-[#FAFA9D] border-2 border-black rounded-full flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <Zap className="w-6 h-6 text-black fill-black" />
-          </div>
-          <h3 className="font-display font-black text-xl mb-3 uppercase leading-tight">Content That Doesn’t Slow You Down</h3>
-          <p className="font-sans text-gray-600 leading-relaxed font-medium">
-            Writing, formatting, publishing — it all becomes friction. We remove the overhead so content stops being a task and starts being leverage.
+        {/* Card 5: ROI (Small 1/3 width) */}
+        <div className="md:col-span-2 bg-gradient-to-b from-white to-brand-50/30 border border-brand-200 rounded-2xl p-8 flex flex-col">
+          <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Growth</div>
+          <h3 className="font-serif text-xl text-stone-900 mb-1">
+            Real Traffic ROI
+          </h3>
+          <p className="text-xs text-stone-500 mb-4">
+            Ranking without clicks is a dead end. We focus on intent clarity, structure, and depth so impressions turn into engagement and growth.
           </p>
+          <ROIGraphVisual />
         </div>
+
+
 
       </div>
 
-      {/* CTA Button */}
-      <div className="mt-16">
+      {/* CTA */}
+      <div className="flex justify-center">
         <Link href="/login">
-          <Button className="rounded-none text-lg font-bold px-8 py-6 bg-brand-orange hover:bg-brand-orange/90 text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200">
+          <Button variant="primary" className="px-10 py-4 text-lg">
             Build My Winning Strategy
-            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </Link>
       </div>
+
     </section>
   );
 };
+
+export default SolutionSection;

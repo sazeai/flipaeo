@@ -13,14 +13,14 @@ export const metadata: Metadata = generateMetadata({
 
 export default function PrivacyPolicy() {
   return (
-    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+    <div className=" min-h-screen w-full flex flex-col overflow-x-hidden font-sans bg-stone-50/50">
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-12">
         {/* Hero */}
         <section className="w-full py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
-              <span className="font-display font-bold text-xs uppercase tracking-widest">Legal</span>
+            <div className="inline-block bg-stone-100 text-stone-800 border border-stone-200 rounded-full px-4 py-1.5 mb-6 text-sm font-medium tracking-wide">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Privacy Policy</h1>
             <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how FlipAEO collects, uses, and protects your personal data.</p>
@@ -31,7 +31,7 @@ export default function PrivacyPolicy() {
         <section className="max-w-5xl mx-auto px-4 py-12 w-full">
           <p className="text-gray-600 mb-6">Effective Date: January 20, 2026</p>
 
-          <div className="space-y-8 bg-white border rounded-2xl p-5">
+          <div className="space-y-8 ">
             <div className="">
               <p>
                 At <strong>FlipAEO</strong>, accessible from{' '}

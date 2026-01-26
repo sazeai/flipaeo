@@ -1,140 +1,148 @@
-
 import React from 'react';
-import { Button } from './Button';
-import Link from 'next/link';
-import { Bot, Zap, Globe, Image as ImageIcon, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { Bot, Zap, Globe, Image as ImageIcon, Link2, ShieldCheck } from 'lucide-react';
+import Button from './Button';
+import Link from 'next/link'
 
-export const PricingSection: React.FC = () => {
+const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
+    <div className="flex gap-4 items-start group">
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white border border-brand-100 flex items-center justify-center text-brand-500">
+            <Icon size={20} strokeWidth={1.5} />
+        </div>
+        <div className="flex-1">
+            <h4 className="font-serif text-lg text-stone-900 leading-tight mb-1">
+                {title}
+            </h4>
+            <p className="text-sm text-stone-500 leading-relaxed">
+                {description}
+            </p>
+        </div>
+    </div>
+);
+
+const PricingSection: React.FC = () => {
     return (
-        <section id="pricing" className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
+        <section id="pricing" className="w-full max-w-5xl mx-auto px-6 py-20 md:py-32 relative">
 
-            {/* Background Decorative Elements */}
-            <div className="absolute top-1/2 -left-12 w-64 h-64 bg-brand-yellow rounded-full border-2 border-black opacity-10 blur-3xl pointer-events-none"></div>
-            <div className="absolute -bottom-12 -right-12 w-80 h-80 bg-brand-orange rounded-full border-2 border-black opacity-10 blur-3xl pointer-events-none"></div>
-
-            {/* Header */}
-            <div className="flex flex-col items-center text-center mb-16 max-w-3xl relative z-10">
-                <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
-                    <span className="font-display font-bold text-xs uppercase tracking-widest">Simple Pricing</span>
-                </div>
-                <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl md:text-6xl leading-[1] mb-6 uppercase">
-                    One Plan.<br />Unlimited Potential.
+            {/* Section Header */}
+            <div className="flex flex-col items-center text-center mb-16">
+                <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
+                    One Plan.  <br /><span className='italic text-stone-500'>Unlimited Potential.</span>
                 </h2>
-                <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl">
-                    Everything you need to turn search into your biggest growth channel. No hidden fees. No complicated tiers.
+
+                <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
+                    Everything you need to turn search into your biggest growth channel. <br className="hidden md:block" />
+                    No hidden fees. No complicated tiers. Just results.
                 </p>
             </div>
 
-            {/* The Master Card */}
-            <div className="w-full max-w-5xl relative z-10">
+            {/* Wrapper Card (Two-Layer Effect) */}
+            <div className="w-full bg-brand-200 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
 
-                {/* Card Container */}
-                <div className="bg-white border-2 md:border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] md:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] flex flex-col lg:flex-row relative">
+                {/* The Inner Pricing Card */}
+                <div className="relative w-full bg-[#fffaf5] border border-brand-100/50 rounded-[17px] overflow-hidden flex flex-col md:flex-row">
 
-                    {/* Absolute Badge for Launch */}
-                    <div className="absolute -top-5 -right-2 md:-right-4 z-20">
-                        <div className="bg-[#FF5F57] text-white border-2 border-black px-4 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform rotate-3 flex flex-col items-center animate-in slide-in-from-top-4 fade-in duration-700">
-                            <span className="font-display font-black text-md uppercase leading-none">Launch Offer</span>
-                            <span className="font-mono text-[10px] font-bold uppercase tracking-wider">Limited Time</span>
+                    {/* Launch Offer Badge (Floating) */}
+                    <div className="absolute top-0 right-0 md:right-auto md:left-0 z-20">
+                        <div className="bg-brand-500 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-bl-[17px] md:rounded-br-[17px] md:rounded-bl-none">
+                            Launch Offer
                         </div>
                     </div>
 
-                    {/* Left Side: The Offer */}
-                    <div className="w-full lg:w-[40%] bg-[#FAFA9D] border-b-2 lg:border-b-0 lg:border-r-2 md:border-r-4 border-black p-8 md:p-12 flex flex-col relative overflow-hidden">
-                        {/* Texture Overlay */}
-                        <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none"></div>
+                    {/* Left Side: Pricing & CTA */}
+                    <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">
 
-                        <div className="relative z-10 flex-grow flex flex-col justify-center">
-                            <h3 className="font-display font-black text-4xl md:text-5xl mb-2 uppercase">All in One</h3>
-                            <p className="font-sans font-bold text-black/60 mb-10 text-lg">For ambitious entrepreneurs</p>
-
-                            <div className="mb-10 p-6 bg-white border-2 border-black shadow-neo-sm rounded-xl relative">
-                                <div className="absolute -top-3 -left-3">
-                                    <Sparkles className="w-8 h-8 text-black fill-brand-orange" />
-                                </div>
-                                <div className="flex flex-col items-center text-center">
-                                    <span className="font-sans font-bold text-gray-400 line-through text-lg decoration-2 decoration-red-500 mb-1">$79 original price</span>
-                                    <div className="flex items-start gap-1">
-                                        <span className="font-sans font-bold text-2xl mt-2">$</span>
-                                        <span className="font-display font-black text-7xl md:text-8xl tracking-tighter leading-none">49</span>
-                                    </div>
-                                    <span className="font-sans font-bold text-black/40 text-sm uppercase tracking-wider mt-2">Per Month</span>
-                                </div>
+                        {/* Handwritten Note */}
+                        <div className="absolute top-8 right-4 md:-right-6 md:top-20 z-10 pointer-events-none transform rotate-12 md:rotate-0">
+                            <div className="relative">
+                                <span className="font-hand text-xl text-stone-400 whitespace-nowrap">Save $360/year</span>
+                                <svg className="absolute -bottom-6 -left-4 w-12 h-12 text-stone-300 transform rotate-12 hidden md:block" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                                    <path d="M80,10 Q40,60 10,80" strokeWidth="2" markerEnd="url(#arrow-price)" />
+                                    <defs>
+                                        <marker id="arrow-price" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                            <path d="M0,0 L10,5 L0,10" fill="none" stroke="currentColor" strokeWidth="2" />
+                                        </marker>
+                                    </defs>
+                                </svg>
                             </div>
                         </div>
 
-                        <div className="relative z-10 mt-auto">
-                            <Link href="/subscribe">
-                                <Button fullWidth variant="primary" size="md" className="h-12 text-md sm:text-lg border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-black hover:bg-gray-800">
-                                    Win The AEO RACE
+                        <div className="mb-6 mt-4">
+                            <span className="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
+                                All In One
+                            </span>
+                            <h3 className="font-serif text-2xl text-stone-900">
+                                For ambitious entrepreneurs
+                            </h3>
+                        </div>
+
+                        <div className="flex items-baseline justify-center gap-3 mb-2">
+                            <span className="text-xl text-stone-400 line-through decoration-brand-300/50 decoration-2">
+                                $79
+                            </span>
+                            <span className="text-6xl md:text-7xl font-serif text-stone-900 tracking-tighter">
+                                $49
+                            </span>
+                        </div>
+                        <p className="text-stone-500 text-sm mb-10">per month</p>
+
+
+
+                        <div className="flex justify-center">
+                            <Link href="/login">
+                                <Button variant="primary" className="w-full px-10 py-4 text-lg">
+                                    Win The AEO Race
                                 </Button>
                             </Link>
-                            <p className="text-center font-sans text-xs font-bold mt-4 opacity-50 uppercase tracking-wide">14-day money-back guarantee</p>
+                        </div>
+
+                        <div className="mt-6 flex items-center gap-2 text-xs text-stone-400 font-medium">
+                            <ShieldCheck size={14} className="text-green-500" />
+                            14-day money-back guarantee
                         </div>
                     </div>
 
                     {/* Right Side: Features */}
-                    <div className="w-full lg:w-[60%] p-4 md:p-8 bg-white flex flex-col justify-center relative">
+                    <div className="flex-1 p-8 md:p-12 bg-white">
+                        <h3 className="font-sans text-xs font-bold text-stone-400 uppercase tracking-widest mb-8 border-b border-stone-100 pb-4">
+                            Included Powerhouse Access
+                        </h3>
 
-                        {/* Decorative Window Controls */}
-                        <div className="absolute top-4 right-4 flex gap-2">
-                            <div className="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
-                            <div className="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
-                        </div>
-
-                        <h4 className="font-display font-black text-2xl uppercase mb-10 flex items-center gap-3">
-                            <span className="bg-black text-white px-2 py-0.5 text-lg">Included</span>
-                            <span>Powerhouse Access</span>
-                        </h4>
-
-                        <div className="space-y-6">
-                            <FeatureRow
-                                icon={<Bot className="w-6 h-6" />}
+                        <div className="space-y-8">
+                            <FeatureItem
+                                icon={Bot}
                                 title="30 Articles / Month"
-                                description="Generated and published on auto-pilot. High quality, human-like output."
+                                description="Generated and published on auto-pilot. High quality, human-like output that passes AI detection."
                             />
-                            <FeatureRow
-                                icon={<Zap className="w-6 h-6" />}
+                            <FeatureItem
+                                icon={Zap}
                                 title="Strategic Content Planning"
-                                description="Hands-free planning based on competitor gaps and search intent."
+                                description="Hands-free planning based on competitor gaps and real-time search intent analysis."
                             />
-                            <FeatureRow
-                                icon={<Globe className="w-6 h-6" />}
+                            <FeatureItem
+                                icon={Globe}
                                 title="CMS Integration"
-                                description="Connects directly with WordPress, Webflow, and Shopify on the go."
+                                description="Connects directly with WordPress, Webflow, and Shopify. We handle the formatting."
                             />
-                            <FeatureRow
-                                icon={<ImageIcon className="w-6 h-6" />}
+                            <FeatureItem
+                                icon={ImageIcon}
                                 title="On-Brand AI Images"
-                                description="Visuals generated to match your brand's unique style automatically."
+                                description="Visuals generated to match your brand's unique style automatically for every post."
                             />
-                            <FeatureRow
-                                icon={<LinkIcon className="w-6 h-6" />}
+                            <FeatureItem
+                                icon={Link2}
                                 title="Smart Interlinking"
-                                description="Powerful suggestions to boost site structure and authority."
+                                description="Powerful semantic suggestions to boost site structure and topical authority."
                             />
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Decorative background blur behind the card */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] bg-brand-100/30 blur-3xl -z-10 rounded-full"></div>
+
         </section>
     );
 };
 
-interface FeatureRowProps {
-    icon: React.ReactElement<{ className?: string }>;
-    title: string;
-    description: string;
-}
-
-const FeatureRow: React.FC<FeatureRowProps> = ({ icon, title, description }) => (
-    <div className="flex items-start gap-5 group">
-        <div className="w-12 h-12 bg-white border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:bg-[#D6F5F2] group-hover:-translate-y-1 group-hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
-            {React.cloneElement(icon, { className: "w-6 h-6 text-black stroke-[2px]" })}
-        </div>
-        <div>
-            <h5 className="font-display font-bold text-lg uppercase leading-none mb-2 pt-1">{title}</h5>
-            <p className="font-sans text-gray-600 text-sm font-medium leading-relaxed max-w-sm">{description}</p>
-        </div>
-    </div>
-);
+export default PricingSection;

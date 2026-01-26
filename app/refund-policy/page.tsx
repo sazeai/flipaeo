@@ -14,14 +14,14 @@ export const metadata: Metadata = generateMetadata({
 
 export default function RefundPolicy() {
   return (
-    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col overflow-x-hidden font-sans bg-stone-50/50">
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full pt-12">
         {/* Hero */}
         <section className="w-full py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
-              <span className="font-display font-bold text-xs uppercase tracking-widest">Legal</span>
+            <div className="inline-block bg-stone-100 text-stone-800 border border-stone-200 rounded-full px-4 py-1.5 mb-6 text-sm font-medium tracking-wide">
+              <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Refund Policy</h1>
             <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Understand our 14-day money-back guarantee and refund process.</p>
@@ -30,7 +30,7 @@ export default function RefundPolicy() {
 
         {/* Content */}
         <section className="max-w-5xl mx-auto px-4 py-12 w-full">
-          <div className="space-y-8 bg-white border rounded-2xl p-5">
+          <div className="space-y-8 p-6 md:p-12">
             <div className="">
               <p>
                 Thank you for choosing{' '}
@@ -42,7 +42,7 @@ export default function RefundPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. 14-Day Money-Back Guarantee</h2>
               <p>
-                We offer a <strong>14-day money-back guarantee</strong> on all new subscriptions. If you're not satisfied with the quality of your initial articles within the first 14 days, we'll refund your subscription payment in full. No questions asked.
+                We offer a <strong>14-day money-back guarantee</strong> on all new subscriptions. If you're not satisfied with the quality of your initial articles within the first 14 days, you'll refund your subscription payment in full. No questions asked.
               </p>
             </div>
 
