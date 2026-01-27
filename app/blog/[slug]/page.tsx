@@ -109,6 +109,9 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
 function BlogPostContent({ post }: { post: WordPressPost }) {
   const readTime = calculateReadingTime(post.content)
   const publishedDate = formatDate(post.date)
+  const modifiedDate = formatDate(post.modified)
+  // Only show updated if modification date is different from published date (ignoring time)
+  const isUpdated = post.modified && new Date(post.modified).toDateString() !== new Date(post.date).toDateString()
   const category = post.categories.nodes[0]?.name || "General"
 
   // Only show excerpt if it's a REAL manual excerpt (not auto-generated)
@@ -179,7 +182,9 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
                 <span className="bg-stone-100 text-stone-700 border border-stone-200 px-3 py-1 font-medium rounded-full">{category}</span>
                 <div className="flex items-center gap-2 text-stone-500 font-medium">
                   <Calendar className="w-4 h-4" />
-                  <span>{publishedDate}</span>
+                  <span title={isUpdated ? `Published: ${publishedDate}` : undefined}>
+                    {isUpdated ? `Updated ${modifiedDate}` : publishedDate}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-stone-500 font-medium">
                   <Clock className="w-4 h-4" />
