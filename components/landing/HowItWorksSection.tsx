@@ -180,7 +180,7 @@ const HowItWorksSection: React.FC = () => {
 
 
           <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-            A Proven System for  <br /><span className='italic'>Compounding Organic Traffic</span>
+            A Proven System for  <br /><span className='italic text-stone-500'>Compounding Organic Traffic</span>
           </h2>
 
           <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">

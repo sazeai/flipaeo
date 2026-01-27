@@ -469,7 +469,7 @@ const FeaturesSection: React.FC = () => {
 
 
         <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-          How we make you win <br /><span className='italic'>Modern AI Search</span>
+          How we make you win <br /><span className='italic text-stone-500'>Modern AI Search</span>
         </h2>
 
         <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
