@@ -17,7 +17,7 @@ const BLOG_EXAMPLES = [
     {
         title: "The Complete Guide to AI SEO & AEO in 2026",
         category: "FlipAEO",
-        href: "https://flipaeo.com/blog/complete-guide-to-ai-seo-aeo-in-2026",
+        href: "https://flipaeo.com/blog/the-complete-guide-to-ai-seo-aeo-in-2026",
         imageSrc: "/brands/flipaeo.png"
     },
     {
