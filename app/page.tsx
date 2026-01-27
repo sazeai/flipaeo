@@ -6,16 +6,15 @@ import { Navbar } from '@/components/landing/Navbar';
 import Hero from '@/components/landing/Hero';
 import ProblemSection from '@/components/landing/ProblemSection';
 import BenefitsSection from '@/components/landing/BenefitsSection';
-import ShowcaseSection from '@/components/landing/ShowcaseSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import PricingSection from '@/components/landing/PricingSection';
 import { FAQSection } from '@/components/landing/FAQSection';
 import CTASection from '@/components/landing/CTASection';
 import { Footer } from '@/components/landing/Footer';
-import { AICitations } from '@/components/landing/AICitations';
 import { GridBackground } from "@/components/landing/GridBackground"
 import BlogCarousel from '@/components/landing/BlogCarousel';
+import FounderNote from '@/components/landing/FounderNote';
 
 
 export const metadata: Metadata = commonPageMetadata.home()
@@ -38,6 +37,7 @@ export default function Home() {
         <BenefitsSection />
         <HowItWorksSection />
         <FeaturesSection />
+        <FounderNote />
         <PricingSection />
         <FAQSection />
         <CTASection />
