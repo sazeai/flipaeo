@@ -367,30 +367,10 @@ IMAGE TYPE: ${imageType.toUpperCase()}
 USE THIS TEMPLATE STRUCTURE:
 ${template}
 
-TEXT SAFETY RULES(CRITICAL - AI IMAGE MODEL LIMITATION):
-The AI image generator CANNOT accurately render certain words.You MUST rewrite any text to use ONLY safe words.
-
-❌ NEVER USE these word patterns in ANY text:
-- Words ending in: -ries, -aces, -ising, -eling, -ulties
-  - Double consonants mid - word(rk + t, bl + ed, ff + ed)
-    - Technical jargon over 10 letters
-      - Multi - word compound tech phrases
-
-✅ ALWAYS REWRITE using safe alternatives:
-- "directories" → "listings" or "sites"
-  - "marketplaces" → "markets"
-    - "recruiters" → "hiring teams"
-      - "professional" → "pro"
-        - "labeled" → "marked"
-          - "promising" → "claiming"
-            - "optimization" → "boost" or "tips"
-              - "strategies" → "plans" or "tips"
-
-✅ SAFE TEXT RULES:
-- Max 6 words per heading
-  - Max 3 words per label
-    - Use only common 5th - grade vocabulary
-      - Acronyms are safe(AI, SEO, PR, HR, CRM)
+TEXT FORMATTING (Flux 2 Turbo):
+- Use handwritten/felt-tip pen style descriptions for better text rendering
+- Keep labels concise (max 3-5 words) for readability
+- Place text in quotation marks when describing what should appear in the image
 
 YOUR TASK:
 1. Fill in the template placeholders based on the section context
