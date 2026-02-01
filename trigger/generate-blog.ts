@@ -355,70 +355,67 @@ const getIntroTemplate = (articleType: ArticleType): string => {
   return INTRO_TEMPLATES[articleType] || INTRO_TEMPLATES.informational
 }
 
-// --- IN-CONTENT IMAGE TEMPLATES (Tested & Working) ---
+// --- IN-CONTENT IMAGE TEMPLATES (Minimized Text - Visual Focus) ---
 const IMAGE_TEMPLATES: Record<string, string> = {
-  concept: `Clean editorial illustration on a white background, 16: 9 ratio.A large [MAIN_VISUAL_ELEMENT] in the center acting like an analysis tool.Around it, four labeled indicators connected with thin lines.
+  concept: `Clean flat illustration on white background with subtle dot pattern.
 
-Text labels placed clearly near each indicator:
-    - [LABEL_1]
-    - [LABEL_2]
-    - [LABEL_3]
-    - [LABEL_4]
+At the top center, ONE heading in hand-drawn marker style: "[4-5 WORD MAX HEADING]"
 
-At the top center, bold heading text:
-    "[SHORT_HEADING_MAX_6_WORDS]"
+Visual elements (NO TEXT LABELS - use icons/shapes instead):
+- A large central icon representing the main concept
+- 3-4 smaller icons around it connected with thin arrows or lines
+- Use color-coding to show relationships (e.g., green for positive, red for negative)
 
-Flat vector style.Minimal color palette.High clarity text.No gradients.Professional blog illustration.`,
+NO checklists. NO text labels on elements. Only the heading has text.
+Flat vector style. Minimal palette. Professional diagram aesthetic.`,
 
-  how_to: `Modern flat illustration on a white background showing [SCENE_DESCRIPTION].On the right side, a vertical checklist panel with check icons.
+  how_to: `Clean step-by-step diagram on white background.
 
-Checklist text:
-    - [STEP_1]
-    - [STEP_2]
-    - [STEP_3]
-    - [STEP_4]
+At the top left, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
 
-Top left bold heading text:
-    "[SHORT_HEADING_MAX_6_WORDS]"
+Visual flow (NO TEXT - use numbered circles and arrows instead):
+- 3-4 numbered circles (1, 2, 3, 4) connected by arrows flowing left to right
+- Each circle contains a simple icon representing that step
+- Arrows show the flow direction
 
-Clean sans serif typography.Flat UI style.Clear readable text.`,
+NO text descriptions. NO checklists. Just numbered icons with arrows.
+Flat UI style. Clean minimal design.`,
 
-  comparison: `Split screen illustration on a white background.Left side labeled "Before" showing[BAD_STATE_DESCRIPTION].Right side labeled "After" showing[GOOD_STATE_DESCRIPTION].
+  comparison: `Split screen illustration on white background.
 
-Text labels under each side:
-    - Before
-    - After
+At the top center, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
 
-Small tags near elements on each side describing the difference.
+Left side: Red-tinted section with X icon, showing [negative visual elements/icons]
+Right side: Green-tinted section with checkmark icon, showing [positive visual elements/icons]
 
-Top center heading text:
-    "[SHORT_HEADING_MAX_6_WORDS]"
+Use visual contrast (colors, icons) NOT text to show the difference.
+NO text labels. NO descriptions. Just visual contrast.
+Flat vector. High contrast colors.`,
 
-Flat vector style.High contrast.Editorial blog illustration.`,
+  process: `Horizontal flow diagram on white background.
 
-  process: `Clean infographic style illustration on a white background.A horizontal flow from left to right with 3 - 4 steps connected by arrows.
+At the top, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
 
-Text under each step:
-    - [STEP_1_NAME]
-    - [STEP_2_NAME]
-    - [STEP_3_NAME]
+Flow visualization (NO TEXT - numbers and icons only):
+- 3-4 circles or boxes numbered 1, 2, 3, 4
+- Each contains a relevant icon (no text)
+- Connected by thick arrows flowing left to right
+- Optional: small decorative elements
 
-Top heading text:
-    "[SHORT_HEADING_MAX_6_WORDS]"
+NO step descriptions. NO labels. Just icons, numbers, and arrows.
+Infographic style. Clean professional look.`,
 
-Minimal flat design.Thin arrows.Clean typography.No gradients.`,
+  insight: `Editorial illustration on white background.
 
-  insight: `Editorial style illustration on a white background. [SCENE_WITH_PERSON_OBSERVING].Over the main element, semi- transparent overlays highlight key aspects.
+At the top, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
 
-Overlay labels:
-- [INSIGHT_1]
-- [INSIGHT_2]
-- [INSIGHT_3]
+Main visual:
+- One large central illustration/icon representing the key insight
+- Optional: magnifying glass, spotlight, or highlight effect on key area
+- Use visual emphasis (glow, arrows pointing) instead of text labels
 
-Top right heading text:
-"[SHORT_HEADING_MAX_6_WORDS]"
-
-Soft flat vector style. Muted colors. Clean readable text.`
+NO overlay labels. NO multiple text elements. Just the heading and visuals.
+Soft flat vector style. Muted professional colors.`
 }
 
 // Generate section image prompt with integrated text safety
@@ -442,30 +439,29 @@ IMAGE TYPE: ${imageType.toUpperCase()}
 REFERENCE TEMPLATE:
 ${template}
 
-CRITICAL - OUTPUT FORMAT:
-You MUST write the prompt in a STRUCTURED, LINE-BY-LINE format:
+CRITICAL - MINIMAL TEXT RULE:
+The image should have ONLY ONE text element: the heading (4-5 words max).
+Everything else must be communicated VISUALLY through:
+- Icons and symbols
+- Numbered circles (1, 2, 3, 4)
+- Arrows and flow lines
+- Color coding (green = good, red = bad)
+- Visual diagrams and connections
 
-1. First line: Style and background (e.g., "Clean flat illustration on white background with subtle grid pattern.")
+DO NOT USE:
+- Checklists with text
+- Multiple text labels
+- Text descriptions on elements
+- Overlay text
 
-2. Main visual element line: What the central element is (e.g., "A large laptop icon in the center with highlighted screen.")
-
-3. Text labels as numbered list:
-   - Label 1: "[2-3 word label]"
-   - Label 2: "[2-3 word label]"
-   - etc.
-
-4. Heading line: At the top, bold heading text in hand-drawn style: "[MAX 6 WORDS]"
-
-5. Final line: Style summary (e.g., "Flat vector. Minimal palette. No gradients.")
-
-TEXT RULES:
-- ALL labels: Max 3 words
-- Heading: Max 6 words
-- Use hand-drawn/marker/felt-tip pen style for text (renders better)
-- Avoid complex technical terms in visible text
+STRUCTURED OUTPUT FORMAT:
+1. First line: Style and background
+2. Heading line: "At the top, ONE heading in hand-drawn style: [4-5 WORDS MAX]"
+3. Visual elements: Describe icons, arrows, numbered circles, color coding
+4. Final line: Style summary
 
 YOUR TASK:
-Fill in the template with specific elements based on the section context. Keep the structured format with each element on its own line.
+Create a visually-driven diagram with ONLY the heading as text. Use icons, arrows, and visual elements to communicate the concept.
 
 OUTPUT: Return ONLY the structured image prompt. No explanations.`
 
@@ -1735,34 +1731,28 @@ Image Style Preference: ${imageStyle}
 
 ${styleTemplate}
 
-TEXT OVERLAY REQUIREMENT:
-- The title text "${keyword.toUpperCase()}" must appear prominently in the image
-- Text should be in a hand-drawn, marker, or felt-tip pen style (NOT photorealistic typography)
-- Position the text at the top or left side of the image
-- High contrast against the background
+CRITICAL - MINIMAL TEXT RULE:
+The image should have ONLY ONE text element: "${keyword.toUpperCase()}" (4-5 words max).
+- Text in hand-drawn, marker, or felt-tip pen style
+- Position at the top or center
+- High contrast against background
 
-CRITICAL - PROMPT STRUCTURE:
-You MUST write the prompt in a STRUCTURED, LINE-BY-LINE format. Do NOT write a wall of text paragraph.
-Use this format:
+Everything else MUST be visual - NO additional text labels:
+- Use icons and symbols
+- Use arrows and flow lines
+- Use color coding
+- Use visual diagrams
 
-1. First line: Overall style and background description
-2. Second line: Text placement and style (where the title appears, font style)
-3. Numbered list: Each visual element described separately
-4. Final line: Overall aesthetic/mood
+DO NOT USE: checklists, multiple text labels, overlay captions, or descriptions.
 
-EXAMPLE OF CORRECT STRUCTURE:
-"Clean editorial illustration on a white background with subtle dot pattern. 
-
-At the top, bold heading text in a hand-drawn felt-tip pen style: "TOPIC TITLE HERE"
-
-Visual elements on the right side:
-1. A laptop icon with highlighted screen
-2. Connected with thin lines to labeled indicators
-
-Flat vector style. Minimal color palette. High clarity. Professional blog illustration."
+STRUCTURED OUTPUT FORMAT:
+1. First line: Style and background
+2. Second line: "At the top, ONE heading in hand-drawn style: [THE KEYWORD]"
+3. Visual elements: Describe icons, diagrams, arrows (NO text on these)
+4. Final line: Style summary
 
 YOUR TASK:
-Generate a structured prompt following the format above. Each element on its own line. Be specific about placement and style.
+Create a visually-driven image with ONLY the keyword as the single text element. All other information through visual elements.
 
 OUTPUT: Return ONLY the structured image prompt. No explanations.`
 
