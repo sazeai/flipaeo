@@ -343,3 +343,166 @@ function validateImpact(impact: string): "High" | "Medium" | "Low" {
     return valid.includes(impact) ? impact as any : "Medium"
 }
 
+/**
+ * Rejected item structure for replacement generation
+ */
+export interface RejectedItem {
+    rejected_keyword: string
+    rejected_title: string
+    reason: string
+    phase?: string
+    category?: string
+    cluster?: string
+}
+
+/**
+ * Generate replacement articles for rejected duplicates.
+ * This is called when the bouncer rejects items and we need replacements to hit 30 articles.
+ */
+export async function generateReplacementArticles({
+    brandData,
+    rejectedItems,
+    existingPlanKeywords
+}: {
+    brandData: BrandDetails
+    rejectedItems: RejectedItem[]
+    existingPlanKeywords: string[] // Keywords from the verified plan so far
+}): Promise<ContentPlanItem[]> {
+    const client = getGeminiClient()
+    const today = new Date()
+    const count = rejectedItems.length
+
+    if (count === 0) return []
+
+    // Format rejected items with reasons for the LLM
+    const rejectedList = rejectedItems.map((item, i) =>
+        `${i + 1}. REJECTED: "${item.rejected_keyword}" (Title: "${item.rejected_title}")
+   - Reason: ${item.reason}
+   - Was in phase: ${item.phase || 'Unknown'}, category: ${item.category || 'Unknown'}, cluster: ${item.cluster || 'Unknown'}`
+    ).join('\n\n')
+
+    // Format existing plan keywords so LLM doesn't repeat them
+    const existingList = existingPlanKeywords.slice(0, 30).map(k => `- ${k}`).join('\n')
+
+    const replacementPrompt = `
+## Context
+You previously generated a content plan for: ${brandData.product_name}
+${count} articles were REJECTED because they were too similar to existing content.
+
+## REJECTED ARTICLES (DO NOT SUGGEST ANYTHING SIMILAR)
+${rejectedList}
+
+## ARTICLES ALREADY IN THE PLAN (DO NOT DUPLICATE)
+${existingList}
+
+## Your Task
+Generate EXACTLY ${count} NEW, UNIQUE article ideas to replace the rejected ones.
+
+CRITICAL RULES:
+1. DO NOT suggest topics similar to the rejected ones - that's WHY they were rejected
+2. DO NOT duplicate any keyword from "ARTICLES ALREADY IN THE PLAN"
+3. Maintain the same phase/category/cluster distribution as the rejected items when possible
+4. ALL keywords must be REAL search queries people actually type into Google
+5. Titles MUST be under 60 characters
+
+## Product Context (Quick Reference)
+- Product: ${brandData.product_name}
+- What it is: ${brandData.product_identity.literally}
+- Core Features: ${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
+
+## Output Format
+Return a JSON array of ${count} articles. Each article:
+\`\`\`json
+{
+  "day": 1,
+  "phase": "Foundation",
+  "category": "Core Answers",
+  "main_keyword": "completely different search query",
+  "supporting_keywords": ["related term 1", "related term 2", "related term 3"],
+  "title": "Short Title Under 60 Chars",
+  "hook": "One-sentence user benefit",
+  "reason": "Strategic rationale for this topic",
+  "user_intent": "Informational",
+  "impact": "Medium",
+  "connected_to": [1, 5],
+  "cluster": "Topic Cluster Name",
+  "article_type": "informational"
+}
+\`\`\`
+
+Think of COMPLETELY DIFFERENT angles, topics, or audiences that the brand could target.
+For example, if rejected topic was about "AI headshots vs professional photographer", suggest something completely unrelated like "best lighting for selfie photos" or "corporate headshot outfit guide for men".
+`
+
+    try {
+        const response = await client.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: [{ role: "user", parts: [{ text: replacementPrompt }] }],
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            day: { type: "INTEGER" },
+                            phase: { type: "STRING" },
+                            category: { type: "STRING" },
+                            main_keyword: { type: "STRING" },
+                            supporting_keywords: {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            },
+                            title: { type: "STRING" },
+                            hook: { type: "STRING" },
+                            reason: { type: "STRING" },
+                            user_intent: { type: "STRING" },
+                            impact: { type: "STRING" },
+                            connected_to: {
+                                type: "ARRAY",
+                                items: { type: "INTEGER" }
+                            },
+                            cluster: { type: "STRING" },
+                            article_type: { type: "STRING" }
+                        },
+                        required: ["day", "phase", "category", "main_keyword", "supporting_keywords", "title", "hook", "reason", "user_intent", "impact", "connected_to", "cluster", "article_type"]
+                    }
+                }
+            }
+        })
+
+        const text = response.text || "[]"
+        const rawItems = JSON.parse(text)
+
+        // Transform to ContentPlanItem format
+        const replacements: ContentPlanItem[] = rawItems.map((item: any, index: number) => {
+            const scheduledDate = new Date(today)
+            scheduledDate.setDate(today.getDate() + (item.day - 1))
+
+            return {
+                id: `replacement-${Date.now()}-${index}`,
+                title: item.title || `Replacement Article ${index + 1}`,
+                main_keyword: item.main_keyword || "",
+                supporting_keywords: item.supporting_keywords || [],
+                article_type: validateArticleType(item.article_type),
+                cluster: item.cluster || "General",
+                scheduled_date: scheduledDate.toISOString().split('T')[0],
+                status: "pending" as const,
+                article_category: validateCategory(item.category),
+                phase: validatePhase(item.phase),
+                hook: item.hook || "",
+                user_intent: validateUserIntent(item.user_intent),
+                connected_to: (item.connected_to || []).map((d: number) => d),
+                impact: validateImpact(item.impact),
+                reason: item.reason || "Replacement article for deduplicated content."
+            }
+        })
+
+        console.log(`[Replacement Generator] Generated ${replacements.length} replacement articles`)
+        return replacements
+
+    } catch (error) {
+        console.error("[Replacement Generator] Failed:", error)
+        throw error
+    }
+}

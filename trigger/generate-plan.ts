@@ -2,6 +2,7 @@ import { task } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { generateStrategicPlan } from "@/lib/plans/strategic-planner"
+import { deduplicateWithReplacementLoop } from "@/lib/plans/plan-deduplication"
 import { tavily } from "@tavily/core"
 import Sitemapper from "sitemapper"
 import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
@@ -273,9 +274,10 @@ async function discoverCompetitors(
 /**
  * Background task for generating content plan using Trigger.dev.
  * 
- * REVAMPED FLOW (2 phases instead of 5):
+ * REVAMPED FLOW (3 phases):
  * 1. Intelligence Phase: Discover competitors if not provided
  * 2. Generation Phase: Use strategic mega-prompt to generate plan
+ * 3. Deduplication Phase: Filter out topics too similar to existing content
  */
 export const generatePlanTask = task({
     id: "generate-content-plan",
@@ -384,11 +386,39 @@ export const generatePlanTask = task({
             console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)
             console.log(`[Generate Plan Task] Content Gap Analysis:`, result.contentGapAnalysis.slice(0, 200) + "...")
 
+            // === PHASE 3: SEMANTIC DEDUPLICATION WITH REPLACEMENT LOOP ===
+            await updateStatus("generating", "deduplication")
+            console.log(`[Generate Plan Task] Phase 3: Deduplication with replacement loop...`)
+
+            const {
+                finalPlan: filteredPlan,
+                totalRejected,
+                replacementsGenerated,
+                attempts
+            } = await deduplicateWithReplacementLoop(
+                result.plan,
+                userId,
+                brandData,
+                {
+                    brandId,
+                    targetCount: 30, // Always aim for exactly 30 articles
+                    maxAttempts: 3
+                }
+            )
+
+            // Detailed logging for Trigger.dev dashboard
+            console.log(`[Generate Plan Task] Deduplication Loop Results:`)
+            console.log(`  - Original articles: ${result.plan.length}`)
+            console.log(`  - Final article count: ${filteredPlan.length}`)
+            console.log(`  - Total rejected: ${totalRejected}`)
+            console.log(`  - Replacements generated: ${replacementsGenerated}`)
+            console.log(`  - Attempts taken: ${attempts}`)
+
             // === SAVE PLAN ===
             const { error: updateError } = await (supabase as any)
                 .from("content_plans")
                 .update({
-                    plan_data: result.plan,
+                    plan_data: filteredPlan,
                     competitor_seeds: competitorBrands.map(c => c.name), // Store competitor names as seeds for reference
                     generation_status: "complete",
                     generation_phase: undefined,
@@ -406,7 +436,10 @@ export const generatePlanTask = task({
             return {
                 success: true,
                 planId,
-                articleCount: result.plan.length,
+                articleCount: filteredPlan.length,
+                originalCount: result.plan.length,
+                removedCount: totalRejected,
+                replacementsGenerated,
                 categoryDistribution: result.categoryDistribution,
                 contentGapAnalysis: result.contentGapAnalysis
             }
