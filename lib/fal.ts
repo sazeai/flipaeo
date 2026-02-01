@@ -1,10 +1,10 @@
 import { fal } from "@fal-ai/client";
 
 export async function generateImage(prompt: string) {
-  const result = await fal.subscribe("fal-ai/flux-2/turbo", {
+  const result = await fal.subscribe("fal-ai/flux-2/flash", {
     input: {
       prompt,
-      guidance_scale: 2.5,
+      guidance_scale: 8,
       image_size: {
         width: 1200,
         height: 800

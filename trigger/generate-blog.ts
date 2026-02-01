@@ -439,22 +439,35 @@ SECTION CONTEXT:
 
 IMAGE TYPE: ${imageType.toUpperCase()}
 
-USE THIS TEMPLATE STRUCTURE:
+REFERENCE TEMPLATE:
 ${template}
 
-TEXT FORMATTING (Flux 2 Turbo):
-- Use handwritten/felt-tip pen style descriptions for better text rendering
-- Keep labels concise (max 3-5 words) for readability
-- Place text in quotation marks when describing what should appear in the image
+CRITICAL - OUTPUT FORMAT:
+You MUST write the prompt in a STRUCTURED, LINE-BY-LINE format:
+
+1. First line: Style and background (e.g., "Clean flat illustration on white background with subtle grid pattern.")
+
+2. Main visual element line: What the central element is (e.g., "A large laptop icon in the center with highlighted screen.")
+
+3. Text labels as numbered list:
+   - Label 1: "[2-3 word label]"
+   - Label 2: "[2-3 word label]"
+   - etc.
+
+4. Heading line: At the top, bold heading text in hand-drawn style: "[MAX 6 WORDS]"
+
+5. Final line: Style summary (e.g., "Flat vector. Minimal palette. No gradients.")
+
+TEXT RULES:
+- ALL labels: Max 3 words
+- Heading: Max 6 words
+- Use hand-drawn/marker/felt-tip pen style for text (renders better)
+- Avoid complex technical terms in visible text
 
 YOUR TASK:
-1. Fill in the template placeholders based on the section context
-2. Rewrite any complex words to image - safe alternatives
-3. Keep ALL text labels to max 3 words
-4. Keep heading to max 6 words
-5. Describe visual elements specifically
+Fill in the template with specific elements based on the section context. Keep the structured format with each element on its own line.
 
-OUTPUT: Return ONLY the complete image prompt.No explanations.`
+OUTPUT: Return ONLY the structured image prompt. No explanations.`
 
   const response = await genAI.models.generateContent({
     model: "gemini-2.5-flash",
@@ -1614,78 +1627,105 @@ CRITICAL EXECUTION RULES:
         const getStyleTemplate = (style: string) => {
           switch (style.toLowerCase()) {
             case 'vector':
-              return `STYLE: Hand-drawn digital illustration with a clean, flat, professional aesthetic.
+              return `STYLE: Clean vector illustration on a white background.
 
-VISUAL APPROACH:
-- Use thick black outlines with solid color fills
-- Choose a harmonious color palette that fits the topic (AI decides colors)
-- Include minimalist illustrations of people, objects, or abstract shapes relevant to the topic
-- Add floating elements like icons, cards, or geometric shapes for visual interest
-- Background should have a subtle pattern (grid, dots, or gradient) with a prominent background color i.e. white, green, blue, etc. - You are free to decide based on context of the title.
+BACKGROUND:
+- Pure white background with a subtle dotted or grid pattern
+- Keep the background clean and minimal - NO busy elements
+
+VISUAL ELEMENTS:
+- Place 1-2 flat vector elements on the RIGHT side of the image
+- Elements should be simple, modern vector illustrations relevant to the topic
+- Use thick outlines with solid color fills
+- Choose a harmonious 2-3 color palette
 
 COMPOSITION:
-- Balanced layout with clear visual hierarchy
-- Title or key concept should be prominent but NOT dominating
-- Leave breathing room - don't overcrowd
+- Left side: Reserved for the text overlay (keep it empty/clean)
+- Right side: 1-2 vector icons, objects, or simple illustrations
+- Plenty of white space - do NOT overcrowd
 
 CONSTRAINTS:
 - NO photorealistic elements
 - NO stock photo clichés
+- NO more than 2 visual elements on the right
 - Clean, modern, tech-forward aesthetic`
 
             case 'photorealistic':
             case 'photo':
             case 'stock':
-              return `STYLE: High-quality professional editorial photography.
+              return `STYLE: Clean editorial composition with photorealistic elements.
 
-VISUAL APPROACH:
-- Realistic, high-resolution photograph
-- Soft natural lighting with slight bokeh in background
-- Professional color grading (not oversaturated)
-- Real people, places, or objects relevant to the topic
+BACKGROUND:
+- Pure white or very light gray background
+- Optional: subtle dotted pattern or soft grid lines
+- Keep the background clean and uncluttered
+
+VISUAL ELEMENTS:
+- Place 1-2 photorealistic objects/elements on the RIGHT side
+- Objects should be relevant to the topic but NOT generic stock clichés
+- High quality, sharp, well-lit objects on the clean background
+- Objects appear to float or sit on the white surface
 
 COMPOSITION:
-- Rule of thirds placement
-- Subject slightly off-center for visual interest
-- Clean background that doesn't distract
+- Left side: Clean white space for text overlay
+- Right side: 1-2 relevant realistic objects or product-style photography
+- Professional product photography aesthetic
 
 CONSTRAINTS:
-- NO obvious stock photo clichés (handshakes, pointing at screens, etc.)
-- NO illustrations or vector elements
+- NO handshakes, pointing at screens, generic office scenes
+- NO busy or cluttered backgrounds
+- NO more than 2 visual elements
 - Editorial quality, suitable for premium business content`
 
             case 'minimalist':
-              return `STYLE: Ultra-minimal, clean graphic design.
+              return `STYLE: Ultra-minimal design on white background.
 
-VISUAL APPROACH:
-- Maximum 2-3 colors in the palette
-- Simple geometric shapes or single iconic element
-- Lots of negative space
-- Typography-inspired or abstract
+BACKGROUND:
+- Pure white background with optional subtle grid or dot pattern
+- Maximum negative space
+
+VISUAL ELEMENTS:
+- Single iconic element or geometric shape on the RIGHT side
+- Maximum 2-3 colors total
+- Abstract or symbolic representation of the topic
+
+COMPOSITION:
+- Left side: Empty for text overlay
+- Right side: One simple, bold visual element
+- Lots of breathing room
 
 CONSTRAINTS:
 - NO busy backgrounds
 - NO photorealistic elements
-- NO cluttered compositions`
+- NO cluttered compositions
+- ONE main visual element only`
 
             default:
-              // Default to vector for unknown styles
-              return `STYLE: Clean, professional digital illustration suitable for business blogs.
+              // Default to clean vector style
+              return `STYLE: Clean professional illustration on white background.
 
-VISUAL APPROACH:
-- Choose the most appropriate visual style for the topic (illustration or subtle photography)
-- Professional color palette that conveys trust and expertise
-- Include relevant visual elements that represent the article's core message
+BACKGROUND:
+- White background with subtle dotted or grid pattern
+- Clean and minimal
+
+VISUAL ELEMENTS:
+- 1-2 relevant elements on the RIGHT side of the image
+- Professional, modern aesthetic
+
+COMPOSITION:
+- Left side reserved for text overlay
+- Right side: visual elements
 
 CONSTRAINTS:
 - Professional and premium aesthetic
-- Suitable as a blog featured image`
+- Clean white background
+- Maximum 2 visual elements`
           }
         }
 
         const styleTemplate = getStyleTemplate(imageStyle)
 
-        const imagePromptSystem = `You are an expert AI Art Director creating a featured image for a blog post.
+        const imagePromptSystem = `You are an expert AI Art Director creating a featured image prompt for a blog post.
 
 ARTICLE CONTEXT:
 Title: ${finalTitle}
@@ -1696,20 +1736,35 @@ Image Style Preference: ${imageStyle}
 ${styleTemplate}
 
 TEXT OVERLAY REQUIREMENT:
-- Include the text "${keyword.toUpperCase()}" as large, bold text on the image
-- Position the text on the left side or center
-- Use a clean, modern sans-serif font style
-- Ensure high contrast between text and background for readability
-- The text should be prominent but integrated with the overall design
+- The title text "${keyword.toUpperCase()}" must appear prominently in the image
+- Text should be in a hand-drawn, marker, or felt-tip pen style (NOT photorealistic typography)
+- Position the text at the top or left side of the image
+- High contrast against the background
+
+CRITICAL - PROMPT STRUCTURE:
+You MUST write the prompt in a STRUCTURED, LINE-BY-LINE format. Do NOT write a wall of text paragraph.
+Use this format:
+
+1. First line: Overall style and background description
+2. Second line: Text placement and style (where the title appears, font style)
+3. Numbered list: Each visual element described separately
+4. Final line: Overall aesthetic/mood
+
+EXAMPLE OF CORRECT STRUCTURE:
+"Clean editorial illustration on a white background with subtle dot pattern. 
+
+At the top, bold heading text in a hand-drawn felt-tip pen style: "TOPIC TITLE HERE"
+
+Visual elements on the right side:
+1. A laptop icon with highlighted screen
+2. Connected with thin lines to labeled indicators
+
+Flat vector style. Minimal color palette. High clarity. Professional blog illustration."
 
 YOUR TASK:
-Generate a detailed, creative prompt that an AI image generator can use to create this featured image.
-- Be SPECIFIC about colors, composition, and visual elements
-- Include the text "${keyword.toUpperCase()}" as part of the image design
-- Describe the scene or illustration in detail
-- The prompt should be 2-3 sentences minimum
+Generate a structured prompt following the format above. Each element on its own line. Be specific about placement and style.
 
-OUTPUT: Return ONLY the image generation prompt as plain text. No JSON, no explanations.`
+OUTPUT: Return ONLY the structured image prompt. No explanations.`
 
         const imagePromptConfig = { responseMimeType: "text/plain" }
         const imagePromptContents = [{ role: "user", parts: [{ text: imagePromptSystem }] }]
