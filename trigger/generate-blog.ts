@@ -355,66 +355,70 @@ const getIntroTemplate = (articleType: ArticleType): string => {
   return INTRO_TEMPLATES[articleType] || INTRO_TEMPLATES.informational
 }
 
-// --- IN-CONTENT IMAGE TEMPLATES (Minimized Text - Visual Focus) ---
+// --- IN-CONTENT IMAGE TEMPLATES (Short Tags OK - NO Checklists) ---
 const IMAGE_TEMPLATES: Record<string, string> = {
-  concept: `Clean flat illustration on white background with subtle dot pattern.
+  concept: `Clean editorial illustration on a white background. Flat vector style.
 
-At the top center, ONE heading in hand-drawn marker style: "[4-5 WORD MAX HEADING]"
+At the top center, bold heading text in handwritten style: "[SHORT_HEADING]"
 
-Visual elements (NO TEXT LABELS - use icons/shapes instead):
-- A large central icon representing the main concept
-- 3-4 smaller icons around it connected with thin arrows or lines
-- Use color-coding to show relationships (e.g., green for positive, red for negative)
+Main visual: A large [MAIN_VISUAL_ELEMENT] in the center.
+Around it, 2-3 smaller visual elements connected with thin lines or arrows.
 
-NO checklists. NO text labels on elements. Only the heading has text.
-Flat vector style. Minimal palette. Professional diagram aesthetic.`,
+Small handwritten tags (1-2 words each, max 3 tags total):
+- Tag near element 1: "[1-2 WORD TAG]"
+- Tag near element 2: "[1-2 WORD TAG]"
 
-  how_to: `Clean step-by-step diagram on white background.
+NO checklists. NO bullet point lists. NO long text descriptions.
+Flat vector. Minimal palette. Professional blog illustration.`,
 
-At the top left, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
+  how_to: `Clean flat illustration on a white background showing [SCENE_DESCRIPTION].
 
-Visual flow (NO TEXT - use numbered circles and arrows instead):
-- 3-4 numbered circles (1, 2, 3, 4) connected by arrows flowing left to right
-- Each circle contains a simple icon representing that step
-- Arrows show the flow direction
+Top left bold heading text in handwritten style: "[SHORT_HEADING]"
 
-NO text descriptions. NO checklists. Just numbered icons with arrows.
+Visual flow with numbered circles (1, 2, 3) connected by arrows.
+Each number has a simple icon inside - NO text descriptions for steps.
+
+Optional: 1-2 small handwritten tags pointing to key elements.
+
+NO checklist panels. NO bullet point lists with text.
 Flat UI style. Clean minimal design.`,
 
-  comparison: `Split screen illustration on white background.
+  comparison: `Split screen illustration on a white background. Flat vector style. High contrast.
 
-At the top center, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
+Top center heading text in handwritten style: "[SHORT_HEADING]"
 
-Left side: Red-tinted section with X icon, showing [negative visual elements/icons]
-Right side: Green-tinted section with checkmark icon, showing [positive visual elements/icons]
+Left side labeled "Before": [SCENE_DESCRIPTION_BAD_STATE]
+- Darker, muted color palette
+- Small handwritten tags (1-2 words): "[TAG1]", "[TAG2]"
 
-Use visual contrast (colors, icons) NOT text to show the difference.
-NO text labels. NO descriptions. Just visual contrast.
-Flat vector. High contrast colors.`,
+Right side labeled "After": [SCENE_DESCRIPTION_GOOD_STATE]  
+- Vibrant, bright color palette
+- Small handwritten tags (1-2 words): "[TAG1]", "[TAG2]"
 
-  process: `Horizontal flow diagram on white background.
+Text labels under each side: "Before" "After" (handwritten style)
+Editorial blog illustration.`,
 
-At the top, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
+  process: `Horizontal flow diagram on a white background.
 
-Flow visualization (NO TEXT - numbers and icons only):
-- 3-4 circles or boxes numbered 1, 2, 3, 4
-- Each contains a relevant icon (no text)
-- Connected by thick arrows flowing left to right
-- Optional: small decorative elements
+Top heading text in handwritten style: "[SHORT_HEADING]"
 
-NO step descriptions. NO labels. Just icons, numbers, and arrows.
+Flow from left to right with 3-4 connected stages:
+- Use icons or simple visuals for each stage
+- Arrows connecting each stage
+- Optional: 1-2 word tag under each stage icon
+
+NO long step descriptions. NO checklist text.
 Infographic style. Clean professional look.`,
 
-  insight: `Editorial illustration on white background.
+  insight: `Editorial style illustration on a white background.
 
-At the top, ONE heading in hand-drawn style: "[4-5 WORD MAX HEADING]"
+Top heading text in handwritten style: "[SHORT_HEADING]"
 
-Main visual:
-- One large central illustration/icon representing the key insight
-- Optional: magnifying glass, spotlight, or highlight effect on key area
-- Use visual emphasis (glow, arrows pointing) instead of text labels
+Main visual: [SCENE_WITH_KEY_ELEMENT]
+- Highlight effect or spotlight on the key insight area
+- 2-3 small handwritten tags (1-2 words each) pointing to important elements
 
-NO overlay labels. NO multiple text elements. Just the heading and visuals.
+NO overlay paragraphs. NO bullet point lists.
 Soft flat vector style. Muted professional colors.`
 }
 
@@ -439,31 +443,33 @@ IMAGE TYPE: ${imageType.toUpperCase()}
 REFERENCE TEMPLATE:
 ${template}
 
-CRITICAL - MINIMAL TEXT RULE:
-The image should have ONLY ONE text element: the heading (4-5 words max).
-Everything else must be communicated VISUALLY through:
-- Icons and symbols
-- Numbered circles (1, 2, 3, 4)
-- Arrows and flow lines
-- Color coding (green = good, red = bad)
-- Visual diagrams and connections
+TEXT RULES - IMPORTANT:
+✅ ALLOWED:
+- ONE heading (4-6 words max) in handwritten style
+- Small 1-2 word tags like "Stressed", "Refreshed", "High Tax", "Easy Savings"
+- Simple labels like "Before", "After"
+- Maximum 4-5 short tags total
 
-DO NOT USE:
-- Checklists with text
-- Multiple text labels
-- Text descriptions on elements
-- Overlay text
+❌ BANNED - DO NOT USE:
+- Checklists with multiple items
+- Bullet point lists with text
+- Long text descriptions (3+ words per item)
+- Checklist panels with "Calculate Break Costs", "Save Enough Funds" etc.
 
-STRUCTURED OUTPUT FORMAT:
-1. First line: Style and background
-2. Heading line: "At the top, ONE heading in hand-drawn style: [4-5 WORDS MAX]"
-3. Visual elements: Describe icons, arrows, numbered circles, color coding
-4. Final line: Style summary
+GOOD EXAMPLE:
+"Small handwritten tag near person: 'Overwhelmed'
+Small handwritten tag near sky: 'New Ideas'"
+
+BAD EXAMPLE:
+"Checklist text:
+- Calculate Break Costs
+- Save Enough Funds  
+- Start 1-3 Years"
 
 YOUR TASK:
-Create a visually-driven diagram with ONLY the heading as text. Use icons, arrows, and visual elements to communicate the concept.
+Create a descriptive, scene-based prompt with SHORT tags (1-2 words each). NO checklists. NO long bullet point lists.
 
-OUTPUT: Return ONLY the structured image prompt. No explanations.`
+OUTPUT: Return ONLY the image prompt. No explanations.`
 
   const response = await genAI.models.generateContent({
     model: "gemini-2.5-flash",
@@ -1731,30 +1737,28 @@ Image Style Preference: ${imageStyle}
 
 ${styleTemplate}
 
-CRITICAL - MINIMAL TEXT RULE:
-The image should have ONLY ONE text element: "${keyword.toUpperCase()}" (4-5 words max).
-- Text in hand-drawn, marker, or felt-tip pen style
-- Position at the top or center
-- High contrast against background
+TEXT RULES - IMPORTANT:
+✅ ALLOWED:
+- ONE main heading: "${keyword.toUpperCase()}" in handwritten/marker style
+- Small 1-2 word tags like "Stressed", "Refreshed", "Before", "After"
+- Maximum 4-5 short tags total
+- Position heading at top or center
 
-Everything else MUST be visual - NO additional text labels:
-- Use icons and symbols
-- Use arrows and flow lines
-- Use color coding
-- Use visual diagrams
+❌ BANNED - DO NOT USE:
+- Checklists with multiple text items
+- Bullet point lists with long text
+- Long descriptions (3+ words per item)
+- Checklist panels like "Calculate Break Costs", "Save Enough Funds"
 
-DO NOT USE: checklists, multiple text labels, overlay captions, or descriptions.
-
-STRUCTURED OUTPUT FORMAT:
-1. First line: Style and background
-2. Second line: "At the top, ONE heading in hand-drawn style: [THE KEYWORD]"
-3. Visual elements: Describe icons, diagrams, arrows (NO text on these)
-4. Final line: Style summary
+GOOD EXAMPLES OF TAGS:
+"Small handwritten tag: 'Overwhelmed'"
+"Tag pointing to figure: 'New Ideas'"
+"Label under section: 'Before'"
 
 YOUR TASK:
-Create a visually-driven image with ONLY the keyword as the single text element. All other information through visual elements.
+Create a descriptive, scene-based prompt. Use short 1-2 word tags where helpful. NO checklists or long bullet lists.
 
-OUTPUT: Return ONLY the structured image prompt. No explanations.`
+OUTPUT: Return ONLY the image prompt. No explanations.`
 
         const imagePromptConfig = { responseMimeType: "text/plain" }
         const imagePromptContents = [{ role: "user", parts: [{ text: imagePromptSystem }] }]
