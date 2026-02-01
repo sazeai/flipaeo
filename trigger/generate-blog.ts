@@ -1779,14 +1779,14 @@ OUTPUT: Return ONLY the image generation prompt as plain text. No JSON, no expla
       await saveTopicMemory(articleId, topicSignal, supabase)
 
       // --- PHASE 9: ANSWER COVERAGE INDEXING ---
-      // Analyze the completed article and extract "Answer Units" for strategic planning
+      // Analyze the completed article outline to extract "Answer Units" for strategic planning
       if (userId) {
         try {
           // Use cluster from payload or derive from keyword prefix
           const coverageCluster = cluster || keyword.split(" ").slice(0, 2).join(" ")
           await analyzeArticleCoverage(
             articleId,
-            finalMarkdown,
+            outline,
             keyword,
             coverageCluster,
             userId,

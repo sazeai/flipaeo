@@ -1,4 +1,5 @@
 import Sitemapper from 'sitemapper'
+import { generateEmbedding } from "@/lib/internal-linking"
 
 /**
  * Fetches all URLs from a website's sitemap
@@ -118,13 +119,26 @@ export async function preseedCoverage(
         }
     }
 
-    const inserts = Array.from(uniqueQuestions.values()).map(question => ({
-        user_id: userId,
-        brand_id: brandId,
-        cluster: "Existing Content",
-        answer_unit: question,
-        coverage_state: "strong" as const, // Existing = already covered
-    }))
+    // Build inserts with embeddings
+    const inserts = []
+    for (const question of uniqueQuestions.values()) {
+        let embeddingForDb: string | null = null
+        try {
+            const embedding = await generateEmbedding(question)
+            embeddingForDb = JSON.stringify(embedding)
+        } catch (e) {
+            console.warn(`[Sitemap] Failed to generate embedding for "${question}"`)
+        }
+
+        inserts.push({
+            user_id: userId,
+            brand_id: brandId,
+            cluster: "Existing Content",
+            answer_unit: question,
+            coverage_state: "strong" as const, // Existing = already covered
+            answer_embedding: embeddingForDb
+        })
+    }
 
     if (inserts.length === 0) return 0
 

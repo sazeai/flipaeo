@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
+import { generateEmbedding } from "@/lib/internal-linking"
 
 // Type for admin Supabase client
 type AdminSupabaseClient = ReturnType<typeof createAdminClient>
@@ -31,12 +32,37 @@ export interface CoverageData {
 }
 
 /**
- * Analyzes an article and extracts the "Answer Units" (user questions) it covers.
+ * Article outline type for coverage analysis
+ */
+export interface ArticleOutline {
+    title: string;
+    intro?: {
+        instruction_note: string;
+        keywords_to_include?: string[];
+    };
+    sections: Array<{
+        id?: number;
+        level?: number;
+        heading: string;
+        instruction_note?: string;
+        keywords_to_include?: string[];
+        needs_image?: boolean;
+        image_type?: string;
+        external_link?: { url: string; anchor_context: string };
+        internal_link?: { url: string; title: string; anchor_context: string };
+    }>;
+}
+
+/**
+ * Analyzes the article outline to extract "Answer Units" —
+ * the distinct user questions the article meaningfully answers.
+ * Uses the structured outline (headings + instruction_notes) instead of 
+ * full article content to reduce token costs by ~80%.
  * Then upserts this data into the `answer_coverage` table.
  */
 export async function analyzeArticleCoverage(
     articleId: string,
-    articleContent: string,
+    outline: ArticleOutline,
     keyword: string,
     cluster: string,
     userId: string,
@@ -46,18 +72,30 @@ export async function analyzeArticleCoverage(
     const genAI = getGeminiClient()
     const supabase = adminClient ?? createAdminClient()
 
+    // Format outline for the prompt - compact but informative
+    const outlineSummary = [
+        `TITLE: ${outline.title}`,
+        outline.intro ? `\nINTRO: ${outline.intro.instruction_note}` : '',
+        '\nSECTIONS:',
+        ...outline.sections.map(s => {
+            const parts = [`- H${s.level || 2}: ${s.heading}`]
+            if (s.instruction_note) parts.push(`  Coverage: ${s.instruction_note}`)
+            if (s.keywords_to_include?.length) parts.push(`  Keywords: ${s.keywords_to_include.join(', ')}`)
+            return parts.join('\n')
+        })
+    ].join('\n')
 
     const prompt = `
-You are an expert SEO analyst. Analyze the following blog article content and extract the distinct USER QUESTIONS that it meaningfully answers.
+You are an expert SEO analyst. Analyze the following blog article OUTLINE and extract the distinct USER QUESTIONS that this article meaningfully answers.
 
 ARTICLE KEYWORD: "${keyword}"
 CLUSTER: "${cluster}"
 
-ARTICLE CONTENT:
-${articleContent.slice(0, 15000)} ${articleContent.length > 15000 ? '...[truncated]' : ''}
+ARTICLE OUTLINE:
+${outlineSummary}
 
 YOUR TASK:
-1. Identify 3-7 distinct user questions that this article answers well.
+1. Identify 3-7 distinct user questions that this article answers well based on the outline.
 2. For each question, classify its "Intent Role" from these options:
    - "Core Answer" (What is X? How does X work?)
    - "Decision" (Should I use X? Is X worth it?)
@@ -70,7 +108,8 @@ RULES:
 - Each question must be a FULL user question, not a tag/label.
   ✅ "How much does AI photo restoration cost?"
   ❌ "cost"
-- Only include questions that are MEANINGFULLY answered (not just mentioned).
+- Derive questions from what each section's heading and instruction_note says it covers.
+- Only include questions that are MEANINGFULLY covered (have dedicated sections or substantial coverage).
 - Assign a coverage strength:
   - "partial": Mentioned but not deeply covered
   - "strong": Dedicated section or comprehensive answer
@@ -115,6 +154,15 @@ OUTPUT (Strict JSON Array):
 
         // Upsert each answer unit into the database
         for (const unit of answerUnits) {
+            // Generate embedding for the answer unit
+            let embeddingForDb: string | null = null
+            try {
+                const embedding = await generateEmbedding(unit.question)
+                embeddingForDb = JSON.stringify(embedding)
+            } catch (e) {
+                console.warn(`[Coverage Analyzer] Failed to generate embedding for "${unit.question}"`)
+            }
+
             // Cast to any to bypass type checking until migration runs and types are regenerated
             const { error } = await (supabase as any)
                 .from("answer_coverage")
@@ -125,7 +173,8 @@ OUTPUT (Strict JSON Array):
                     answer_unit: unit.question,
                     coverage_state: unit.coverage_strength,
                     first_covered_by: articleId,
-                    last_updated_at: new Date().toISOString()
+                    last_updated_at: new Date().toISOString(),
+                    answer_embedding: embeddingForDb
                 }, {
                     onConflict: "user_id,brand_id,cluster,answer_unit"
                 })
