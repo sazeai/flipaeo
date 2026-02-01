@@ -754,144 +754,173 @@ export default function ContentPlanPage() {
                     ) : (
                         <>
                             <div className="space-y-8">
-                                {Object.entries(ARTICLE_CATEGORY_CONFIG).map(([categoryKey, categoryConfig], categoryIndex) => {
-                                    // Get items for this category
-                                    const categoryItems = filteredPlan.filter(
-                                        item => item.article_category === categoryKey
-                                    )
+                                {(() => {
+                                    // Get today's date in local timezone (YYYY-MM-DD format)
+                                    const today = new Date()
+                                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-                                    // Skip empty sections when filtering by status
-                                    if (categoryItems.length === 0 && filter !== 'all') return null
+                                    // Sort categories: the one containing today's article comes first
+                                    const sortedCategories = Object.entries(ARTICLE_CATEGORY_CONFIG).sort(([keyA], [keyB]) => {
+                                        const hasToday = (key: string) => filteredPlan.some(
+                                            item => item.article_category === key &&
+                                                item.scheduled_date.split('T')[0] === todayStr
+                                        )
+                                        const aHasToday = hasToday(keyA)
+                                        const bHasToday = hasToday(keyB)
+                                        if (aHasToday && !bHasToday) return -1
+                                        if (!aHasToday && bHasToday) return 1
+                                        return 0
+                                    })
 
-                                    const CategoryIcon = categoryConfig.icon
-                                    const completedCount = categoryItems.filter(i => i.status === 'published').length
+                                    return sortedCategories.map(([categoryKey, categoryConfig], categoryIndex) => {
+                                        // Get items for this category and sort by date
+                                        const rawCategoryItems = filteredPlan
+                                            .filter(item => item.article_category === categoryKey)
+                                            .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
 
-                                    // FREE USER GATING LOGIC:
-                                    // - First category (index 0): show first 2 cards enabled (can write), rest paywalled
-                                    // - Other categories (1,2,3): show first 3 cards visible but DISABLED, rest paywalled
-                                    // SUBSCRIBER LOGIC: Never paywalled, button state controlled by hasCredits
-                                    const isFirstCategory = categoryIndex === 0
+                                        // Circular rotation: find today's article index and rotate
+                                        // So today's article is first, older ones wrap to end
+                                        const todayIndex = rawCategoryItems.findIndex(
+                                            item => item.scheduled_date.split('T')[0] === todayStr
+                                        )
 
-                                    // Cards per row (for showing one full row in other categories)
-                                    const CARDS_PER_ROW = 3
+                                        const categoryItems = todayIndex > 0
+                                            ? [...rawCategoryItems.slice(todayIndex), ...rawCategoryItems.slice(0, todayIndex)]
+                                            : rawCategoryItems
 
-                                    // Enabled cards: only first category gets writing ability
-                                    const freeUserEnabledCount = isFirstCategory ? MAX_FREE_ENABLED_CARDS : 0
+                                        // Skip empty sections when filtering by status
+                                        if (categoryItems.length === 0 && filter !== 'all') return null
 
-                                    // Visible cards: first category uses enabledCount, others show full first row
-                                    const freeUserVisibleCount = isFirstCategory
-                                        ? MAX_FREE_ENABLED_CARDS
-                                        : CARDS_PER_ROW
+                                        const CategoryIcon = categoryConfig.icon
+                                        const completedCount = categoryItems.filter(i => i.status === 'published').length
 
-                                    // Determine how many cards to show (not paywalled)
-                                    const visibleCardsCount = isSubscribed
-                                        ? categoryItems.length
-                                        : freeUserVisibleCount
+                                        // FREE USER GATING LOGIC:
+                                        // - First category (index 0): show first 2 cards enabled (can write), rest paywalled
+                                        // - Other categories (1,2,3): show first 3 cards visible but DISABLED, rest paywalled
+                                        // SUBSCRIBER LOGIC: Never paywalled, button state controlled by hasCredits
+                                        const isFirstCategory = categoryIndex === 0
 
-                                    // Determine how many cards have write enabled
-                                    const enabledCardsCount = isSubscribed
-                                        ? categoryItems.length
-                                        : freeUserEnabledCount
+                                        // Cards per row (for showing one full row in other categories)
+                                        const CARDS_PER_ROW = 3
 
-                                    // Should we show paywall for this category?
-                                    const showPaywall = !isSubscribed && categoryItems.length > visibleCardsCount
+                                        // Enabled cards: only first category gets writing ability
+                                        const freeUserEnabledCount = isFirstCategory ? MAX_FREE_ENABLED_CARDS : 0
 
-                                    return (
-                                        <section key={categoryKey}>
-                                            {/* Section Header */}
-                                            {/* Section Header */}
-                                            <div className="flex items-start justify-between gap-4 mb-6 mt-2 px-1">
-                                                <div className="flex gap-3">
-                                                    <div className={cn(
-                                                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0 mt-0.5 border",
-                                                        categoryConfig.bgColor,
-                                                        categoryConfig.color
-                                                    )}>
-                                                        <CategoryIcon className="w-4 h-4" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <h2 className="text-sm font-bold text-stone-900 tracking-tight flex items-center gap-2">
-                                                            {categoryConfig.label}
-                                                        </h2>
-                                                        <p className="text-[11px] text-stone-500 max-w-md leading-relaxed">
-                                                            <span className="font-semibold text-stone-400">Why: </span>
-                                                            {categoryConfig.tagline}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className={cn(
-                                                        "text-[10px] font-bold px-2 py-1 rounded-md bg-stone-100/50 text-stone-400 border border-stone-100/50"
-                                                    )}>
-                                                        {completedCount} / {categoryConfig.targetCount} Published
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        // Visible cards: first category uses enabledCount, others show full first row
+                                        const freeUserVisibleCount = isFirstCategory
+                                            ? MAX_FREE_ENABLED_CARDS
+                                            : CARDS_PER_ROW
 
-                                            {/* Articles Grid */}
-                                            {categoryItems.length > 0 ? (
-                                                <>
-                                                    {/* Visible Cards (may include enabled + disabled-but-visible) */}
-                                                    {visibleCardsCount > 0 && (
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                                            {categoryItems.slice(0, visibleCardsCount).map((item, itemIndex) => {
-                                                                // Determine if this card's write button should be enabled
-                                                                // Subscribers: all cards follow hasCredits
-                                                                // Free users: only first N cards in FIRST category can write
-                                                                const canWrite = isSubscribed
-                                                                    ? hasCredits
-                                                                    : (itemIndex < enabledCardsCount && hasCredits)
+                                        // Determine how many cards to show (not paywalled)
+                                        const visibleCardsCount = isSubscribed
+                                            ? categoryItems.length
+                                            : freeUserVisibleCount
 
-                                                                return (
-                                                                    <PlanCard
-                                                                        key={item.id}
-                                                                        item={item}
-                                                                        isEditing={editingId === item.id}
-                                                                        hasCredits={canWrite}
-                                                                        onStartEdit={() => handleStartEdit(item)}
-                                                                        onCancelEdit={() => setEditingId(null)}
-                                                                        onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
-                                                                        onWriteArticle={() => handleWriteArticle(item)}
-                                                                    />
-                                                                )
-                                                            })}
+                                        // Determine how many cards have write enabled
+                                        const enabledCardsCount = isSubscribed
+                                            ? categoryItems.length
+                                            : freeUserEnabledCount
+
+                                        // Should we show paywall for this category?
+                                        const showPaywall = !isSubscribed && categoryItems.length > visibleCardsCount
+
+                                        return (
+                                            <section key={categoryKey}>
+                                                {/* Section Header */}
+                                                {/* Section Header */}
+                                                <div className="flex items-start justify-between gap-4 mb-6 mt-2 px-1">
+                                                    <div className="flex gap-3">
+                                                        <div className={cn(
+                                                            "w-8 h-8 rounded-md flex items-center justify-center shrink-0 mt-0.5 border",
+                                                            categoryConfig.bgColor,
+                                                            categoryConfig.color
+                                                        )}>
+                                                            <CategoryIcon className="w-4 h-4" />
                                                         </div>
-                                                    )}
-
-                                                    {/* Paywalled Cards (free users only, subscribers never see this) */}
-                                                    {showPaywall && (
-                                                        <PaywallOverlay
-                                                            hiddenCount={categoryItems.length - visibleCardsCount}
-                                                            categoryName={categoryConfig.label}
-                                                        >
-                                                            <div className={cn(
-                                                                "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
-                                                                visibleCardsCount > 0 && "mt-5"
-                                                            )}>
-                                                                {categoryItems.slice(visibleCardsCount).map((item) => (
-                                                                    <PlanCard
-                                                                        key={item.id}
-                                                                        item={item}
-                                                                        isEditing={false}
-                                                                        hasCredits={false}
-                                                                        onStartEdit={() => { }}
-                                                                        onCancelEdit={() => { }}
-                                                                        onSaveEdit={() => { }}
-                                                                        onWriteArticle={() => { }}
-                                                                    />
-                                                                ))}
-                                                            </div>
-                                                        </PaywallOverlay>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <div className="text-center py-6 text-stone-400 text-sm border border-dashed border-stone-200 rounded-lg">
-                                                    No {categoryConfig.label} yet
+                                                        <div className="space-y-1">
+                                                            <h2 className="text-sm font-bold text-stone-900 tracking-tight flex items-center gap-2">
+                                                                {categoryConfig.label}
+                                                            </h2>
+                                                            <p className="text-[11px] text-stone-500 max-w-md leading-relaxed">
+                                                                <span className="font-semibold text-stone-400">Why: </span>
+                                                                {categoryConfig.tagline}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={cn(
+                                                            "text-[10px] font-bold px-2 py-1 rounded-md bg-stone-100/50 text-stone-400 border border-stone-100/50"
+                                                        )}>
+                                                            {completedCount} / {categoryConfig.targetCount} Published
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </section>
-                                    )
-                                })}
+
+                                                {/* Articles Grid */}
+                                                {categoryItems.length > 0 ? (
+                                                    <>
+                                                        {/* Visible Cards (may include enabled + disabled-but-visible) */}
+                                                        {visibleCardsCount > 0 && (
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                                                {categoryItems.slice(0, visibleCardsCount).map((item, itemIndex) => {
+                                                                    // Determine if this card's write button should be enabled
+                                                                    // Subscribers: all cards follow hasCredits
+                                                                    // Free users: only first N cards in FIRST category can write
+                                                                    const canWrite = isSubscribed
+                                                                        ? hasCredits
+                                                                        : (itemIndex < enabledCardsCount && hasCredits)
+
+                                                                    return (
+                                                                        <PlanCard
+                                                                            key={item.id}
+                                                                            item={item}
+                                                                            isEditing={editingId === item.id}
+                                                                            hasCredits={canWrite}
+                                                                            onStartEdit={() => handleStartEdit(item)}
+                                                                            onCancelEdit={() => setEditingId(null)}
+                                                                            onSaveEdit={(updates) => handleSaveEditForItem(item.id, updates)}
+                                                                            onWriteArticle={() => handleWriteArticle(item)}
+                                                                        />
+                                                                    )
+                                                                })}
+                                                            </div>
+                                                        )}
+
+                                                        {/* Paywalled Cards (free users only, subscribers never see this) */}
+                                                        {showPaywall && (
+                                                            <PaywallOverlay
+                                                                hiddenCount={categoryItems.length - visibleCardsCount}
+                                                                categoryName={categoryConfig.label}
+                                                            >
+                                                                <div className={cn(
+                                                                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
+                                                                    visibleCardsCount > 0 && "mt-5"
+                                                                )}>
+                                                                    {categoryItems.slice(visibleCardsCount).map((item) => (
+                                                                        <PlanCard
+                                                                            key={item.id}
+                                                                            item={item}
+                                                                            isEditing={false}
+                                                                            hasCredits={false}
+                                                                            onStartEdit={() => { }}
+                                                                            onCancelEdit={() => { }}
+                                                                            onSaveEdit={() => { }}
+                                                                            onWriteArticle={() => { }}
+                                                                        />
+                                                                    ))}
+                                                                </div>
+                                                            </PaywallOverlay>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center py-6 text-stone-400 text-sm border border-dashed border-stone-200 rounded-lg">
+                                                        No {categoryConfig.label} yet
+                                                    </div>
+                                                )}
+                                            </section>
+                                        )
+                                    })
+                                })()}
 
                                 {/* Uncategorized Section (for legacy plans without article_category) */}
                                 {filteredPlan.filter(item => !item.article_category).length > 0 && (

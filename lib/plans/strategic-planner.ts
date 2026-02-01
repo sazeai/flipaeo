@@ -103,7 +103,7 @@ Educational "hub" content. Example queries:
 - "how long do AI headshots take"
 
 ### 2. Supporting Articles (8 articles)
-Specific how-to guides. Example queries:
+Specific how-to guides and tips. Example queries:
 - "how to take good photos for AI headshot"
 - "best outfit for professional headshot"
 - "how to smile naturally in photos"
@@ -118,6 +118,29 @@ Persona + comparison content. Example queries:
 Data-driven thought leadership. Example queries:
 - "AI headshot industry statistics 2026"
 - "study: do recruiters prefer professional photos"
+
+---
+
+## article_type: Choose Based on CONTENT, Not Category
+
+**CRITICAL: You MUST use a MIX of all 3 article types.** Do NOT default everything to "informational".
+
+| article_type | When to Use | Example Keywords |
+|--------------|-------------|------------------|
+| "informational" | Explains concepts, answers "what is", educational | "what are AI headshots", "are AI photos legal" |
+| "howto" | Step-by-step guides, tutorials, "how to" content | "how to pose for headshot", "best lighting for photos" |
+| "commercial" | Comparisons, alternatives, "best X", persona-specific buying guides | "best AI headshot generator", "Photoroom vs Aragon", "AI headshots for realtors" |
+
+**REQUIRED DISTRIBUTION:** Your 30-article plan MUST include:
+- 8-12 articles with article_type: "informational"
+- 8-10 articles with article_type: "howto" 
+- 8-12 articles with article_type: "commercial"
+
+**Examples of how ANY category can have ANY type:**
+- Core Answers + "howto": "How to Choose the Right AI Headshot Generator"
+- Supporting Articles + "commercial": "Best Poses for LinkedIn vs Tinder Headshots" 
+- Authority Plays + "commercial": "Top 10 AI Headshot Tools Compared: 2026 Study"
+- Conversion Pages + "informational": "What Realtors Need to Know About AI Headshots"
 
 ---
 
@@ -183,21 +206,26 @@ Return JSON with:
 Each article schema:
 \`\`\`json
 {
-  "day": 1,
-  "phase": "Foundation",
-  "category": "Core Answers",
-  "main_keyword": "what are AI headshots",
-  "supporting_keywords": ["AI generated photos", "AI portrait generator", "fake headshots AI"],
-  "title": "What Are AI Headshots? Everything You Need to Know",
-  "hook": "One-sentence user benefit",
-  "reason": "Strategic rationale explaining traffic potential and competitive advantage",
+  "day": 8,
+  "phase": "Use-Case",
+  "category": "Supporting Articles",
+  "main_keyword": "how to pose for AI headshot",
+  "supporting_keywords": ["AI headshot tips", "best pose for professional photo", "linkedin photo poses"],
+  "title": "How to Pose for AI Headshots: Quick Guide",
+  "hook": "Get camera-ready in 5 minutes",
+  "reason": "High-traffic how-to query for users actively preparing to use the product",
   "user_intent": "Informational",
-  "impact": "High",
-  "connected_to": [2, 5, 8],
-  "cluster": "Category Fundamentals",
-  "article_type": "informational"
+  "impact": "Medium",
+  "connected_to": [1, 3, 12],
+  "cluster": "Photo Tips",
+  "article_type": "howto"
 }
 \`\`\`
+
+**CRITICAL: Vary your article_type!**
+- Use "informational" for educational/explanatory articles (8-12 total)
+- Use "howto" for step-by-step guides and tutorials (8-10 total)
+- Use "commercial" for comparisons, alternatives, and buying guides (8-12 total)
 
 ---
 
@@ -212,6 +240,7 @@ Before finalizing, verify:
 - [ ] \`connected_to\` uses day numbers as integers
 - [ ] At least 3 competitor comparison articles with real names
 - [ ] At least 3 persona-specific articles (realtors, doctors, actors, etc.)
+- [ ] article_type distribution: 8-12 informational, 8-10 howto, 8-12 commercial (NOT all informational!)
 `
 
     try {
@@ -404,6 +433,10 @@ CRITICAL RULES:
 3. Maintain the same phase/category/cluster distribution as the rejected items when possible
 4. ALL keywords must be REAL search queries people actually type into Google
 5. Titles MUST be under 60 characters
+6. Choose article_type based on CONTENT:
+   - "informational" for explanatory/educational content
+   - "howto" for step-by-step guides and tutorials
+   - "commercial" for comparisons, alternatives, and buying guides
 
 ## Product Context (Quick Reference)
 - Product: ${brandData.product_name}
@@ -414,19 +447,19 @@ CRITICAL RULES:
 Return a JSON array of ${count} articles. Each article:
 \`\`\`json
 {
-  "day": 1,
-  "phase": "Foundation",
-  "category": "Core Answers",
-  "main_keyword": "completely different search query",
-  "supporting_keywords": ["related term 1", "related term 2", "related term 3"],
-  "title": "Short Title Under 60 Chars",
-  "hook": "One-sentence user benefit",
-  "reason": "Strategic rationale for this topic",
+  "day": 15,
+  "phase": "Technical",
+  "category": "Supporting Articles",
+  "main_keyword": "how to smile naturally for photos",
+  "supporting_keywords": ["natural smile tips", "photo smile tricks", "candid photo pose"],
+  "title": "How to Smile Naturally in Photos",
+  "hook": "Look confident, not awkward",
+  "reason": "High-volume how-to query for photo preparation",
   "user_intent": "Informational",
   "impact": "Medium",
   "connected_to": [1, 5],
-  "cluster": "Topic Cluster Name",
-  "article_type": "informational"
+  "cluster": "Photo Tips",
+  "article_type": "howto"
 }
 \`\`\`
 
