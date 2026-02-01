@@ -97,7 +97,7 @@ function LoginFormContent({ displayError, state, formAction }: {
               Welcome Back
             </h2>
             <p className="text-stone-500 text-sm">
-              Sign in to manage your content agents
+              Sign in to grow your brand for real
             </p>
           </div>
 
