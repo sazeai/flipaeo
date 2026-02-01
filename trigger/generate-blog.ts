@@ -13,12 +13,87 @@ import { jsonrepair } from "jsonrepair"
 import { ArticleType } from "@/lib/prompts/article-types"
 import { getArticleStrategy } from "@/lib/prompts/strategies"
 import { getCurrentDateContext } from "@/lib/utils/date-context"
-import { getRelevantInternalLinks } from "@/lib/internal-linking"
+import { getRelevantInternalLinks, generateEmbedding } from "@/lib/internal-linking"
 import { saveTopicMemory } from "@/lib/topic-memory"
 import { analyzeArticleCoverage } from "@/lib/coverage/analyzer"
 import { ArticleReadyEmail } from "@/lib/emails/templates/article-ready"
 import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
 import { render } from "@react-email/components"
+
+/**
+ * Tactical Deduplication Layer: Enriches outline sections with link instructions
+ * When a section covers a topic already answered in another article, inject a link instruction.
+ */
+async function enrichOutlineWithLinks(
+  outline: { sections: Array<{ heading: string; instruction_note?: string }> },
+  brandId: string,
+  supabase: any
+): Promise<void> {
+  console.log(`[Dedup] Starting outline enrichment for ${outline.sections.length} sections`)
+
+  for (let i = 0; i < outline.sections.length; i++) {
+    const section = outline.sections[i]
+
+    try {
+      // Step 1: Generate embedding for section heading
+      const headingEmbedding = await generateEmbedding(section.heading)
+      const embeddingStr = JSON.stringify(headingEmbedding)
+
+      // Step 2: Find if we've already covered this answer (threshold > 0.88)
+      const { data: coverageMatch, error: covErr } = await supabase.rpc('find_covered_answer', {
+        check_embedding: embeddingStr,
+        brand_uuid: brandId,
+        match_threshold: 0.88
+      })
+
+      if (covErr) {
+        console.warn(`[Dedup] RPC error for section "${section.heading}":`, covErr)
+        continue
+      }
+
+      if (!coverageMatch || coverageMatch.length === 0) {
+        // No match - this is a new topic
+        continue
+      }
+
+      const { article_id, answer_text, similarity: answerSim } = coverageMatch[0]
+      console.log(`[Dedup] Found coverage match for "${section.heading}" (sim: ${answerSim.toFixed(3)})`)
+
+      // Step 3: Find the live URL for this article (threshold > 0.85)
+      const { data: liveMatch, error: liveErr } = await supabase.rpc('find_live_url_from_article', {
+        target_article_id: article_id,
+        brand_uuid: brandId,
+        match_threshold: 0.85
+      })
+
+      if (liveErr) {
+        console.warn(`[Dedup] Live URL RPC error for article ${article_id}:`, liveErr)
+        continue
+      }
+
+      if (!liveMatch || liveMatch.length === 0) {
+        // No live URL - article might not be published yet
+        console.log(`[Dedup] No live URL found for article ${article_id} - skipping link injection`)
+        continue
+      }
+
+      const { live_url, live_title, similarity: urlSim } = liveMatch[0]
+      console.log(`[Dedup] Found live URL "${live_title}" (sim: ${urlSim.toFixed(3)})`)
+
+      // Step 4: Inject link instruction into section
+      const linkInstruction = `\n\n[LINK INSTRUCTION]: We have already answered '${answer_text}'. Briefly summarize and LINK to '${live_title}' (${live_url}). Do not re-explain in depth.`
+
+      section.instruction_note = (section.instruction_note || '') + linkInstruction
+      console.log(`[Dedup] ✅ Injected link instruction for section "${section.heading}"`)
+
+    } catch (err) {
+      console.warn(`[Dedup] Error processing section "${section.heading}":`, err)
+      // Non-blocking - continue with other sections
+    }
+  }
+
+  console.log(`[Dedup] Outline enrichment complete`)
+}
 
 const cleanAndParse = (text: string) => {
   const clean = text.replace(/```json/g, "").replace(/```/g, "")
@@ -1292,6 +1367,10 @@ export const generateBlogPost = task({
       // IMPORTANT: Override outline.title with finalTitle to ensure consistency
       // This prevents the stored outline from having a different title than the article
       outline.title = finalTitle
+
+      // --- TACTICAL DEDUPLICATION: Enrich outline with link injection ---
+      // For each section, check if we've already covered this topic and inject link instruction
+      await enrichOutlineWithLinks(outline, brandId, supabase)
 
       // Initialize draft with Title
       const initialDraft = `# ${finalTitle} \n\n`
