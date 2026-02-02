@@ -28,7 +28,16 @@ export interface DeduplicationResult {
     }
 }
 
-const SIMILARITY_THRESHOLD = 0.85 // More aggressive than 0.90 used elsewhere
+const SIMILARITY_THRESHOLD_STRICT = 0.88
+const SIMILARITY_THRESHOLD_LOOSE = 0.60
+
+const GEMINI_MODEL = "gemini-2.5-flash"
+
+// Initialize Gemini Client
+// We use a lazy initialization or direct import if env is available
+import { checkSimilarityWithAgent } from "@/lib/plans/similarity-agent"
+
+// Removed local checkSimilarityWithAgent definition as it is now imported
 
 /**
  * Deduplicate a content plan against existing content
@@ -47,12 +56,13 @@ export async function deduplicateContentPlan(
     let removedByArticles = 0
 
     console.log(`\n${'='.repeat(80)}`)
-    console.log(`[Deduplication] 🚀 STARTING BOUNCER CHECK`)
+    console.log(`[Deduplication] 🚀 STARTING BOUNCER CHECK (Agentic Mode)`)
     console.log(`${'='.repeat(80)}`)
     console.log(`[Deduplication] Input: ${plan.length} plan items`)
     console.log(`[Deduplication] User ID: ${userId}`)
     console.log(`[Deduplication] Brand ID: ${brandId || 'NONE'}`)
-    console.log(`[Deduplication] Similarity Threshold: ${SIMILARITY_THRESHOLD} (${SIMILARITY_THRESHOLD * 100}%)`)
+    console.log(`[Deduplication] Thresholds: Loose=${SIMILARITY_THRESHOLD_LOOSE}, Strict=${SIMILARITY_THRESHOLD_STRICT}`)
+    console.log(`[Deduplication] Agent Model: ${GEMINI_MODEL}`)
     console.log(`${'='.repeat(80)}\n`)
 
     for (let i = 0; i < plan.length; i++) {
@@ -62,63 +72,72 @@ export async function deduplicateContentPlan(
         console.log(`\n${'─'.repeat(60)}`)
         console.log(`[Deduplication] ${itemLabel} Processing: "${item.main_keyword}"`)
         console.log(`[Deduplication] ${itemLabel} Title: "${item.title}"`)
-        console.log(`[Deduplication] ${itemLabel} Phase: ${item.phase}, Category: ${item.article_category}`)
 
-        // Create embedding text from title + main keyword for semantic matching
+        // Create embedding text
         const embeddingText = `${item.title} ${item.main_keyword}`
-        console.log(`[Deduplication] ${itemLabel} Embedding text: "${embeddingText}"`)
 
         let embedding: number[]
         try {
-            console.log(`[Deduplication] ${itemLabel} Generating embedding...`)
             embedding = await generateEmbedding(embeddingText)
-            console.log(`[Deduplication] ${itemLabel} ✅ Embedding generated (${embedding.length} dimensions)`)
-            console.log(`[Deduplication] ${itemLabel} Embedding preview: [${embedding.slice(0, 5).map(n => n.toFixed(4)).join(', ')}...]`)
         } catch (error) {
             console.error(`[Deduplication] ${itemLabel} ❌ FAILED to get embedding:`, error)
-            console.log(`[Deduplication] ${itemLabel} ⚠️ Keeping item (fail open policy)`)
             filteredPlan.push(item)
             continue
         }
 
-        // Check 1: Compare against sitemap/internal links
-        console.log(`[Deduplication] ${itemLabel} 🔍 Check 1: Sitemap/Internal Links...`)
+        // Helper to process match result
+        const processMatch = async (match: { title: string, similarity: number } | null, source: 'sitemap' | 'article') => {
+            if (!match) return false
+
+            const { title: matchTitle, similarity } = match
+            console.log(`[Deduplication] ${itemLabel} ⚠️ Potential match found in ${source}: "${matchTitle}" (${(similarity * 100).toFixed(2)}%)`)
+
+            // 1. Strict Match (High Confidence) -> Auto Reject
+            if (similarity > SIMILARITY_THRESHOLD_STRICT) {
+                console.log(`[Deduplication] ${itemLabel} 🚫 REJECTED by strict threshold (> ${SIMILARITY_THRESHOLD_STRICT})`)
+                removedItems.push({
+                    item,
+                    reason: `Too similar to existing ${source} (Strict)`,
+                    similarTo: matchTitle,
+                    similarity
+                })
+                if (source === 'sitemap') removedBySitemap++
+                else removedByArticles++
+                return true
+            }
+
+            // 2. Loose Match (Gray Area) -> Agent Check
+            // We know similarity > SIMILARITY_THRESHOLD_LOOSE because the RPC filters by it
+            console.log(`[Deduplication] ${itemLabel} 🕵️ Gray area match (${SIMILARITY_THRESHOLD_LOOSE} - ${SIMILARITY_THRESHOLD_STRICT}). Asking Agent...`)
+
+            const isDuplicate = await checkSimilarityWithAgent(item.title, matchTitle)
+
+            if (isDuplicate) {
+                console.log(`[Deduplication] ${itemLabel} 🚫 REJECTED by Agent!`)
+                removedItems.push({
+                    item,
+                    reason: `Agent confirmed duplicate of existing ${source}`,
+                    similarTo: matchTitle,
+                    similarity
+                })
+                if (source === 'sitemap') removedBySitemap++
+                else removedByArticles++
+                return true
+            } else {
+                console.log(`[Deduplication] ${itemLabel} ✅ Agent allowed it (False positive vector match)`)
+                return false
+            }
+        }
+
+        // Check 1: Sitemap
         const sitemapMatch = await checkAgainstSitemap(supabase, embedding, userId, itemLabel)
-        if (sitemapMatch) {
-            console.log(`[Deduplication] ${itemLabel} 🚫 REJECTED by sitemap match!`)
-            console.log(`[Deduplication] ${itemLabel}    Similar to: "${sitemapMatch.title}"`)
-            console.log(`[Deduplication] ${itemLabel}    Similarity: ${(sitemapMatch.similarity * 100).toFixed(2)}%`)
-            removedItems.push({
-                item,
-                reason: `Too similar to existing sitemap page`,
-                similarTo: sitemapMatch.title,
-                similarity: sitemapMatch.similarity
-            })
-            removedBySitemap++
-            continue
-        }
-        console.log(`[Deduplication] ${itemLabel} ✅ Passed sitemap check`)
+        if (await processMatch(sitemapMatch, 'sitemap')) continue
 
-        // Check 2: Compare against existing articles
-        console.log(`[Deduplication] ${itemLabel} 🔍 Check 2: Existing Articles...`)
+        // Check 2: Articles
         const articleMatch = await checkAgainstArticles(supabase, embedding, userId, brandId, itemLabel)
-        if (articleMatch) {
-            console.log(`[Deduplication] ${itemLabel} 🚫 REJECTED by article match!`)
-            console.log(`[Deduplication] ${itemLabel}    Similar to: "${articleMatch.keyword}"`)
-            console.log(`[Deduplication] ${itemLabel}    Similarity: ${(articleMatch.similarity * 100).toFixed(2)}%`)
-            removedItems.push({
-                item,
-                reason: `Too similar to existing article`,
-                similarTo: articleMatch.keyword,
-                similarity: articleMatch.similarity
-            })
-            removedByArticles++
-            continue
-        }
-        console.log(`[Deduplication] ${itemLabel} ✅ Passed article check`)
+        if (await processMatch(articleMatch, 'article')) continue
 
-        // No duplicates found, keep this item
-        console.log(`[Deduplication] ${itemLabel} ✅ PASSED ALL CHECKS - Keeping item`)
+        console.log(`[Deduplication] ${itemLabel} ✅ Keeping item`)
         filteredPlan.push(item)
     }
 
@@ -131,21 +150,7 @@ export async function deduplicateContentPlan(
 
     console.log(`\n${'='.repeat(80)}`)
     console.log(`[Deduplication] 🏁 BOUNCER CHECK COMPLETE`)
-    console.log(`${'='.repeat(80)}`)
-    console.log(`[Deduplication] 📊 FINAL STATS:`)
-    console.log(`[Deduplication]    Original items:     ${stats.originalCount}`)
-    console.log(`[Deduplication]    Kept items:         ${stats.filteredCount}`)
-    console.log(`[Deduplication]    Removed by sitemap: ${removedBySitemap}`)
-    console.log(`[Deduplication]    Removed by articles: ${removedByArticles}`)
-    console.log(`[Deduplication]    Total removed:      ${removedBySitemap + removedByArticles}`)
-
-    if (removedItems.length > 0) {
-        console.log(`\n[Deduplication] 📋 REJECTED ITEMS SUMMARY:`)
-        removedItems.forEach((r, idx) => {
-            console.log(`[Deduplication]    ${idx + 1}. "${r.item.main_keyword}" → ${r.reason}`)
-            console.log(`[Deduplication]       Similar to: "${r.similarTo}" (${(r.similarity * 100).toFixed(2)}%)`)
-        })
-    }
+    console.log(`[Deduplication] Final Stats: Tried ${stats.originalCount}, Kept ${stats.filteredCount}, Rejected ${stats.removedBySitemap + stats.removedByArticles}`)
     console.log(`${'='.repeat(80)}\n`)
 
     return { filteredPlan, removedItems, stats }
@@ -161,35 +166,27 @@ async function checkAgainstSitemap(
     itemLabel: string
 ): Promise<{ title: string; similarity: number } | null> {
     try {
-        console.log(`[Deduplication] ${itemLabel}    RPC: match_internal_links`)
-        console.log(`[Deduplication] ${itemLabel}    Params: threshold=${SIMILARITY_THRESHOLD}, count=1, user_id=${userId}`)
-
         const { data, error } = await supabase.rpc('match_internal_links', {
             query_embedding: embedding,
-            match_threshold: SIMILARITY_THRESHOLD,
+            match_threshold: SIMILARITY_THRESHOLD_LOOSE, // Use loose threshold for initial fetch
             match_count: 1,
             p_user_id: userId
         })
 
         if (error) {
-            console.error(`[Deduplication] ${itemLabel}    ❌ RPC ERROR:`, error.message)
-            console.error(`[Deduplication] ${itemLabel}    Error details:`, JSON.stringify(error))
+            console.error(`[Deduplication] ${itemLabel}    ❌ RPC ERROR (Sitemap):`, error.message)
             return null
         }
 
-        console.log(`[Deduplication] ${itemLabel}    RPC returned: ${data?.length || 0} matches`)
         if (data && data.length > 0) {
-            console.log(`[Deduplication] ${itemLabel}    Top match: "${data[0].title}" (${(data[0].similarity * 100).toFixed(2)}%)`)
             return {
                 title: data[0].title,
                 similarity: data[0].similarity
             }
         }
-
-        console.log(`[Deduplication] ${itemLabel}    No matches above threshold`)
         return null
     } catch (error) {
-        console.error(`[Deduplication] ${itemLabel}    ❌ EXCEPTION:`, error)
+        console.error(`[Deduplication] ${itemLabel}    ❌ EXCEPTION (Sitemap):`, error)
         return null
     }
 }
@@ -203,70 +200,30 @@ async function checkAgainstArticles(
     userId: string,
     brandId: string | undefined,
     itemLabel: string
-): Promise<{ keyword: string; similarity: number } | null> {
+): Promise<{ title: string; similarity: number } | null> {
     try {
-        console.log(`[Deduplication] ${itemLabel}    RPC: match_articles`)
-        console.log(`[Deduplication] ${itemLabel}    Params: threshold=${SIMILARITY_THRESHOLD}, count=1, user_id=${userId}, brand_id=${brandId || 'NULL'}`)
-
         const { data, error } = await supabase.rpc('match_articles', {
             query_embedding: embedding,
-            match_threshold: SIMILARITY_THRESHOLD,
+            match_threshold: SIMILARITY_THRESHOLD_LOOSE, // Use loose threshold for initial fetch
             match_count: 1,
             p_user_id: userId,
             p_brand_id: brandId || null
         })
 
         if (error) {
-            console.warn(`[Deduplication] ${itemLabel}    ⚠️ RPC ERROR (may not exist):`, error.message)
-            console.warn(`[Deduplication] ${itemLabel}    Error code: ${error.code}`)
-            console.warn(`[Deduplication] ${itemLabel}    Error details:`, JSON.stringify(error))
+            // Quietly fail or warn
             return null
         }
 
-        console.log(`[Deduplication] ${itemLabel}    RPC returned: ${data?.length || 0} matches`)
-
-        // Log raw RPC response for debugging
         if (data && data.length > 0) {
-            console.log(`[Deduplication] ${itemLabel}    Raw response:`, JSON.stringify(data[0]))
-            console.log(`[Deduplication] ${itemLabel}    Top match: "${data[0].keyword}" (${(data[0].similarity * 100).toFixed(2)}%)`)
             return {
-                keyword: data[0].keyword,
+                title: data[0].keyword,
                 similarity: data[0].similarity
             }
         }
-
-        console.log(`[Deduplication] ${itemLabel}    No matches above threshold (${SIMILARITY_THRESHOLD * 100}%)`)
-
-        // DEBUG: Also query to see what articles exist for this user/brand
-        console.log(`[Deduplication] ${itemLabel}    🔬 DEBUG: Checking what articles exist...`)
-        try {
-            let query = supabase
-                .from('articles')
-                .select('id, keyword, topic_embedding')
-                .eq('user_id', userId)
-
-            if (brandId) {
-                query = query.eq('brand_id', brandId)
-            }
-
-            const { data: articles, error: listError } = await query.limit(10)
-
-            if (listError) {
-                console.log(`[Deduplication] ${itemLabel}    DEBUG query error:`, listError.message)
-            } else {
-                console.log(`[Deduplication] ${itemLabel}    DEBUG: Found ${articles?.length || 0} articles (showing up to 10)`)
-                articles?.forEach((a: any, idx: number) => {
-                    const hasEmbedding = a.topic_embedding !== null
-                    console.log(`[Deduplication] ${itemLabel}       ${idx + 1}. "${a.keyword}" - embedding: ${hasEmbedding ? '✅ YES' : '❌ NO'}`)
-                })
-            }
-        } catch (debugError) {
-            console.log(`[Deduplication] ${itemLabel}    DEBUG query exception:`, debugError)
-        }
-
         return null
     } catch (error) {
-        console.error(`[Deduplication] ${itemLabel}    ❌ EXCEPTION:`, error)
+        console.error(`[Deduplication] ${itemLabel}    ❌ EXCEPTION (Articles):`, error)
         return null
     }
 }
