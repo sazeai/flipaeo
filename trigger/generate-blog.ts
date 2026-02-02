@@ -443,16 +443,27 @@ IMAGE TYPE: ${imageType.toUpperCase()}
 REFERENCE TEMPLATE:
 ${template}
 
-TEXT RULES - IMPORTANT:
-✅ ALLOWED:
-- ONE heading (4-6 words max) in handwritten style
-- Small 1-2 word tags like "Stressed", "Refreshed", "High Tax", "Easy Savings"
-- Simple labels like "Before", "After"
-- Maximum 4-5 short tags total
+TEXT PROCESSING RULES (CRITICAL):
+1.  **HEADING HANDLING:** If the heading is > 4 words, YOU MUST summarize it into a 2-3 word visual concept.
+    - ❌ "${section.heading}" (Too long)
+    - ✅ [Short 3-5 word summary]
+2.  **PROBLEM WORDS:** The AI struggles with complex words like "Finances", "Directories", "Optimization".
+    - **DO NOT write these words.**
+    - **USE ICONS** instead (e.g., Dollar sign, Folder, Gear).
+3.  **TEXT RATIO:** 90% Illustration, 10% Text.
+    - If unsure, OMIT TEXT entirely.
+    - Simple labels like "Before", "After"
+    - Maximum 4-5 short tags total
+
+✅ ALLOWED TEXT:
+- 1-2 word labels MAX (e.g. "Growth", "Risk", "10x").
+- Numbers and Symbols (%, $, #).
 
 ❌ BANNED - DO NOT USE:
 - Checklists with multiple items
 - Bullet point lists with text
+- The literal words "Finances" or "Directories" (Use visual metaphors).
+- Long headings.
 - Long text descriptions (3+ words per item)
 - Checklist panels with "Calculate Break Costs", "Save Enough Funds" etc.
 
@@ -1737,26 +1748,21 @@ Image Style Preference: ${imageStyle}
 
 ${styleTemplate}
 
-TEXT RULES - IMPORTANT:
-✅ ALLOWED:
-- ONE main heading: "${keyword.toUpperCase()}" in BIG, BOLD handwritten/marker style
-- Small 1-2 word tags like "Stressed", "Refreshed", "Before", "After"
-- Maximum 4-5 short tags total
-- Position the MAIN HEADING on the LEFT SIDE of the image in BIG, BOLD letters - this is critical!
-
-❌ BANNED - DO NOT USE:
-- Checklists with multiple text items
-- Bullet point lists with long text
-- Long descriptions (3+ words per item)
-- Checklist panels like "Calculate Break Costs", "Save Enough Funds"
-
-GOOD EXAMPLES OF TAGS:
-"Small handwritten tag: 'Overwhelmed'"
-"Tag pointing to figure: 'New Ideas'"
-"Label under section: 'Before'"
+TEXT PROCESSING RULES (CRITICAL):
+1.  **MAIN HEADING:** Use "${keyword.toUpperCase()}" on the LEFT SIDE.
+    - IF the keyword is > 4 words, SUMMARIZE it into 2-3 punchy words.
+    - Style: Big, Bold, Handwritten/Marker.
+2.  **SECONDARY TEXT:**
+    - Allowed: Small 1-2 word tags (e.g., "Guide", "Review", "2026").
+    - Max 3 tags total.
+3.  **BANNED:**
+    - NO Sentences. NO Paragraphs. NO Checklists.
+    - Avoid complex financial/technical terms if possible - use icons instead.
+    - NO "Wall of text".
 
 YOUR TASK:
-Create a descriptive, scene-based prompt. Use short 1-2 word tags where helpful. NO checklists or long bullet lists.
+Create a descriptive, scene-based prompt. Focus on visual composition.
+Ensure the text is MINIMAL and legible.
 
 OUTPUT: Return ONLY the image prompt. No explanations.`
 
