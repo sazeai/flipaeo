@@ -455,6 +455,14 @@ TEXT PROCESSING RULES (CRITICAL):
     - Simple labels like "Before", "After"
     - Maximum 4-5 short tags total
 
+
+4.  **VISUAL ABSTRACTION (MANDATORY):**
+    - **RULE:** If the subject involves text presentation (e.g., "Summaries", "Code Snippets", "Logs", "Documents"), YOU MUST visualize it as a "Stylized Data Representation".
+    - **HOW:** Use icons, flowing lines, glowing geometric blocks, or abstract grids.
+    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences.
+    - **Example:** Instead of "A document showing summary text", use "A glowing document icon emitting abstract data lines".
+Why we are doing this is because AI art generator we are using -struggle to generate text and when it does it is not good so we are using icons and symbols instead.
+
 ✅ ALLOWED TEXT:
 - 1-2 word labels MAX (e.g. "Growth", "Risk", "10x").
 - Numbers and Symbols (%, $, #).
@@ -465,7 +473,8 @@ TEXT PROCESSING RULES (CRITICAL):
 - The literal words "Finances" or "Directories" (Use visual metaphors).
 - Long headings.
 - Long text descriptions (3+ words per item)
-- Checklist panels with "Calculate Break Costs", "Save Enough Funds" etc.
+- Legible body text of any kind.
+- "Summary text", "Table of contents", "Snippets".
 
 GOOD EXAMPLE:
 "Small handwritten tag near person: 'Overwhelmed'
@@ -1755,7 +1764,11 @@ TEXT PROCESSING RULES (CRITICAL):
 2.  **SECONDARY TEXT:**
     - Allowed: Small 1-2 word tags (e.g., "Guide", "Review", "2026").
     - Max 3 tags total.
-3.  **BANNED:**
+3.  **VISUAL ABSTRACTION (MANDATORY):**
+    - **RULE:** If the topic involves "AI Overviews", "Search Results", or "Text Content", visualize it as "Glowing Data Blocks" or "Geometric Flow".
+    - **NEVER** include "Lorem Ipsum", "Fake Text", or "Blurry Paragraphs".
+    - **NEVER** use words like "Summary", "Snippet", or "Log" as visual elements.
+4.  **BANNED:**
     - NO Sentences. NO Paragraphs. NO Checklists.
     - Avoid complex financial/technical terms if possible - use icons instead.
     - NO "Wall of text".
