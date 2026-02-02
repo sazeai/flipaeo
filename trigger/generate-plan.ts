@@ -6,7 +6,6 @@ import { deduplicateWithReplacementLoop } from "@/lib/plans/plan-deduplication"
 import { tavily } from "@tavily/core"
 import Sitemapper from "sitemapper"
 import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
-import { getGeminiClient } from "@/utils/gemini/geminiClient"
 
 
 interface GeneratePlanPayload {
@@ -211,87 +210,63 @@ async function syncSitemapToInternalLinks(
 }
 
 /**
- * Quick competitor discovery using Tavily search + AI extraction.
- * Searches for "Top [category] software tools competitors" to force listicle results,
- * then uses Gemini Flash to extract real B2B product brands.
+ * Quick competitor discovery using Tavily search.
+ * Searches for "[category] tools" to find real competitor brands.
  */
 async function discoverCompetitors(
     brandData: BrandDetails
 ): Promise<Array<{ name: string; url?: string }>> {
     const apiKey = process.env.TAVILY_API_KEY
     if (!apiKey) {
-        console.warn("[Competitor Discovery] No Tavily API key, skipping competitor discovery")
+        console.warn("[Generate Plan] No Tavily API key, skipping competitor discovery")
         return []
     }
 
     try {
         const tvly = tavily({ apiKey })
-
-        // 1. SMART QUERY: Force a "Listicle" result which contains many competitors
         const category = brandData.product_identity.literally || brandData.category
-        const searchQuery = `Top ${category} software tools competitors and alternatives 2026`
+        const searchQuery = category
 
-        console.log(`[Competitor Discovery] Searching: "${searchQuery}"`)
+        console.log(`[Generate Plan] Discovering competitors for: "${searchQuery}"`)
 
-        // 2. FETCH CONTEXT: Get the content, not just the URL
         const response = await tvly.search(searchQuery, {
-            maxResults: 6,
-            searchDepth: "advanced", // worth the extra credit for better snippets
-            includeAnswer: true      // Tavily tries to summarize the answer
+            maxResults: 10,
+            searchDepth: "basic"
         })
 
-        // 3. THE AGENT: Feed the noise to the LLM
-        const contextText = `
-        Tavily Summary: ${response.answer || ''}
-        
-        Search Results:
-        ${response.results.map(r => `- Title: ${r.title}\n  Snippet: ${r.content}\n  URL: ${r.url}`).join('\n')}
-        `
+        // Extract unique domains as competitors
+        const competitors: Array<{ name: string; url: string }> = []
+        const seenDomains = new Set<string>()
 
-        const genAI = getGeminiClient() // Use a cheap model like Flash
-        const prompt = `
-        I am analyzing the market for "${category}".
-        Based on the search results below, extract the top 5 REAL direct competitor BRANDS (software/products).
-        
-        RULES:
-        1. IGNORE review sites (G2, Capterra, Reddit).
-        2. IGNORE news/publishers (Forbes, TechCrunch, Search Engine Land).
-        3. IGNORE the user's own brand: "${brandData.product_name}".
-        4. Return ONLY a valid JSON array of objects: [{"name": "BrandName", "url": "BrandURL"}].
-        5. If the URL is a blog post (e.g., hubspot.com/blog/...), strip it to the root domain (hubspot.com).
-        
-        SEARCH CONTEXT:
-        ${contextText}
-        `
+        for (const result of response.results || []) {
+            try {
+                const url = new URL(result.url)
+                const domain = url.hostname.replace('www.', '')
 
-        const result = await genAI.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "ARRAY",
-                    items: {
-                        type: "OBJECT",
-                        properties: {
-                            name: { type: "STRING" },
-                            url: { type: "STRING" }
-                        },
-                        required: ["name", "url"]
-                    }
-                }
+                // Skip if already seen or is the brand itself
+                if (seenDomains.has(domain)) continue
+                if (brandData.product_name.toLowerCase().includes(domain.split('.')[0])) continue
+
+                seenDomains.add(domain)
+
+                // Extract brand name from title or domain
+                const brandName = result.title?.split(' - ')[0]?.split(' | ')[0]?.trim() ||
+                    domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)
+
+                competitors.push({
+                    name: brandName,
+                    url: url.origin
+                })
+            } catch {
+                // Invalid URL, skip
             }
-        })
+        }
 
-        const text = result.text || "[]"
-        const competitors = JSON.parse(text) as Array<{ name: string; url: string }>
-
-        console.log(`[Competitor Discovery] AI Extracted:`, competitors.map((c) => c.name))
-        return competitors
+        console.log(`[Generate Plan] Found ${competitors.length} competitors`)
+        return competitors.slice(0, 8) // Max 8 competitors
 
     } catch (error) {
-        console.error("[Competitor Discovery] AI Extraction Failed:", error)
-        // Fallback to empty
+        console.error("[Generate Plan] Competitor discovery failed:", error)
         return []
     }
 }
