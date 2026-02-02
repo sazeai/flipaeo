@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Proxy route to serve images from R2 storage.
- * Usage: /api/images/featured-images/article-id/image.png
+ * Usage: /api/images/featured-images/article-id/image.webp
  */
 export async function GET(
     request: NextRequest,

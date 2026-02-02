@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                             connection.api_token,
                             connection.site_id,
                             buffer,
-                            `section-${Date.now()}.png`
+                            `section-${Date.now()}.webp`
                         )
 
                         if (assetResult.url) {

@@ -787,7 +787,7 @@ export default function ArticleDetailPage() {
                                                                     const blobUrl = URL.createObjectURL(blob)
                                                                     const link = document.createElement('a')
                                                                     link.href = blobUrl
-                                                                    link.download = `featured-image-${article.id}.png`
+                                                                    link.download = `featured-image-${article.id}.webp`
                                                                     document.body.appendChild(link)
                                                                     link.click()
                                                                     document.body.removeChild(link)

@@ -425,7 +425,7 @@ export async function publishToWordPress(
 
     // 1. Upload featured image if available
     if (article.featuredImageUrl) {
-        const filename = `featured-${article.slug || 'image'}.png`
+        const filename = `featured-${article.slug || 'image'}.webp`
         const mediaResult = await uploadMedia(credentials, article.featuredImageUrl, filename)
         if (mediaResult) {
             featuredMediaId = mediaResult.id
@@ -480,7 +480,7 @@ export async function uploadContentImagesToWordPress(
         try {
             // Generate filename from URL
             const urlParts = originalUrl.split('/')
-            const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.png'}`
+            const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.webp'}`
 
             // Upload to WordPress media library
             const mediaResult = await uploadMedia(credentials, fetchableUrl, filename)

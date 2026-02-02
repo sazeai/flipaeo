@@ -1540,7 +1540,7 @@ CRITICAL EXECUTION RULES:
               // Download and upload to R2
               const sectionImgResponse = await fetch(sectionImageUrl)
               const sectionImgBuffer = Buffer.from(await sectionImgResponse.arrayBuffer())
-              const sectionImgFileName = `section-images/${userId}/${brandId}/${articleId}/${Date.now()}.png`
+              const sectionImgFileName = `section-images/${userId}/${brandId}/${articleId}/${Date.now()}.webp`
 
               await putR2Object(sectionImgFileName, sectionImgBuffer)
               const r2Domain = process.env.R2_PUBLIC_DOMAIN || `${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL}`
@@ -1784,10 +1784,10 @@ OUTPUT: Return ONLY the image prompt. No explanations.`
         if (imageUrl) {
           const imageResponse = await fetch(imageUrl)
           const imageBuffer = await imageResponse.arrayBuffer()
-          const imageKey = `featured-images/${articleId}/${randomUUID()}.png`
+          const imageKey = `featured-images/${articleId}/${randomUUID()}.webp`
 
           // Upload to R2
-          await putR2Object(imageKey, Buffer.from(imageBuffer), "image/png")
+          await putR2Object(imageKey, Buffer.from(imageBuffer), "image/webp")
 
           // 4. Construct Public URL - Prioritize public accessibility for CMS/Editor
           const r2PublicDomain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, '')
