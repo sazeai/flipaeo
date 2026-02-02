@@ -310,7 +310,9 @@ export async function deduplicateWithReplacementLoop(
     console.log(`[Replacement Loop] Brand ID: ${options.brandId || 'NONE'}`)
     console.log(`${'#'.repeat(80)}\n`)
 
-    while (currentPlan.length < targetCount && attempt < maxAttempts) {
+    // CRITICAL: Use do-while to ALWAYS run deduplication at least once
+    // Previously used while loop which skipped entirely when starting with target count
+    do {
         attempt++
         console.log(`\n${'*'.repeat(60)}`)
         console.log(`[Replacement Loop] 🔁 ATTEMPT ${attempt}/${maxAttempts}`)
@@ -324,7 +326,7 @@ export async function deduplicateWithReplacementLoop(
             options.brandId
         )
 
-        // If nothing was removed, we're done
+        // If nothing was removed, we're done with deduplication
         if (removedItems.length === 0) {
             console.log(`[Replacement Loop] ✅ No duplicates found this round`)
             console.log(`[Replacement Loop] Keeping all ${filteredPlan.length} items`)
@@ -387,7 +389,7 @@ export async function deduplicateWithReplacementLoop(
             currentPlan = filteredPlan
             break
         }
-    }
+    } while (currentPlan.length < targetCount && attempt < maxAttempts)
 
     // Final safety check - ensure we don't exceed target
     if (currentPlan.length > targetCount) {
