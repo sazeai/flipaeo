@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { generateEmbedding } from "@/lib/internal-linking"
 
@@ -38,7 +38,7 @@ export async function deduplicateContentPlan(
     userId: string,
     brandId?: string
 ): Promise<DeduplicationResult> {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
 
     const removedItems: DeduplicationResult['removedItems'] = []
     const filteredPlan: ContentPlanItem[] = []
@@ -155,7 +155,7 @@ export async function deduplicateContentPlan(
  * Check if an embedding matches any existing sitemap pages
  */
 async function checkAgainstSitemap(
-    supabase: Awaited<ReturnType<typeof createClient>>,
+    supabase: any,
     embedding: number[],
     userId: string,
     itemLabel: string
@@ -198,7 +198,7 @@ async function checkAgainstSitemap(
  * Check if an embedding matches any existing articles
  */
 async function checkAgainstArticles(
-    supabase: Awaited<ReturnType<typeof createClient>>,
+    supabase: any,
     embedding: number[],
     userId: string,
     brandId: string | undefined,
@@ -255,7 +255,7 @@ async function checkAgainstArticles(
                 console.log(`[Deduplication] ${itemLabel}    DEBUG query error:`, listError.message)
             } else {
                 console.log(`[Deduplication] ${itemLabel}    DEBUG: Found ${articles?.length || 0} articles (showing up to 10)`)
-                articles?.forEach((a, idx) => {
+                articles?.forEach((a: any, idx: number) => {
                     const hasEmbedding = a.topic_embedding !== null
                     console.log(`[Deduplication] ${itemLabel}       ${idx + 1}. "${a.keyword}" - embedding: ${hasEmbedding ? '✅ YES' : '❌ NO'}`)
                 })
