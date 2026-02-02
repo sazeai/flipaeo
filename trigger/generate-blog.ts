@@ -43,7 +43,7 @@ async function enrichOutlineWithLinks(
       const { data: coverageMatch, error: covErr } = await supabase.rpc('find_covered_answer', {
         check_embedding: embeddingStr,
         brand_uuid: brandId,
-        match_threshold: 0.88
+        match_threshold: 0.82
       })
 
       if (covErr) {
