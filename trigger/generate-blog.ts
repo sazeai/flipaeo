@@ -1642,8 +1642,8 @@ VISUAL ELEMENTS:
 - Choose a harmonious 2-3 color palette
 
 COMPOSITION:
-- Left side: Reserved for the text overlay (keep it empty/clean)
-- Right side: 1-2 vector icons, objects, or simple illustrations
+- LEFT SIDE: The main headline/title text in BIG, BOLD letters - this is where the title goes!
+- RIGHT SIDE: 1-2 vector icons, objects, or simple illustrations
 - Plenty of white space - do NOT overcrowd
 
 CONSTRAINTS:
@@ -1669,8 +1669,8 @@ VISUAL ELEMENTS:
 - Objects appear to float or sit on the white surface
 
 COMPOSITION:
-- Left side: Clean white space for text overlay
-- Right side: 1-2 relevant realistic objects or product-style photography
+- LEFT SIDE: The main headline/title text in BIG, BOLD letters - this is where the title goes!
+- RIGHT SIDE: 1-2 relevant realistic objects or product-style photography
 - Professional product photography aesthetic
 
 CONSTRAINTS:
@@ -1692,8 +1692,8 @@ VISUAL ELEMENTS:
 - Abstract or symbolic representation of the topic
 
 COMPOSITION:
-- Left side: Empty for text overlay
-- Right side: One simple, bold visual element
+- LEFT SIDE: The main headline/title text in BIG, BOLD letters - this is where the title goes!
+- RIGHT SIDE: One simple, bold visual element
 - Lots of breathing room
 
 CONSTRAINTS:
@@ -1715,8 +1715,8 @@ VISUAL ELEMENTS:
 - Professional, modern aesthetic
 
 COMPOSITION:
-- Left side reserved for text overlay
-- Right side: visual elements
+- LEFT SIDE: The main headline/title text in BIG, BOLD letters - this is where the title goes!
+- RIGHT SIDE: visual elements
 
 CONSTRAINTS:
 - Professional and premium aesthetic
@@ -1739,10 +1739,10 @@ ${styleTemplate}
 
 TEXT RULES - IMPORTANT:
 ✅ ALLOWED:
-- ONE main heading: "${keyword.toUpperCase()}" in handwritten/marker style
+- ONE main heading: "${keyword.toUpperCase()}" in BIG, BOLD handwritten/marker style
 - Small 1-2 word tags like "Stressed", "Refreshed", "Before", "After"
 - Maximum 4-5 short tags total
-- Position heading at top or center
+- Position the MAIN HEADING on the LEFT SIDE of the image in BIG, BOLD letters - this is critical!
 
 ❌ BANNED - DO NOT USE:
 - Checklists with multiple text items
