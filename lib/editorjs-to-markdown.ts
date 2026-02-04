@@ -15,7 +15,50 @@ export function editorJsToMarkdown(data: OutputData): string {
                 return '#'.repeat(block.data.level) + ' ' + convertHtmlToMarkdown(block.data.text) + '\n'
 
             case 'paragraph':
-                return convertHtmlToMarkdown(block.data.text) + '\n\n'
+                const text = block.data.text || ""
+
+                // Hack to support tables: EditorJS sometimes renders tables as HTML inside a paragraph
+                // if the table tool isn't fully playing nice or if it was pasted as HTML
+                if (text.includes('<table') && text.includes('</table>')) {
+                    const tableMatch = text.match(/<table[^>]*>([\s\S]*?)<\/table>/)
+                    if (tableMatch) {
+                        const tableContent = tableMatch[1]
+                        const rows = tableContent.match(/<tr[^>]*>([\s\S]*?)<\/tr>/g)
+
+                        if (rows && rows.length > 0) {
+                            let markdownTable = ""
+
+                            // Process header row
+                            const headerRow = rows[0]
+                            const headers = headerRow.match(/<th[^>]*>([\s\S]*?)<\/th>/g)
+                            if (headers) {
+                                const headerText = headers.map((h: string) => {
+                                    const content = h.replace(/<\/?th[^>]*>/g, "").trim()
+                                    return convertHtmlToMarkdown(content)
+                                })
+                                markdownTable += "| " + headerText.join(" | ") + " |\n"
+                                markdownTable += "| " + headerText.map(() => "---").join(" | ") + " |\n"
+                            }
+
+                            // Process body rows
+                            for (let i = 1; i < rows.length; i++) {
+                                const row = rows[i]
+                                const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/g)
+                                if (cells) {
+                                    const cellText = cells.map((c: string) => {
+                                        const content = c.replace(/<\/?td[^>]*>/g, "").trim()
+                                        return convertHtmlToMarkdown(content)
+                                    })
+                                    markdownTable += "| " + cellText.join(" | ") + " |\n"
+                                }
+                            }
+
+                            if (markdownTable) return markdownTable + '\n'
+                        }
+                    }
+                }
+
+                return convertHtmlToMarkdown(text) + '\n\n'
 
             case 'list':
                 // Supports nested-list plugin structure or standard list

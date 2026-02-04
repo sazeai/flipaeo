@@ -113,6 +113,22 @@ const testCases = [
             version: "2.22.2"
         },
         expected: "This is **bold\nacross lines**.\n\n"
+    },
+    {
+        name: "HTML Table in Paragraph",
+        input: {
+            time: 1630000000000,
+            blocks: [
+                {
+                    type: "paragraph",
+                    data: {
+                        text: "<table class=\"editor-table\"><thead><tr><th>Name</th><th>Role</th></tr></thead><tbody><tr><td>Alice</td><td>Admin</td></tr><tr><td>Bob</td><td>User</td></tr></tbody></table>"
+                    }
+                }
+            ],
+            version: "2.22.2"
+        },
+        expected: "| Name | Role |\n| --- | --- |\n| Alice | Admin |\n| Bob | User |\n\n"
     }
 
 ];

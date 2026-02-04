@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
 import Button from './Button';
-import { Quote, Sparkles } from 'lucide-react';
+import { Quote } from 'lucide-react';
+import Link from 'next/link';
 
 export default function FounderNote() {
     return (
@@ -98,13 +98,16 @@ export default function FounderNote() {
 
                                 {/* CTA Action */}
                                 <div className="flex flex-col items-center gap-3">
-                                    <Button
-                                        variant="primary"
-                                        className="px-10 py-3 text-base shadow-hero "
+                                    <Link href="/login">
+                                        <Button
+                                            variant="primary"
+                                            className="px-10 py-3 text-base shadow-hero "
 
-                                    >
-                                        Claim My 2 Free Articles
-                                    </Button>
+                                        >
+                                            Claim My 2 Free Articles
+                                        </Button>
+                                    </Link>
+
                                     <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">
                                         No credit card required
                                     </p>
