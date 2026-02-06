@@ -149,17 +149,23 @@ export function prepareContentForWordPress(htmlContent: string): string {
     content = content.replace(/<h4([^>]*)>([\s\S]*?)<\/h4>/gi,
         '<!-- wp:heading {"level":4} -->\n<h4$1>$2</h4>\n<!-- /wp:heading -->\n\n')
 
-    // Convert unordered lists
-    content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi,
-        '<!-- wp:list -->\n<ul$1>$2</ul>\n<!-- /wp:list -->\n\n')
+    // Convert unordered lists - wrap <li> items in wp:list-item blocks
+    content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi, (match, attrs, listContent) => {
+        const wrappedItems = listContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi,
+            '<!-- wp:list-item -->\n<li$1>$2</li>\n<!-- /wp:list-item -->')
+        return `<!-- wp:list -->\n<ul class="wp-block-list">${wrappedItems}</ul>\n<!-- /wp:list -->\n\n`
+    })
 
-    // Convert ordered lists
-    content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi,
-        '<!-- wp:list {"ordered":true} -->\n<ol$1>$2</ol>\n<!-- /wp:list -->\n\n')
+    // Convert ordered lists - wrap <li> items in wp:list-item blocks
+    content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi, (match, attrs, listContent) => {
+        const wrappedItems = listContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi,
+            '<!-- wp:list-item -->\n<li$1>$2</li>\n<!-- /wp:list-item -->')
+        return `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">${wrappedItems}</ol>\n<!-- /wp:list -->\n\n`
+    })
 
-    // Convert blockquotes
+    // Convert blockquotes - add wp-block-quote class
     content = content.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gi,
-        '<!-- wp:quote -->\n<blockquote$1>$2</blockquote>\n<!-- /wp:quote -->\n\n')
+        '<!-- wp:quote -->\n<blockquote class="wp-block-quote"$1>$2</blockquote>\n<!-- /wp:quote -->\n\n')
 
     // Convert paragraphs LAST (so other elements aren't wrapped)
     content = content.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi,
