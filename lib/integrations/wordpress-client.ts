@@ -168,17 +168,68 @@ export function prepareContentForWordPress(htmlContent: string): string {
     content = content.replace(/<h4([^>]*)>([\s\S]*?)<\/h4>/gi,
         '<!-- wp:heading {"level":4} -->\n<h4$1>$2</h4>\n<!-- /wp:heading -->\n\n')
 
-    // Convert unordered lists - wrap <li> items in wp:list-item blocks
+    // Convert lists (both ul and ol) - handles nested lists properly
+    // WordPress requires nested lists to be INSIDE the parent li's wp:list-item block
+
+    // Helper function to wrap list items with wp:list-item blocks
+    // This handles nested lists by NOT splitting on </li> that contains nested lists
+    const wrapListItems = (html: string): string => {
+        // Match each <li>...</li> including any nested content
+        // Use a simple approach: find <li>, then count tag depth to find matching </li>
+        let result = ''
+        let i = 0
+
+        while (i < html.length) {
+            const liStart = html.indexOf('<li', i)
+            if (liStart === -1) {
+                result += html.slice(i)
+                break
+            }
+
+            // Add content before <li>
+            result += html.slice(i, liStart)
+
+            // Find the end of opening <li> tag
+            const liTagEnd = html.indexOf('>', liStart)
+            if (liTagEnd === -1) break
+
+            // Find matching </li> by counting depth
+            let depth = 1
+            let j = liTagEnd + 1
+            while (j < html.length && depth > 0) {
+                if (html.slice(j, j + 3) === '<li') {
+                    depth++
+                    j += 3
+                } else if (html.slice(j, j + 5) === '</li>') {
+                    depth--
+                    if (depth === 0) break
+                    j += 5
+                } else {
+                    j++
+                }
+            }
+
+            // Extract the full <li>...</li> content
+            const liContent = html.slice(liStart, j + 5)
+
+            // Wrap in wp:list-item
+            result += `<!-- wp:list-item -->\n${liContent}\n<!-- /wp:list-item -->`
+
+            i = j + 5
+        }
+
+        return result
+    }
+
+    // Convert unordered lists
     content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi, (match, attrs, listContent) => {
-        const wrappedItems = listContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi,
-            '<!-- wp:list-item -->\n<li$1>$2</li>\n<!-- /wp:list-item -->')
+        const wrappedItems = wrapListItems(listContent)
         return `<!-- wp:list -->\n<ul class="wp-block-list">${wrappedItems}</ul>\n<!-- /wp:list -->\n\n`
     })
 
-    // Convert ordered lists - wrap <li> items in wp:list-item blocks
+    // Convert ordered lists
     content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi, (match, attrs, listContent) => {
-        const wrappedItems = listContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/gi,
-            '<!-- wp:list-item -->\n<li$1>$2</li>\n<!-- /wp:list-item -->')
+        const wrappedItems = wrapListItems(listContent)
         return `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">${wrappedItems}</ol>\n<!-- /wp:list -->\n\n`
     })
 
