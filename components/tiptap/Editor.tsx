@@ -166,7 +166,7 @@ export default function TipTapEditor({
             )}
 
             {/* Content area - auto expands */}
-            <div className="relative min-h-[500px] p-2">
+            <div className="relative min-h-[500px]">
                 <AIBubbleMenu editor={editor} />
                 <EditorContent editor={editor} />
             </div>
