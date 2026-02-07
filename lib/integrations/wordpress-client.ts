@@ -102,12 +102,21 @@ export function prepareContentForWordPress(htmlContent: string): string {
 
     // Now extract all tables and convert to WordPress Gutenberg table blocks
     content = content.replace(/<table([\s\S]*?)<\/table>/gi, (match, tableContent) => {
-        // Clean up inline styles - WordPress prefers class-based styling
+        // Clean up attributes that WordPress Gutenberg doesn't accept
         let cleanTable = match
             // Remove inline styles from table and cells
             .replace(/\s+style="[^"]*"/gi, '')
-            // Add WordPress table classes
-            .replace(/<table/i, '<table class="has-fixed-layout"')
+            // Remove align attributes from all elements (th, td, tr, etc.)
+            .replace(/\s+align="[^"]*"/gi, '')
+            // Remove class attributes from th/td (WordPress adds its own)
+            .replace(/<(th|td)([^>]*)\s+class="[^"]*"/gi, '<$1$2')
+            // Remove colspan/rowspan if they're 1 (default)
+            .replace(/\s+(colspan|rowspan)="1"/gi, '')
+
+        // WordPress table block needs clean structure
+        // Remove any existing class from table and add WordPress class
+        cleanTable = cleanTable
+            .replace(/<table[^>]*>/i, '<table class="has-fixed-layout">')
 
         // Create the Gutenberg table block
         const tableBlock = `<!-- wp:table -->\n<figure class="wp-block-table">${cleanTable}</figure>\n<!-- /wp:table -->`
