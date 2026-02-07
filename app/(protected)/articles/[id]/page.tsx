@@ -7,10 +7,8 @@ import { useParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Save, Calendar, User, FileText, Image as ImageIcon, Link as LinkIcon, Activity, ArrowLeft, Loader2, Menu, Info, LayoutTemplate, PenTool, Share2, MoreVertical, CheckCircle2, AlertCircle, Clock, Download, Copy, Check } from "lucide-react"
-import { OutputData } from "@editorjs/editorjs"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { toast } from "sonner"
-import { editorJsToMarkdown } from "@/lib/editorjs-to-markdown"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import OutlineEditor from "@/components/outline-editor"
 import {
@@ -34,7 +32,7 @@ import { marked } from "marked"
 import { ChevronDown, FileText as FileTextIcon, Type } from "lucide-react"
 
 
-const Editor = dynamic(() => import("@/components/editor"), { ssr: false })
+const TipTapEditor = dynamic(() => import("@/components/tiptap/Editor"), { ssr: false })
 
 type Article = {
     id: string
@@ -89,7 +87,7 @@ export default function ArticleDetailPage() {
     const [article, setArticle] = useState<Article | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const [isSaving, setIsSaving] = useState<boolean>(false)
-    const [editorData, setEditorData] = useState<OutputData | null>(null)
+    const [editorMarkdown, setEditorMarkdown] = useState<string | null>(null)
     const [outlineData, setOutlineData] = useState<any>(null)
     const [lastSaved, setLastSaved] = useState<Date | null>(null)
     const [activeTab, setActiveTab] = useState<string>("editor")
@@ -145,30 +143,19 @@ export default function ArticleDetailPage() {
         }
     }, [id, supabase])
 
-    const handleEditorChange = useCallback((data: OutputData) => {
-        setEditorData(data)
+    const handleEditorChange = useCallback((markdown: string) => {
+        setEditorMarkdown(markdown)
     }, [])
 
     const getMarkdownContent = useCallback(() => {
-        if (editorData) {
-            return editorJsToMarkdown(editorData)
+        if (editorMarkdown) {
+            return editorMarkdown
         }
         if (article?.raw_content) {
-            const content = article.raw_content.trim()
-            if (content.startsWith("{") && content.endsWith("}")) {
-                try {
-                    const data = JSON.parse(content)
-                    if (data.blocks) {
-                        return editorJsToMarkdown(data)
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            }
             return article.raw_content
         }
         return ""
-    }, [editorData, article?.raw_content])
+    }, [editorMarkdown, article?.raw_content])
 
     const handleCopyMarkdown = async () => {
         let markdown = getMarkdownContent()
@@ -247,8 +234,8 @@ export default function ArticleDetailPage() {
         try {
             const updatePayload: any = {}
 
-            if (editorData) {
-                const markdownContent = editorJsToMarkdown(editorData)
+            if (editorMarkdown) {
+                const markdownContent = editorMarkdown
                 updatePayload.raw_content = markdownContent
 
                 // Convert to HTML for publishing
@@ -325,59 +312,16 @@ export default function ArticleDetailPage() {
             keywordDensity: 0
         }
 
-        if (!editorData && !article?.raw_content) return defaultStats
+        if (!editorMarkdown && !article?.raw_content) return defaultStats
 
-        let fullText = ''
-        let words = 0
-        let images = 0
-        let links = 0
+        // Use markdown content directly
+        const content = editorMarkdown || article?.raw_content || ""
 
-        if (editorData) {
-            editorData.blocks.forEach(block => {
-                if (block.type === 'paragraph' || block.type === 'header' || block.type === 'quote' || block.type === 'list') {
-                    const text = block.data.text || ""
-                    const plainText = extractPlainText(text)
-                    fullText += plainText + ' '
-                    words += plainText.split(/\s+/).filter((w: string) => w.length > 0).length
-                    const linkMatches = text.match(/<a\s/g)
-                    if (linkMatches) links += linkMatches.length
-                }
-                if (block.type === 'image' || block.type === 'simpleImage') {
-                    images++
-                }
-            })
-        } else if (article?.raw_content) {
-            const content = article.raw_content.trim()
-            if (content.startsWith("{") && content.endsWith("}")) {
-                try {
-                    const data = JSON.parse(content)
-                    if (data.blocks) {
-                        data.blocks.forEach((block: any) => {
-                            if (block.type === 'paragraph' || block.type === 'header' || block.type === 'quote' || block.type === 'list') {
-                                const text = block.data.text || ""
-                                const plainText = extractPlainText(text)
-                                fullText += plainText + ' '
-                                words += plainText.split(/\s+/).filter((w: any) => w.length > 0).length
-                                const linkMatches = text.match(/<a\s/g)
-                                if (linkMatches) links += linkMatches.length
-                            }
-                            if (block.type === 'image' || block.type === 'simpleImage') {
-                                images++
-                            }
-                        })
-                    }
-                } catch (e) {
-                    // Fall through to markdown parsing
-                }
-            }
-
-            if (!fullText) {
-                fullText = extractPlainText(content)
-                words = fullText.split(/\s+/).filter(w => w.length > 0).length
-                images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
-                links = (content.match(/(?<!!)\[.*?\]\(.*?\)/g) || []).length
-            }
-        }
+        // Extract plain text from markdown (remove markdown syntax)
+        const fullText = extractPlainText(content)
+        const words = fullText.split(/\s+/).filter(w => w.length > 0).length
+        const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
+        const links = (content.match(/(?<!!)\[.*?\]\(.*?\)/g) || []).length
 
         // Reading Time (200 words per minute average)
         const readingTime = Math.ceil(words / 200)
@@ -434,7 +378,7 @@ export default function ArticleDetailPage() {
             readabilityLabel,
             keywordDensity
         }
-    }, [editorData, article?.raw_content, article?.keyword, countSyllables, extractPlainText])
+    }, [editorMarkdown, article?.raw_content, article?.keyword, countSyllables, extractPlainText])
 
 
     if (loading) {
@@ -805,8 +749,8 @@ export default function ArticleDetailPage() {
                                             )}
 
                                             <div>
-                                                <Editor
-                                                    markdown={article.raw_content || ""}
+                                                <TipTapEditor
+                                                    content={article.raw_content || ""}
                                                     readOnly={false}
                                                     onChange={handleEditorChange}
                                                 />
@@ -848,7 +792,6 @@ export default function ArticleDetailPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="h-20" /> {/* Bottom spacer */}
                             </TabsContent>
 
                             {/* Outline tab content hidden for now - not useful after article is written

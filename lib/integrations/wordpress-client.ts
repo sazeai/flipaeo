@@ -121,8 +121,15 @@ export function prepareContentForWordPress(htmlContent: string): string {
         const srcMatch = attrs.match(/src=["']([^"']*)["']/)
         const altMatch = attrs.match(/alt=["']([^"']*)["']/)
         const src = srcMatch ? srcMatch[1] : ''
-        const alt = altMatch ? altMatch[1] : ''
-        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"/></figure>\n<!-- /wp:image -->`
+        const alt = altMatch ? altMatch[1].replace(/"/g, '&quot;') : ''
+
+        // WordPress expects non-self-closing img tag and proper block attributes
+        // The JSON must have valid URL (no unescaped special chars)
+        const escapedSrc = src.replace(/"/g, '\\"')
+
+        return `<!-- wp:image {"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"></figure>
+<!-- /wp:image -->`
     }
 
     // Extract images wrapped in <p> tags first
