@@ -221,17 +221,76 @@ export function prepareContentForWordPress(htmlContent: string): string {
         return result
     }
 
-    // Convert unordered lists
-    content = content.replace(/<ul([^>]*)>([\s\S]*?)<\/ul>/gi, (match, attrs, listContent) => {
-        const wrappedItems = wrapListItems(listContent)
-        return `<!-- wp:list -->\n<ul class="wp-block-list">${wrappedItems}</ul>\n<!-- /wp:list -->\n\n`
-    })
+    // Helper function to find and convert lists using depth counting (handles nesting)
+    const convertLists = (html: string, tagName: 'ul' | 'ol'): string => {
+        const openTag = `<${tagName}`
+        const closeTag = `</${tagName}>`
+        const isOrdered = tagName === 'ol'
+
+        let result = ''
+        let i = 0
+
+        while (i < html.length) {
+            const listStart = html.toLowerCase().indexOf(openTag, i)
+            if (listStart === -1) {
+                result += html.slice(i)
+                break
+            }
+
+            // Add content before the list
+            result += html.slice(i, listStart)
+
+            // Find end of opening tag
+            const tagEnd = html.indexOf('>', listStart)
+            if (tagEnd === -1) {
+                result += html.slice(listStart)
+                break
+            }
+
+            // Find matching closing tag by counting depth
+            let depth = 1
+            let j = tagEnd + 1
+            while (j < html.length && depth > 0) {
+                const nextOpen = html.toLowerCase().indexOf(openTag, j)
+                const nextClose = html.toLowerCase().indexOf(closeTag, j)
+
+                if (nextClose === -1) break
+
+                if (nextOpen !== -1 && nextOpen < nextClose) {
+                    depth++
+                    j = nextOpen + openTag.length
+                } else {
+                    depth--
+                    if (depth === 0) {
+                        j = nextClose
+                        break
+                    }
+                    j = nextClose + closeTag.length
+                }
+            }
+
+            // Extract inner content (between opening and closing tags)
+            const innerContent = html.slice(tagEnd + 1, j)
+            const wrappedItems = wrapListItems(innerContent)
+
+            // Create WordPress block
+            if (isOrdered) {
+                result += `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">${wrappedItems}</ol>\n<!-- /wp:list -->\n\n`
+            } else {
+                result += `<!-- wp:list -->\n<ul class="wp-block-list">${wrappedItems}</ul>\n<!-- /wp:list -->\n\n`
+            }
+
+            i = j + closeTag.length
+        }
+
+        return result
+    }
+
+    // Convert unordered lists first (outermost)
+    content = convertLists(content, 'ul')
 
     // Convert ordered lists
-    content = content.replace(/<ol([^>]*)>([\s\S]*?)<\/ol>/gi, (match, attrs, listContent) => {
-        const wrappedItems = wrapListItems(listContent)
-        return `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">${wrappedItems}</ol>\n<!-- /wp:list -->\n\n`
-    })
+    content = convertLists(content, 'ol')
 
     // Convert blockquotes - add wp-block-quote class
     content = content.replace(/<blockquote([^>]*)>([\s\S]*?)<\/blockquote>/gi,
