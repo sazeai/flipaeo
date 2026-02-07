@@ -897,7 +897,7 @@
 
 /* Tables */
 .blog-content table {
-  @apply w-full border-collapse mb-6 rounded-lg overflow-hidden border border-border bg-card shadow-sm;
+  @apply w-full border-collapse mb-6 rounded-lg overflow-hidden border border-border bg-card;
 }
 
 .blog-content th {
