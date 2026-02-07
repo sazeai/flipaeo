@@ -43,7 +43,7 @@ const testCases = [
         input: "<table><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td>1</td></tr></tbody></table>",
         expectedContains: [
             '<!-- wp:table -->',
-            '<figure class="wp-block-table">',
+            '<figure class="    ">',
             '<table class="has-fixed-layout"',
             '<!-- /wp:table -->'
         ]

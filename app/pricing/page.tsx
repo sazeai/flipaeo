@@ -4,8 +4,8 @@ import { Navbar } from '@/components/landing/Navbar'
 import { Footer } from '@/components/landing/Footer'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Check, ChevronDown } from 'lucide-react'
+import Button from '@/components/landing/Button'
+import { Check, ShieldCheck, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
 const planFeatures = [
@@ -67,35 +67,43 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
   return (
     <div
       className={`
-        w-full bg-white border-2 border-black shadow-neo transition-all duration-200 overflow-hidden
-        ${isOpen ? 'translate-x-[2px] translate-y-[2px] shadow-none' : 'hover:-translate-y-1 hover:shadow-neo-hover'}
+        group w-full rounded-[20px] p-1 transition-all duration-300 cursor-pointer
+        ${isOpen
+          ? 'bg-brand-100 shadow-[inset_0_0_0_1px_#c4b5fd]'
+          : 'bg-white border border-stone-200 hover:border-brand-200 hover:shadow-sm'
+        }
       `}
+      onClick={() => setIsOpen(!isOpen)}
     >
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex items-center justify-between group text-left"
-      >
-        <span className="font-display font-black text-lg md:text-xl uppercase pr-4">{question}</span>
+      <div className={`
+        w-full bg-stone-100/50 rounded-[17px] border transition-all duration-300 overflow-hidden relative
+        ${isOpen ? 'border-brand-100 bg-white' : 'border-stone-100'}
+      `}>
+        <div className="flex items-center justify-between px-6 py-5">
+          <h3 className={`font-sans font-medium text-base md:text-xl pr-8 leading-snug transition-colors duration-300 ${isOpen ? 'text-stone-900' : 'text-stone-600 group-hover:text-stone-900'}`}>
+            {question}
+          </h3>
+          <div className={`
+            flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border transition-all duration-300
+            ${isOpen
+              ? 'bg-brand-50 border-brand-200 text-brand-600 rotate-90'
+              : 'bg-stone-50 border-stone-200 text-stone-400 rotate-0 group-hover:bg-brand-50 group-hover:border-brand-200 group-hover:text-brand-500'}
+          `}>
+            {isOpen ? <X size={16} strokeWidth={2.5} /> : <Plus size={16} strokeWidth={2.5} />}
+          </div>
+        </div>
+
         <div
           className={`
-            w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0 transition-all duration-200
-            ${isOpen ? 'bg-brand-orange rotate-180' : 'bg-brand-yellow group-hover:bg-brand-orange'}
+            grid transition-all duration-500 ease-in-out
+            ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}
           `}
         >
-          <ChevronDown className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[3px]" />
-        </div>
-      </button>
-
-      <div
-        className={`
-          transition-[max-height,opacity] duration-300 ease-in-out
-          ${isOpen ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'}
-        `}
-      >
-        <div className="px-6 pb-6 pt-0">
-          <p className="font-sans text-gray-600 text-lg leading-relaxed border-t-2 border-black/5 pt-4">
-            {answer}
-          </p>
+          <div className="overflow-hidden px-6 pb-6 pt-0">
+            <p className="text-stone-500 leading-relaxed text-base border-t border-brand-100/50 pt-4">
+              {answer}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -104,181 +112,216 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
 
 export default function PricingPage() {
   return (
-    <div className="landing-page min-h-screen w-full flex flex-col overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col overflow-x-hidden font-sans selection:bg-brand-100 selection:text-brand-900">
       <Navbar />
-      <main className="flex-grow flex flex-col items-center w-full pt-12">
+      <main className="flex-grow flex flex-col items-center w-full pt-6 md:pt-12">
+
         {/* Pricing Overview Hero */}
-        <section className="w-full py-16 px-4">
-          <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-block bg-black text-white border-2 border-black shadow-neo-sm px-4 py-1.5 mb-6 transform -rotate-2 hover:rotate-0 transition-transform">
-              <span className="font-display font-bold text-xs uppercase tracking-widest">Simple Pricing</span>
+        <section className="w-full py-12 md:py-20 px-4">
+          <div className="max-w-5xl mx-auto text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-4 pt-1.5 pb-2 rounded-full border border-brand-400 bg-white text-stone-900 text-[11px] font-normal mb-6 shadow-sm">
+              <span className="font-bold tracking-widest uppercase">Simple Pricing</span>
             </div>
-            <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">
+            <h1 className="font-serif text-stone-900 text-4xl sm:text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6">
               One Plan. Zero Complexity.
             </h1>
-            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-8">
+            <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
               Everything you need to win AI search. No hidden fees. No complicated tiers.
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <span className="px-4 py-1.5 bg-[#D6F5F2] border-2 border-black text-sm font-bold uppercase tracking-wide">14-day guarantee</span>
-              <span className="px-4 py-1.5 bg-[#FAFA9D] border-2 border-black text-sm font-bold uppercase tracking-wide">Cancel anytime</span>
-              <span className="px-4 py-1.5 bg-white border-2 border-black text-sm font-bold uppercase tracking-wide">No hidden fees</span>
+
+            <div className="flex flex-wrap justify-center gap-3 md:gap-6">
+              <div className="flex items-center gap-2 text-stone-600 text-sm font-medium">
+                <Check size={16} className="text-brand-500" />
+                <span>14-day guarantee</span>
+              </div>
+              <div className="flex items-center gap-2 text-stone-600 text-sm font-medium">
+                <Check size={16} className="text-brand-500" />
+                <span>Cancel anytime</span>
+              </div>
+              <div className="flex items-center gap-2 text-stone-600 text-sm font-medium">
+                <Check size={16} className="text-brand-500" />
+                <span>No hidden fees</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Pricing Card */}
-        <section className="max-w-5xl mx-auto px-4 py-12 w-full">
-          <div className="bg-white border-2 md:border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] md:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative">
-            {/* Launch Badge */}
-            <div className="absolute -top-5 -right-2 md:-right-4 z-20">
-              <div className="bg-[#FF5F57] text-white border-2 border-black px-6 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform rotate-3 flex flex-col items-center">
-                <span className="font-display font-black text-lg uppercase leading-none">Launch Offer</span>
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider">Limited Time</span>
+        {/* Pricing Card Section */}
+        <section className="max-w-5xl mx-auto px-6 pb-20 w-full relative">
+
+          {/* Card Wrapper matching PricingSection.tsx design */}
+          <div className="w-full bg-brand-200 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
+
+            <div className="relative w-full bg-[#fffaf5] border border-brand-100/50 rounded-[17px] overflow-hidden flex flex-col md:flex-row">
+
+              {/* Launch Badge */}
+              <div className="absolute top-0 right-0 md:right-auto md:left-0 z-20">
+                <div className="bg-brand-500 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-bl-[17px] md:rounded-br-[17px] md:rounded-bl-none">
+                  Launch Offer
+                </div>
               </div>
-            </div>
 
-            <div className="grid md:grid-cols-2">
-              {/* Left: Price */}
-              <div className="bg-[#FAFA9D] p-8 md:p-12 border-b md:border-b-0 md:border-r-2 md:border-r-4 border-black relative overflow-hidden">
-                {/* Texture Overlay */}
-                <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none"></div>
+              {/* Left: Price Column */}
+              <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">
 
-                <div className="relative z-10">
-                  <h2 className="font-display font-black text-4xl md:text-5xl uppercase mb-2">All-in-One</h2>
-                  <p className="font-sans font-bold text-black/60 mb-10 text-lg">For ambitious entrepreneurs</p>
-
-                  <div className="mb-10 p-6 bg-white border-2 border-black shadow-neo-sm rounded-xl">
-                    <div className="flex flex-col items-center text-center">
-                      <span className="font-sans font-bold text-gray-400 line-through text-lg decoration-2 decoration-red-500 mb-1">$79 original price</span>
-                      <div className="flex items-start gap-1">
-                        <span className="font-sans font-bold text-2xl mt-2">$</span>
-                        <span className="font-display font-black text-7xl md:text-8xl tracking-tighter leading-none">49</span>
-                      </div>
-                      <span className="font-sans font-bold text-black/40 text-sm uppercase tracking-wider mt-2">Per Month</span>
-                    </div>
+                {/* Handwritten Note Effect */}
+                <div className="absolute top-8 right-4 md:-right-6 md:top-20 z-10 pointer-events-none transform rotate-12 md:rotate-0 hidden sm:block">
+                  <div className="relative">
+                    <span className="font-hand text-xl text-stone-400 whitespace-nowrap">Limited Time</span>
+                    <svg className="absolute -bottom-6 -left-4 w-12 h-12 text-stone-300 transform rotate-12 hidden md:block" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                      <path d="M80,10 Q40,60 10,80" strokeWidth="2" markerEnd="url(#arrow-price)" />
+                      <defs>
+                        <marker id="arrow-price" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                          <path d="M0,0 L10,5 L0,10" fill="none" stroke="currentColor" strokeWidth="2" />
+                        </marker>
+                      </defs>
+                    </svg>
                   </div>
+                </div>
 
-                  <Link href="/subscribe">
-                    <Button className="w-full h-16 text-xl font-bold bg-brand-yellow text-black border-2 border-black hover:bg-brand-orange rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase">
-                      Start My Content Strategy
+                <div className="mb-6 mt-4 relative z-10">
+                  <span className="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
+                    All In One
+                  </span>
+                  <h2 className="font-serif text-2xl text-stone-900">
+                    For ambitious entrepreneurs
+                  </h2>
+                </div>
+
+                <div className="flex items-baseline justify-center gap-3 mb-2 relative z-10">
+                  <span className="text-xl text-stone-400 line-through decoration-brand-300/50 decoration-2">$79</span>
+                  <div className="flex items-start">
+                    <span className="text-2xl font-serif text-stone-900 mt-2">$</span>
+                    <span className="text-6xl md:text-7xl font-serif text-stone-900 tracking-tighter">49</span>
+                  </div>
+                </div>
+                <span className="font-sans font-bold text-stone-400 text-xs uppercase tracking-wider mb-10">Per Month</span>
+
+                <div className="w-full relative z-10">
+                  <Link href="/login">
+                    <Button variant="primary" className="max-w-2xl px-2 py-4 text-md justify-center">
+                      Grow My Brand
                     </Button>
                   </Link>
-                  <p className="text-center font-sans text-xs font-bold mt-4 opacity-50 uppercase tracking-wide">14-day money-back guarantee</p>
+                  <div className="mt-4 flex items-center justify-center gap-2 text-xs text-stone-400 font-medium">
+                    <ShieldCheck size={14} className="text-green-500" />
+                    14-day money-back guarantee
+                  </div>
                 </div>
               </div>
 
-              {/* Right: Features */}
-              <div className="p-8 md:p-12 bg-white relative">
-                {/* Decorative Window Controls */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <div className="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
-                  <div className="w-3 h-3 rounded-full border-2 border-black bg-white"></div>
+              {/* Right: Features Column */}
+              <div className="flex-1 p-8 md:p-12 bg-white flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-8 border-b border-stone-100 pb-4">
+                  <span className="bg-stone-900 text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-sm">Included</span>
+                  <h3 className="font-serif text-xl text-stone-900">Everything you need</h3>
                 </div>
 
-                <h3 className="font-display font-black text-2xl uppercase mb-10 flex items-center gap-3">
-                  <span className="bg-black text-white px-2 py-0.5 text-lg">Included</span>
-                  <span>Everything</span>
-                </h3>
-                <ul className="space-y-5">
+                <ul className="space-y-4">
                   {planFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-4 group">
-                      <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:bg-[#D6F5F2] group-hover:-translate-y-1 group-hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
-                        <Check className="w-5 h-5 text-black stroke-[3px]" />
+                    <li key={i} className="flex items-start gap-3 group">
+                      <div className="mt-0.5 w-5 h-5 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center flex-shrink-0 text-brand-600 group-hover:bg-brand-100 transition-colors">
+                        <Check size={12} strokeWidth={3} />
                       </div>
-                      <span className="font-sans font-medium text-gray-700 pt-1">{feature}</span>
+                      <span className="font-sans text-stone-600 group-hover:text-stone-900 transition-colors leading-snug">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
           </div>
+
+          {/* Decorative Blur */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] bg-brand-100/30 blur-3xl -z-10 rounded-full"></div>
         </section>
 
-        {/* How We Compare */}
-        <section className="max-w-5xl mx-auto px-4 py-16 w-full">
-          <div className="text-center mb-12">
-            <div className="inline-block bg-[#D6F5F2] border-2 border-black shadow-neo-sm px-4 py-1 mb-6 transform rotate-2 hover:rotate-0 transition-transform">
-              <span className="font-display font-black text-xs uppercase tracking-widest">Comparison</span>
-            </div>
-            <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-3xl md:text-5xl leading-tight uppercase mb-4">
+        <section className="max-w-5xl mx-auto px-6 py-16 w-full">
+          <div className="text-center mb-16">
+            <h2 className="font-serif text-3xl md:text-5xl text-stone-900 mb-6 tracking-tight">
               How We Stack Up
             </h2>
-            <p className="font-sans text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="font-sans text-stone-500 text-lg max-w-2xl mx-auto">
               See why FlipAEO beats traditional agencies and generic AI tools.
             </p>
           </div>
 
-          {/* Traditional Content vs FlipAEO */}
-          <div className="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mb-8 overflow-hidden">
-            <div className="bg-[#FAFA9D] border-b-2 border-black p-4">
-              <h3 className="font-display font-black text-lg uppercase">Traditional Content Creation vs FlipAEO</h3>
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+            {/* Table 1: Container Layer Pattern */}
+            <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
+              <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
+                <div className="bg-stone-50/50 border-b border-stone-100 p-6">
+                  <h3 className="font-serif text-xl text-stone-900">FlipAEO vs Traditional Agencies</h3>
+                </div>
+                <div className="p-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Them</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">FlipAEO</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonData.traditional.map((row, i) => (
+                        <tr key={i} className="group hover:bg-stone-50/30 transition-colors">
+                          <td className="p-4 pl-6 text-sm font-medium text-stone-900 border-b border-stone-50 group-last:border-0">{row.aspect}</td>
+                          <td className="p-4 text-xs md:text-sm text-stone-500 border-b border-stone-50 group-last:border-0 leading-tight">{row.traditional}</td>
+                          <td className="p-4 text-xs md:text-sm font-medium text-brand-900 bg-brand-50/10 border-b border-stone-50 group-last:border-0 border-l border-dashed border-stone-100 leading-tight">
+                            {row.flipaeo}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-black bg-gray-50">
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm">Aspect</th>
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm">Traditional Approach</th>
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm bg-[#D6F5F2]">FlipAEO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonData.traditional.map((row, i) => (
-                    <tr key={i} className="border-b border-black/10 hover:bg-gray-50 transition-colors">
-                      <td className="p-4 font-bold text-gray-800">{row.aspect}</td>
-                      <td className="p-4 text-gray-600">{row.traditional}</td>
-                      <td className="p-4 font-semibold text-gray-800 bg-[#D6F5F2]/30">{row.flipaeo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          {/* Generic AI vs FlipAEO */}
-          <div className="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-            <div className="bg-[#FAFA9D] border-b-2 border-black p-4">
-              <h3 className="font-display font-black text-lg uppercase">Generic AI Tools vs FlipAEO</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-black bg-gray-50">
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm">Aspect</th>
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm">Generic AI (ChatGPT, etc.)</th>
-                    <th className="text-left p-4 font-display font-bold uppercase text-sm bg-[#D6F5F2]">FlipAEO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonData.generic.map((row, i) => (
-                    <tr key={i} className="border-b border-black/10 hover:bg-gray-50 transition-colors">
-                      <td className="p-4 font-bold text-gray-800">{row.aspect}</td>
-                      <td className="p-4 text-gray-600">{row.generic}</td>
-                      <td className="p-4 font-semibold text-gray-800 bg-[#D6F5F2]/30">{row.flipaeo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Table 2: Container Layer Pattern */}
+            <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
+              <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
+                <div className="bg-stone-50/50 border-b border-stone-100 p-6">
+                  <h3 className="font-serif text-xl text-stone-900">FlipAEO vs Generic AI Tools</h3>
+                </div>
+                <div className="p-0">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Generic</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">FlipAEO</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonData.generic.map((row, i) => (
+                        <tr key={i} className="group hover:bg-stone-50/30 transition-colors">
+                          <td className="p-4 pl-6 text-sm font-medium text-stone-900 border-b border-stone-50 group-last:border-0">{row.aspect}</td>
+                          <td className="p-4 text-xs md:text-sm text-stone-500 border-b border-stone-50 group-last:border-0 leading-tight">{row.generic}</td>
+                          <td className="p-4 text-xs md:text-sm font-medium text-brand-900 bg-brand-50/10 border-b border-stone-50 group-last:border-0 border-l border-dashed border-stone-100 leading-tight">
+                            {row.flipaeo}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* FAQs */}
-        <section className="max-w-5xl mx-auto px-4 py-16 w-full">
-          <div className="text-center mb-12">
-            <div className="inline-block bg-[#FAFA9D] border-2 border-black shadow-neo-sm px-4 py-1 mb-6 transform rotate-2 hover:rotate-0 transition-transform">
-              <span className="font-display font-black text-xs uppercase tracking-widest">FAQ</span>
-            </div>
-            <h2 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-3xl md:text-5xl leading-tight uppercase mb-4">
+        <section className="max-w-3xl mx-auto px-6 py-16 w-full">
+          <div className="text-center mb-16">
+            <h2 className="font-serif text-3xl md:text-5xl text-stone-900 mb-6 tracking-tight">
               Questions? Answered.
             </h2>
-            <p className="font-sans text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="font-sans text-stone-500 text-lg max-w-2xl mx-auto">
               Everything you need to know about FlipAEO.
             </p>
           </div>
 
-          <div className="space-y-4 max-w-3xl mx-auto">
+          <div className="flex flex-col gap-4">
             {faqs.map((faq, index) => (
               <FAQItem key={index} question={faq.question} answer={faq.answer} />
             ))}
@@ -286,21 +329,29 @@ export default function PricingPage() {
         </section>
 
         {/* Guarantee & Policies */}
-        <section className="max-w-5xl mx-auto px-4 pb-12 w-full">
-          <div className="bg-[#FAFA9D] border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-wrap items-center justify-between gap-4">
-            <p className="font-display font-bold text-lg uppercase">14-day money-back guarantee. No hidden fees. Cancel anytime.</p>
+        <section className="max-w-5xl mx-auto px-6 pb-20 w-full">
+          <div className="bg-brand-50 border border-brand-200 rounded-[20px] p-8 flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <Link href="/refund-policy" className="font-bold uppercase text-sm border-b-2 border-black hover:border-brand-orange transition-colors">Refund Policy</Link>
-              <Link href="/terms" className="font-bold uppercase text-sm border-b-2 border-black hover:border-brand-orange transition-colors">Terms</Link>
+              <div className="w-12 h-12 rounded-full bg-brand-200 flex items-center justify-center text-brand-600">
+                <ShieldCheck size={24} />
+              </div>
+              <div>
+                <p className="font-serif text-stone-900 text-lg leading-tight mb-1">Risk-Free Guarantee</p>
+                <p className="font-sans text-sm text-stone-500 uppercase tracking-wide">14-day money-back. Cancel anytime.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <Link href="/refund-policy" className="font-bold uppercase text-xs text-stone-400 hover:text-stone-900 border-b border-transparent hover:border-stone-900 transition-all">Refund Policy</Link>
+              <Link href="/terms" className="font-bold uppercase text-xs text-stone-400 hover:text-stone-900 border-b border-transparent hover:border-stone-900 transition-all">Terms</Link>
             </div>
           </div>
         </section>
 
-
       </main>
       <Footer />
 
-      {/* Structured Data */}
+      {/* Structured Data - Preserved EXACTLY */}
       <MultipleStructuredData
         schemas={[
           {
