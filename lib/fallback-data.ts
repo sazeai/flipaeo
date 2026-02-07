@@ -2,12 +2,12 @@
 export const fallbackBlogPosts = [
   {
     id: "fallback-1",
-    title: "How to Restore Old Family Photos: A Complete Guide",
-    excerpt: "Learn the essential techniques and tools for bringing your precious family memories back to life with our comprehensive photo restoration guide.",
-    content: "Photo restoration is an art that combines technical skill with emotional care...",
-    slug: "how-to-restore-old-family-photos",
-    date: "2025-01-15T10:00:00Z",
-    modified: "2025-01-15T10:00:00Z",
+    title: "What is Generative Engine Optimization (GEO)? A Complete Guide",
+    excerpt: "Learn how GEO differs from traditional SEO and why optimizing for AI search engines like ChatGPT and Perplexity is critical for your brand's visibility.",
+    content: "Generative Engine Optimization is the practice of optimizing content to be cited by AI-powered search engines...",
+    slug: "what-is-generative-engine-optimization",
+    date: "2026-02-01T10:00:00Z",
+    modified: "2026-02-01T10:00:00Z",
     author: {
       node: {
         name: "FlipAEO Team",
@@ -18,27 +18,27 @@ export const fallbackBlogPosts = [
     },
     featuredImage: {
       node: {
-        sourceUrl: "/placeholder.svg?height=400&width=600&text=Photo+Restoration+Guide",
-        altText: "Photo restoration guide"
+        sourceUrl: "/placeholder.svg?height=400&width=600&text=GEO+Guide",
+        altText: "Generative Engine Optimization guide"
       }
     },
     categories: {
       nodes: [
         {
-          name: "Tutorials",
-          slug: "tutorials"
+          name: "GEO",
+          slug: "geo"
         }
       ]
     }
   },
   {
     id: "fallback-2",
-    title: "5 Common Photo Damage Types and How to Fix Them",
-    excerpt: "Discover the most common types of photo damage including tears, fading, water damage, and scratches, plus professional tips for restoration.",
-    content: "Photos can suffer from various types of damage over time...",
-    slug: "common-photo-damage-types",
-    date: "2025-01-10T14:30:00Z",
-    modified: "2025-01-10T14:30:00Z",
+    title: "How to Get Your Brand Cited by ChatGPT and Perplexity",
+    excerpt: "Discover proven strategies to increase your brand's visibility in AI-generated responses and become a trusted source for AI search engines.",
+    content: "Getting cited by AI search engines requires a different approach than traditional SEO...",
+    slug: "get-cited-by-ai-search-engines",
+    date: "2026-01-25T14:30:00Z",
+    modified: "2026-01-25T14:30:00Z",
     author: {
       node: {
         name: "FlipAEO Team",
@@ -49,27 +49,27 @@ export const fallbackBlogPosts = [
     },
     featuredImage: {
       node: {
-        sourceUrl: "/placeholder.svg?height=400&width=600&text=Photo+Damage+Types",
-        altText: "Common photo damage types"
+        sourceUrl: "/placeholder.svg?height=400&width=600&text=AI+Citations",
+        altText: "How to get cited by AI search engines"
       }
     },
     categories: {
       nodes: [
         {
-          name: "Tips",
-          slug: "tips"
+          name: "Strategy",
+          slug: "strategy"
         }
       ]
     }
   },
   {
     id: "fallback-3",
-    title: "Preserving Your Digital Memories for Future Generations",
-    excerpt: "Learn best practices for storing and organizing your restored photos to ensure they last for generations to come.",
-    content: "Digital preservation is crucial for maintaining your restored photos...",
-    slug: "preserving-digital-memories",
-    date: "2025-01-05T09:15:00Z",
-    modified: "2025-01-05T09:15:00Z",
+    title: "AI Content Strategy: Building Authority with AI-First SEO",
+    excerpt: "Learn how to create content that establishes your brand as an authority source that AI engines trust and cite in their responses.",
+    content: "Building authority in the age of AI search requires strategic content planning...",
+    slug: "ai-content-strategy-authority-building",
+    date: "2026-01-20T09:15:00Z",
+    modified: "2026-01-20T09:15:00Z",
     author: {
       node: {
         name: "FlipAEO Team",
@@ -80,15 +80,15 @@ export const fallbackBlogPosts = [
     },
     featuredImage: {
       node: {
-        sourceUrl: "/placeholder.svg?height=400&width=600&text=Digital+Preservation",
-        altText: "Digital photo preservation"
+        sourceUrl: "/placeholder.svg?height=400&width=600&text=AI+Content+Strategy",
+        altText: "AI content strategy guide"
       }
     },
     categories: {
       nodes: [
         {
-          name: "Preservation",
-          slug: "preservation"
+          name: "Content Strategy",
+          slug: "content-strategy"
         }
       ]
     }
