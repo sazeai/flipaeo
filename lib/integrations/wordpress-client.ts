@@ -49,6 +49,10 @@ function createAuthHeader(username: string, appPassword: string): string {
 export function prepareContentForWordPress(htmlContent: string): string {
     if (!htmlContent) return ''
 
+    // Log how many images are in the source content
+    const imgCount = (htmlContent.match(/<img/gi) || []).length
+    console.log('[WP Prepare] Input has', imgCount, 'images')
+
     // 1. Remove the first H1 tag (title is sent separately as post title)
     let content = htmlContent.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')
 
@@ -121,15 +125,9 @@ export function prepareContentForWordPress(htmlContent: string): string {
         const srcMatch = attrs.match(/src=["']([^"']*)["']/)
         const altMatch = attrs.match(/alt=["']([^"']*)["']/)
         const src = srcMatch ? srcMatch[1] : ''
-        const alt = altMatch ? altMatch[1].replace(/"/g, '&quot;') : ''
-
-        // WordPress expects non-self-closing img tag and proper block attributes
-        // The JSON must have valid URL (no unescaped special chars)
-        const escapedSrc = src.replace(/"/g, '\\"')
-
-        return `<!-- wp:image {"sizeSlug":"large"} -->
-<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"></figure>
-<!-- /wp:image -->`
+        const alt = altMatch ? altMatch[1] : ''
+        // IMPORTANT: WordPress requires non-self-closing <img> tag (no trailing /)
+        return `<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="${alt}"></figure>\n<!-- /wp:image -->`
     }
 
     // Extract images wrapped in <p> tags first
@@ -145,6 +143,11 @@ export function prepareContentForWordPress(htmlContent: string): string {
         imageBlocks.push(createImageBlock(attrs))
         return placeholder
     })
+
+    console.log('[WP Prepare] Extracted', imageBlocks.length, 'image blocks')
+    if (imageBlocks.length > 0) {
+        console.log('[WP Prepare] First image block:', imageBlocks[0].substring(0, 200))
+    }
 
     // 4. Now convert other HTML elements to Gutenberg blocks
 
@@ -495,8 +498,16 @@ export async function uploadContentImagesToWordPress(
             const urlParts = originalUrl.split('/')
             const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.webp'}`
 
+            console.log('[WP Image Upload] Processing:', {
+                originalUrl,
+                fetchableUrl,
+                filename
+            })
+
             // Upload to WordPress media library
             const mediaResult = await uploadMedia(credentials, fetchableUrl, filename)
+
+            console.log('[WP Image Upload] Result:', mediaResult ? 'Success' : 'Failed')
 
             if (mediaResult) {
                 // Replace R2 URL with WordPress media URL in content
@@ -506,6 +517,7 @@ export async function uploadContentImagesToWordPress(
                 )
             }
         } catch (error) {
+            console.error('[WP Image Upload] Error:', error)
             // Continue with other images - non-blocking
         }
     }
