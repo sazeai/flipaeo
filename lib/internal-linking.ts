@@ -43,7 +43,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const genAI = getGeminiClient()
         // Using the GA SDK @google/genai structure
         const result = await genAI.models.embedContent({
-            model: "text-embedding-004",
+            model: "gemini-embedding-001",
             contents: [{ parts: [{ text }] }]
         })
 

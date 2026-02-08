@@ -15,7 +15,7 @@ export async function checkTopicDuplication(
     try {
         // 1. Generate embedding for the new topic
         const result = await genAI.models.embedContent({
-            model: "text-embedding-004",
+            model: "gemini-embedding-001",
             contents: [{ role: "user", parts: [{ text: topic }] }]
         })
 
@@ -77,7 +77,7 @@ export async function saveTopicMemory(articleId: string, topic: string, adminCli
 
     try {
         const result = await genAI.models.embedContent({
-            model: "text-embedding-004",
+            model: "gemini-embedding-001",
             contents: [{ role: "user", parts: [{ text: topic }] }]
         })
 
