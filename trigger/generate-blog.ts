@@ -467,9 +467,9 @@ TEXT PROCESSING RULES (CRITICAL):
 4.  **VISUAL ABSTRACTION (MANDATORY):**
     - **RULE:** If the subject involves text presentation (e.g., "Summaries", "Code Snippets", "Logs", "Documents"), YOU MUST visualize it as a "Stylized Data Representation".
     - **HOW:** Use icons, flowing lines, glowing geometric blocks, or abstract grids.
-    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences. force a line in the end like "do not duplicate a text in the image"
+    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences. force a line in the end like "do not duplicate a text in the image, no extra text in the image which is not asked to add"
     - **Example:** Instead of "A document showing summary text", use "A glowing document icon emitting abstract data lines but this to b deisnged based on image type above".
-Why we are doing this is because AI art generator we are using struggle to generate text and when it does it is not good so we are using icons and symbols instead.
+Why we are doing this is because AI art generator we are using struggle to generate text and when it does it is not good so we are using icons and symbols instead. Make sure each text is clearly told to print at correct spot. dont give the ai mdoel a chanc eto hallucinate.
 
 ❌ BANNED - DO NOT USE:
 - Checklists with multiple items
@@ -1814,6 +1814,8 @@ TEXT PROCESSING RULES (CRITICAL):
     - NO Sentences. NO Paragraphs. NO Checklists.
     - Avoid complex financial/technical terms if possible - use icons instead.
     - NO "Wall of text".
+
+      (Note:  As my ai model is not able to print text properly, it make ssilly mistakes in text, like if you ask it to add a heaidng,,, it will hallucinate at 3rd or 4th word and repeats that word in the headline. So force a kind of weighted instrcutions in the end like "do not duplicate a text in the image, no extra text in the image which is not asked to add."
 
 YOUR TASK:
 Create a descriptive, scene-based prompt. Focus on visual composition.
