@@ -87,13 +87,38 @@ export async function GET(req: NextRequest) {
                         })
                         .eq("id", plan.id)
 
-                    // Return the updated data immediately
-                    return NextResponse.json({ ...plan, plan_data: updatedPlanData })
+                    // Fetch pillar recommendations from brand_details
+                    const { data: brand } = await supabase
+                        .from("brand_details")
+                        .select("pillar_recommendations")
+                        .eq("id", plan.brand_id)
+                        .maybeSingle()
+
+                    // Return the updated data with pillars
+                    return NextResponse.json({
+                        ...plan,
+                        plan_data: updatedPlanData,
+                        pillar_recommendations: brand?.pillar_recommendations || null
+                    })
                 }
             }
         }
 
-        return NextResponse.json(plan || null)
+        // Fetch pillar recommendations from brand_details for normal response
+        let pillarRecommendations = null
+        if (plan.brand_id) {
+            const { data: brand } = await supabase
+                .from("brand_details")
+                .select("pillar_recommendations")
+                .eq("id", plan.brand_id)
+                .maybeSingle()
+            pillarRecommendations = brand?.pillar_recommendations || null
+        }
+
+        return NextResponse.json({
+            ...plan,
+            pillar_recommendations: pillarRecommendations
+        })
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }

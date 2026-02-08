@@ -2,17 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
 import {
     Calendar,
     Sparkles,
-    TrendingUp,
     Zap,
     Target,
     Lock,
     PenTool,
-    SquarePen,
     CheckCircle2,
     Loader2,
     FileText,
@@ -20,18 +17,10 @@ import {
     Layout,
     BarChart3,
     MousePointerClick,
-    Search,
-    Feather,
-    Lightbulb,
-    Gauge,
-    Tag,
     Play,
-    Pause,
     Layers,
     Award,
     Waypoints,
-    MousePointer2,
-    ChevronDown,
 } from "lucide-react"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { Button } from "@/components/ui/button"
@@ -43,6 +32,7 @@ import { createClient } from "@/utils/supabase/client"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PlanCard } from "@/components/content-plan/plan-card"
 import { PaywallOverlay } from "@/components/content-plan/paywall-overlay"
+import { PillarPagesSection, PillarRecommendation } from "@/components/content-plan/pillar-pages-section"
 import { useSubscription } from "@/contexts/subscription-context"
 
 // --- Minimal Design System Configuration ---
@@ -129,16 +119,16 @@ const ARTICLE_CATEGORY_CONFIG: Record<string, {
 export default function ContentPlanPage() {
     const router = useRouter()
     const [loading, setLoading] = useState(true)
-    const [isAnalysisOpen, setIsAnalysisOpen] = useState(false) // Default closed/collapsible
     const [plan, setPlan] = useState<{
         id: string;
+        brand_id: string;
         plan_data: ContentPlanItem[];
         gsc_enhanced: boolean;
         automation_status?: string;
-        generation_status?: string; // 'pending' | 'generating' | 'complete' | 'failed'
-        generation_phase?: string; // 'intelligence' | 'plan'
+        generation_status?: string;
+        generation_phase?: string;
         generation_error?: string;
-        content_gap_analysis?: string; // Strategic analysis from mega-prompt
+        pillar_recommendations?: PillarRecommendation[] | null;
     } | null>(null)
     const [filter, setFilter] = useState<"all" | "pending" | "writing" | "published">("all")
     const [error, setError] = useState("")
@@ -676,53 +666,24 @@ export default function ContentPlanPage() {
 
 
 
-                    {/* Strategic Analysis - Premium Accordion */}
-                    {plan?.content_gap_analysis && (
-                        <div className="border-b border-stone-200 pb-2 mb-6">
-                            <button
-                                onClick={() => setIsAnalysisOpen(!isAnalysisOpen)}
-                                className="cursor-pointer w-full flex items-center justify-between group py-2"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                                        isAnalysisOpen ? "bg-amber-100/50 text-amber-600" : "bg-stone-100 text-stone-500 group-hover:text-amber-600 group-hover:bg-amber-50"
-                                    )}>
-                                        <Lightbulb className="w-4 h-4" />
-                                    </div>
-                                    <h3 className={cn(
-                                        "text-xs font-bold uppercase tracking-wide transition-colors",
-                                        isAnalysisOpen ? "text-amber-900" : "text-stone-500 group-hover:text-amber-900"
-                                    )}>
-                                        Quick Analysis
-                                    </h3>
-                                </div>
-                                <div className={cn(
-                                    "w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300",
-                                    isAnalysisOpen ? "bg-amber-100 text-amber-900 rotate-180" : "bg-stone-100 text-stone-400 group-hover:text-stone-600"
-                                )}>
-                                    <ChevronDown className="w-4 h-4" />
-                                </div>
-                            </button>
-
-                            <AnimatePresence initial={false}>
-                                {isAnalysisOpen && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
-                                        className="overflow-hidden"
-                                    >
-                                        <div className="pl-11 pr-2 pb-6">
-                                            <p className="text-sm text-stone-600 leading-relaxed">
-                                                {plan.content_gap_analysis}
-                                            </p>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                    {/* Pillar Pages Section - Replaces Quick Analysis */}
+                    {plan && (
+                        <PillarPagesSection
+                            pillars={plan.pillar_recommendations || null}
+                            brandId={plan.brand_id}
+                            onPillarUpdated={(updatedPillar) => {
+                                // Update local state when a pillar is marked as created
+                                setPlan(prev => {
+                                    if (!prev || !prev.pillar_recommendations) return prev
+                                    return {
+                                        ...prev,
+                                        pillar_recommendations: prev.pillar_recommendations.map(p =>
+                                            p.id === updatedPillar.id ? updatedPillar : p
+                                        )
+                                    }
+                                })
+                            }}
+                        />
                     )}
 
                     {loading ? (

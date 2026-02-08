@@ -3,6 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { generateStrategicPlan } from "@/lib/plans/strategic-planner"
 import { deduplicateWithReplacementLoop } from "@/lib/plans/plan-deduplication"
+import { generatePillarRecommendations } from "@/lib/plans/pillar-generator"
 import { tavily } from "@tavily/core"
 import Sitemapper from "sitemapper"
 import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
@@ -335,24 +336,44 @@ export const generatePlanTask = task({
             ]))
             console.log(`[Generate Plan Task] Total existing content for deduplication: ${allExistingContent.length}`)
 
+            // === PHASE 0.5: PILLAR PAGE GENERATION (One-time) ===
+            // Check if brand already has pillar recommendations - if not, generate them
+            const { data: brandRecord } = await (supabase as any)
+                .from("brand_details")
+                .select("pillar_recommendations, discovered_competitors")
+                .eq("id", brandId)
+                .single()
+
+            if (!brandRecord?.pillar_recommendations || brandRecord.pillar_recommendations.length === 0) {
+                console.log(`[Generate Plan Task] Generating pillar page recommendations...`)
+                try {
+                    const pillarRecommendations = await generatePillarRecommendations(brandData)
+
+                    // Save to brand_details (persists across plan regenerations)
+                    await (supabase as any)
+                        .from("brand_details")
+                        .update({ pillar_recommendations: pillarRecommendations })
+                        .eq("id", brandId)
+
+                    console.log(`[Generate Plan Task] Saved ${pillarRecommendations.length} pillar recommendations to brand`)
+                } catch (pillarError) {
+                    console.warn(`[Generate Plan Task] Pillar generation failed (non-blocking):`, pillarError)
+                    // Non-blocking - continue with plan generation even if pillars fail
+                }
+            } else {
+                console.log(`[Generate Plan Task] Brand already has ${brandRecord.pillar_recommendations.length} pillar recommendations, skipping generation`)
+            }
+
             // === PHASE 1: INTELLIGENCE (Competitor Discovery) ===
             await updateStatus("generating", "intelligence")
             console.log(`[Generate Plan Task] Phase 1: Intelligence gathering...`)
 
             let competitorBrands = passedCompetitors || []
 
-            // Check for cached competitors in brand_details first
-            if (competitorBrands.length === 0 && brandId) {
-                const { data: brandRecord } = await (supabase as any)
-                    .from("brand_details")
-                    .select("discovered_competitors")
-                    .eq("id", brandId)
-                    .single()
-
-                if (brandRecord?.discovered_competitors?.length > 0) {
-                    competitorBrands = brandRecord.discovered_competitors
-                    console.log(`[Generate Plan Task] Using ${competitorBrands.length} cached competitors`)
-                }
+            // Check for cached competitors in brand_details (already fetched above)
+            if (competitorBrands.length === 0 && brandRecord?.discovered_competitors?.length > 0) {
+                competitorBrands = brandRecord.discovered_competitors
+                console.log(`[Generate Plan Task] Using ${competitorBrands.length} cached competitors`)
             }
 
             // Discover competitors if not cached and not provided
@@ -384,7 +405,6 @@ export const generatePlanTask = task({
             })
 
             console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)
-            console.log(`[Generate Plan Task] Content Gap Analysis:`, result.contentGapAnalysis.slice(0, 200) + "...")
 
             // === PHASE 3: SEMANTIC DEDUPLICATION WITH REPLACEMENT LOOP ===
             await updateStatus("generating", "deduplication")
@@ -419,10 +439,9 @@ export const generatePlanTask = task({
                 .from("content_plans")
                 .update({
                     plan_data: filteredPlan,
-                    competitor_seeds: competitorBrands.map(c => c.name), // Store competitor names as seeds for reference
+                    competitor_seeds: competitorBrands.map(c => c.name),
                     generation_status: "complete",
                     generation_phase: undefined,
-                    content_gap_analysis: result.contentGapAnalysis, // Store the analysis if column exists
                     updated_at: new Date().toISOString()
                 })
                 .eq("id", planId)
@@ -440,8 +459,7 @@ export const generatePlanTask = task({
                 originalCount: result.plan.length,
                 removedCount: totalRejected,
                 replacementsGenerated,
-                categoryDistribution: result.categoryDistribution,
-                contentGapAnalysis: result.contentGapAnalysis
+                categoryDistribution: result.categoryDistribution
             }
 
         } catch (error: any) {

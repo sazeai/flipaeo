@@ -17,7 +17,6 @@ export interface StrategicPlanParams {
 }
 
 export interface StrategicPlanResult {
-    contentGapAnalysis: string
     plan: ContentPlanItem[]
     categoryDistribution: Record<string, number>
 }
@@ -188,20 +187,10 @@ Use integers: \`[1, 5, 12]\` not \`["day-1", "day-5"]\`
 
 ---
 
-## Deep Analysis Requirement
-
-BEFORE the plan, provide ~150 words analyzing:
-- What high-traffic queries is the brand missing?
-- What comparison keywords should they target?
-- What user questions remain unanswered by competitors?
-
----
-
 ## Output Format
 
 Return JSON with:
-1. \`content_gap_analysis\`: Your analysis
-2. \`plan\`: Array of 30 articles
+1. \`plan\`: Array of 30 articles
 
 Each article schema:
 \`\`\`json
@@ -252,10 +241,6 @@ Before finalizing, verify:
                 responseSchema: {
                     type: "OBJECT",
                     properties: {
-                        content_gap_analysis: {
-                            type: "STRING",
-                            description: "150-word analysis of content gaps"
-                        },
                         plan: {
                             type: "ARRAY",
                             items: {
@@ -285,7 +270,7 @@ Before finalizing, verify:
                             }
                         }
                     },
-                    required: ["content_gap_analysis", "plan"]
+                    required: ["plan"]
                 }
             }
         })
@@ -335,7 +320,6 @@ Before finalizing, verify:
 
 
         return {
-            contentGapAnalysis: result.content_gap_analysis || "",
             plan: planItems,
             categoryDistribution
         }
