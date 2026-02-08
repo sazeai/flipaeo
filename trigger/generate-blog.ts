@@ -939,23 +939,37 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 const generateWritingSystemPrompt = (styleDNA: string, outline: any, currentSectionIndex: number, brandDetails: any = null, articleType: string = 'informational') => {
   // styleDNA is now a paragraph describing the writing style
 
-  // --- GLOBAL ARTICLE MAP (THE MAP) ---
-  const completedSectionsList = currentSectionIndex < 0 ? [] : outline.sections.slice(0, currentSectionIndex)
-  const upcomingSectionsList = currentSectionIndex < 0 ? outline.sections : outline.sections.slice(currentSectionIndex + 1)
+  // --- SEMANTIC CONTEXT (Previous/Next Section Instructions) ---
+  // Instead of listing all headings, we provide the instruction_notes for adjacent sections.
+  // This gives the LLM clear boundaries on what was/will be covered.
 
-  const completedSections = completedSectionsList.map((s: any) => `- [COMPLETED] ${s.heading}`).join('\n')
-  const upcomingSections = upcomingSectionsList.map((s: any) => `- [UPCOMING] ${s.heading}`).join('\n')
+  const currentSection = outline.sections[currentSectionIndex]
+
+  // Get previous 2 sections with their instruction_notes
+  const prevSections = outline.sections.slice(Math.max(0, currentSectionIndex - 2), currentSectionIndex)
+  const prevContext = prevSections.length > 0
+    ? prevSections.map((s: any) => `- **${s.heading}**: ${s.instruction_note || 'No specific instructions'}`).join('\n')
+    : "(This is the first section)"
+
+  // Get next 2 sections with their instruction_notes  
+  const nextSections = outline.sections.slice(currentSectionIndex + 1, currentSectionIndex + 3)
+  const nextContext = nextSections.length > 0
+    ? nextSections.map((s: any) => `- **${s.heading}**: ${s.instruction_note || 'No specific instructions'}`).join('\n')
+    : "(This is the last section)"
 
   const globalMap = `
-### 0. GLOBAL ARTICLE MAP (YOUR GPS)
-You are writing ONE specific section in a larger article.
-DO NOT repeat what is already done. DO NOT steal thunder from what is coming.
+### 0. SECTION BOUNDARIES (CRITICAL - AVOID OVERLAP)
+You are writing section ${currentSectionIndex + 1} of ${outline.sections.length}: **${currentSection?.heading || 'Unknown'}**
 
-**PREVIOUSLY COVERED (Do not repeat):**
-${completedSections || "(This is the previous section)"}
+**PREVIOUS SECTIONS (Already covered - DO NOT REPEAT):**
+${prevContext}
 
-**COMING NEXT (Do not cover these topics):**
-${upcomingSections || "(This is the next section)"}
+**NEXT SECTIONS (Coming up - DO NOT COVER THESE TOPICS):**
+${nextContext}
+
+**YOUR CURRENT SECTION:**
+- Heading: ${currentSection?.heading}
+- Section Number: ${currentSectionIndex + 1} of ${outline.sections.length}
 `
 
   // Build brand context section with contextual guidelines
@@ -1159,15 +1173,13 @@ You MUST include an internal link to our own content in this section.
   }
 
   return `
-### BEFORE YOU WRITE - CHECK THE CONTEXT to ensure smooth flow of article.
+### SENTENCE-LEVEL FLOW (Last few sentences for smooth transition)
+"${previousFullText}"
 
-### CONTEXT SNOWBALL
-Read this to ensure continuity and **AVOID REPETITION**.
-"${previousFullText}".
-
-1.  **BRAND CHECK:** If brand was just mentioned, do NOT mention it again. Use "we".
-2.  **REPETITION CHECK:** Do NOT define concepts already defined. Do NOT re-state the "problem".
-3.  **FLOW CHECK:** Connect smoothly to the previous paragraph.
+**FLOW RULES:**
+- Connect smoothly to the last sentence above.
+- If the brand was just named, use "we" or "our tool" instead of repeating it.
+- Do NOT repeat the exact phrasing from the snippet.
 
 ---
 
@@ -1493,8 +1505,8 @@ CRITICAL EXECUTION RULES:
           .eq("id", articleId)
 
         const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, i, brandDetails, articleType)
-        // THE BRIDGE: Only pass last 2000 chars to prevent "Echo Chamber" repetition
-        const userPrompt = generateWritingUserPrompt(currentDraft.slice(-2000), section)
+        // THE BRIDGE: Pass last 500 chars for sentence-level flow (semantic context is now in system prompt)
+        const userPrompt = generateWritingUserPrompt(currentDraft.slice(-500), section)
 
         // Using Gemini 2.5 Flash for Speed & Context
         const writeConfig = {}
