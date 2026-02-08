@@ -264,7 +264,7 @@ export const PlanCard = memo(function PlanCard({
                             {item.title}
                         </h3>
                         {item.reason && (
-                            <p className="text-[11px] text-stone-500 leading-normal bg-stone-50 p-2 rounded-lg border border-stone-100">
+                            <p className="text-[11px] text-stone-500 leading-normal p-2 rounded-lg border border-stone-100">
                                 <span className="font-bold text-stone-900 mr-1.5 underline decoration-amber-500/30">Why:</span>
                                 {item.reason}
                             </p>
@@ -273,7 +273,7 @@ export const PlanCard = memo(function PlanCard({
 
                     {/* SEO Metrics Bar */}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
+                        <div className="flex items-center gap-1.5 text-[11px] text-stone-600 px-2 py-0.5 rounded border border-stone-100">
                             <span className="font-bold uppercase text-[9px] text-stone-400">Main Keyword:</span>
                             <span className="font-bold tracking-tight text-stone-900">{item.main_keyword}</span>
                         </div>
@@ -323,13 +323,13 @@ export const PlanCard = memo(function PlanCard({
                         {item.status === 'writing' ? (
                             <Link
                                 href="/articles"
-                                className="flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg hover:bg-blue-100 transition-all"
+                                className="flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-2 rounded-md hover:bg-blue-100 transition-all"
                             >
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                 Generating...
                             </Link>
                         ) : item.status === 'published' ? (
-                            <span className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-lg">
+                            <span className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-2 rounded-md">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Published
                             </span>
@@ -342,7 +342,7 @@ export const PlanCard = memo(function PlanCard({
                                             size="sm"
                                             disabled={!hasCredits}
                                             className={cn(
-                                                "text-xs font-semibold px-4 rounded-lg transition-all active:scale-95",
+                                                "text-xs font-semibold px-2 py-2 rounded-md transition-all active:scale-95",
                                                 !hasCredits
                                                     ? "bg-stone-100 text-stone-400 cursor-not-allowed hover:bg-stone-100 border border-stone-200"
                                                     : "bg-stone-900 text-white hover:bg-stone-800"

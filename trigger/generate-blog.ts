@@ -144,7 +144,7 @@ Make sure all required fields are present and have the correct types.
 `
 
     const fixResponse = await genAI.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       config: { responseMimeType: "application/json" },
       contents: [{ role: "user", parts: [{ text: fixPrompt }] }]
     })
@@ -492,7 +492,7 @@ Create a descriptive, scene-based prompt with SHORT tags (1-2 words each). NO ch
 OUTPUT: Return ONLY the image prompt. No explanations.`
 
   const response = await genAI.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: { responseMimeType: "text/plain" }
   })
@@ -1626,7 +1626,7 @@ CRITICAL EXECUTION RULES:
       let meta_description = ""
       try {
         const seoResponse = await genAI.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-flash-lite",
           config: seoConfig,
           contents: seoContents
         })
@@ -1783,7 +1783,7 @@ OUTPUT: Return ONLY the image prompt. No explanations.`
         const imagePromptContents = [{ role: "user", parts: [{ text: imagePromptSystem }] }]
 
         const imagePromptResponse = await genAI.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-flash-lite",
           config: imagePromptConfig,
           contents: imagePromptContents
         })
