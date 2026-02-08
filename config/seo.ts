@@ -255,12 +255,6 @@ export const schemaTemplates = {
       priceValidUntil: '2026-02-29',
     },
     publisher: organizationSchema,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      ratingCount: '127',
-      bestRating: '5',
-    },
     featureList: [
       '30 AI-generated articles per month',
       'Automated content strategy based on competitor analysis',

@@ -222,12 +222,6 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
         "availability": "https://schema.org/InStock"
       }
     ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "bestRating": "5",
-      "ratingCount": "127"
-    },
     "review": [
       {
         "@type": "Review",
@@ -248,7 +242,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
         "author": {
           "@type": "Person",
           "name": "Rishabh",
-          "jobTitle": "Founder & CEO"
+          "jobTitle": "SaaS Entrepreneur"
         },
         "reviewRating": {
           "@type": "Rating",
