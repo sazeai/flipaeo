@@ -504,27 +504,27 @@ const getCriticGapPrompt = (keyword: string, articleType: ArticleType, broadCont
   const strategy = getArticleStrategy(articleType)
 
   return `
-You are a ruthless Research Critic.${getCurrentDateContext()}
+You are a ruthless Research Critic. today date is ${getCurrentDateContext()} (just for context, so that you dont hallucinate).
 
-I have gathered initial search results for the keyword: "${keyword}"
+I have gathered initial search results for the keyword from the serp from teh rankign compititors: "${keyword}"
 
 YOUR TASK:
 Analyze this research data and identify EXACTLY what is MISSING that we need to write a winning article.
-You MUST find at least 3 gaps - there are ALWAYS gaps in any research.
+You MUST find at least 3-5 gaps - there are ALWAYS gaps in any research (but no fluff, it should be accurate and meaningful).
 
 ** ARTICLE TYPE: ${articleType.toUpperCase()}**
-  ${strategy.research_focus}
+ This is our research focus, follow this: ${strategy.research_focus}
 
 THINK LIKE A CRITIC - Always find gaps:
 - "What SPECIFIC product names are mentioned? Extract them."
   - "I see features, but where is the 2026 pricing?"
   - "They mention customer support, but is it 24/7 or email-only?"
   - "Where are the real user reviews? This is all marketing fluff."
-  - "What specific statistics or benchmarks are missing?"
+  - "What specific statistics or benchmarks are missing which can improve our article?"
   - "Are there competitor comparisons that should exist but don't?"
-  - "What are the actual tool/product names I should research more?"
+  - "What are the actual tool/product names I should research more, if data is less for a winning article?"
 
-  === INITIAL RESEARCH DATA(Summary) ===
+  === HERE WE HAVE INITIAL RESEARCH DATA ===
     ${broadContext}
 
 IMPORTANT RULES:
@@ -536,7 +536,7 @@ IMPORTANT RULES:
 OUTPUT(Strict JSON):
 {
   "gap_analysis": string,  // Brief description of what's missing (NEVER say "no gaps")
-    "competitor_names": string[],  // Extract any product/company names mentioned in the research
+    "competitor_names": string[],  // Extract all product/company names mentioned in the research
       "targeted_queries": string[]  // 3-5 SPECIFIC search queries to fill gaps (REQUIRED)
 }
 `
@@ -551,7 +551,7 @@ You are an expert SEO Strategist and Data Analyst.${getCurrentDateContext()}
 
 I will provide you with TWO sets of research data:
 1. BROAD LANDSCAPE DATA - General information from top search results
-2. DEEP DIVE DATA - Specific gap - filling information we hunted down
+2. DEEP DIVE DATA - Specific gap - filling information we hunted down based on first BROAD LANDSCAPE DATA for missing data
 
 YOUR GOAL:
 Combine these into ONE comprehensive "Detailed Research Brief" that allows us to write a better article than all competitors combined to dominate modern ai search for answer first intent.
@@ -559,21 +559,21 @@ Combine these into ONE comprehensive "Detailed Research Brief" that allows us to
 ** KEYWORD: "${keyword}" **
 ** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
-  ${strategy.research_focus}
+${strategy.research_focus}
 
 DATA CLEANING RULES:
 1. Ignore UI elements like "Login", "Sign Up", "Footer", "Cookie Policy", "Alt tags".
-2. Focus ONLY on educational content, tutorials, and facts.
+2. Focus ONLY on educational content, tutorials, facts and any other data that can improve our article.
 3. PRIORITIZE the Deep Dive data - it contains the specific facts that competitors miss.
 
 OUTPUT REQUIREMENTS(Return strict JSON):
-1. "fact_sheet": Extract hard facts, statistics, dates, and specific steps.MUST include fresh data from Deep Dive.
+1. "fact_sheet": Extract hard facts, statistics, dates, and specific steps. MUST include fresh data from Deep Dive.
 2. "content_gap": What is STILL missing after both research phases ? This helps the writer know where to add original insight.
 3. "product_matrix": (ONLY for commercial / comparison articles) Product details with REAL pricing if found.
-4. "step_sequence": (ONLY for how - to / tutorial articles) Extract step - by - step sequence.
-5. "prerequisites": (ONLY for how - to / tutorial articles) What the reader needs.
+4. "step_sequence": (ONLY for how-to / tutorial articles) Extract step-by-step sequence.
+5. "prerequisites": (ONLY for how-to / tutorial articles) What the reader needs.
 6. "sources_summary": All sources used.
-7. "authority_links": Extract 3 - 5 HIGH - QUALITY, non - competitor URLs suitable for citation(e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news, top tier publications website, and any informational blog site from the product niche).These will be used as external links in the article.
+7. "authority_links": Extract 3-5 HIGH-QUALITY, non-competitor URLs suitable for citation(e.g., statistics from Statista, definitions from Wikipedia, official docs, industry reports, major news, top tier publications website, and any informational blog site from the product niche).These will be used as external links in the article.
 
 JSON SCHEMA:
 {
