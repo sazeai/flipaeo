@@ -23,23 +23,24 @@ import { render } from "@react-email/components"
 /**
  * Tactical Deduplication Layer: Enriches outline sections with link instructions
  * When a section covers a topic already answered in another article, inject a link instruction.
+ * 
+ * OPTIMIZATION: Uses Promise.all to check all sections concurrently instead of sequentially.
  */
 async function enrichOutlineWithLinks(
   outline: { sections: Array<{ heading: string; instruction_note?: string }> },
   brandId: string,
   supabase: any
 ): Promise<void> {
-  console.log(`[Dedup] Starting outline enrichment for ${outline.sections.length} sections`)
+  console.log(`[Dedup] Starting PARALLEL outline enrichment for ${outline.sections.length} sections`)
 
-  for (let i = 0; i < outline.sections.length; i++) {
-    const section = outline.sections[i]
-
+  // Process all sections in parallel
+  const enrichmentPromises = outline.sections.map(async (section, i) => {
     try {
       // Step 1: Generate embedding for section heading
       const headingEmbedding = await generateEmbedding(section.heading)
       const embeddingStr = JSON.stringify(headingEmbedding)
 
-      // Step 2: Find if we've already covered this answer (threshold > 0.88)
+      // Step 2: Find if we've already covered this answer (threshold > 0.82)
       const { data: coverageMatch, error: covErr } = await supabase.rpc('find_covered_answer', {
         check_embedding: embeddingStr,
         brand_uuid: brandId,
@@ -48,12 +49,12 @@ async function enrichOutlineWithLinks(
 
       if (covErr) {
         console.warn(`[Dedup] RPC error for section "${section.heading}":`, covErr)
-        continue
+        return
       }
 
       if (!coverageMatch || coverageMatch.length === 0) {
         // No match - this is a new topic
-        continue
+        return
       }
 
       const { article_id, answer_text, similarity: answerSim } = coverageMatch[0]
@@ -68,13 +69,13 @@ async function enrichOutlineWithLinks(
 
       if (liveErr) {
         console.warn(`[Dedup] Live URL RPC error for article ${article_id}:`, liveErr)
-        continue
+        return
       }
 
       if (!liveMatch || liveMatch.length === 0) {
         // No live URL - article might not be published yet
         console.log(`[Dedup] No live URL found for article ${article_id} - skipping link injection`)
-        continue
+        return
       }
 
       const { live_url, live_title, similarity: urlSim } = liveMatch[0]
@@ -90,9 +91,12 @@ async function enrichOutlineWithLinks(
       console.warn(`[Dedup] Error processing section "${section.heading}":`, err)
       // Non-blocking - continue with other sections
     }
-  }
+  })
 
-  console.log(`[Dedup] Outline enrichment complete`)
+  // Wait for all parallel checks to complete
+  await Promise.all(enrichmentPromises)
+
+  console.log(`[Dedup] PARALLEL outline enrichment complete`)
 }
 
 const cleanAndParse = (text: string) => {
@@ -362,14 +366,15 @@ const IMAGE_TEMPLATES: Record<string, string> = {
 At the top center, bold heading text in handwritten style: "[SHORT_HEADING]"
 
 Main visual: A large [MAIN_VISUAL_ELEMENT] in the center.
-Around it, 2-3 smaller visual elements connected with thin lines or arrows.
+Around it, 3 smaller visual elements connected with thin lines.
 
 Small handwritten tags (1-2 words each, max 3 tags total):
 - Tag near element 1: "[1-2 WORD TAG]"
 - Tag near element 2: "[1-2 WORD TAG]"
-
+That’s it. No other  text to be added.
 NO checklists. NO bullet point lists. NO long text descriptions.
-Flat vector. Minimal palette. Professional blog illustration.`,
+Flat vector. Minimal palette. Professional blog illustration. 
+Only print the exact text instructed. Do not add or repeat any text.`,
 
   how_to: `Clean flat illustration on a white background showing [SCENE_DESCRIPTION].
 
@@ -381,7 +386,8 @@ Each number has a simple icon inside - NO text descriptions for steps.
 Optional: 1-2 small handwritten tags pointing to key elements.
 
 NO checklist panels. NO bullet point lists with text.
-Flat UI style. Clean minimal design.`,
+Flat UI style. Clean minimal design.
+Only print the exact text instructed. Do not add or repeat any text.`,
 
   comparison: `Split screen illustration on a white background. Flat vector style. High contrast.
 
@@ -396,7 +402,8 @@ Right side labeled "After": [SCENE_DESCRIPTION_GOOD_STATE]
 - Small handwritten tags (1-2 words): "[TAG1]", "[TAG2]"
 
 Text labels under each side: "Before" "After" (handwritten style)
-Editorial blog illustration.`,
+Editorial blog illustration.
+Only print the exact text instructed. Do not add or repeat any text.`,
 
   process: `Horizontal flow diagram on a white background.
 
@@ -408,7 +415,8 @@ Flow from left to right with 3-4 connected stages:
 - Optional: 1-2 word tag under each stage icon
 
 NO long step descriptions. NO checklist text.
-Infographic style. Clean professional look.`,
+Infographic style. Clean professional look. 
+Only print the exact text instructed. Do not add or repeat any text.`,
 
   insight: `Editorial style illustration on a white background.
 
@@ -419,7 +427,8 @@ Main visual: [SCENE_WITH_KEY_ELEMENT]
 - 2-3 small handwritten tags (1-2 words each) pointing to important elements
 
 NO overlay paragraphs. NO bullet point lists.
-Soft flat vector style. Muted professional colors.`
+Soft flat vector style. Muted professional colors.
+Only print the exact text instructed. Do not add or repeat any text.`
 }
 
 // Generate section image prompt with integrated text safety
@@ -433,22 +442,21 @@ const generateSectionImagePrompt = async (
 
   const prompt = `You are an AI Art Director creating an in-content blog image.
 
-SECTION CONTEXT:
-- Heading: "${section.heading}"
-- Content Focus: ${section.instruction_note}
-- Article: "${articleTitle}"
+You are goign to write a prompt abse don this content of the article:
+- My article Section Heading is: "${section.heading}"
+- My article Title is: "${articleTitle}"
 
 IMAGE TYPE: ${imageType.toUpperCase()}
 
-REFERENCE TEMPLATE:
+REFERENCE TEMPLATE(we have tested that ai works with this tpye of structured lienby line prompts whihc dont make it halucinate):
 ${template}
 
 TEXT PROCESSING RULES (CRITICAL):
-1.  **HEADING HANDLING:** If the heading is > 4 words, YOU MUST summarize it into a 2-3 word visual concept.
+1.  **HEADING HANDLING:** If the heading is long, YOU MUST summarize it into a 2-4 word visual concept.
     - ❌ "${section.heading}" (Too long)
     - ✅ [Short 3-5 word summary]
 2.  **PROBLEM WORDS:** The AI struggles with complex words like "Finances", "Directories", "Optimization".
-    - **DO NOT write these words.**
+    - **DO NOT include these and these types of words.**
     - **USE ICONS** instead (e.g., Dollar sign, Folder, Gear).
 3.  **TEXT RATIO:** 90% Illustration, 10% Text.
     - If unsure, OMIT TEXT entirely.
@@ -459,35 +467,26 @@ TEXT PROCESSING RULES (CRITICAL):
 4.  **VISUAL ABSTRACTION (MANDATORY):**
     - **RULE:** If the subject involves text presentation (e.g., "Summaries", "Code Snippets", "Logs", "Documents"), YOU MUST visualize it as a "Stylized Data Representation".
     - **HOW:** Use icons, flowing lines, glowing geometric blocks, or abstract grids.
-    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences.
-    - **Example:** Instead of "A document showing summary text", use "A glowing document icon emitting abstract data lines".
-Why we are doing this is because AI art generator we are using -struggle to generate text and when it does it is not good so we are using icons and symbols instead.
-
-✅ ALLOWED TEXT:
-- 1-2 word labels MAX (e.g. "Growth", "Risk", "10x").
-- Numbers and Symbols (%, $, #).
+    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences. force a line in the end like "do not duplicate a text in the image"
+    - **Example:** Instead of "A document showing summary text", use "A glowing document icon emitting abstract data lines but this to b deisnged based on image type above".
+Why we are doing this is because AI art generator we are using struggle to generate text and when it does it is not good so we are using icons and symbols instead.
 
 ❌ BANNED - DO NOT USE:
 - Checklists with multiple items
 - Bullet point lists with text
-- The literal words "Finances" or "Directories" (Use visual metaphors).
 - Long headings.
 - Long text descriptions (3+ words per item)
 - Legible body text of any kind.
 - "Summary text", "Table of contents", "Snippets".
 
-GOOD EXAMPLE:
-"Small handwritten tag near person: 'Overwhelmed'
-Small handwritten tag near sky: 'New Ideas'"
-
-BAD EXAMPLE:
+❌ BAD EXAMPLE:
 "Checklist text:
 - Calculate Break Costs
 - Save Enough Funds  
 - Start 1-3 Years"
 
 YOUR TASK:
-Create a descriptive, scene-based prompt with SHORT tags (1-2 words each). NO checklists. NO long bullet point lists.
+Create a descriptive, visually rich, scene-based prompt with SHORT tags (1-2 words each). NO checklists. NO long bullet point lists.
 
 OUTPUT: Return ONLY the image prompt. No explanations.`
 
@@ -1114,6 +1113,14 @@ Return **Markdown** formatted text.
 - Make use of proper H2, H3, and H4 headers for SEO appropriately.
 - Do NOT include the main H2 Section Heading (system adds it).
 - Start directly with the body content.
+
+### 7. ANTI-FLUFF PROTOCOL (CRITICAL - READ THIS)
+**THE STOP RULE:** When the core point of the section is delivered, STOP WRITING.
+- Do NOT add filler paragraphs to "round out" the section.
+- Do NOT repeat what was said in previous sections (you have the Context Snowball for reference).
+- Do NOT re-state the problem if it was already stated in the intro.
+- **DENSITY > LENGTH:** A 150-word paragraph with 3 concrete facts beats a 400-word paragraph with 1 fact and fluff.
+- If a section feels "thin", add MORE FACTS, not more words.
 `
 }
 
@@ -1489,6 +1496,9 @@ CRITICAL EXECUTION RULES:
           .eq("id", articleId)
       }
 
+      // Collect sections that need images for parallel generation later
+      const imageSectionsToGenerate: Array<{ heading: string; instruction_note: string; image_type?: string; sectionIndex: number }> = []
+
       // Start loop from saved index for checkpoint resumption
       for (let i = startIndex; i < outline.sections.length; i++) {
         const section = outline.sections[i]
@@ -1513,7 +1523,7 @@ CRITICAL EXECUTION RULES:
         ]
 
         const writeStream = await genAI.models.generateContentStream({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-flash-lite",
           config: writeConfig,
           contents: writeContents
         })
@@ -1529,14 +1539,40 @@ CRITICAL EXECUTION RULES:
         const cleanedWriteText = writeText.replace(headingPattern, '').trim()
         currentDraft += `${headingHash} ${section.heading} \n\n${cleanedWriteText} \n\n`
 
-        // --- IN-CONTENT IMAGE GENERATION (if section marked for image) ---
+        // --- COLLECT IMAGE REQUEST (if section marked for image) ---
+        // Instead of generating here (blocking), we collect and generate in parallel later
         if (section.needs_image && section.image_type) {
-          try {
-            console.log(`[Section Image] Generating image for: ${section.heading}`)
+          // Add placeholder marker to draft that we'll replace after parallel generation
+          const placeholderMarker = `<!--IMAGE_PLACEHOLDER_${i}-->`
+          currentDraft += `${placeholderMarker}\n`
+          imageSectionsToGenerate.push({
+            heading: section.heading,
+            instruction_note: section.instruction_note || '',
+            image_type: section.image_type,
+            sectionIndex: i
+          })
+          console.log(`[Section Image] Queued for parallel generation: ${section.heading}`)
+        }
 
+        // Real-time Save
+        await supabase
+          .from("articles")
+          .update({ raw_content: currentDraft })
+          .eq("id", articleId)
+
+        // Tiny delay to be safe
+        await new Promise(r => setTimeout(r, 500))
+      }
+
+      // --- PHASE 4.5: PARALLEL IN-CONTENT IMAGE GENERATION ---
+      if (imageSectionsToGenerate.length > 0) {
+        console.log(`[Section Images] Starting PARALLEL generation for ${imageSectionsToGenerate.length} images`)
+
+        const imagePromises = imageSectionsToGenerate.map(async (imageSection) => {
+          try {
             // Generate section-specific image prompt
             const sectionImagePrompt = await generateSectionImagePrompt(
-              section,
+              imageSection,
               finalTitle,
               genAI
             )
@@ -1549,30 +1585,41 @@ CRITICAL EXECUTION RULES:
               // Download and upload to R2
               const sectionImgResponse = await fetch(sectionImageUrl)
               const sectionImgBuffer = Buffer.from(await sectionImgResponse.arrayBuffer())
-              const sectionImgFileName = `section-images/${userId}/${brandId}/${articleId}/${Date.now()}.webp`
+              const sectionImgFileName = `section-images/${userId}/${brandId}/${articleId}/${Date.now()}-${imageSection.sectionIndex}.webp`
 
               await putR2Object(sectionImgFileName, sectionImgBuffer)
               const r2Domain = process.env.R2_PUBLIC_DOMAIN || `${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL}`
               const sectionImageR2Url = `${r2Domain}/${sectionImgFileName}`
 
-              // Inject image into markdown (after section content) - single newline to prevent blank space
-              currentDraft += `![${section.heading}](${sectionImageR2Url})\n`
-              console.log(`[Section Image] Added image for: ${section.heading}`)
+              console.log(`[Section Image] ✅ Generated: ${imageSection.heading}`)
+              return {
+                sectionIndex: imageSection.sectionIndex,
+                heading: imageSection.heading,
+                imageUrl: sectionImageR2Url
+              }
             }
+            return null
           } catch (imgErr) {
-            console.error(`[Section Image] Failed for ${section.heading}:`, imgErr)
-            // Non-blocking - continue without image
+            console.error(`[Section Image] Failed for ${imageSection.heading}:`, imgErr)
+            return null
+          }
+        })
+
+        // Wait for all images to complete
+        const imageResults = await Promise.all(imagePromises)
+
+        // Inject images into draft by replacing placeholders
+        for (const result of imageResults) {
+          if (result) {
+            const placeholderMarker = `<!--IMAGE_PLACEHOLDER_${result.sectionIndex}-->`
+            currentDraft = currentDraft.replace(placeholderMarker, `![${result.heading}](${result.imageUrl})\n`)
           }
         }
 
-        // Real-time Save
-        await supabase
-          .from("articles")
-          .update({ raw_content: currentDraft })
-          .eq("id", articleId)
+        // Clean up any remaining placeholders (for failed images)
+        currentDraft = currentDraft.replace(/<!--IMAGE_PLACEHOLDER_\d+-->\n/g, '')
 
-        // Tiny delay to be safe
-        await new Promise(r => setTimeout(r, 500))
+        console.log(`[Section Images] PARALLEL generation complete`)
       }
 
 
