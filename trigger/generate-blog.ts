@@ -528,7 +528,7 @@ THINK LIKE A CRITIC - Always find gaps:
     ${broadContext}
 
 IMPORTANT RULES:
-1. You MUST return 3 - 5 targeted queries - NEVER return an empty array
+1. You MUST return exact 3 targeted queries - NEVER return an empty array
 2. If the data mentions ANY product / tool names, include queries about those specific products
 3. Be SPECIFIC - not "best CRM" but "Salesforce pricing 2026" or "HubSpot vs Pipedrive user reviews reddit"
 4. Include at least one query for "[keyword] reddit" or "[keyword] reviews" for real user opinions
@@ -559,12 +559,13 @@ Combine these into ONE comprehensive "Detailed Research Brief" that allows us to
 ** KEYWORD: "${keyword}" **
 ** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
-${strategy.research_focus}
+This si our research focus: "${strategy.research_focus}"
 
 DATA CLEANING RULES:
 1. Ignore UI elements like "Login", "Sign Up", "Footer", "Cookie Policy", "Alt tags".
 2. Focus ONLY on educational content, tutorials, facts and any other data that can improve our article.
 3. PRIORITIZE the Deep Dive data - it contains the specific facts that competitors miss.
+4. This both data was fetched from web using tavily, somtime it may miss and can get some wrong results... if you think something is out of the context, drop it form the final answer, becuase it willl make the article writer confused.
 
 OUTPUT REQUIREMENTS(Return strict JSON):
 1. "fact_sheet": Extract hard facts, statistics, dates, and specific steps. MUST include fresh data from Deep Dive.
@@ -730,7 +731,7 @@ ${criticAnalysis.gap_analysis || "No major gaps identified."}
   return cleanParseAndValidate(synthesisText, CompetitorDataSchema, genAI)
 }
 
-const generateOutlineSystemPrompt = (keyword: string, styleDNA: any, competitorData: any, articleType: ArticleType, brandDetails: any = null, title?: string, internalLinks: any[] = []) => {
+const generateOutlineSystemPrompt = (keyword: string, styleDNA: any, competitorData: any, articleType: ArticleType, brandDetails: any = null, title?: string, internalLinks: any[] = [], supportingKeywords: string[] = []) => {
   const strategy = getArticleStrategy(articleType)
 
   // Extract authority links from competitor data for external linking
@@ -738,37 +739,37 @@ const generateOutlineSystemPrompt = (keyword: string, styleDNA: any, competitorD
 
   return `
 You are an expert Content Architect and SEO Strategist.
-Your goal is to outline a high - ranking blog post that beats the competition by filling their "Content Gaps".
+Your goal is to outline a high ranking blog post that beats the competition by filling their "Content Gaps" and build a authoritative article to rank in modern ai search.
 
 ** ARTICLE TYPE: ${articleType.toUpperCase()}**
 
   INPUT CONTEXT:
-1. MAIN KEYWORD WE ARE FOCUSING ON: "${keyword}"
-2. COMPETITOR & GAP DATA: "${JSON.stringify(competitorData)}"
-3. ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
+1. MAIN KEYWORD: "${keyword}"
+2. ARTICLE TITLE: "${title || 'To be generated'}"
+3. SUPPORTING KEYWORDS (Include these naturally): ${supportingKeywords.length ? supportingKeywords.join(", ") : "None provided"}
+4. COMPETITOR & GAP DATA: "${JSON.stringify(competitorData)}"
+5. ${brandDetails ? `### BRAND CONTEXT (Strategic Integration)
 - Brand: ${brandDetails.product_name}
 - Type: ${brandDetails.product_identity?.literally || 'Product/Service'}
 - Audience: ${brandDetails.audience?.primary || 'Users seeking solutions'}
 - Features: ${brandDetails.features?.join(', ') || 'N/A'}
+- Pricing: ${brandDetails.pricing || 'N/A'}
 - UVP: ${brandDetails.unique_value_proposition}
 - How It Works: ${brandDetails.how_it_works || 'N/A'}
+NOTE: Use this brand data as source of supporting context, never write anything which is not in brand data, Never assume our brand might be offering this and that.
 
-NOTE: Use this brand data as source of supporting context.
-CRITICAL INSTRUCTION FOR "HOW-TO" SECTIONS:
-If the user intent is to solve a problem that OUR product solves (e.g., "how to animate photos"), the "How-To" section of the outline MUST instruct the writer to use OUR product's process.
-- In the 'instruction_note' for that section, you MUST specifically write: "Explain how to solve this using ${brandDetails.product_name}. Steps: [Insert relevant steps from 'How It Works' above]. Mention that for best results, proper restoration/prep is key (if applicable)."
+"IF There is a "How-To" section in the outline, then it is a CRITICAL INSTRUCTION FOR "HOW-TO" SECTIONS in terms of use of brand data:
+If the user intent is to solve a problem that OUR product actually solves which you can know from brand data above, the "How-To" section of the outline MUST instruct the writer to use OUR product's process.
+- In the 'instruction_note' for that section, you MUST specifically write: "Explain how to solve this using ${brandDetails.product_name}. Steps: [write in new words, relevant steps from 'How It Works' above]."
 - DO NOT suggest competitors or generic tools as the primary solution if we offer a direct one.
-- For unrelated sections, keep brand mentions sparing and natural.
-
-Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors, in comparison tables for features or anything else.
-4. Don't just list competitors - explain why YOUR approach is different/better
-5. Strategic mentions: Make sure you dont forcefully add user brand evrywhere, if you do this its called spamming. So, it must earn its place naturally and strategically, nothing is random here, everything needs to be planned.
+- For unrelated sections, keep brand mentions sparing and natural. Most importantly, if it requires, then add it otherwise dont add brand to make the article spammy."
+Plan brand mentions sparingly - only where contextually valuable, HOW to section to position us against other competitors. Make sure if there is a comparison table for features or anything else, you must add our product in it.
 ` : ''
     }
-${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-2 MAX)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
+${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-3 MAX NATURALLY WHERE MAKES SENSE and BUILDS AUTHORITY)\n${internalLinks.map(l => `- Title: ${l.title} | URL: ${l.url}`).join('\n')}` : ''}
 
 ### ARTICLE REQUIREMENT STRATEGY:
-${strategy.outline_instruction}
+"${strategy.outline_instruction}" 
 
 ---
   Before outlining, analyze the "Keyword Intent" to determine the required depth:
@@ -779,17 +780,17 @@ ${strategy.outline_instruction}
    - Total Sections: ** 7 - 10 sections ** are sufficient.
    - GOAL: Speed to solution.
 
-2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software"):
+2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software", "comparison articles", "how to articles", "step by step articles"):
 - Structure: Deep, nested.
    - Depth: Heavy use of H3s and H4s.
-   - Total Sections: ** 10 - 15 sections **.
+   - Total Sections: ** 9 - 12 sections **.
    - GOAL: Exhaustive coverage.
 
-** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 15 - section outline for a 8 - section topic.
+** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 12 - section outline for a 8 - section topic.
 
 ## HEADING STYLE PROTOCOL(MANDATORY - READ CAREFULLY)
 
-You must write headers that look like they were written by a HUMAN expert, not an AI.
+You must write headers that are written for both humans and search engines, i mean intent driven.
 
 🚫 ** BANNED HEADER PATTERNS(INSTANT FAIL):**
   - NO Colons: "The Evolution: From X to Y" -> FAIL
@@ -798,17 +799,13 @@ You must write headers that look like they were written by a HUMAN expert, not a
         - NO "The Art of..." or "The Future of..."
           - NO "Demystifying X" or "Navigating the Landscape"
 
-✅ ** REQUIRED HEADER PATTERNS(USE THESE):**
-- ** Direct Questions:** "What is a high authority backlink?"
-  - ** Direct Statements:** "Why 'authority' is more than a DR number"
-    - ** Vs / Comparison:** "Dofollow vs Nofollow: The real difference"
-      - ** Action - Oriented:** "How to judge a backlink's authority"
-        - ** Listicles:** "Quick checks that founders skip"
-          - ** Outcome - Based:** "What results look like in the first 30 days"
+✅ ** REQUIRED HEADER PATTERNS:**
+- Direct Contextual Questions, Direct real Statements, Vs / Comparison, Action Oriented, Listicles, Outcome Based
+- subheaidngs should be contextual to their parent heading.
 
-            ** THE LITMUS TEST:**
-              If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
-If it sounds like a Google Search Query, keep it.
+** THE LITMUS TEST:**
+If the header sounds like a "Chapter Title" in a fantasy novel, delete it.
+If it sounds like a user might be searching for or a Google Search Query, keep it.
 
 ## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
 
@@ -829,11 +826,6 @@ H2: Main Topic B
   H3: Subtopic B.1
   H3: Subtopic B.2
 \`\`\`
-**THE "DEPTH" MANDATE:**
-1. **NO WALLS OF TEXT:** We are writing for the scroll-heavy mobile web.
-2. **AGGRESSIVE FRAGMENTATION:** Break big ideas down.
-   - ❌ Bad: One H2 with 500 words.
-   - ✅ Good: One H2 with three H3s and two H4s.
 
 **HIERARCHY REQUIREMENTS (STRICT):**
 1. **The 60% Rule:** AT LEAST 60% of your sections MUST be level 3 or 4.
@@ -845,8 +837,7 @@ H2: Main Topic B
    - "Why this matters" deep dives
 3. **NEVER** have back-to-back H2s without at least one H3 in between (unless it's a very simple transition).
 4. **Structure:** The output sections array is flat, but the logic is nested.
-5. **Depth over Breadth:** Prefer fewer H2s with more depth (H3/H4) over many shallow H2s.
-6. **Internal Link Placement:** If internal links are provided, identify 1-2 sub-sections (H3/H4) where they strictly fit.
+5. **Depth over Breadth:** Prefer fewer H2s with more depth (H3/H4/Listicles/Tables/Quotes/Code Examples) over many shallow H2s.
 
 ---
 
@@ -857,12 +848,12 @@ ${JSON.stringify(authorityLinks)}
 
 **YOUR TASK:** 
 - Select **EXACTLY A TOTAL OF 2 LINKS** (if available) for the entire article.
-- Assign "external_link" to the 2 most relevant sections.
+- Assign "external_link" to the 2 most relevant sections, where you are makign any claim. No hard claim is to be made without a citation.
 - **Rule:** If the authority links list is empty or irrelevant, you may skip this. But if valid links exist, you MUST use 2.
 
 **EXTERNAL LINKING RULES:**
 1. Do not clump links. Spread them out.
-2. The "anchor_context" is critical—it tells the writer *why* to cite this.
+2. The "anchor_context" is critical — it tells the writer *why* to cite this.
 3. Prefer citations for Specific Data/Stats or Definitions.
 
 ## INTERNAL LINKING STRATEGY (DISTRIBUTOR MODEL)
@@ -874,7 +865,7 @@ ${internalLinks.length > 0 ? internalLinks.map(l => `- Title: ${l.title} | URL: 
 - Review the pool and select **MAXIMUM 3 LINKS** that are highly relevant.
 - Assign them to the most appropriate sections using the "internal_link" field.
 - **Rule:** If the pool is empty or nothing fits, SKIP it. Do not force it.
-- **Rule:** Distribute them. Never more than 1 internal link per section.
+- **Rule:** Distribute them. Never more than 1 internal link in a section.
 
 ---
 
@@ -885,14 +876,14 @@ ${internalLinks.length > 0 ? internalLinks.map(l => `- Title: ${l.title} | URL: 
    - It needs to hook the reader immediately.
 3. **Structure:** Create a logical flow FOLLOWING the TYPE-SPECIFIC STRATEGY above.
    - **MANDATORY:** You MUST create specific sections that address the "missing_topics" identified in the Competitor Data.
-   - **USER INTENT:** Ensure the structure answers the specific questions users are asking.
-4. **Instruction Notes (THE DATA DISTRIBUTION RULE):**
+   - **USER INTENT:** Ensure the structure answers the specific questions users are asking, no extra fluff.
+4. **Fact Sheet Notes (THE DATA DISTRIBUTION RULE):**
    - You have a "Fact Sheet" in the input. You must DISTRIBUTE these facts into the most relevant sections. tell the writer to use this data in their own words.
    - **Constraint:** Do not be vague. Do not say "Include data."
-   - **Requirement:** You must COPY the specific number/stat from the Fact Sheet into the instruction_note.
-   - *Example:* "Explain the traffic drop. CITE DATA: 'Gartner predicts 50% drop by 2028' (from Fact Sheet)."
+   - **Requirement:** You must COPY the specific number/stat from the Fact Sheet into the instruction_note (dont forget anything important, the fact sheet is curated data from the research).
    - **Rule:** Do not reuse the same fact in multiple sections. Assign it to the ONE best spot.
    - **DO NOT** write style instructions. Only focus on the **Substance**.
+5. Keep the instructions note as detaile das possible to avoid any hallucination or misinterpretation by the writer.
 
 ## IN-CONTENT IMAGE SELECTION (IMPORTANT):
 For EACH H2 section, decide if an image would ADD VALUE to the content:
@@ -936,11 +927,11 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 
 **FINAL CHECK:** Before outputting, verify that:
 - You have adhered to the 60% rule (majority of sections are H3/H4)
-- You have broken down complex topics into H4 lists/steps
+- You have instructed the writer to break down complex topics/Heavy walls of text into LISTICLES, TABLES, CODE EXAMPLES, QUOTES, etc.
 - Does this outline solve the specific intent of "${keyword}"?
-- Did you remove unnecessary fluff sections?
-- Did you assign 1-2 external links to relevant sections?
-- Did you mark 2-3 H2 sections with needs_image: true?
+- Have you instructed the writer to remove unnecessary fluff?
+- Have you assigned 1-2 external links to relevant sections?
+- Have you marked 2-3 H2 sections with needs_image: true?
 `
 }
 
@@ -961,10 +952,10 @@ You are writing ONE specific section in a larger article.
 DO NOT repeat what is already done. DO NOT steal thunder from what is coming.
 
 **PREVIOUSLY COVERED (Do not repeat):**
-${completedSections || "(This is the first section)"}
+${completedSections || "(This is the previous section)"}
 
 **COMING NEXT (Do not cover these topics):**
-${upcomingSections || "(This is the last section)"}
+${upcomingSections || "(This is the next section)"}
 `
 
   // Build brand context section with contextual guidelines
@@ -976,13 +967,13 @@ ${upcomingSections || "(This is the last section)"}
 **Your brand:** ${brandDetails.product_name}
 **Audience:** ${brandDetails.audience?.primary || 'Users seeking solutions'}
 
-**THE PRINCIPLE:** Mention the brand only where it adds VALUE, not artificially. se it where you need to provide solution to teh article answers.
+**THE PRINCIPLE:** Mention the brand only where it required by the intent of the article, not forcefully.
 
 **WHEN TO MENTION BRAND (Natural contexts):**
-- When establishing authority in the intro (once)
-- When comparing to competitors in a features/comparison section/tables
-- When the section is SPECIFICALLY about your product's approach
-- In a call-to-action at the end
+- When establishing authority
+- When comparing to competitors if the section demands a table or comparison
+- When the section is SPECIFICALLY about our product's approach
+- In a call-to-action at the end if required
 
 **WHEN NOT TO MENTION BRAND (Forced contexts):**
 - In purely educational/informational sections about general concepts
@@ -991,8 +982,8 @@ ${upcomingSections || "(This is the last section)"}
 - Just to "remind" the reader - they already know
 
 **THE GOOGLE TEST:**
-Ask: "If Google saw this, would it look like an informative article or a sales pitch?"
-Informative articles rank. Sales pitches don't.
+Ask: "If Google or ai search LLMs saw this, would it look like an informative article/Authoritative article or a sales pitch?"
+Authoritative articles are trusted by search engines. Sales pitches are not.
 
 **USE ALTERNATIVES instead of repeating "${brandDetails.product_name}":**
 - "we" / "our tool" / "our platform" / "our approach"
@@ -1000,14 +991,14 @@ Informative articles rank. Sales pitches don't.
 - Just describe the feature without naming the brand
 
 **CONTEXT CHECK (USE THE PREVIOUS SECTIONS):**
-Before mentioning the brand, check the CONTEXT section in your prompt.
-- If brand was already mentioned in the last 2 sections → DO NOT mention again
+- Before mentioning the brand, check the CONTEXT section in the instrcutions of last section covered.
+- If brand was already instructed to be mentioned in the last sections → DO NOT mention again
 - If brand hasn't been mentioned for 3+ sections and it's genuinely relevant → OK to mention
 
 **AUTHORITY POSITIONING:**
-- For YOUR product/brand: Use first-person plural ("We built...", "Our tool...")
-- For competitor products: Use third-party framing ("According to reviews...", "Users report...")
-- For general concepts: State facts confidently without fake personal claims
+- For OUR product/brand: Use first-person plural
+- For competitor products: Use third-party framing ("According to reviews...", "Users report..."), you can also name them specifically if it's required
+- For general concepts: State facts confidently without fake personal claims, dont assume anything.
 `
   }
 
@@ -1021,21 +1012,15 @@ ${articleType === 'informational' ? `**INFORMATIONAL ARTICLE:**
 - Then provide brief context
 - Example: "A reunion hug video is created by uploading two photos to an AI generator. The process takes 2-3 minutes. Here's exactly how it works..."` : ''}
 
-
-${articleType === 'commercial' ? `**COMMERCIAL ARTICLE:**
+${articleType === 'commercial' ? `**COMMERCIAL / COMPARISON ARTICLE:**
 - **The "Pain"**: Lead with the key insight or recommendation, Describe the specific frustration the user feels right now.
 - **The "Agitation"**: "It’s not just annoying; it’s costing you time/money."
 - **The "Solution"**: Introduce the fix immediately. "That's why we built [Product]..."
-- Can include brief emotional context if relevant to the problem
+- **The "Differentiator"**: Be fair and objective. "The main difference between X and Y is [key factor]."
 - Example: "After testing 7 AI video tools, [Product] offers the best balance of quality and privacy. Here's what I found..."` : ''}
 
-${articleType === 'comparison' ? `**COMPARISON ARTICLE:**
-- Lead with the key differentiator
-- Be fair and objective in tone
-- Example: "The main difference between X and Y is [key factor]. Here's a detailed breakdown..."` : ''}
 
-
-${articleType === 'how-to' ? `**HOW-TO/TUTORIAL ARTICLE:**
+${articleType === 'howto' ? `**HOW-TO/TUTORIAL ARTICLE:**
 - **The "End State"**: Describe the completed result first. "By the end of this, you’ll have a fully functional..."
 - **The "Warning"**: "Most people mess up step 3. Pay attention there."
 - **The "Prerequisites"**: List them fast.` : ''}
@@ -1055,18 +1040,18 @@ You are an expert Blog Writer who knows the autneticity rules for modern ai sear
 
 ${globalMap}
 
-### 1. THE CODE OF AUTHENTICITY (NON-NEGOTIABLE)
+### 7. THE CODE OF AUTHENTICITY (NON-NEGOTIABLE)
 **We write for HUMANS, not just algorithms. If you sound like a robot or violate these formatting constraints, the article will fail.**
 "${AUTHENTIC_WRITING_RULES}"
 
-### 2. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
+### 8. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
 "${styleDNA}"
 
-### 3. STRATEGY & MINDSET
+### 9. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google and get cited by ai LLMs by being more specific, helpful, and "human" than the competition to answer the user's question.
 - **Method:** High information density, low word count. Every sentence must earn its place.
 
-### 4. THE "ANTI-FLUFF" PROTOCOL (COMPETITOR TRANSFORMATION)
+### 10. THE "ANTI-FLUFF" PROTOCOL (COMPETITOR TRANSFORMATION)
 **How to handle data and citations to maximize OUR authority without risking plagiarism:**
 
 1. **NEVER CITE COMPETITORS:**
@@ -1086,13 +1071,11 @@ ${globalMap}
    - Whenever possible, prioritize insights derived from our own tool/platform over external reports.
    - Use phrases like "Our platform handles this by..." or "We built [Brand Name] to solve this specific issue..."
 
-
-
-### 5. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
+### 11. ARTICLE STRATEGY - supporting data (${articleType.toUpperCase()})
 ${introStrategy}
 ${brandContextSection}
 
-### 6. THE "VISUAL RHYTHM" MANDATE (SCANNABILITY)
+### 12. THE "VISUAL RHYTHM" MANDATE (SCANNABILITY)
 *The formatting is as important as the text.*
 
 1.  **THE TABLE RULE:** If you equate/compare >2 items (features, pros/cons, prices), you **MUST** use a Markdown Table.
@@ -1370,7 +1353,7 @@ export const generateBlogPost = task({
         console.log(`🔗 [DEBUG] No external authority links available for outline`)
       }
 
-      const outlinePrompt = generateOutlineSystemPrompt(keyword, styleDNA, cleanedCompetitorData, articleType, brandDetails, title, internalLinks)
+      const outlinePrompt = generateOutlineSystemPrompt(keyword, styleDNA, cleanedCompetitorData, articleType, brandDetails, title, internalLinks, supportingKeywords)
       const outlineConfig = {}
       const outlineContents = [
         {
@@ -1513,7 +1496,7 @@ CRITICAL EXECUTION RULES:
         // THE BRIDGE: Only pass last 2000 chars to prevent "Echo Chamber" repetition
         const userPrompt = generateWritingUserPrompt(currentDraft.slice(-2000), section)
 
-        // Using Gemini 2.0 Flash for Speed & Context
+        // Using Gemini 2.5 Flash for Speed & Context
         const writeConfig = {}
         const writeContents = [
           {

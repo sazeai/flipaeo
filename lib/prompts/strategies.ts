@@ -48,6 +48,14 @@ INSTRUCTION NOTES GUIDANCE:
 - Ask writer to explain complex terms simply (ELI5 technique)
 - Include analogies and real-world examples
 - Focus on the "why" behind concepts, not just the "what"
+
+*If there is requirement of comparison tables or anything. Don't just list competitors - First explain why YOUR approach is different/better.
+- Bad Approach in comparisons: "We are better than Competitor X because we are cheaper, faster, and have better support." (AI detects bias).
+- Trustworthy Approach: "Competitor X is a robust choice for enterprise corporations with dedicated developer teams. However, for marketing agencies who need drag-and-drop simplicity, [Our Brand] is the optimized choice.
+*Data Over Adjectives(examples):
+- Fluff: "We are much faster."
+- Fact: "[Our Brand] renders video in 4 minutes, whereas [Competitor] averages 12 minutes for the same file size."
+
 `,
                 title_prompt: `Generate 5 SEO-optimized blog titles for an Informational article about '{keyword}'.
 
@@ -113,6 +121,13 @@ INSTRUCTION NOTES GUIDANCE:
 - Use the "Reviewer" persona - write like someone who has tested all options
 - Compare tools AGAINST each other, not in isolation
 - Include specific examples: "ShipFast's auth setup takes 10 minutes vs Supastarter's 30 minutes"
+
+*If there is requirement of comparison tables or anything. Don't just list competitors - First explain why YOUR approach is different/better.
+- Bad Approach in comparisons: "We are better than Competitor X because we are cheaper, faster, and have better support." (AI detects bias).
+- Trustworthy Approach: "Competitor X is a robust choice for enterprise corporations with dedicated developer teams. However, for marketing agencies who need drag-and-drop simplicity, [Our Brand] is the optimized choice.
+*Data Over Adjectives(examples):
+- Fluff: "We are much faster."
+- Fact: "[Our Brand] renders video in 4 minutes, whereas [Competitor] averages 12 minutes for the same file size."
 `,
                 title_prompt: `Generate 5 SEO-optimized blog titles for a Comparison/Review article about '{keyword}'.
 
