@@ -1,5 +1,5 @@
 import Sitemapper from 'sitemapper'
-import { generateEmbedding } from "@/lib/internal-linking"
+import { generateEmbedding } from "@/lib/gemini-embedding"
 
 /**
  * Fetches all URLs from a website's sitemap

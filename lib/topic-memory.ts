@@ -1,6 +1,7 @@
 
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
+import { generateEmbedding } from "@/lib/gemini-embedding"
 
 // Type for admin Supabase client (inferred from createAdminClient)
 type AdminSupabaseClient = ReturnType<typeof createAdminClient>
@@ -14,13 +15,7 @@ export async function checkTopicDuplication(
 
     try {
         // 1. Generate embedding for the new topic
-        const result = await genAI.models.embedContent({
-            model: "gemini-embedding-001",
-            contents: [{ role: "user", parts: [{ text: topic }] }]
-        })
-
-        // Correct way to access embedding values in new SDK
-        const embedding = result.embeddings?.[0]?.values || []
+        const embedding = await generateEmbedding(topic)
 
         if (!embedding || embedding.length === 0) {
             console.warn("Topic duplication check failed: No embedding returned")
@@ -76,12 +71,7 @@ export async function saveTopicMemory(articleId: string, topic: string, adminCli
     const genAI = getGeminiClient()
 
     try {
-        const result = await genAI.models.embedContent({
-            model: "gemini-embedding-001",
-            contents: [{ role: "user", parts: [{ text: topic }] }]
-        })
-
-        const embedding = result.embeddings?.[0]?.values || []
+        const embedding = await generateEmbedding(topic)
 
         if (!embedding || embedding.length === 0) return
 

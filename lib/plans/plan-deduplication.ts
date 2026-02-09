@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
-import { generateEmbedding } from "@/lib/internal-linking"
+import { generateEmbedding } from "@/lib/gemini-embedding"
 
 /**
  * Semantic Deduplication "Bouncer" for Content Plans

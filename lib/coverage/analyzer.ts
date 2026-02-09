@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
-import { generateEmbedding } from "@/lib/internal-linking"
+import { generateEmbedding } from "@/lib/gemini-embedding"
 
 // Type for admin Supabase client
 type AdminSupabaseClient = ReturnType<typeof createAdminClient>

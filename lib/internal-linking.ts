@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
+import { generateEmbedding } from "@/lib/gemini-embedding"
 
 /**
  * Extracts a readable title from a URL slug.
@@ -35,30 +36,8 @@ export function extractTitleFromUrl(url: string): string {
     }
 }
 
-/**
- * Generates an embedding for a piece of text using Gemini.
- */
-export async function generateEmbedding(text: string): Promise<number[]> {
-    try {
-        const genAI = getGeminiClient()
-        // Using the GA SDK @google/genai structure
-        const result = await genAI.models.embedContent({
-            model: "gemini-embedding-001",
-            contents: [{ parts: [{ text }] }]
-        })
-
-        const embedding = (result as any).embeddings && (result as any).embeddings[0]
-
-        if (!embedding || !embedding.values) {
-            throw new Error("Failed to get embedding values from Gemini response")
-        }
-
-        return embedding.values
-    } catch (error) {
-        console.error("❌ Error generating embedding:", error)
-        throw error
-    }
-}
+// Re-export for backward compatibility
+export { generateEmbedding } from "@/lib/gemini-embedding"
 
 /**
  * Searches for the top N relevant internal links for a given focus.
