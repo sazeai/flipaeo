@@ -222,6 +222,11 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
         "availability": "https://schema.org/InStock"
       }
     ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "ratingCount": "3"
+    },
     "review": [
       {
         "@type": "Review",
