@@ -224,7 +224,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     ],
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "5",
+      "ratingValue": "4.8",
       "ratingCount": "3"
     },
     "review": [
@@ -240,7 +240,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
           "ratingValue": "5",
           "bestRating": "5"
         },
-        "reviewBody": "FlipAEO transformed our content strategy. We went from struggling to publish weekly to having 30 high-quality articles ready each month."
+        "reviewBody": "FlipAEO transformed my content strategy. the article quality is really satisfying, now i am using it on two of my saas, getting pretty results"
       },
       {
         "@type": "Review",
@@ -265,7 +265,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
         },
         "reviewRating": {
           "@type": "Rating",
-          "ratingValue": "5",
+          "ratingValue": "4.5",
           "bestRating": "5"
         },
         "reviewBody": "The competitor analysis and content gap identification is a game-changer. Worth every penny."
