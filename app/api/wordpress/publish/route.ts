@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
             .single()
 
         if (articleError || !article) {
+            console.error(`[WP Publish API] Article not found: ${articleId}`)
             return NextResponse.json({ error: "Article not found" }, { status: 404 })
         }
 
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
             .single()
 
         if (connectionError || !connection) {
+            console.error(`[WP Publish API] Connection not found: ${connectionId}`)
             return NextResponse.json({ error: "WordPress connection not found" }, { status: 404 })
         }
 
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest) {
                 appUrl
             )
         } catch (imgError) {
-            console.error('[WordPress Publish] Section images processing failed:', imgError)
+            console.error('[WP Publish API] Section images processing failed:', imgError)
             // Continue with original content - non-blocking
         }
 

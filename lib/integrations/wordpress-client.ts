@@ -49,10 +49,6 @@ function createAuthHeader(username: string, appPassword: string): string {
 export function prepareContentForWordPress(htmlContent: string): string {
     if (!htmlContent) return ''
 
-    // Log how many images are in the source content
-    const imgCount = (htmlContent.match(/<img/gi) || []).length
-    console.log('[WP Prepare] Input has', imgCount, 'images')
-
     // 1. Remove the first H1 tag (title is sent separately as post title)
     let content = htmlContent.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, '')
 
@@ -153,13 +149,7 @@ export function prepareContentForWordPress(htmlContent: string): string {
         return placeholder
     })
 
-    console.log('[WP Prepare] Extracted', imageBlocks.length, 'image blocks')
-    if (imageBlocks.length > 0) {
-        console.log('[WP Prepare] First image block:', imageBlocks[0].substring(0, 200))
-    }
-
     // 4. Now convert other HTML elements to Gutenberg blocks
-
     // Convert headings
     content = content.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
         '<!-- wp:heading {"level":2} -->\n<h2$1>$2</h2>\n<!-- /wp:heading -->\n\n')
@@ -226,37 +216,51 @@ export function prepareContentForWordPress(htmlContent: string): string {
     const convertAllLists = (html: string): string => {
         let result = html
         let changed = true
+        let iterations = 0
+        const MAX_ITERATIONS = 100 // Safety break
 
-        // Keep processing until no more raw ul/ol tags remain
-        while (changed) {
+        // 1. Convert standard ul/ol tags to unique wp-tagged markers innermost-first
+        // This prevents the regex from re-matching the same list in an infinite loop
+        while (changed && iterations < MAX_ITERATIONS) {
             changed = false
+            iterations++
 
             // Find innermost ul (one that doesn't contain nested ul or ol)
             const ulMatch = result.match(/<ul([^>]*)>((?:(?!<ul|<ol|<\/ul>|<\/ol>)[\s\S])*?)<\/ul>/i)
             if (ulMatch) {
                 const fullMatch = ulMatch[0]
-                const attrs = ulMatch[1]
                 const innerContent = ulMatch[2]
                 const wrappedItems = wrapListItems(innerContent)
-                const replacement = `<!-- wp:list -->\n<ul class="wp-block-list">${wrappedItems}</ul>\n<!-- /wp:list -->`
+                // Use a marker tag that won't be re-matched by the raw ul/ol regex
+                const replacement = `<wp-ul-processed class="wp-block-list">${wrappedItems}</wp-ul-processed>`
                 result = result.replace(fullMatch, replacement)
                 changed = true
                 continue
             }
 
-            // Find innermost ol (one that doesn't contain nested ul or ol)
+            // Find innermost ol
             const olMatch = result.match(/<ol([^>]*)>((?:(?!<ul|<ol|<\/ul>|<\/ol>)[\s\S])*?)<\/ol>/i)
             if (olMatch) {
                 const fullMatch = olMatch[0]
-                const attrs = olMatch[1]
                 const innerContent = olMatch[2]
                 const wrappedItems = wrapListItems(innerContent)
-                const replacement = `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">${wrappedItems}</ol>\n<!-- /wp:list -->`
+                const replacement = `<wp-ol-processed class="wp-block-list">${wrappedItems}</wp-ol-processed>`
                 result = result.replace(fullMatch, replacement)
                 changed = true
                 continue
             }
         }
+
+        if (iterations >= MAX_ITERATIONS) {
+            console.warn('[WP Prepare] List conversion hit MAX_ITERATIONS safety break.')
+        }
+
+        // 2. Convert markers back to standard tags wrapped in WordPress comments
+        result = result.replace(/<wp-ul-processed([^>]*)>([\s\S]*?)<\/wp-ul-processed>/gi,
+            '<!-- wp:list -->\n<ul$1>$2</ul>\n<!-- /wp:list -->')
+
+        result = result.replace(/<wp-ol-processed([^>]*)>([\s\S]*?)<\/wp-ol-processed>/gi,
+            '<!-- wp:list {"ordered":true} -->\n<ol$1>$2</ol>\n<!-- /wp:list -->')
 
         return result
     }
@@ -357,7 +361,7 @@ export async function uploadMedia(
         // Fetch the image
         const imageResponse = await fetch(imageUrl)
         if (!imageResponse.ok) {
-            console.error('Failed to fetch image:', imageUrl)
+            console.error('[WP Client] Failed to fetch image:', imageUrl)
             return null
         }
 
@@ -367,7 +371,6 @@ export async function uploadMedia(
         // Upload to WordPress
         const baseUrl = siteUrl.replace(/\/+$/, '')
         const apiUrl = `${baseUrl}/wp-json/wp/v2/media`
-
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -380,7 +383,7 @@ export async function uploadMedia(
 
         if (!response.ok) {
             const errorText = await response.text()
-            console.error('Failed to upload media:', errorText)
+            console.error('[WP Client] Failed to upload media:', errorText)
             return null
         }
 
@@ -390,7 +393,7 @@ export async function uploadMedia(
             source_url: media.source_url,
         }
     } catch (error) {
-        console.error('Error uploading media:', error)
+        console.error('[WP Client] Error uploading media:', error)
         return null
     }
 }
@@ -489,6 +492,7 @@ export async function createPost(
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}))
+            console.error('[WP Client] Failed to create post:', JSON.stringify(errorData))
             return {
                 success: false,
                 error: errorData.message || `Failed to create post: ${response.status}`
@@ -506,6 +510,7 @@ export async function createPost(
             }
         }
     } catch (error: any) {
+        console.error('[WP Client] Error creating post:', error)
         return {
             success: false,
             error: error.message || 'Failed to create post'
@@ -536,6 +541,8 @@ export async function publishToWordPress(
         const mediaResult = await uploadMedia(credentials, article.featuredImageUrl, filename)
         if (mediaResult) {
             featuredMediaId = mediaResult.id
+        } else {
+            console.warn(`[WP Client] Featured image upload failed or returned null.`, new Date().toISOString())
         }
     }
 
@@ -584,21 +591,14 @@ export async function uploadContentImagesToWordPress(
             fetchableUrl = `${appUrl}/${originalUrl}`
         }
 
+
         try {
             // Generate filename from URL
             const urlParts = originalUrl.split('/')
             const filename = `section-${urlParts[urlParts.length - 1] || Date.now() + '.webp'}`
 
-            console.log('[WP Image Upload] Processing:', {
-                originalUrl,
-                fetchableUrl,
-                filename
-            })
-
             // Upload to WordPress media library
             const mediaResult = await uploadMedia(credentials, fetchableUrl, filename)
-
-            console.log('[WP Image Upload] Result:', mediaResult ? 'Success' : 'Failed')
 
             if (mediaResult) {
                 // Replace R2 URL with WordPress media URL in content
@@ -608,7 +608,7 @@ export async function uploadContentImagesToWordPress(
                 )
             }
         } catch (error) {
-            console.error('[WP Image Upload] Error:', error)
+            console.error('[WP Client] Error processing section image:', error)
             // Continue with other images - non-blocking
         }
     }

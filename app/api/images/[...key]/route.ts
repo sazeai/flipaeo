@@ -33,6 +33,7 @@ export async function GET(
         const { body, contentType, contentLength, lastModified } = await getR2ObjectStream(key);
 
         if (!body) {
+            console.warn(`[Image Proxy API] Image not found in R2: ${key}`)
             return NextResponse.json({ error: "Image not found" }, { status: 404 });
         }
 
