@@ -871,15 +871,24 @@
 
 /* Blockquotes */
 .blog-content blockquote {
-  @apply border-l-2 border-primary/30 bg-muted/30 pl-6 pr-4 py-4 mb-6 italic text-gray-800 rounded-r-lg;
+  @apply relative py-6 pl-14 pr-4 mb-10 text-left border-none bg-transparent;
+}
+
+.blog-content blockquote::before {
+  content: "";
+  @apply absolute top-0 left-0 w-10 h-10 opacity-30 pointer-events-none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231c1917' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-quote'%3E%3Cpath d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'%3E%3C/path%3E%3Cpath d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .blog-content blockquote p {
-  @apply mb-0 text-lg;
+  font-family: var(--font-space-grotesk), sans-serif;
+  @apply text-xl md:text-2xl italic text-stone-800 leading-relaxed mb-0 relative z-10;
 }
 
 .blog-content blockquote cite {
-  @apply block mt-2 text-sm text-gray-600 not-italic font-medium;
+  @apply block mt-4 text-sm font-sans font-medium text-stone-500 uppercase tracking-widest not-italic pl-0;
 }
 
 /* Code */
@@ -939,15 +948,24 @@
 }
 
 .blog-content .wp-block-quote {
-  @apply border-l-2 border-primary/30 bg-muted/30 pl-6 pr-4 py-4 mb-6 rounded-r-lg;
+  @apply relative py-6 pl-14 pr-4 mb-10 text-left border-none bg-transparent;
+}
+
+.blog-content .wp-block-quote::before {
+  content: "";
+  @apply absolute top-0 left-0 w-10 h-10 opacity-30 pointer-events-none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231c1917' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-quote'%3E%3Cpath d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'%3E%3C/path%3E%3Cpath d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .blog-content .wp-block-quote p {
-  @apply text-lg italic text-foreground mb-0;
+  font-family: var(--font-space-grotesk), sans-serif;
+  @apply text-xl md:text-2xl italic text-stone-800 leading-relaxed mb-0 relative z-10;
 }
 
 .blog-content .wp-block-quote cite {
-  @apply block mt-2 text-sm text-muted-foreground not-italic font-medium;
+  @apply block mt-4 text-sm font-sans font-medium text-stone-500 uppercase tracking-widest not-italic pl-0;
 }
 
 /* Embedded content */
@@ -1019,6 +1037,11 @@
   @apply w-full h-auto object-cover rounded-lg;
 }
 
+/* WordPress heading */
+.blog-content .wp-block-heading {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
 /* WordPress columns */
 .blog-content .wp-block-columns {
   @apply grid grid-cols-1 md:grid-cols-2 gap-6 mb-6;
@@ -1055,6 +1078,8 @@
 .blog-content .wp-block-preformatted {
   @apply bg-gray-100 p-4 rounded-lg mb-6 font-mono text-sm whitespace-pre-wrap overflow-x-auto;
 }
+
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
