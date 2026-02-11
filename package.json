@@ -139,9 +139,7 @@
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
   },
-  "overrides": {
-    "jsdom": "22.1.0"
-  },
+  
   "name": "dodo-starter",
   "private": true,
   "scripts": {
