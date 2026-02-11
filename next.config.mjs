@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["jsdom", "isomorphic-dompurify"],
+
   typescript: {
     ignoreBuildErrors: true,
   },
