@@ -6,7 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "blog.flipseo.com" },
+      { protocol: "https", hostname: "blog.flipaeo.com" },
       { protocol: "http", hostname: "localhost" },
       { protocol: "https", hostname: "fal.ai" },
       { protocol: "https", hostname: "fal.media" },
