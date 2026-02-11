@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ["jsdom", "isomorphic-dompurify"],
+  transpilePackages: ['isomorphic-dompurify', 'html-encoding-sniffer', '@exodus/bytes'],
+  
+  serverExternalPackages: ["jsdom"],
 
   typescript: {
     ignoreBuildErrors: true,
