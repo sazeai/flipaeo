@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio'
-import DOMPurify from 'isomorphic-dompurify'
+// import DOMPurify from 'isomorphic-dompurify'
 
 // Define types for extracted data
 export interface TOCEntry {
@@ -35,7 +35,9 @@ export function parseContent(rawContent: string): ParsedContent {
         }
 
         // 1. Sanitize the raw content first with stricter settings
-        const sanitizedContent = DOMPurify.sanitize(rawContent, {
+        // DOMPurify removed due to server-side ESM crash with jsdom
+        const sanitizedContent = rawContent; 
+        /* DOMPurify.sanitize(rawContent, {
             ALLOWED_TAGS: [
                 'p', 'br', 'strong', 'em', 'u', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'img', 'figure', 'figcaption',
@@ -46,7 +48,7 @@ export function parseContent(rawContent: string): ParsedContent {
                 'allow', 'allowfullscreen', 'frameborder', 'scrolling', 'loading'
             ],
             KEEP_CONTENT: true,
-        })
+        }) */
 
         if (!sanitizedContent) {
             console.warn('parseContent: Sanitization resulted in empty content')
@@ -60,7 +62,7 @@ export function parseContent(rawContent: string): ParsedContent {
         // 2. Load into Cheerio for extraction with proper settings
         const $ = cheerio.load(sanitizedContent, {
             decodeEntities: false, // Preserve HTML entities
-            selfClosingTags: ['img', 'br', 'hr', 'input', 'meta', 'link']
+            // selfClosingTags: ['img', 'br', 'hr', 'input', 'meta', 'link']
         })
 
         const tocEntries: TOCEntry[] = []

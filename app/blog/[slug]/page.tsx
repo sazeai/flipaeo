@@ -248,7 +248,7 @@ function BlogPostContent({ post }: { post: WordPressPost }) {
         )}
 
         {/* Article Content */}
-        <div className="max-w-4xl mx-auto px-4 w-full pb-24 pt-6">
+        <div className="max-w-4xl mx-auto px-4 w-full pb-24">
           <div className="md:p-8 ">
             <BlogContentRenderer content={post.content} />
 

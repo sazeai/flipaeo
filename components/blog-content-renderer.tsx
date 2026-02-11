@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import DOMPurify from 'isomorphic-dompurify'
 import { BlogCTABanner } from './blog-cta-banner'
 
 interface BlogContentRendererProps {
@@ -13,23 +12,19 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
   const contentRef = useRef<HTMLDivElement>(null)
   const [isClient, setIsClient] = useState(false)
 
-  // Sanitize content to prevent XSS
-  const sanctifiedContent = DOMPurify.sanitize(content, {
-    ADD_TAGS: ['iframe'], // Allow iframes for embeds
-    ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target']
-  })
 
   // Split content for CTA injection
   const splitIndex = 22 // Inject after 22nd paragraph
-  const paragraphs = sanctifiedContent.split('</p>')
+  const paragraphs = content.split('</p>')
   const hasEnoughContent = paragraphs.length > splitIndex + 1
 
   const contentBefore = hasEnoughContent
     ? paragraphs.slice(0, splitIndex).join('</p>') + '</p>'
-    : sanctifiedContent
+    : content
   const contentAfter = hasEnoughContent
     ? paragraphs.slice(splitIndex).join('</p>')
     : null
+
 
   useEffect(() => {
     setIsClient(true)
@@ -45,11 +40,11 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
         const wrapper = document.createElement('div')
         wrapper.className = 'relative w-full mb-6 rounded-lg overflow-hidden'
         wrapper.style.aspectRatio = '16/9'
-
+        
         iframe.className = 'absolute inset-0 w-full h-full'
         iframe.setAttribute('loading', 'lazy')
         iframe.setAttribute('allowfullscreen', 'true')
-
+        
         iframe.parentNode?.insertBefore(wrapper, iframe)
         wrapper.appendChild(iframe)
       })
@@ -62,10 +57,10 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
         const wrapper = document.createElement('div')
         wrapper.className = 'relative w-full mb-6 rounded-lg overflow-hidden'
         wrapper.style.aspectRatio = '16/9'
-
+        
         iframe.className = 'absolute inset-0 w-full h-full'
         iframe.setAttribute('loading', 'lazy')
-
+        
         iframe.parentNode?.insertBefore(wrapper, iframe)
         wrapper.appendChild(iframe)
       })
@@ -76,7 +71,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
       const galleries = contentRef.current?.querySelectorAll('.wp-block-gallery')
       galleries?.forEach((gallery) => {
         gallery.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6'
-
+        
         const images = gallery.querySelectorAll('img')
         images.forEach((img) => {
           img.className = 'w-full h-auto object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200'
@@ -91,7 +86,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
       columns?.forEach((column) => {
         column.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'
       })
-
+      
       const columnItems = contentRef.current?.querySelectorAll('.wp-block-column')
       columnItems?.forEach((item) => {
         item.className = 'space-y-4'
@@ -105,7 +100,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
         if (!img.hasAttribute('loading')) {
           img.setAttribute('loading', 'lazy')
         }
-
+        
         // Add click handler for image lightbox (optional)
         img.style.cursor = 'pointer'
         img.addEventListener('click', () => {
@@ -121,10 +116,10 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
       tables?.forEach((table) => {
         const wrapper = document.createElement('div')
         wrapper.className = 'overflow-x-auto mb-6'
-
+        
         table.parentNode?.insertBefore(wrapper, table)
         wrapper.appendChild(table)
-
+        
         table.className = 'w-full border-collapse border border-gray-300 rounded-lg overflow-hidden'
       })
     }
@@ -134,7 +129,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
       const preBlocks = contentRef.current?.querySelectorAll('pre')
       preBlocks?.forEach((pre) => {
         pre.className = 'bg-gray-900 text-gray-100 p-4 rounded-lg mb-6 overflow-x-auto'
-
+        
         const code = pre.querySelector('code')
         if (code) {
           code.className = 'bg-transparent text-gray-100 p-0 font-mono text-sm'
@@ -159,7 +154,7 @@ export default function BlogContentRenderer({ content, className = '' }: BlogCon
     processTables()
     processCodeBlocks()
     processButtons()
-
+ 
   }, [content, isClient])
 
   return (
