@@ -3,8 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { generateStrategicPlan } from "@/lib/plans/strategic-planner"
 import { deduplicateWithReplacementLoop } from "@/lib/plans/plan-deduplication"
-import { generatePillarRecommendations } from "@/lib/plans/pillar-generator"
-import { tavily } from "@tavily/core"
+import { runAuditTask } from "@/trigger/run-audit"
 import Sitemapper from "sitemapper"
 import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
 
@@ -210,67 +209,8 @@ async function syncSitemapToInternalLinks(
     return { titles: allTitles, syncedCount }
 }
 
-/**
- * Quick competitor discovery using Tavily search.
- * Searches for "[category] tools" to find real competitor brands.
- */
-async function discoverCompetitors(
-    brandData: BrandDetails
-): Promise<Array<{ name: string; url?: string }>> {
-    const apiKey = process.env.TAVILY_API_KEY
-    if (!apiKey) {
-        console.warn("[Generate Plan] No Tavily API key, skipping competitor discovery")
-        return []
-    }
-
-    try {
-        const tvly = tavily({ apiKey })
-        const category = brandData.product_identity.literally || brandData.category
-        const searchQuery = category
-
-        console.log(`[Generate Plan] Discovering competitors for: "${searchQuery}"`)
-
-        const response = await tvly.search(searchQuery, {
-            maxResults: 10,
-            searchDepth: "basic"
-        })
-
-        // Extract unique domains as competitors
-        const competitors: Array<{ name: string; url: string }> = []
-        const seenDomains = new Set<string>()
-
-        for (const result of response.results || []) {
-            try {
-                const url = new URL(result.url)
-                const domain = url.hostname.replace('www.', '')
-
-                // Skip if already seen or is the brand itself
-                if (seenDomains.has(domain)) continue
-                if (brandData.product_name.toLowerCase().includes(domain.split('.')[0])) continue
-
-                seenDomains.add(domain)
-
-                // Extract brand name from title or domain
-                const brandName = result.title?.split(' - ')[0]?.split(' | ')[0]?.trim() ||
-                    domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1)
-
-                competitors.push({
-                    name: brandName,
-                    url: url.origin
-                })
-            } catch {
-                // Invalid URL, skip
-            }
-        }
-
-        console.log(`[Generate Plan] Found ${competitors.length} competitors`)
-        return competitors.slice(0, 8) // Max 8 competitors
-
-    } catch (error) {
-        console.error("[Generate Plan] Competitor discovery failed:", error)
-        return []
-    }
-}
+// discoverCompetitors() removed — the audit task handles competitor discovery +
+// deep content scanning, producing real gap data instead of just brand names.
 
 /**
  * Background task for generating content plan using Trigger.dev.
@@ -282,7 +222,7 @@ async function discoverCompetitors(
  */
 export const generatePlanTask = task({
     id: "generate-content-plan",
-    maxDuration: 600, // 10 minutes max
+    maxDuration: 900, // 15 minutes max (includes audit + plan generation)
     retry: {
         maxAttempts: 2,
         minTimeoutInMs: 5000,
@@ -336,58 +276,106 @@ export const generatePlanTask = task({
             ]))
             console.log(`[Generate Plan Task] Total existing content for deduplication: ${allExistingContent.length}`)
 
-            // === PHASE 0.5: PILLAR PAGE GENERATION (One-time) ===
-            // Check if brand already has pillar recommendations - if not, generate them
-            const { data: brandRecord } = await (supabase as any)
-                .from("brand_details")
-                .select("pillar_recommendations, discovered_competitors")
-                .eq("id", brandId)
-                .single()
-
-            if (!brandRecord?.pillar_recommendations || brandRecord.pillar_recommendations.length === 0) {
-                console.log(`[Generate Plan Task] Generating pillar page recommendations...`)
-                try {
-                    const pillarRecommendations = await generatePillarRecommendations(brandData)
-
-                    // Save to brand_details (persists across plan regenerations)
-                    await (supabase as any)
-                        .from("brand_details")
-                        .update({ pillar_recommendations: pillarRecommendations })
-                        .eq("id", brandId)
-
-                    console.log(`[Generate Plan Task] Saved ${pillarRecommendations.length} pillar recommendations to brand`)
-                } catch (pillarError) {
-                    console.warn(`[Generate Plan Task] Pillar generation failed (non-blocking):`, pillarError)
-                    // Non-blocking - continue with plan generation even if pillars fail
-                }
-            } else {
-                console.log(`[Generate Plan Task] Brand already has ${brandRecord.pillar_recommendations.length} pillar recommendations, skipping generation`)
-            }
-
-            // === PHASE 1: INTELLIGENCE (Competitor Discovery) ===
-            await updateStatus("generating", "intelligence")
-            console.log(`[Generate Plan Task] Phase 1: Intelligence gathering...`)
+            // === PHASE 1: FRESH TOPICAL AUDIT ===
+            // Run a fresh audit every time — this produces real gap data,
+            // competitor analysis, and pillar suggestions that drive the plan.
+            await updateStatus("generating", "audit")
+            console.log(`[Generate Plan Task] Phase 1: Running fresh topical authority audit...`)
 
             let competitorBrands = passedCompetitors || []
+            let auditGaps: any[] | undefined
+            let auditPillarSuggestions: any[] | undefined
 
-            // Check for cached competitors in brand_details (already fetched above)
-            if (competitorBrands.length === 0 && brandRecord?.discovered_competitors?.length > 0) {
-                competitorBrands = brandRecord.discovered_competitors
-                console.log(`[Generate Plan Task] Using ${competitorBrands.length} cached competitors`)
-            }
+            try {
+                // Ensure audit row exists (upsert — create if missing, reset if exists)
+                await (supabase as any)
+                    .from("topical_audits")
+                    .upsert({
+                        user_id: userId,
+                        brand_id: brandId,
+                        generation_status: "running",
+                        generation_phase: "niche_mapping",
+                        generation_error: null,
+                        niche_blueprint: null,
+                        user_coverage: null,
+                        competitor_coverages: null,
+                        authority_score: null,
+                        pillar_scores: null,
+                        gap_matrix: null,
+                        pillar_suggestions: null,
+                        projected_score: null,
+                        competitors_scanned: 0,
+                        topics_analyzed: 0,
+                        user_pages_scanned: 0,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: "user_id,brand_id"
+                    })
 
-            // Discover competitors if not cached and not provided
-            if (competitorBrands.length === 0) {
-                competitorBrands = await discoverCompetitors(brandData)
+                // Run the audit and WAIT for it to complete
+                console.log(`[Generate Plan Task] Triggering audit task and waiting...`)
+                const auditResult = await runAuditTask.triggerAndWait({
+                    userId,
+                    brandId,
+                    brandData,
+                    brandUrl: brandUrl || ''
+                })
 
-                // Cache discovered competitors for future use (non-blocking)
-                if (brandId && competitorBrands.length > 0) {
-                    (supabase as any)
+                console.log(`[Generate Plan Task] Audit task completed. Fetching fresh data...`)
+
+                // Fetch the fresh audit data that was just saved
+                const { data: auditData } = await (supabase as any)
+                    .from("topical_audits")
+                    .select("gap_matrix, pillar_suggestions")
+                    .eq("user_id", userId)
+                    .eq("brand_id", brandId)
+                    .single()
+
+                if (auditData?.gap_matrix) {
+                    auditGaps = auditData.gap_matrix
+                        .filter((g: any) => !g.user_covered)
+                        .map((g: any) => ({
+                            topic: g.topic,
+                            importance: g.importance,
+                            pillar: g.pillar,
+                            competitors_covering: g.competitors_covering || []
+                        }))
+                    console.log(`[Generate Plan Task] Fresh audit: ${auditGaps!.length} gaps to address`)
+                }
+
+                if (auditData?.pillar_suggestions) {
+                    auditPillarSuggestions = auditData.pillar_suggestions
+                    console.log(`[Generate Plan Task] Fresh audit: ${auditPillarSuggestions!.length} pillar suggestions`)
+                }
+
+                // Get competitors from audit (saved to brand_details by audit task)
+                const { data: brandRecord } = await (supabase as any)
+                    .from("brand_details")
+                    .select("discovered_competitors")
+                    .eq("id", brandId)
+                    .single()
+
+                if (competitorBrands.length === 0 && brandRecord?.discovered_competitors?.length > 0) {
+                    competitorBrands = brandRecord.discovered_competitors
+                    console.log(`[Generate Plan Task] Using ${competitorBrands.length} competitors from audit`)
+                }
+            } catch (auditError: any) {
+                // Audit failed — continue without gap data (graceful degradation)
+                console.warn(`[Generate Plan Task] Audit failed (non-blocking):`, auditError.message || auditError)
+                console.log(`[Generate Plan Task] Continuing plan generation without audit gap data`)
+
+                // Still try to get any existing competitors from brand_details
+                try {
+                    const { data: brandRecord } = await (supabase as any)
                         .from("brand_details")
-                        .update({ discovered_competitors: competitorBrands })
+                        .select("discovered_competitors")
                         .eq("id", brandId)
-                        .then(() => console.log(`[Generate Plan Task] Cached ${competitorBrands.length} competitors to DB`))
-                        .catch((e: any) => console.warn(`[Generate Plan Task] Failed to cache competitors:`, e))
+                        .single()
+                    if (competitorBrands.length === 0 && brandRecord?.discovered_competitors?.length > 0) {
+                        competitorBrands = brandRecord.discovered_competitors
+                    }
+                } catch (e) {
+                    // Truly no data — plan will use LLM knowledge only
                 }
             }
 
@@ -401,7 +389,9 @@ export const generatePlanTask = task({
                 brandData,
                 brandUrl,
                 competitorBrands,
-                existingContent: allExistingContent
+                existingContent: allExistingContent,
+                auditGaps,
+                auditPillarSuggestions
             })
 
             console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)

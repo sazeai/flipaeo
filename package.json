@@ -71,7 +71,7 @@
     "@tiptap/pm": "^3.19.0",
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",
-    "@trigger.dev/sdk": "^4.3.3",
+    "@trigger.dev/sdk": "4.3.3",
     "@types/cheerio": "^0.22.35",
     "@types/mark.js": "^8.11.12",
     "@upstash/qstash": "^2.8.3",
@@ -127,7 +127,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
-    "@trigger.dev/build": "^4.3.3",
+    "@trigger.dev/build": "4.3.3",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -139,7 +139,6 @@
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
   },
-  
   "name": "dodo-starter",
   "private": true,
   "scripts": {

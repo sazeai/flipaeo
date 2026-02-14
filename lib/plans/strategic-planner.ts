@@ -14,6 +14,8 @@ export interface StrategicPlanParams {
     brandUrl?: string
     competitorBrands: Array<{ name: string; url?: string }>
     existingContent?: string[]
+    auditGaps?: Array<{ topic: string; importance: string; pillar: string; competitors_covering: string[] }>
+    auditPillarSuggestions?: Array<{ suggested_title: string; key_sections: string[] }>
 }
 
 export interface StrategicPlanResult {
@@ -29,7 +31,9 @@ export async function generateStrategicPlan({
     brandData,
     brandUrl,
     competitorBrands = [],
-    existingContent = []
+    existingContent = [],
+    auditGaps,
+    auditPillarSuggestions
 }: StrategicPlanParams): Promise<StrategicPlanResult> {
     const client = getGeminiClient()
     const today = new Date()
@@ -52,6 +56,23 @@ ${existingContent.slice(0, 20).map(c => `- ${c}`).join('\n')}
 Create EXPANSION content, not duplicate coverage.`
         : ``
 
+    // Format audit gaps section (if audit was performed)
+    const auditGapsSection = auditGaps && auditGaps.length > 0
+        ? `## CRITICAL: Authority Gap Analysis Results
+A topical authority audit has identified these SPECIFIC content gaps that competitors cover but this brand does NOT.
+PRIORITIZE creating articles that address these gaps, especially the CRITICAL ones:
+
+${auditGaps.slice(0, 20).map(g => `- [${g.importance.toUpperCase()}] ${g.topic} (Pillar: ${g.pillar})${g.competitors_covering.length > 0 ? ` — ${g.competitors_covering.length} competitors cover this` : ''}`).join('\n')}
+
+At least 60% of the 30 articles MUST directly address one of these gaps. The remaining articles can be supporting or conversion content.`
+        : ``
+
+    const pillarSuggestionsSection = auditPillarSuggestions && auditPillarSuggestions.length > 0
+        ? `## Recommended Pillar Page Topics
+The audit recommends these pillar pages. Create supporting articles that naturally link back to these pillar topics:
+${auditPillarSuggestions.map(p => `- ${p.suggested_title} (Sections: ${p.key_sections.join(', ')})`).join('\n')}`
+        : ``
+
     const megaPrompt = `
 ## Context
 You are analyzing a brand: ${brandData.product_name}
@@ -68,6 +89,10 @@ Current Date: ${currentDate}
 
 here are the competitor brands:
 ${competitorSection}
+
+${auditGapsSection}
+
+${pillarSuggestionsSection}
 
 here is the existing content which is already been published by the brand:
 ${existingContentSection}

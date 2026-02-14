@@ -1,16 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { X, Plus } from "lucide-react"
+import { X, Globe, Tag } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export interface PillInputProps {
     value: string[]
     onChange: (value: string[]) => void
     placeholder?: string
     className?: string
+    variant?: "default" | "url" | "keyword"
 }
 
-export function PillInput({ value = [], onChange, placeholder, className }: PillInputProps) {
+export function PillInput({ value = [], onChange, placeholder, className, variant = "default" }: PillInputProps) {
     const [inputValue, setInputValue] = React.useState("")
     const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -29,7 +31,10 @@ export function PillInput({ value = [], onChange, placeholder, className }: Pill
     const addPill = () => {
         const trimmed = inputValue.trim()
         if (trimmed) {
-            onChange([...value, trimmed])
+            // Check for duplicates
+            if (!value.includes(trimmed)) {
+                onChange([...value, trimmed])
+            }
             setInputValue("")
         }
     }
@@ -45,24 +50,36 @@ export function PillInput({ value = [], onChange, placeholder, className }: Pill
         inputRef.current?.focus()
     }
 
+    const renderIcon = () => {
+        if (variant === "url") return <Globe className="w-3 h-3 text-stone-500 shrink-0" />
+        if (variant === "keyword") return <Tag className="w-3 h-3 text-stone-500 shrink-0" />
+        return null
+    }
+
     return (
         <div
-            className={`flex flex-wrap gap-2 min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:border-ring ${className}`}
+            className={cn(
+                "flex flex-wrap items-center gap-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm transition-all",
+                "focus-within:ring-1 focus-within:ring-stone-200 focus-within:border-stone-200",
+                "min-h-[42px]",
+                className
+            )}
             onClick={handleContainerClick}
         >
             {value.map((item, index) => (
                 <div
                     key={index}
-                    className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full text-xs font-medium animate-in fade-in zoom-in-95 duration-200"
+                    className="group flex items-center gap-1.5 bg-stone-100 text-stone-700 pl-2 pr-1 py-0.5 rounded text-xs font-medium border border-transparent hover:border-stone-200 transition-all select-none"
                 >
-                    <span>{item}</span>
+                    {renderIcon()}
+                    <span className="max-w-[200px] truncate">{item}</span>
                     <button
                         type="button"
                         onClick={(e) => {
                             e.stopPropagation()
                             removePill(index)
                         }}
-                        className="text-secondary-foreground/50 hover:text-secondary-foreground focus:outline-none ml-1"
+                        className="text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded p-0.5 focus:outline-none transition-colors ml-0.5"
                     >
                         <X className="h-3 w-3" />
                         <span className="sr-only">Remove {item}</span>
@@ -77,7 +94,7 @@ export function PillInput({ value = [], onChange, placeholder, className }: Pill
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={addPill} // Add on blur as well
-                className="flex-1 bg-transparent border-none outline-none min-w-[120px] placeholder:text-muted-foreground text-sm h-7"
+                className="flex-1 bg-transparent border-none outline-none min-w-[120px] placeholder:text-stone-400 text-stone-900 text-sm h-6 py-0 focus:ring-0"
                 placeholder={value.length === 0 ? placeholder : ""}
             />
         </div>

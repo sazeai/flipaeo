@@ -79,7 +79,8 @@ ${page.rawContent || page.markdown || page.content || ''}
       6. **Unique Value Proposition:** 3-5 distinct, permanent selling points.
       7. **Core Features (The "Fixes"):** List permanent product capabilities, not transient UI features.
       8. **Pricing:** High-level model (Subscription, One-time, Free tier).
-      9. **Style DNA (ROBUST LINGUISTIC GUIDE):** 
+      9. **Brand Keywords:** Generate 4-5 SHORT search keywords (2-4 words each) that represent what a user would type into Google to find this type of product. NOT the brand name, NOT full sentences — just the search terms. Example: for a photo restoration app, keywords might be: "ai photo restoration", "restore old photos", "fix damaged photos", "old photo animation", "family photo repair".
+      10. **Style DNA (ROBUST LINGUISTIC GUIDE):** 
          Create a SINGLE paragraph that defines the LINGUISTIC STYLE. 
          - **Perspective:** (e.g., Second-person addressing user, first-person plural for brand).
          - **Rhetorical Patterns:** (e.g., Do they lead with benefits? Use rhetorical questions? Use active/command verbs?).
@@ -145,12 +146,17 @@ ${page.rawContent || page.markdown || page.content || ''}
               type: "ARRAY",
               items: { type: "STRING" }
             },
+            brand_keywords: {
+              type: "ARRAY",
+              items: { type: "STRING" },
+              description: "4-5 short search keywords (2-4 words each) users would type to find this product type"
+            },
             style_dna: {
               type: "STRING",
               description: "Complete writing voice and style guide as a single paragraph covering perspective, tone, sentence style, formality, patterns, and words to avoid"
             }
           },
-          required: ["product_name", "product_identity", "mission", "audience", "enemy", "category", "uvp", "core_features", "pricing", "how_it_works", "style_dna"]
+          required: ["product_name", "product_identity", "mission", "audience", "enemy", "category", "uvp", "core_features", "pricing", "how_it_works", "brand_keywords", "style_dna"]
         }
       }
     })

@@ -4,7 +4,11 @@ import { createClient } from "@/utils/supabase/server"
 import { getUserBrandLimit, getBrandCount } from "@/lib/brands"
 import { BrandDetails } from "@/lib/schemas/brand"
 
-export async function saveBrandAction(url: string, brandData: BrandDetails) {
+export async function saveBrandAction(
+  url: string,
+  brandData: BrandDetails,
+  competitors?: string[] // Optional competitor domains from onboarding
+) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -29,12 +33,22 @@ export async function saveBrandAction(url: string, brandData: BrandDetails) {
 
     if (existingBrand) {
       // Update existing brand with new URL and data
+      const updatePayload: Record<string, any> = {
+        brand_data: brandData,
+        website_url: url
+      }
+      // Save competitors if provided
+      if (competitors && competitors.length > 0) {
+        updatePayload.discovered_competitors = competitors
+          .filter(c => c.trim())
+          .map(domain => {
+            const clean = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]
+            return { name: clean, url: `https://${clean}` }
+          })
+      }
       const { error } = await supabase
         .from("brand_details")
-        .update({
-          brand_data: brandData,
-          website_url: url
-        })
+        .update(updatePayload)
         .eq("id", existingBrand.id)
         .eq("user_id", user.id)
 
@@ -67,13 +81,23 @@ export async function saveBrandAction(url: string, brandData: BrandDetails) {
   }
 
   // Insert new brand
+  const insertPayload: Record<string, any> = {
+    user_id: user.id,
+    website_url: url,
+    brand_data: brandData,
+  }
+  // Save competitors if provided
+  if (competitors && competitors.length > 0) {
+    insertPayload.discovered_competitors = competitors
+      .filter(c => c.trim())
+      .map(domain => {
+        const clean = domain.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0]
+        return { name: clean, url: `https://${clean}` }
+      })
+  }
   const { data, error } = await supabase
     .from("brand_details")
-    .insert({
-      user_id: user.id,
-      website_url: url,
-      brand_data: brandData,
-    })
+    .insert(insertPayload)
     .select()
     .single()
 

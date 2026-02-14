@@ -3,24 +3,28 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
-import { Loader2, ChevronUp, ArrowRight, Sparkles, Eye, Globe, Globe2 } from "lucide-react"
+import { Loader2, ChevronUp, ArrowRight, Sparkles, Eye, Globe, Globe2, Plus } from "lucide-react"
 import { saveBrandAction } from "@/actions/brand"
 import { canAccessOnboarding } from "@/actions/onboarding"
 import { BrandDetails } from "@/lib/schemas/brand"
+import { TopicalAuditResult } from "@/lib/audit/types"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PillInput } from "@/components/ui/pill-input"
+import { AuditConsole } from "@/components/audit/audit-console"
+import { AuditResults } from "@/components/audit/audit-results"
 
 const STORAGE_KEYS = {
     STEP: 'onboarding_step',
     BRAND_URL: 'onboarding_brand_url',
     BRAND_DATA: 'onboarding_brand_data',
     BRAND_ID: 'onboarding_brand_id',
+    AUDIT_RESULT: 'onboarding_audit_result',
 } as const
 
-type Step = "brand"
+type Step = "brand" | "audit" | "audit-results"
 
 export default function OnboardingPage() {
     const router = useRouter()
@@ -44,11 +48,13 @@ export default function OnboardingPage() {
     }, [router, searchParams])
 
     const [url, setUrl] = useState("")
+    const [competitors, setCompetitors] = useState<string[]>([])
     const [analyzing, setAnalyzing] = useState(false)
     const [brandData, setBrandData] = useState<BrandDetails | null>(null)
     const [savingBrand, setSavingBrand] = useState(false)
     const [brandId, setBrandId] = useState<string | null>(null)
-
+    const [auditResult, setAuditResult] = useState<TopicalAuditResult | null>(null)
+    const [isGeneratingPlan, setIsGeneratingPlan] = useState(false)
 
     const [error, setError] = useState("")
 
@@ -173,6 +179,7 @@ export default function OnboardingPage() {
             how_it_works: cleanArray(brandData.how_it_works),
             core_features: cleanArray(brandData.core_features),
             pricing: cleanArray(brandData.pricing),
+            brand_keywords: cleanArray(brandData.brand_keywords),
         }
 
         setSavingBrand(true)
@@ -180,7 +187,7 @@ export default function OnboardingPage() {
         try {
             // Save brand data (style_dna is already included in brandData)
             const fullUrl = `https://${url.trim()}`
-            const res = await saveBrandAction(fullUrl, cleanData)
+            const res = await saveBrandAction(fullUrl, cleanData, competitors.length > 0 ? competitors : undefined)
             if (!res.success) {
                 throw new Error('error' in res ? res.error : "Failed to save brand")
             }
@@ -190,15 +197,47 @@ export default function OnboardingPage() {
             const savedBrandId = res.brandId
             setBrandId(savedBrandId)
 
-            // Trigger background plan generation
-            // Sitemap sync happens inside the Trigger task, not here
+            // Instead of triggering plan immediately, go to audit step
+            setStep("audit")
+
+        } catch (e: any) {
+            setError(e.message || "Failed to save brand details")
+        } finally {
+            setSavingBrand(false)
+        }
+    }
+
+    // Audit completion handler
+    const handleAuditComplete = (result: TopicalAuditResult) => {
+        setAuditResult(result)
+        // Persist audit result for page refresh recovery
+        try {
+            localStorage.setItem(STORAGE_KEYS.AUDIT_RESULT, JSON.stringify(result))
+        } catch { /* too large for localStorage, skip */ }
+        setStep("audit-results")
+    }
+
+    const handleAuditError = (message: string) => {
+        setError(`Audit failed: ${message}. You can still generate a plan.`)
+        // On audit failure, allow skipping to plan generation
+        setStep("audit-results")
+    }
+
+    // Generate plan after viewing audit results
+    const handleGeneratePlan = async () => {
+        if (!brandId || !brandData) return
+        setIsGeneratingPlan(true)
+        setError("")
+
+        try {
+            const fullUrl = `https://${url.trim()}`
             const bgRes = await fetch("/api/content-plan/start-background", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    brandId: savedBrandId,
-                    brandData: cleanData,
-                    brandUrl: fullUrl // Pass URL for sitemap sync in Trigger task
+                    brandId,
+                    brandData,
+                    brandUrl: fullUrl
                 }),
             })
 
@@ -207,14 +246,12 @@ export default function OnboardingPage() {
                 throw new Error(bgError.error || "Failed to start plan generation")
             }
 
-            // Clear onboarding storage and redirect immediately
+            // Clear onboarding storage and redirect
             clearOnboardingStorage()
             router.push("/content-plan")
-
         } catch (e: any) {
-            setError(e.message || "Failed to save brand details")
-        } finally {
-            setSavingBrand(false)
+            setError(e.message || "Failed to start plan generation")
+            setIsGeneratingPlan(false)
         }
     }
 
@@ -259,10 +296,11 @@ export default function OnboardingPage() {
                         layout
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         className={`
-          relative p-1 overflow-hidden w-full max-w-xl transition-all duration-300
+          relative p-1 overflow-hidden w-full transition-all duration-300
           shadow-[0_0_0_1px_rgba(0,0,0,0.08),0px_1px_2px_rgba(0,0,0,0.04)]
           rounded-[20px]
           bg-stone-100
+          ${step === "audit-results" ? "max-w-[1400px] w-full px-4 sm:px-6" : "max-w-xl"}
         `}
                     >
                         {/* Top Notch */}
@@ -284,7 +322,7 @@ export default function OnboardingPage() {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 20 }}
-                                        className="p-6"
+                                        className="px-4 py-6 sm:px-6"
                                     >
                                         {!brandData ? (
                                             // URL Input Form
@@ -342,6 +380,26 @@ export default function OnboardingPage() {
                                                         </motion.div>
                                                         {analyzing ? "Analyzing..." : "Analyze"}
                                                     </Button>
+                                                </div>
+
+                                                {/* Optional Competitor Input */}
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <label className="text-xs font-medium text-stone-500">
+                                                            Know your competitors? <span className="text-stone-400">(optional — improves audit accuracy)</span>
+                                                        </label>
+                                                    </div>
+                                                    <PillInput
+                                                        value={competitors}
+                                                        onChange={setCompetitors}
+                                                        placeholder="e.g. competitor.com (press Enter to add)"
+                                                        variant="url"
+                                                    />
+                                                    {competitors.length === 0 && (
+                                                        <p className="text-[10px] text-stone-400">
+                                                            We&apos;ll auto-discover competitors if you skip this
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (
@@ -412,6 +470,16 @@ export default function OnboardingPage() {
                                                             placeholder="e.g., Privacy-First Web Analytics, AI Photo Restoration"
                                                         />
                                                         <p className={`text-[10px] text-stone-400 mt-1`}>How would you describe your product category?</p>
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <label className={`block text-xs font-medium mb-1 text-stone-600`}>Brand Keywords</label>
+                                                        <PillInput
+                                                            value={brandData.brand_keywords || []}
+                                                            onChange={arr => setBrandData(prev => prev ? ({ ...prev, brand_keywords: arr }) : null)}
+                                                            className="min-h-[60px]"
+                                                            placeholder="Type keyword and press Enter"
+                                                        />
+                                                        <p className={`text-[10px] text-stone-400 mt-1`}>Search terms users would type to find your product (e.g. "ai photo restoration", "restore old photos")</p>
                                                     </div>
                                                 </div>
 
@@ -536,6 +604,59 @@ export default function OnboardingPage() {
                                     </motion.div>
                                 )}
 
+                                {step === "audit" && brandData && brandId && (
+                                    <motion.div
+                                        key="audit-step"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        className="p-6"
+                                    >
+                                        <AuditConsole
+                                            brandData={brandData}
+                                            brandId={brandId}
+                                            brandUrl={`https://${url.trim()}`}
+                                            onComplete={handleAuditComplete}
+                                            onError={handleAuditError}
+                                        />
+                                    </motion.div>
+                                )}
+
+                                {step === "audit-results" && (
+                                    <motion.div
+                                        key="audit-results-step"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        className="p-6"
+                                    >
+                                        {auditResult ? (
+                                            <AuditResults
+                                                auditResult={auditResult}
+                                                brandName={brandData?.product_name || "Your Site"}
+                                                onGeneratePlan={handleGeneratePlan}
+                                                isGeneratingPlan={isGeneratingPlan}
+                                            />
+                                        ) : (
+                                            <div className="text-center py-8 space-y-4">
+                                                <p className="text-stone-500 text-sm">
+                                                    Audit data not available. You can still generate a content plan.
+                                                </p>
+                                                <Button
+                                                    onClick={handleGeneratePlan}
+                                                    disabled={isGeneratingPlan}
+                                                    className="bg-stone-900 text-white hover:bg-stone-800"
+                                                >
+                                                    {isGeneratingPlan ? (
+                                                        <><Loader2 className="w-4 h-4 animate-spin mr-2" />Generating...</>
+                                                    ) : (
+                                                        <>Generate Content Plan <ArrowRight className="w-4 h-4 ml-2" /></>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
 
                             </AnimatePresence>
                         </div>

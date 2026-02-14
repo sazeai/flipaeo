@@ -18,6 +18,7 @@ export const BrandDetailsSchema = z.object({
   core_features: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   pricing: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   how_it_works: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
+  brand_keywords: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),  // Search keywords for competitor discovery
   image_style: z.string().optional().default("stock"),
   style_dna: z.union([
     z.string(),

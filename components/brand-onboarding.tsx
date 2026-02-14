@@ -165,6 +165,7 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                             how_it_works: [],
                             image_style: "stock",
                             style_dna: "",
+                            brand_keywords: [], // Added to fix type error
                         })}
                     >
                         Or enter details manually
@@ -329,6 +330,7 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                             onChange={arr => setBrandData(prev => prev ? ({ ...prev, core_features: arr }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
                             placeholder="Type feature and press Enter"
+                            variant="keyword"
                         />
                         <p className="text-[10px] text-stone-400 mt-1 text-right">Press Enter to add feature</p>
                     </div>
@@ -343,6 +345,7 @@ export default function BrandOnboarding({ onComplete, onCancel, initialData, ini
                             onChange={arr => setBrandData(prev => prev ? ({ ...prev, pricing: arr }) : null)}
                             className="bg-stone-50 border-stone-200 min-h-[80px]"
                             placeholder="Type plan and press Enter"
+                            variant="keyword"
                         />
                         <p className="text-[10px] text-stone-400 mt-1 text-right">One line e.g. "Pro Plan: $29/mo"</p>
                     </div>
