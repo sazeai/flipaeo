@@ -101,6 +101,14 @@ export default function OnboardingPage() {
             setBrandId(savedBrandId)
         }
 
+        // Restore step from URL or fallback to saved step, or default to brand
+        const savedStep = localStorage.getItem(STORAGE_KEYS.STEP) as Step
+        if (urlStep) {
+            setStep(urlStep as Step)
+        } else if (savedStep) {
+            setStep(savedStep)
+        }
+
         setIsHydrated(true)
     }, [searchParams])
 
@@ -254,6 +262,29 @@ export default function OnboardingPage() {
             setIsGeneratingPlan(false)
         }
     }
+
+    // New Effect: Fetch audit result if on results page but missing data (e.g. refresh)
+    useEffect(() => {
+        if (!isHydrated || !brandId || step !== 'audit-results' || auditResult) return
+
+        const fetchAudit = async () => {
+            try {
+                const res = await fetch(`/api/topical-audit?brandId=${brandId}`)
+                if (!res.ok) return
+                const data = await res.json()
+
+                if (data.status === 'completed' && data.audit) {
+                    setAuditResult(data.audit)
+                } else if (data.status === 'running') {
+                    // If still running, go back to console
+                    setStep('audit')
+                }
+            } catch (e) {
+                console.error("Failed to recover audit:", e)
+            }
+        }
+        fetchAudit()
+    }, [brandId, step, auditResult, isHydrated])
 
     // NOTE: Plan generation is now fully handled in Trigger.dev
 

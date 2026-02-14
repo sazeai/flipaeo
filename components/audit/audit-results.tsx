@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import {
     Shield,
@@ -157,9 +157,7 @@ export function AuditResults({
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" size="sm" className="gap-2 text-stone-600">
-                        <Share2 className="w-4 h-4" /> Share
-                    </Button>
+
                     <Button
                         onClick={onGeneratePlan}
                         disabled={isGeneratingPlan}
@@ -334,9 +332,8 @@ export function AuditResults({
                                 const isExpanded = expandedPillar === pillar.pillar
 
                                 return (
-                                    <>
+                                    <React.Fragment key={pillar.pillar}>
                                         <tr
-                                            key={pillar.pillar}
                                             className={cn("hover:bg-stone-50 transition-colors cursor-pointer", isExpanded ? "bg-stone-50/80" : "")}
                                             onClick={() => setExpandedPillar(isExpanded ? null : pillar.pillar)}
                                         >
@@ -404,7 +401,7 @@ export function AuditResults({
                                                 </tr>
                                             )}
                                         </AnimatePresence>
-                                    </>
+                                    </React.Fragment>
                                 )
                             })}
                         </tbody>
@@ -423,7 +420,7 @@ export function AuditResults({
                     {isGeneratingPlan ? (
                         <><span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Working...</>
                     ) : (
-                        <>Start My 30-Day Recovery Plan <ArrowRight className="w-5 h-5" /></>
+                        <>Start My First Recovery Plan <ArrowRight className="w-5 h-5" /></>
                     )}
                 </Button>
             </div>

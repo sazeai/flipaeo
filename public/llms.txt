@@ -43,9 +43,9 @@ FlipAEO transforms how businesses approach content marketing in the age of AI se
 - Priority support
 - 14-day money-back guarantee
 
-## How GEO Works
+## How AEO Works
 
-Generative Engine Optimization (GEO) is the practice of creating content that AI search engines will cite and recommend when users ask questions. Unlike traditional SEO that focuses on keyword rankings, GEO focuses on:
+Generative Engine Optimization (AEO) is the practice of creating content that AI search engines will cite and recommend when users ask questions. Unlike traditional SEO that focuses on keyword rankings, AEO focuses on:
 
 1. **Authority Building**: Creating content that establishes expertise
 2. **Information Gain**: Providing unique insights not found elsewhere

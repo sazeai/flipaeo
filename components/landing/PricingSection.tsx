@@ -64,7 +64,7 @@ const PricingSection: React.FC = () => {
 
                         <div className="flex items-baseline justify-center gap-3 mb-2">
                             <span className="text-xl text-stone-400 line-through decoration-brand-300/50 decoration-2">
-                                $99
+                                $149
                             </span>
                             <span className="text-6xl md:text-7xl font-serif text-stone-900 tracking-tighter">
                                 $79
