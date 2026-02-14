@@ -51,20 +51,7 @@ const PricingSection: React.FC = () => {
                     {/* Left Side: Pricing & CTA */}
                     <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">
 
-                        {/* Handwritten Note */}
-                        <div className="absolute top-8 right-4 md:-right-6 md:top-20 z-10 pointer-events-none transform rotate-12 md:rotate-0">
-                            <div className="relative">
-                                <span className="font-hand text-xl text-stone-400 whitespace-nowrap">Save $360/year</span>
-                                <svg className="absolute -bottom-6 -left-4 w-12 h-12 text-stone-300 transform rotate-12 hidden md:block" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                                    <path d="M80,10 Q40,60 10,80" strokeWidth="2" markerEnd="url(#arrow-price)" />
-                                    <defs>
-                                        <marker id="arrow-price" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-                                            <path d="M0,0 L10,5 L0,10" fill="none" stroke="currentColor" strokeWidth="2" />
-                                        </marker>
-                                    </defs>
-                                </svg>
-                            </div>
-                        </div>
+
 
                         <div className="mb-6 mt-4">
                             <span className="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
@@ -77,10 +64,10 @@ const PricingSection: React.FC = () => {
 
                         <div className="flex items-baseline justify-center gap-3 mb-2">
                             <span className="text-xl text-stone-400 line-through decoration-brand-300/50 decoration-2">
-                                $79
+                                $99
                             </span>
                             <span className="text-6xl md:text-7xl font-serif text-stone-900 tracking-tighter">
-                                $49
+                                $79
                             </span>
                         </div>
                         <p className="text-stone-500 text-sm mb-10">per month</p>
@@ -90,7 +77,7 @@ const PricingSection: React.FC = () => {
                         <div className="flex justify-center">
                             <Link href="/login">
                                 <Button variant="primary" className="w-full px-10 py-4 text-lg">
-                                    Win The AEO Race
+                                    Win AI Search Race
                                 </Button>
                             </Link>
                         </div>

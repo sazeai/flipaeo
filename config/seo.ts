@@ -119,8 +119,8 @@ export const organizationSchema: OrganizationSchema = {
 export const pageSEO = {
   home: {
     title: 'FlipAEO - Strategic Content Engine for AI Search Domination',
-    description: 'Generate authority-building articles that AI search engines cite and recommend. 30 AI-researched articles/month with automated content strategy, CMS integration, and smart internal linking.',
-    keywords: ['GEO', 'generative engine optimization', 'AI search optimization', 'AI content engine', 'content strategy', 'authority content'],
+    description: 'Generate authority-building articles that AI search engines cite and recommend. 30 AI-researched articles/month with automated content strategy.',
+    keywords: ['AEO', 'GEO', 'generative engine optimization', 'Answer Engine Optimization', 'AI search optimization', 'AI content engine', 'content strategy', 'AI SEO blog writer'],
   },
   login: {
     title: 'Sign In - FlipAEO',
@@ -134,9 +134,9 @@ export const pageSEO = {
     robots: 'noindex, nofollow',
   },
   pricing: {
-    title: 'Pricing - FlipAEO | $49/month for 30 AI Articles',
+    title: 'Pricing - FlipAEO | $79/Month for dominating Google and AI search engines',
     description: 'Simple, transparent pricing for FlipAEO. One plan with everything you need: 30 AI-generated articles/month, automated content strategy, CMS integration, and priority support. 14-day money-back guarantee.',
-    keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost', 'article generation pricing'],
+    keywords: ['FlipAEO pricing', 'AI seo content generation pricing', 'AI Search visibility pricing', 'content engine cost', 'article generation pricing'],
   },
   about: {
     title: 'About FlipAEO - Our Mission to Democratize AI Visibility',
@@ -144,9 +144,9 @@ export const pageSEO = {
     keywords: ['about FlipAEO', 'AI content company', 'GEO company', 'content strategy team'],
   },
   blog: {
-    title: 'Blog - FlipAEO | GEO & AI Content Strategy Insights',
+    title: 'Blog - FlipAEO | AEO/GEO & AI Content Strategy Insights',
     description: 'Expert insights on Generative Engine Optimization (GEO), AI search visibility, content strategy, and how to get cited by AI search engines like ChatGPT and Perplexity.',
-    keywords: ['GEO blog', 'AI SEO tips', 'content strategy blog', 'AI visibility insights', 'generative engine optimization guide'],
+    keywords: ['AEO guides', 'GEO guides', 'AI SEO tips', 'content strategy blog', 'AI visibility insights', 'generative engine optimization guide'],
   },
   privacyPolicy: {
     title: 'Privacy Policy - FlipAEO',
