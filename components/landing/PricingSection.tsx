@@ -41,12 +41,7 @@ const PricingSection: React.FC = () => {
                 {/* The Inner Pricing Card */}
                 <div className="relative w-full bg-[#fffaf5] border border-brand-100/50 rounded-[17px] overflow-hidden flex flex-col md:flex-row">
 
-                    {/* Launch Offer Badge (Floating) */}
-                    <div className="absolute top-0 right-0 md:right-auto md:left-0 z-20">
-                        <div className="bg-brand-500 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-bl-[17px] md:rounded-br-[17px] md:rounded-bl-none">
-                            Launch Offer
-                        </div>
-                    </div>
+
 
                     {/* Left Side: Pricing & CTA */}
                     <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">

@@ -180,11 +180,9 @@ export default async function SubscribePage() {
                         <div className="flex flex-col items-center mb-8">
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="text-base text-stone-400 line-through">
-                                    $79/mo
+                                    $149/mo
                                 </span>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-gradient-to-r from-brand-500 to-amber-500 px-2 py-0.5 rounded-full">
-                                    Launch Price
-                                </span>
+
                             </div>
                             <div className="flex items-baseline gap-1">
                                 <span className="text-5xl font-bold tracking-tighter text-stone-900">
