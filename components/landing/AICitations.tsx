@@ -10,6 +10,7 @@ const PROOF_POINTS = [
         tag: "Traffic",
         description: "We started from zero. In 90-100 days, we reached 1.3k+ consistent monthly clicks without spending a dollar on ads.",
         image: "/case-study/proof-1.webp",
+        alt: "Google Search Console performance graph showing 1,300% growth in organic clicks for BringBack.pro over 90 days",
         span: "md:col-span-2"
     },
     {
@@ -17,6 +18,7 @@ const PROOF_POINTS = [
         tag: "SERP Dominance",
         description: "We don't just write; we rank. FlipAEO content is outranking major competitors for high-volume, high-intent keywords.",
         image: "/case-study/proof-2.webp",
+        alt: "Google Rankings showing BringBack.pro claiming the #1 spot for high-intent keywords like 'combine photos', outranking major competitors",
         align: "object-top",
         span: "md:col-span-2"
     },
@@ -25,6 +27,7 @@ const PROOF_POINTS = [
         tag: "Analytics Proof",
         description: "The proof is in the data. See ChatGPT referral traffic driving real, high-intent users directly to our site.",
         image: "/case-study/proof-3.webp",
+        alt: "Google Analytics data proving significant referral traffic coming directly from ChatGPT to BringBack.pro",
         span: "md:col-span-2"
     },
     {
@@ -32,6 +35,7 @@ const PROOF_POINTS = [
         tag: "AI Consensus",
         description: "Not just ChatGPT. Google's own AI model, Gemini, puts BringBack in the Top recommendation when we asked a natural user query.",
         image: "/case-study/proof-4.webp",
+        alt: "Google Gemini AI response recommending BringBack.pro as the 'Best All-Around AI Tool' for photo restoration in response to a user query",
         align: "object-top",
         span: "md:col-span-3"
     },
@@ -40,6 +44,7 @@ const PROOF_POINTS = [
         tag: "AI Authority",
         description: "The ultimate proof of quality: ChatGPT mentions bringback ai in their answers to user.",
         image: "/case-study/proof-5.webp",
+        alt: "ChatGPT conversation citing BringBack.pro as a verified source in its answer to a user query about photo tools",
         align: "object-top",
         span: "md:col-span-3"
     }
@@ -93,7 +98,7 @@ export const AICitations: React.FC = () => {
                             <div className={`relative w-full aspect-[16/10] bg-stone-50 rounded-2xl overflow-hidden border border-stone-100`}>
                                 <Image
                                     src={item.image}
-                                    alt={item.title}
+                                    alt={item.alt || item.title}
                                     fill
                                     className={`object-contain p-2 ${item.align || "object-center"} transition-transform duration-700 group-hover:scale-[1.01]`}
                                 />
