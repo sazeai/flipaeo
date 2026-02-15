@@ -169,7 +169,7 @@ async function syncSitemapToInternalLinks(
             const title = extractTitleFromUrl(url)
 
             try {
-                const embedding = await generateEmbedding(title)
+                const embedding = await generateEmbedding(title, "SEMANTIC_SIMILARITY")
                 return {
                     user_id: userId,
                     brand_id: brandId,

@@ -54,7 +54,7 @@ export async function getRelevantInternalLinks(
 
         // Create a combined search string for context
         const searchString = `${articleTitle} ${articleKeyword}`
-        const embedding = await generateEmbedding(searchString)
+        const embedding = await generateEmbedding(searchString, "SEMANTIC_SIMILARITY")
 
         // Call the RPC function we defined in the migration
         const { data, error } = await supabase.rpc('match_internal_links', {
@@ -88,7 +88,7 @@ export async function checkSitemapDuplication(
 ): Promise<{ isDuplicate: boolean; similarUrl: string | null }> {
     try {
         const supabase = createAdminClient() as any
-        const embedding = await generateEmbedding(topic)
+        const embedding = await generateEmbedding(topic, "SEMANTIC_SIMILARITY")
 
         const { data, error } = await supabase.rpc('match_internal_links', {
             query_embedding: embedding,

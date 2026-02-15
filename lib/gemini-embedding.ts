@@ -4,7 +4,7 @@ import { getGeminiClient } from "@/utils/gemini/geminiClient"
  * Generates an embedding for a piece of text using Gemini.
  * Enforces 768 dimensions to match the Postgres vector(768) columns.
  */
-export async function generateEmbedding(text: string): Promise<number[]> {
+export async function generateEmbedding(text: string, taskType?: string): Promise<number[]> {
     try {
         const genAI = getGeminiClient()
         const result = await genAI.models.embedContent({
@@ -12,8 +12,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
             config: {
                 outputDimensionality: 768,
             },
-            contents: [{ parts: [{ text }] }]
-        })
+            contents: [{ parts: [{ text }] }],
+            taskType: taskType
+        } as any)
 
         const embedding = result.embeddings?.[0]?.values || []
 

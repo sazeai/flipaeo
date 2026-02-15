@@ -78,7 +78,7 @@ export async function deduplicateContentPlan(
 
         let embedding: number[]
         try {
-            embedding = await generateEmbedding(embeddingText)
+            embedding = await generateEmbedding(embeddingText, "SEMANTIC_SIMILARITY")
         } catch (error) {
             console.error(`[Deduplication] ${itemLabel} ❌ FAILED to get embedding:`, error)
             filteredPlan.push(item)
