@@ -64,7 +64,7 @@ export default function Hero() {
       <div className="relative group z-10">
         <Link href="/login">
           <Button variant="primary" className="text-brand-600">
-            Build My Growth Strategy
+            Audit My Authority Gaps
           </Button>
         </Link>
 
@@ -88,25 +88,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* "Human" Break Element */}
-      <div className="absolute bottom-0 right-4 lg:-right-2 translate-y-1/2 flex flex-col items-center md:rotate-6 pointer-events-none ">
-        <p className="font-hand text-base md:text-lg text-stone-500 mb-2 w-40 text-center leading-none">
-          See real examples of blogs written by our AI
-        </p>
-        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] text-stone-700 ml-8">
-          <path
-            d="M20,20 Q60,10 60,60"
-            strokeWidth="2"
-            fill="none"
-            markerEnd="url(#arrowhead)"
-          />
-          <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-              <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
-            </marker>
-          </defs>
-        </svg>
-      </div>
+
 
 
 

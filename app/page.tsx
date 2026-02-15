@@ -15,6 +15,7 @@ import { Footer } from '@/components/landing/Footer';
 import { GridBackground } from "@/components/landing/GridBackground"
 import BlogCarousel from '@/components/landing/BlogCarousel';
 import FounderNote from '@/components/landing/FounderNote';
+import { AICitations } from '@/components/landing/AICitations';
 
 
 export const metadata: Metadata = commonPageMetadata.home()
@@ -32,7 +33,7 @@ export default function Home() {
 
         {/* Hero Section */}
         <Hero />
-        <BlogCarousel />
+        <AICitations />
         <ProblemSection />
         <BenefitsSection />
         <HowItWorksSection />

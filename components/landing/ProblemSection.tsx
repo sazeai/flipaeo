@@ -23,11 +23,10 @@ const ProblemSection: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-16">
         <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-          One-click AI content is <br /><span className='italic text-stone-500'>killing your growth</span>
+          Why AI Engines are <br /><span className='italic text-stone-500'>Ghosting Your Brand</span>
         </h2>
         <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
-          You’re publishing more than ever, yet traffic stays flat. Modern search engines can tell the difference between real answers and mass-produced content.
-        </p>
+          You’re publishing more than ever, yet your brand is nowhere to be found in ChatGPT, Perplexity, or Gemini. You aren’t just losing rankings; you’re losing the trust of the engines that control the answers.        </p>
       </div>
 
       {/* Problem Grid */}
@@ -40,11 +39,10 @@ const ProblemSection: React.FC = () => {
           </div>
           <div>
             <h3 className="font-sans text-2xl font-medium text-stone-900 mb-4 tracking-tight">
-              AI Search Ignores you
+              Tracking your failure won't fix it
             </h3>
             <p className="font-sans text-stone-500 leading-relaxed">
-              You publish dozens of articles. AI search still doesn’t recognize your brand. When people ask real questions in your category, AI recommends competitors - not YOU.
-            </p>
+              Knowing you are invisible in a "Visibility Tracker" is like weighing yourself every hour while you're starving. A scorecard doesn't tell you how to be found,it just confirms you’re being ignored while your competitors take the traffic.            </p>
           </div>
         </div>
 
@@ -55,11 +53,10 @@ const ProblemSection: React.FC = () => {
           </div>
           <div>
             <h3 className="font-sans text-2xl font-medium text-stone-900 mb-4 tracking-tight">
-              You sound like a bot
+              Your Authority has "Holes."
             </h3>
             <p className="font-sans text-stone-500 leading-relaxed">
-              Modern AI Search engines & LLMs spot generic AI content in 3 seconds. It has no brand voice, no unique data, and no soul. It doesn't build authority; it just adds to the noise.
-            </p>
+              AI search engines ignore you because your topical coverage is incomplete. When a user asks a real question, the LLM spots a "semantic gap" in your content and recommends a competitor who sounds more like an expert. You’re a partial source in a world that only cites the "Guru".            </p>
           </div>
         </div>
 
@@ -70,11 +67,10 @@ const ProblemSection: React.FC = () => {
           </div>
           <div>
             <h3 className="font-sans text-2xl font-medium text-stone-900 mb-4 tracking-tight">
-              Impressions? Zero clicks
+              Generic content is just background noise.
             </h3>
             <p className="font-sans text-stone-500 leading-relaxed">
-              You rank for keywords that don’t move the business. Without real visibility data guiding the roadmap, you’re guessing while competitors own the answers.
-            </p>
+              One-click AI articles that read like Wikipedia summaries are killing your growth. They have no unique data, no brand voice, and no "soul". LLMs spot generic bot-filler in 3 seconds and skip you for content that actually provides a real answer.            </p>
           </div>
         </div>
 

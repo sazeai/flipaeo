@@ -1,103 +1,123 @@
+"use client"
+
 import React from 'react';
 import Image from 'next/image';
-import { BadgeCheck, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+
+const PROOF_POINTS = [
+    {
+        title: "1,300% Organic Growth",
+        tag: "Traffic",
+        description: "We started from zero. In 90-100 days, we reached 1.3k+ consistent monthly clicks without spending a dollar on ads.",
+        image: "/case-study/proof-1.webp",
+        span: "md:col-span-2"
+    },
+    {
+        title: "Ranking #1 on Google",
+        tag: "SERP Dominance",
+        description: "We don't just write; we rank. FlipAEO content is outranking major competitors for high-volume, high-intent keywords.",
+        image: "/case-study/proof-2.webp",
+        align: "object-top",
+        span: "md:col-span-2"
+    },
+    {
+        title: "Real AI Traffic",
+        tag: "Analytics Proof",
+        description: "The proof is in the data. See ChatGPT referral traffic driving real, high-intent users directly to our site.",
+        image: "/case-study/proof-3.webp",
+        span: "md:col-span-2"
+    },
+    {
+        title: "Cited by Gemini",
+        tag: "AI Consensus",
+        description: "Not just ChatGPT. Google's own AI model, Gemini, puts BringBack in the Top recommendation when we asked a natural user query.",
+        image: "/case-study/proof-4.webp",
+        align: "object-top",
+        span: "md:col-span-3"
+    },
+    {
+        title: "Cited by ChatGPT ",
+        tag: "AI Authority",
+        description: "The ultimate proof of quality: ChatGPT mentions bringback ai in their answers to user.",
+        image: "/case-study/proof-5.webp",
+        align: "object-top",
+        span: "md:col-span-3"
+    }
+];
 
 export const AICitations: React.FC = () => {
     return (
-        <section className="w-full py-24 px-4 flex flex-col items-center relative overflow-hidden">
+        <section className="w-full py-24 px-4 border-t border-stone-100 relative">
+            <div className="absolute top-0 right-[20%] lg:right-[35%] translate-y-1/2 flex flex-col items-center md:rotate-6 pointer-events-none ">
+                <p className="font-hand text-base md:text-lg text-stone-500 mb-2 w-40 text-center leading-none">
+                    Testimonials? But we have proofs!
+                </p>
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] text-stone-700 ml-8">
+                    <path
+                        d="M20,20 Q60,10 60,60"
+                        strokeWidth="2"
+                        fill="none"
+                        markerEnd="url(#arrowhead)"
+                    />
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            <div className="max-w-[1126px] mx-auto ">
+                {/* "Human" Break Element */}
 
-            {/* Header Content */}
-            <div className="max-w-4xl mx-auto text-center mb-16 relative z-10 flex flex-col items-center">
-                <div className="inline-block bg-brand-orange border-2 border-black shadow-neo-sm px-4 py-1 mb-8">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-black" />
-                        <span className="font-display font-black text-xs uppercase tracking-widest text-black">Unbelievable Results</span>
-                    </div>
+
+                {/* Header */}
+                <div className="text-center mb-16 max-w-3xl mx-auto items-center">
+                    <span className="font-sans text-xs font-bold tracking-widest text-stone-400 uppercase mb-4 block">
+                        Live Case Study
+                    </span>
+
+                    <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
+                        We Drink Our<br /><span className='italic text-stone-500'>Own Champagne</span>
+                    </h2>
+                    <p className="font-sans text-stone-500 text-lg leading-relaxed ">
+                        We didn’t just build a tool - we proved it. We used FlipAEO to <span className="text-stone-900 font-medium">scale</span> our own SaaS, <a href="https://bringback.pro" target="_blank" className="text-stone-900 font-medium underline decoration-stone-300 hover:decoration-stone-900 transition-all">BringBack.pro</a>, from zero to market leader. No ads, no backlinks - just pure, high-intent authority.
+                    </p>
+                </div>
+
+                {/* Grid - 3 Up / 2 Up */}
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-x-6 gap-y-10">
+                    {PROOF_POINTS.map((item, i) => (
+                        <div key={i} className={`flex flex-col gap-4 group ${item.span || "md:col-span-2"}`}>
+
+                            {/* Image Container */}
+                            <div className={`relative w-full aspect-[16/10] bg-stone-50 rounded-2xl overflow-hidden border border-stone-100`}>
+                                <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className={`object-contain p-2 ${item.align || "object-center"} transition-transform duration-700 group-hover:scale-[1.01]`}
+                                />
+                            </div>
+
+                            {/* Content */}
+                            <div className="space-y-2 px-1">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-serif text-xl text-stone-900 tracking-tight">
+                                        {item.title}
+                                    </h3>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full">
+                                        {item.tag}
+                                    </span>
+                                </div>
+                                <p className="text-stone-500 leading-relaxed text-sm">
+                                    {item.description}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
 
-                <h2 className="font-display text-4xl md:text-6xl leading-[1] mb-6 uppercase text-black">
-                    Testimonials? <span className="text-gray-400 line-through decoration-red-500 decoration-4">Not Yet.</span><br />
-                    But we have Proof.
-                </h2>
-
-                <p className="font-sans text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                    FlipAEO was built to make your brand citable in LLMs. We launched our own fresh domain and published one article written by our own engine to prove it. <span className="font-bold text-black">It did exactly what it says.</span> Hours later, ChatGPT and Gemini were citing us as a source of truth.
-                </p>
-            </div>
-
-            {/* Evidence Grid */}
-            <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
-
-                {/* Proof Item 1: ChatGPT */}
-                <a
-                    href="https://chatgpt.com/share/696d2fba-6c68-8002-9356-7c0ca378f51f"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col transition-opacity hover:opacity-90"
-                >
-                    <div className="bg-white border-2 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        <div className="flex items-center gap-2 mb-4 border-b-2 border-black/10 pb-3">
-                            <div className="w-3 h-3 rounded-full bg-red-500 border border-black" />
-                            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-black" />
-                            <div className="w-3 h-3 rounded-full bg-green-500 border border-black" />
-                            <span className="ml-2 font-mono text-xs text-gray-500">chatgpt-evidence.png</span>
-                            <div className="ml-auto px-2 py-0.5 bg-green-100 border border-green-500 text-green-700 text-[10px] font-bold uppercase rounded">Verified</div>
-                        </div>
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 border border-black/5">
-                            <Image
-                                src="/proof/chatgpt-citation.webp"
-                                alt="ChatGPT Citing FlipAEO"
-                                fill
-                                className="object-cover object-top"
-                            />
-                        </div>
-                    </div>
-                    <div className="mt-6 text-center lg:text-left pl-2">
-                        <h3 className="font-display text-2xl mb-2 flex items-center justify-center lg:justify-start gap-2">
-                            <BadgeCheck className="w-6 h-6 text-blue-500 fill-blue-100" />
-                            ChatGPT Citation
-                        </h3>
-                        <p className="font-mono text-sm text-gray-500">
-                            "Practical ways to own your brand's authority... backed by credible sources."
-                        </p>
-                    </div>
-                </a>
-
-                {/* Proof Item 2: Gemini */}
-                <a
-                    href="https://aistudio.google.com/app/prompts/1mVD6Sfl5qCDrN4C8o5oskcft4ylCOmsK"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col lg:mt-12 transition-opacity hover:opacity-90"
-                >
-                    <div className="bg-white border-2 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        <div className="flex items-center gap-2 mb-4 border-b-2 border-black/10 pb-3">
-                            <div className="w-3 h-3 rounded-full bg-red-500 border border-black" />
-                            <div className="w-3 h-3 rounded-full bg-yellow-500 border border-black" />
-                            <div className="w-3 h-3 rounded-full bg-green-500 border border-black" />
-                            <span className="ml-2 font-mono text-xs text-gray-500">gemini-evidence.png</span>
-                            <div className="ml-auto px-2 py-0.5 bg-blue-100 border border-blue-500 text-blue-700 text-[10px] font-bold uppercase rounded">Verified</div>
-                        </div>
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 border border-black/5">
-                            <Image
-                                src="/proof/gemini-citation.webp"
-                                alt="Gemini Citing FlipAEO"
-                                fill
-                                className="object-cover object-top"
-                            />
-                        </div>
-                    </div>
-                    <div className="mt-6 text-center lg:text-left pl-2">
-                        <h3 className="font-display text-2xl mb-2 flex items-center justify-center lg:justify-start gap-2">
-                            <BadgeCheck className="w-6 h-6 text-blue-500 fill-blue-100" />
-                            Gemini Citation
-                        </h3>
-                        <p className="font-mono text-sm text-gray-500">
-                            "Source of Truth: FlipAEO... mention recall and factual density are the new authority signals."
-                        </p>
-                    </div>
-                </a>
 
             </div>
         </section>
