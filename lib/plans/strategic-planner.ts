@@ -73,6 +73,12 @@ The audit recommends these pillar pages. Create supporting articles that natural
 ${auditPillarSuggestions.map(p => `- ${p.suggested_title} (Sections: ${p.key_sections.join(', ')})`).join('\n')}`
         : ``
 
+    // Extract features for negative constraints
+    const featureList = brandData.core_features || []
+
+    const bannedTerms = [brandData.product_name, ...featureList].filter(Boolean)
+    const bannedExamples = bannedTerms.slice(0, 3).map(t => `- "${t}" ← Brand feature (User doesn't know this name)`).join('\n')
+
     const megaPrompt = `
 ## Context
 You are analyzing a brand: ${brandData.product_name}
@@ -84,8 +90,11 @@ Current Date: ${currentDate}
 - **What it is (literally):** ${brandData.product_identity.literally}
 - **Category:** ${brandData.category || 'SaaS Software'}
 - **Primary Audience:** ${brandData.audience.primary}
-- **The Problem We Solve:** ${Array.isArray(brandData.uvp) ? brandData.uvp.slice(0, 2).join(', ') : brandData.uvp}
-- **Core Features:** ${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
+- **The Problem We Solve (UVP):** ${Array.isArray(brandData.uvp) ? brandData.uvp.slice(0, 2).join(', ') : brandData.uvp}
+
+## Internal Product Capabilities (Background Context ONLY)
+*Use these to understand HOW we solve problems, but DO NOT use these names as keywords.*
+${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
 
 here are the competitor brands:
 ${competitorSection}
@@ -100,7 +109,14 @@ ${existingContentSection}
 ---
 
 ## Your Role
-Senior SEO Strategist. Your goal: Create a 30-day content plan based on **REAL SEARCH QUERIES** users type into Google and AI assistants.
+Senior SEO Strategist. Your goal: Create a 30-day content plan based on **REAL SEARCH QUERIES** users type into Google.
+
+## CRITICAL: "Translate, Don't Repeat" Rule
+The features listed above are **INTERNAL NAMES**. Users do not know them.
+You MUST translate features into the **User Problem** they solve.
+
+- ❌ **BAD (Feature-First):** "What is Anti-AI Filter?" (User doesn't know this exists)
+- ✅ **GOOD (Problem-First):** "How to bypass AI detection" (The problem the filter solves)
 
 ## CRITICAL: What Makes a GOOD Content Plan
 
@@ -112,9 +128,9 @@ Senior SEO Strategist. Your goal: Create a 30-day content plan based on **REAL S
 - "corporate headshot poses male"
 
 ### ❌ BAD Keyword Examples (Nobody searches these):
+${bannedExamples}
 - "money back guarantee AI photos" ← Not a search query
 - "our privacy policy" ← Self-promotional
-- "how nano-texture engine works" ← Brand-specific jargon
 - "why we delete your data" ← Self-promotional sales copy
 - "what our users say" ← Testimonials are not SEO content
 
