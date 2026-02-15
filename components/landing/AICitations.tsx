@@ -14,7 +14,7 @@ const PROOF_POINTS = [
         span: "md:col-span-2"
     },
     {
-        title: "Ranking #1 on Google",
+        title: "Ranking on Google page #1",
         tag: "SERP Dominance",
         description: "We don't just write; we rank. FlipAEO content is outranking major competitors for high-volume, high-intent keywords.",
         image: "/case-study/proof-2.webp",
