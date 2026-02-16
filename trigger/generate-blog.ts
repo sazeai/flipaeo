@@ -359,76 +359,233 @@ const getIntroTemplate = (articleType: ArticleType): string => {
   return INTRO_TEMPLATES[articleType] || INTRO_TEMPLATES.informational
 }
 
-// --- IN-CONTENT IMAGE TEMPLATES (Short Tags OK - NO Checklists) ---
-const IMAGE_TEMPLATES: Record<string, string> = {
-  concept: `Clean editorial illustration on a white background. Flat vector style.
+// --- IN-CONTENT IMAGE PROMPT FIREWALL & LOGIC ---
 
-At the top center, bold heading text in handwritten style: "[SHORT_HEADING]"
+const IMAGE_PROMPT_FIREWALL = `
+### GOAL
+Create clean in-article infographic images with minimal text and no hallucinated or broken typography using a text-to-image model with weak layout control.
 
-Main visual: A large [MAIN_VISUAL_ELEMENT] in the center.
-Around it, 3 smaller visual elements connected with thin lines.
+---
 
-Small handwritten tags (1-2 words each, max 3 tags total):
-- Tag near element 1: "[1-2 WORD TAG]"
-- Tag near element 2: "[1-2 WORD TAG]"
-That’s it. No other  text to be added.
-NO checklists. NO bullet point lists. NO long text descriptions.
-Flat vector. Minimal palette. Professional blog illustration. 
-Only print the exact text instructed. Do not add or repeat any text.`,
+## HARD CONSTRAINTS (NON-NEGOTIABLE)
 
-  how_to: `Clean flat illustration on a white background showing [SCENE_DESCRIPTION].
+### 1. TEXT LIMITS
+* Maximum **6 total text elements** in the entire image
+* Each text element max **2 lines**
+* No paragraphs
+* No repeated labels anywhere in the image
 
-Top left bold heading text in handwritten style: "[SHORT_HEADING]"
+---
 
-Visual flow with numbered circles (1, 2, 3) connected by arrows.
-Each number has a simple icon inside - NO text descriptions for steps.
+### 2. TITLE HANDLING
+* Every image must either
+  a) have **only a title**
+  OR
+  b) have **a title and an explicitly defined subtitle**
+* Never leave space under a title without instruction
+* If no subtitle is desired, explicitly state
+  “No subtitle text appears below the title”
 
-Optional: 1-2 small handwritten tags pointing to key elements.
+---
 
-NO checklist panels. NO bullet point lists with text.
-Flat UI style. Clean minimal design.
-Only print the exact text instructed. Do not add or repeat any text.`,
+### 3. FORBIDDEN STRUCTURES
+The prompt MUST NOT include or imply:
+* Tables
+* Grids
+* Columns
+* Rows
+* Pipelines
+* Architectures
+* Layers
+* Stages
+* Frameworks
+* Dashboards
+* Step-by-step processes
+* Vertical stacked systems
+* Circular layouts with text
 
-  comparison: `Split screen illustration on a white background. Flat vector style. High contrast.
+---
 
-Top center heading text in handwritten style: "[SHORT_HEADING]"
+### 4. FORBIDDEN TEXT PATTERNS
+The prompt MUST NOT include:
+* Statistics
+* Percentages
+* Numeric metrics with meaning
+* Repeated concepts
+* Instructional verbs as labels
 
-Left side labeled "Before": [SCENE_DESCRIPTION_BAD_STATE]
-- Darker, muted color palette
-- Small handwritten tags (1-2 words): "[TAG1]", "[TAG2]"
+Examples to avoid:
+* Optimize
+* Evaluate
+* Improve
+* Measure
+* Rank
+* Retrieve
+* Generate
+* Authority
+* Accuracy
+* Completeness
 
-Right side labeled "After": [SCENE_DESCRIPTION_GOOD_STATE]  
-- Vibrant, bright color palette
-- Small handwritten tags (1-2 words): "[TAG1]", "[TAG2]"
+---
 
-Text labels under each side: "Before" "After" (handwritten style)
-Editorial blog illustration.
-Only print the exact text instructed. Do not add or repeat any text.`,
+### 5. SAFE TEXT TYPES ONLY
+Allowed text types:
+* Titles
+* Short labels
+* Captions
 
-  process: `Horizontal flow diagram on a white background.
+Labels must be **concrete nouns**, not abstract concepts
 
-Top heading text in handwritten style: "[SHORT_HEADING]"
+Good:
+* Business Category
+* Location
+* Photos
+* Reviews
+* Contact Info
 
-Flow from left to right with 3-4 connected stages:
-- Use icons or simple visuals for each stage
-- Arrows connecting each stage
-- Optional: 1-2 word tag under each stage icon
+Bad:
+* Accurate Details
+* Complete Profile
+* Listing Optimization
 
-NO long step descriptions. NO checklist text.
-Infographic style. Clean professional look. 
-Only print the exact text instructed. Do not add or repeat any text.`,
+---
 
-  insight: `Editorial style illustration on a white background.
+### 6. LAYOUT RULES
+* Maximum **one labeled focal object**
+* Any additional elements must be:
+  * Icons without text
+  * Decorative shapes
+* If multiple labels are needed:
+  * Use **horizontal cards** or **simple rows**
+  * Never radial or circular with text
+* Avoid vertical hierarchy beyond 2 levels
 
-Top heading text in handwritten style: "[SHORT_HEADING]"
+---
 
-Main visual: [SCENE_WITH_KEY_ELEMENT]
-- Highlight effect or spotlight on the key insight area
-- 2-3 small handwritten tags (1-2 words each) pointing to important elements
+### 7. NUMBER HANDLING
+* Numbers may only be used if they are:
+  * Decorative badges
+  * Step numbers with **no explanation**
+* Never use numbers with meaning or context
 
-NO overlay paragraphs. NO bullet point lists.
-Soft flat vector style. Muted professional colors.
-Only print the exact text instructed. Do not add or repeat any text.`
+---
+
+### 8. ICON USAGE
+* Every text label should be visually anchored to:
+  * An icon
+  * A card
+  * A shape
+* Icons stabilize text placement and reduce hallucination
+
+---
+
+### 9. CAPTION RULE
+* Captions must be:
+  * One line only
+  * Placed at the bottom
+* Captions must not explain data or metrics
+
+---
+
+### 10. WHAT THE IMAGE SHOULD DO
+* Reinforce the **idea**, not explain the section
+* Visualize outcomes, not instructions
+* Support the article, not replace it
+
+---
+
+## SAFE IMAGE PATTERNS (ALWAYS ALLOWED)
+* Title + central icon + unlabeled supporting icons
+* Horizontal cards with one label each
+* Side-by-side comparisons with one label per side
+* Abstract concept visuals with a single caption
+* Metric-free highlight visuals
+
+---
+
+## INTERNAL MENTAL MODEL FOR THE LLM
+Do NOT think:
+“I need to explain this section visually”
+
+Think:
+“I need to give the reader a visual anchor they’ll remember”
+
+---
+
+## FINAL INSTRUCTION TO THE PROMPT-WRITING LLM
+> When generating image prompts, prioritize visual clarity over completeness.
+> Avoid structure, hierarchy, repetition, and explanation.
+> Use minimal text, concrete nouns, and explicit layout constraints.
+> If unsure, remove text rather than add it.
+`
+
+const IMAGE_PROMPT_EXAMPLE_LIBRARY: Record<string, string[]> = {
+  // General Concepts & Infographics (Default)
+  concept: [
+    `"A clean modern infographic on a white background.
+Top center title text
+“Optimize Your Business Listing”
+No subtitle text appears below the title.
+Below the title, three cards arranged horizontally.
+Card 1 label
+“Business Category”
+Card 2 label
+“Location and Contact”
+Card 3 label
+“Photos and Details”
+Bottom caption
+“Complete listings drive visibility and trust”
+Minimal flat design.
+Plenty of white space."`,
+    `"A clean modern illustration on a white background. Top center title text “Why Local Listings Matter” In the center, a single business storefront icon with a checkmark badge. Around it, several small unlabeled directory icons without text. Bottom caption text “Consistent information builds trust and visibility” Flat SaaS illustration style. Soft blue and green accents. No text near the icons"`
+  ],
+
+  // Comparison Visuals
+  comparison: [
+    `"A side by side comparison infographic on a light background. Top center title “Traditional Search vs AI Search” Left side card with icon Title “Traditional Search” Subtext “Keyword Matching” Right side card with icon Title “AI Search” Subtext “Intent Understanding” No bullet points. No grid lines. Only two cards with clear separation"`
+  ],
+
+  // Step-by-Step or Process Flows
+  process: [
+    `"A clean modern infographic illustration on a white background. Central large title text “How AI Search Understands Intent” Below the title a simple left to right flow with three icons. Left icon label “User Query” Middle icon label “Semantic Understanding” Right icon label “Best Answer” Each label is short and clearly separated. No tables. No grids. No paragraphs. Minimal flat design. Soft accent colors. Plenty of white space"`
+  ],
+
+  // How-To Guides (Process + Concrete Objects)
+  how_to: [
+    `"A bright yellow Post-it note stuck to a silver MacBook monitor bezel.
+Handwritten text in blue ink
+“Don't forget!”
+Bulleted list below
+“- Call Sarah @ 3pm”
+“- Upload final assets”
+“- Buy cat food”
+Bottom right corner doodle
+(A small smiley face)"`,
+    `"A close-up, slightly angled photo of a white paper grocery receipt resting on a dark wooden table. The paper is slightly crinkled.
+Top Header (Centered)
+“FRESH MARKET”
+Sub-header
+“123 Main St, New York”
+Item List (Left aligned) with Prices (Right aligned)
+“Organic Bananas      $2.99”
+“Sourdough Bread      $5.50”
+“Almond Milk          $4.25”
+“Dark Chocolate       $3.99”
+Divider Line
+(Dashed line)
+Totals (Bold)
+“SUBTOTAL            $16.73”
+“TAX (8.8%)           $1.47”
+“TOTAL               $18.20”
+Bottom Footer
+“Thank you for shopping!”"`
+  ],
+
+  // Key Insights & Warnings
+  insight: [
+    `"A warning style infographic. Top icon Warning triangle Bold title text “Common SEO Mistake” Below small text “Optimizing for Keywords Only” Clean layout. No paragraphs."`,
+    `"A clean modern illustration on a white background. Top center title text “Why Local Listings Matter” In the center, a single business storefront icon with a checkmark badge. Around it, several small unlabeled directory icons without text. Bottom caption text “Consistent information builds trust and visibility” Flat SaaS illustration style. Soft blue and green accents. No text near the icons"`
+  ]
 }
 
 // Generate section image prompt with integrated text safety
@@ -437,58 +594,44 @@ const generateSectionImagePrompt = async (
   articleTitle: string,
   genAI: any
 ): Promise<string> => {
-  const imageType = section.image_type || 'concept'
-  const template = IMAGE_TEMPLATES[imageType] || IMAGE_TEMPLATES.concept
 
-  const prompt = `You are an AI Art Director creating an in-content blog image.
+  // Dynamic Example Injection to reduce token usage
+  const requestedType = section.image_type || 'concept'
+  // Fallback to 'concept' if the specific type isn't found in the library
+  const selectedExamples = IMAGE_PROMPT_EXAMPLE_LIBRARY[requestedType] || IMAGE_PROMPT_EXAMPLE_LIBRARY.concept
 
-You are goign to write a prompt abse don this content of the article:
-- My article Section Heading is: "${section.heading}"
-- My article Title is: "${articleTitle}"
+  // Format examples for the prompt
+  const examplesText = selectedExamples.map((ex, i) => `${i + 1}. ${ex}`).join("\n\n")
 
-IMAGE TYPE: ${imageType.toUpperCase()}
+  const prompt = `You are an AI Art Director creating an in-content blog image prompt.
 
-REFERENCE TEMPLATE(we have tested that ai works with this tpye of structured lienby line prompts whihc dont make it halucinate):
-${template}
+Your goal is to write a precise image generation prompt based on the provided section content, following strictly defined constraints.
 
-TEXT PROCESSING RULES (CRITICAL):
-1.  **HEADING HANDLING:** If the heading is long, YOU MUST summarize it into a 2-4 word visual concept.
-    - ❌ "${section.heading}" (Too long)
-    - ✅ [Short 3-5 word summary]
-2.  **PROBLEM WORDS:** The AI struggles with complex words like "Finances", "Directories", "Optimization".
-    - **DO NOT include these and these types of words.**
-    - **USE ICONS** instead (e.g., Dollar sign, Folder, Gear).
-3.  **TEXT RATIO:** 90% Illustration, 10% Text.
-    - If unsure, OMIT TEXT entirely.
-    - Simple labels like "Before", "After"
-    - Maximum 4-5 short tags total
+---
 
+${IMAGE_PROMPT_FIREWALL}
 
-4.  **VISUAL ABSTRACTION (MANDATORY):**
-    - **RULE:** If the subject involves text presentation (e.g., "Summaries", "Code Snippets", "Logs", "Documents"), YOU MUST visualize it as a "Stylized Data Representation".
-    - **HOW:** Use icons, flowing lines, glowing geometric blocks, or abstract grids.
-    - **NEVER:** Do not describe specific text content, paragraphs, or legible sentences. force a line in the end like "do not duplicate a text in the image, no extra text in the image which is not asked to add"
-    - **Example:** Instead of "A document showing summary text", use "A glowing document icon emitting abstract data lines but this to b deisnged based on image type above".
-Why we are doing this is because AI art generator we are using struggle to generate text and when it does it is not good so we are using icons and symbols instead. Make sure each text is clearly told to print at correct spot. dont give the ai mdoel a chanc eto hallucinate.
+---
 
-❌ BANNED - DO NOT USE:
-- Checklists with multiple items
-- Bullet point lists with text
-- Long headings.
-- Long text descriptions (3+ words per item)
-- Legible body text of any kind.
-- "Summary text", "Table of contents", "Snippets".
+### FEW-SHOT EXAMPLES (Strictly mimic this style):
+${examplesText}
 
-❌ BAD EXAMPLE:
-"Checklist text:
-- Calculate Break Costs
-- Save Enough Funds  
-- Start 1-3 Years"
+---
 
-YOUR TASK:
-Create a descriptive, visually rich, scene-based prompt with SHORT tags (1-2 words each). NO checklists. NO long bullet point lists.
+### CURRENT TASK:
+- **Article Title:** "${articleTitle}"
+- **Section Heading:** "${section.heading}"
+- **What is being wirtten in this section:** "${section.instruction_note || 'Visualize the core concept of this section.'}"
+- **Desired Style:** ${requestedType.toUpperCase().replace('_', ' ')}
 
-OUTPUT: Return ONLY the image prompt. No explanations.`
+**YOUR TASK:**
+Create a descriptive, visually rich, scene-based prompt that adheres 100% to the FIREWALL rules above.
+- If the concept is abstract, use a metaphor or icon-based visualization.
+- If the concept implies a process, use a simple linear flow or cards.
+- **CRITICAL:** Do NOT violate any "Forbidden Structures" or "Forbidden Text Patterns".
+
+OUTPUT: Return ONLY the image prompt string. No explanations.
+`
 
   const response = await genAI.models.generateContent({
     model: "gemini-2.5-flash-lite",
@@ -496,7 +639,7 @@ OUTPUT: Return ONLY the image prompt. No explanations.`
     config: { responseMimeType: "text/plain" }
   })
 
-  return response.text || `Clean flat illustration for a blog section about ${section.heading} `
+  return response.text || `Clean flat illustration for a blog section about ${section.heading}`
 }
 
 // --- PHASE 2 HELPER: "The Critic" Gap Analysis Prompt ---
