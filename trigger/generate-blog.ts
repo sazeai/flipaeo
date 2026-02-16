@@ -1649,7 +1649,9 @@ CRITICAL EXECUTION RULES:
 
         const systemPrompt = generateWritingSystemPrompt(styleDNA, outline, i, brandDetails, articleType)
         // THE BRIDGE: Pass last 500 chars for sentence-level flow (semantic context is now in system prompt)
-        const userPrompt = generateWritingUserPrompt(currentDraft.slice(-500), section)
+        // FIX: Clean context to prevent LLM from hallucinating placeholders
+        const cleanContext = currentDraft.slice(-500).replace(/<!--IMAGE_PLACEHOLDER_\d+-->/g, '')
+        const userPrompt = generateWritingUserPrompt(cleanContext, section)
 
         // Using Gemini 2.5 Flash for Speed & Context
         const writeConfig = {}
@@ -1675,14 +1677,17 @@ CRITICAL EXECUTION RULES:
         const headingHash = "#".repeat(section.level || 2)
         const headingPattern = new RegExp(`^\\s*#{1,4}\\s*${section.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i')
         const cleanedWriteText = writeText.replace(headingPattern, '').trim()
-        currentDraft += `${headingHash} ${section.heading} \n\n${cleanedWriteText} \n\n`
 
-        // --- COLLECT IMAGE REQUEST (if section marked for image) ---
-        // Instead of generating here (blocking), we collect and generate in parallel later
-        if (section.needs_image && section.image_type) {
+        // 1. Append Heading
+        currentDraft += `${headingHash} ${section.heading} \n\n`
+
+        // 2. Inject Image Placeholder IMMEDIATELY after heading
+        // FIX: Enforce STRICT limit of MAX 3 images
+        const MAX_IMAGES = 3
+        if (section.needs_image && section.image_type && imageSectionsToGenerate.length < MAX_IMAGES) {
           // Add placeholder marker to draft that we'll replace after parallel generation
           const placeholderMarker = `<!--IMAGE_PLACEHOLDER_${i}-->`
-          currentDraft += `${placeholderMarker}\n`
+          currentDraft += `${placeholderMarker}\n\n`
           imageSectionsToGenerate.push({
             heading: section.heading,
             instruction_note: section.instruction_note || '',
@@ -1691,6 +1696,9 @@ CRITICAL EXECUTION RULES:
           })
           console.log(`[Section Image] Queued for parallel generation: ${section.heading}`)
         }
+
+        // 3. Append Section Text
+        currentDraft += `${cleanedWriteText} \n\n`
 
         // Real-time Save
         await supabase
@@ -1750,12 +1758,14 @@ CRITICAL EXECUTION RULES:
         for (const result of imageResults) {
           if (result) {
             const placeholderMarker = `<!--IMAGE_PLACEHOLDER_${result.sectionIndex}-->`
-            currentDraft = currentDraft.replace(placeholderMarker, `![${result.heading}](${result.imageUrl})\n`)
+            // FIX: Global replace using split/join to catch any hallucinated duplicates
+            currentDraft = currentDraft.split(placeholderMarker).join(`![${result.heading}](${result.imageUrl})\n`)
           }
         }
 
-        // Clean up any remaining placeholders (for failed images)
-        currentDraft = currentDraft.replace(/<!--IMAGE_PLACEHOLDER_\d+-->\n/g, '')
+        // Clean up any remaining placeholders (for failed images OR hallucinations)
+        // FIX: Robust regex to handle newlines
+        currentDraft = currentDraft.replace(/<!--IMAGE_PLACEHOLDER_\d+-->(\r\n|\n)*/g, '')
 
         console.log(`[Section Images] PARALLEL generation complete`)
       }
