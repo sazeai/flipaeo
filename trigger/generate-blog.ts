@@ -1944,7 +1944,11 @@ ${styleTemplate}
 
 TEXT PROCESSING RULES (CRITICAL):
 1.  **MAIN HEADING:** Use "${keyword.toUpperCase()}" on the LEFT SIDE.
-    - IF the keyword is > 4 words, SUMMARIZE it into 2-3 punchy words.
+    - HEADLINE TOKEN RULE (CRITICAL):
+      - The main heading must contain EXACTLY 2 or 3 words
+      - Each word may appear ONLY ONCE
+      - Repeating any word in the main heading is STRICTLY FORBIDDEN
+      - Do not emphasize or stylize text by repetition
     - Style: Big, Bold, Handwritten/Marker.
 2.  **SECONDARY TEXT:**
     - Allowed: Small 1-2 word tags (e.g., "Guide", "Review", "2026").
@@ -1957,6 +1961,10 @@ TEXT PROCESSING RULES (CRITICAL):
     - NO Sentences. NO Paragraphs. NO Checklists.
     - Avoid complex financial/technical terms if possible - use icons instead.
     - NO "Wall of text".
+
+5.  TEXT VALIDATION RULE:
+    - Before finalizing the heading, verify that no word or character sequence is duplicated
+    - If duplication is detected, rewrite the heading using different words
 
       (Note:  As my ai model is not able to print text properly, it make ssilly mistakes in text, like if you ask it to add a heaidng,,, it will hallucinate at 3rd or 4th word and repeats that word in the headline. So force a kind of weighted instrcutions in the end like "do not duplicate a text in the image, no extra text in the image which is not asked to add."
 
