@@ -88,7 +88,6 @@ const PricingSection: React.FC = () => {
                         <h3 className="font-sans text-xs font-bold text-stone-400 uppercase tracking-widest mb-8 border-b border-stone-100 pb-4">
                             Included Powerhouse Access
                         </h3>
-
                         <div className="space-y-6">
                             <FeatureItem
                                 icon={Bot}
