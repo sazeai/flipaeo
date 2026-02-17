@@ -26,12 +26,12 @@ const PricingSection: React.FC = () => {
             {/* Section Header */}
             <div className="flex flex-col items-center text-center mb-16">
                 <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-                    One Plan.  <br /><span className='italic text-stone-500'>Unlimited Potential.</span>
+                    Stop Renting SEO Writers. <br /><span className='italic text-stone-500'>Own an AI Visibility Engine.</span>
                 </h2>
 
-                <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
-                    Everything you need to turn search into your biggest growth channel. <br className="hidden md:block" />
-                    No hidden fees. No complicated tiers. Just results.
+                <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-3xl">
+                    Get the output of a $2,500/mo SEO Agency for the price of a dinner. <br className="hidden md:block" />
+                    We don't just write 'blogs'—we build the Strategic Content Infrastructure your brand needs.
                 </p>
             </div>
 
@@ -53,7 +53,7 @@ const PricingSection: React.FC = () => {
                                 All In One
                             </span>
                             <h3 className="font-serif text-2xl text-stone-900">
-                                For ambitious entrepreneurs
+                                The Authority Engine Plan
                             </h3>
                         </div>
 
@@ -72,7 +72,7 @@ const PricingSection: React.FC = () => {
                         <div className="flex justify-center">
                             <Link href="/login">
                                 <Button variant="primary" className="w-full px-10 py-4 text-lg">
-                                    Win AI Search Race
+                                    Deploy My Content Engine
                                 </Button>
                             </Link>
                         </div>
@@ -89,32 +89,36 @@ const PricingSection: React.FC = () => {
                             Included Powerhouse Access
                         </h3>
 
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             <FeatureItem
                                 icon={Bot}
-                                title="30 Articles / Month"
+                                title="30 Citation-Optimized Authority Articles"
                                 description="Generated and published on auto-pilot. High quality, human-like output that passes AI detection."
                             />
                             <FeatureItem
                                 icon={Zap}
-                                title="Strategic Content Planning"
+                                title="Competitor Research & Gap-Analysis"
                                 description="Hands-free planning based on competitor gaps and real-time search intent analysis."
                             />
                             <FeatureItem
+                                icon={Link2}
+                                title="Semantic Internal Linking"
+                                description="Powerful semantic suggestions to boost site structure and topical authority."
+                            />
+                            <FeatureItem
+                                icon={ShieldCheck}
+                                title="Google and LLM-Ready Structure"
+                                description="Answer-first content optimized for Perplexity, ChatGPT, and Google featured snippets."
+                            />
+                            <FeatureItem
                                 icon={Globe}
-                                title="CMS Integration"
+                                title="1-Click CMS Publishing"
                                 description="Connects directly with WordPress, Webflow, and Shopify. We handle the formatting."
                             />
                             <FeatureItem
                                 icon={ImageIcon}
                                 title="On-Brand AI Images"
-                                description="Visuals generated to match your brand's unique style automatically for every post."
-                            />
-                            <FeatureItem
-                                icon={Link2}
-                                title="Smart Interlinking"
-                                description="Powerful semantic suggestions to boost site structure and topical authority."
-                            />
+                                description="Visuals generated to match your brand's unique style automatically for every post." />
                         </div>
                     </div>
                 </div>

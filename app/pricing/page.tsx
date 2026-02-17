@@ -10,20 +10,21 @@ import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
   title: 'Pricing',
-  description: 'Simple, transparent pricing for FlipAEO. One plan with everything you need: 30 AI-generated articles/month, automated content strategy, CMS integration, and priority support. 14-day money-back guarantee.',
+  description: 'Stop Renting SEO Writers. Own an AI Visibility Engine. Get the output of a $2,500/mo SEO Agency for the price of a dinner.',
   keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost', 'article generation pricing'],
   canonical: '/pricing',
 })
 
 const planFeatures = [
-  "30 AI-generated articles per month",
-  "Automated content strategy",
-  "CMS integration (WordPress, Webflow, Shopify)",
-  "On-brand AI images",
-  "Smart internal linking",
+  "30 Citation-Optimized Authority Articles",
+  "Competitor Research & Gap-Analysis",
+  "Google and LLM-Ready Structure",
   "Answer-first content structure",
-  "Real-time research with citations",
-  "Priority support"
+  "Automated content strategy",
+  "1-Click CMS Publishing",
+  "On-brand Featured Images",
+  "Semantic Internal Linking",
+  "24x7 Priority Support"
 ]
 
 const faqs = [
@@ -61,7 +62,7 @@ const comparisonData = {
   generic: [
     { aspect: "Purpose", generic: "General-purpose chatbot", flipaeo: "Purpose-built for GEO & authority" },
     { aspect: "Research", generic: "Relies on training data (may be outdated)", flipaeo: "Real-time research with verified sources" },
-    { aspect: "Strategy", generic: "None—you decide what to write", flipaeo: "Competitor analysis + gap identification" },
+    { aspect: "Strategy", generic: "None - you decide what to write.", flipaeo: "Autonomous Agent. We analyze your niche and tell YOU what to write to win." },
     { aspect: "Internal Linking", generic: "Manual", flipaeo: "Semantic auto-linking" },
     { aspect: "Citations", generic: "Often hallucinated or missing", flipaeo: "Verified, high-authority sources" },
     { aspect: "Publishing", generic: "Copy-paste required", flipaeo: "Direct CMS integration" },
@@ -81,10 +82,10 @@ export default function PricingPage() {
               <span className="font-bold tracking-widest uppercase">Simple Pricing</span>
             </div>
             <h1 className="font-serif text-stone-900 text-4xl sm:text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6">
-              One Plan. Zero Complexity.
+              Stop Renting SEO Writers. <br className="hidden md:block " /> <span className="italic text-stone-500">Own an AI Visibility Engine.</span>
             </h1>
-            <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto mb-10">
-              Everything you need to win AI search. No hidden fees. No complicated tiers.
+            <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-10">
+              Get the output of a $2,500/mo SEO Agency for the price of a dinner. We don't just write 'blogs'—we build the Strategic Content Infrastructure your brand needs to rank in Perplexity, ChatGPT, and Google.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 md:gap-6">
@@ -115,7 +116,7 @@ export default function PricingPage() {
 
 
               {/* Left: Price Column */}
-              <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">
+              <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-4 sm:p-8 md:p-12 flex flex-col items-center text-center relative">
 
                 {/* Handwritten Note Effect */}
                 <div className="absolute top-8 right-4 md:-right-6 md:top-20 z-10 pointer-events-none transform rotate-12 md:rotate-0 hidden sm:block">
@@ -137,7 +138,7 @@ export default function PricingPage() {
                     All In One
                   </span>
                   <h2 className="font-serif text-2xl text-stone-900">
-                    For ambitious entrepreneurs
+                    The Authority Engine Plan
                   </h2>
                 </div>
 
@@ -153,7 +154,7 @@ export default function PricingPage() {
                 <div className="w-full relative z-10">
                   <Link href="/login">
                     <Button variant="primary" className="max-w-2xl px-2 py-4 text-md justify-center">
-                      Grow My Brand
+                      Deploy My Content Engine
                     </Button>
                   </Link>
                   <div className="mt-4 flex items-center justify-center gap-2 text-xs text-stone-400 font-medium">
@@ -176,7 +177,7 @@ export default function PricingPage() {
                       <div className="mt-0.5 w-5 h-5 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center flex-shrink-0 text-brand-600 group-hover:bg-brand-100 transition-colors">
                         <Check size={12} strokeWidth={3} />
                       </div>
-                      <span className="font-sans text-stone-600 group-hover:text-stone-900 transition-colors leading-snug">{feature}</span>
+                      <span className="font-sans text-stone-600 group-hover:text-stone-900 transition-colors leading-snug">{feature.replace("✅ ", "")}</span>
                     </li>
                   ))}
                 </ul>
@@ -184,8 +185,79 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Decorative Blur */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] bg-brand-100/30 blur-3xl -z-10 rounded-full"></div>
+        </section>
+
+        {/* The Closer Section - Brand Aligned Double-Layer Pattern */}
+        <section className="max-w-4xl mx-auto px-6 pb-20 w-full">
+
+          <div className="w-full bg-brand-100/100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
+            <div className="bg-white rounded-[17px] overflow-hidden border border-white p-4 sm:p-8 md:p-12 text-center">
+
+              <h3 className="font-serif text-3xl md:text-4xl mb-4 text-stone-900">The Math is Simple</h3>
+              <p className="font-sans text-stone-500 mb-10 max-w-lg mx-auto leading-relaxed">
+                Why FlipAEO is the obvious choice for founders.
+              </p>
+
+              <div className="space-y-4 font-sans text-left">
+
+                {/* Option A: Freelancers */}
+                <div className="p-5 rounded-xl bg-stone-50 border border-stone-100 flex flex-col md:flex-row items-center justify-between gap-4 group hover:border-stone-200 transition-colors">
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-bold shadow-sm flex-shrink-0">A</div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">Freelancers</span>
+                      <span className="text-stone-700 font-medium">Pay per article ($200 × 30)</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <span className="text-xl font-bold text-stone-900">$6,000<span className="text-sm font-normal text-stone-400">/mo</span></span>
+                    <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-100 uppercase tracking-wide">Expensive</span>
+                  </div>
+                </div>
+
+                {/* Option B: DIY */}
+                <div className="p-5 rounded-xl bg-stone-50 border border-stone-100 flex flex-col md:flex-row items-center justify-between gap-4 group hover:border-stone-200 transition-colors">
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-bold shadow-sm flex-shrink-0">B</div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">Do It Yourself</span>
+                      <span className="text-stone-700 font-medium">Manually writing 30 articles</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <span className="text-xl font-bold text-stone-900">20+ Hours<span className="text-sm font-normal text-stone-400">/mo</span></span>
+                    <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-100 uppercase tracking-wide">Slow</span>
+                  </div>
+                </div>
+
+                {/* Option C: FlipAEO */}
+                <div className="relative p-6 rounded-xl bg-brand-50 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-4 mt-6 overflow-hidden">
+
+                  <div className="flex items-center gap-4 w-full md:w-auto relative z-10">
+                    <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold flex-shrink-0">C</div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-brand-600 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        FlipAEO Authority Engine <Check className="w-3 h-3" />
+                      </span>
+                      <span className="text-stone-900 font-bold text-lg">Strategy + 30 Articles + Citations</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 w-full md:w-auto justify-end relative z-10">
+                    <span className="text-3xl font-serif text-brand-600">$79<span className="text-lg font-sans text-stone-500 font-normal">/mo</span></span>
+                  </div>
+                </div>
+
+                <div className="text-center mt-6">
+                  <p className="text-sm text-stone-400 italic">
+                    "Even if you only publish the top 5 articles we generate, you are still saving $900/mo compared to a human writer."
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="max-w-5xl mx-auto px-6 py-16 w-full">
@@ -203,7 +275,7 @@ export default function PricingPage() {
             <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
               <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
                 <div className="bg-stone-50/50 border-b border-stone-100 p-6">
-                  <h3 className="font-serif text-xl text-stone-900">FlipAEO vs Traditional Agencies</h3>
+                  <h3 className="font-serif text-xl text-stone-900">Why pay for 'Hours' when you can pay for 'Outcome'?</h3>
                 </div>
                 <div className="p-0">
                   <table className="w-full text-left border-collapse">
@@ -234,7 +306,7 @@ export default function PricingPage() {
             <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
               <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
                 <div className="bg-stone-50/50 border-b border-stone-100 p-6">
-                  <h3 className="font-serif text-xl text-stone-900">FlipAEO vs Generic AI Tools</h3>
+                  <h3 className="font-serif text-xl text-stone-900">Why Chatbots fail at SEO (and we don't).</h3>
                 </div>
                 <div className="p-0">
                   <table className="w-full text-left border-collapse">
