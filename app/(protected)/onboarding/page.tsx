@@ -226,9 +226,11 @@ export default function OnboardingPage() {
     }
 
     const handleAuditError = (message: string) => {
-        setError(`Audit failed: ${message}. You can still generate a plan.`)
-        // On audit failure, allow skipping to plan generation
-        setStep("audit-results")
+        setError(`Audit failed: ${message}. The issue has been reported to the developer. we will fix it ASAP and email you once we are back.`)
+        // On audit failure, go back to brand step to allow retry
+        setStep("brand")
+        // Scroll to top to see error
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     // Generate plan after viewing audit results

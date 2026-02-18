@@ -5,6 +5,8 @@ import { generateNicheBlueprint } from "@/lib/audit/niche-blueprint"
 import { scanSite, generateBlueprintEmbeddings } from "@/lib/audit/site-scanner"
 import { discoverCompetitors, scanAllCompetitors } from "@/lib/audit/competitor-scanner"
 import { buildGapMatrix, generatePillarSuggestions, assembleAuditResult } from "@/lib/audit/gap-matrix"
+import { resend, EMAIL_FROM } from "@/lib/emails/client"
+import { AuditFailedEmail } from "@/lib/emails/templates/audit-failed"
 
 // ============================================================
 // Run Topical Authority Audit — Trigger.dev Background Task
@@ -288,6 +290,25 @@ export const runAuditTask = task({
             await updateStatus("failed", null, {
                 generation_error: error.message || "Unknown error"
             })
+
+            // Send failure notification to developer
+            try {
+                await resend.emails.send({
+                    from: EMAIL_FROM,
+                    to: "harvanshjatt@gmail.com",
+                    subject: `🚨 Audit Failed: ${payload.brandData.product_name || payload.brandId}`,
+                    react: AuditFailedEmail({
+                        userId: payload.userId || 'unknown',
+                        brandId: payload.brandId,
+                        brandName: payload.brandData.product_name,
+                        error: error.message || "Unknown error",
+                        timestamp: new Date().toISOString()
+                    })
+                })
+                console.log("[Audit Task] 📧 Failure notification sent to developer.")
+            } catch (emailError) {
+                console.error("[Audit Task] Failed to send failure email:", emailError)
+            }
 
             throw error // Let Trigger.dev handle the failure
         }
