@@ -41,19 +41,21 @@ export const runAuditTask = task({
                 updated_at: new Date().toISOString(),
                 ...extraData
             }
-            const { error } = await (supabase as any)
+            const { error, count } = await (supabase as any)
                 .from("topical_audits")
-                .update(updatePayload)
+                .update(updatePayload, { count: 'exact' })
                 .eq("user_id", userId)
                 .eq("brand_id", brandId)
 
             if (error) {
                 console.error(`[Audit Task] Failed to update status:`, error)
+            } else if (count === 0) {
+                console.warn(`[Audit Task] WARNING: Updated 0 rows! User: ${userId}, Brand: ${brandId}`)
             }
         }
 
         try {
-            console.log(`[Audit Task] Starting audit for brand ${brandId}`)
+            console.log(`[Audit Task] Starting audit for brand: ${brandId}, user: ${userId}`)
             await updateStatus("running", "niche_mapping")
 
             // === PHASE 1: NICHE BLUEPRINT ===
@@ -170,7 +172,7 @@ export const runAuditTask = task({
             )
 
             // Save complete audit result
-            const { error: saveError } = await (supabase as any)
+            const { error: saveError, count } = await (supabase as any)
                 .from("topical_audits")
                 .update({
                     generation_status: "completed",
@@ -188,13 +190,15 @@ export const runAuditTask = task({
                     topics_analyzed: auditResult.audit_meta.topics_analyzed,
                     user_pages_scanned: auditResult.audit_meta.user_pages_scanned,
                     updated_at: new Date().toISOString()
-                })
+                }, { count: 'exact' })
                 .eq("user_id", userId)
                 .eq("brand_id", brandId)
 
             if (saveError) {
                 console.error("[Audit Task] Save error:", saveError)
                 throw new Error(`Failed to save audit result: ${saveError.message}`)
+            } else if (count === 0) {
+                console.error(`[Audit Task] CRITICAL: Final save updated 0 rows! User: ${userId}, Brand: ${brandId}`)
             }
 
             // Save pillar suggestions to brand_details.pillar_recommendations
