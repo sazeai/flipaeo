@@ -145,8 +145,11 @@ export async function extractPageTitle(url: string): Promise<PageInfo> {
         // 4. <h1> tag (first one)
         const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
         if (h1Match?.[1]?.trim()) {
-            // Strip any inner HTML tags
-            const title = h1Match[1].replace(/<[^>]+>/g, '').trim()
+            // Strip any inner HTML tags first
+            let rawH1 = h1Match[1].replace(/<[^>]+>/g, '').trim()
+            // Then clean/sanitize (removes null bytes, decodes entities)
+            const title = cleanPageTitle(rawH1)
+
             if (title.length > 3) {
                 return { url, title, source: "h1" }
             }
@@ -166,9 +169,14 @@ export async function extractPageTitle(url: string): Promise<PageInfo> {
 
 /**
  * Cleans a page title by removing common suffixes like "| Brand Name", "- Company"
+ * AND sanitizes control characters (null bytes) that crash Postgres.
  */
 function cleanPageTitle(title: string): string {
-    // Decode HTML entities
+    // 1. Remove control characters (null bytes, etc) - CRITICAL for Postgres
+    // eslint-disable-next-line no-control-regex
+    title = title.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+
+    // 2. Decode HTML entities
     title = title
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
@@ -179,7 +187,7 @@ function cleanPageTitle(title: string): string {
         .replace(/&ndash;/g, '–')
         .replace(/&mdash;/g, '—')
 
-    // Remove trailing " | Brand", " - Brand", " — Brand" patterns
+    // 3. Remove trailing " | Brand", " - Brand", " — Brand" patterns
     // Only remove if there's meaningful content before the separator
     const separators = [' | ', ' - ', ' — ', ' – ', ' : ']
     for (const sep of separators) {

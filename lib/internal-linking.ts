@@ -29,7 +29,9 @@ export function extractTitleFromUrl(url: string): string {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
         })
 
-        return title.trim()
+        // Remove control characters just in case
+        // eslint-disable-next-line no-control-regex
+        return title.replace(/[\u0000-\u001F\u007F-\u009F]/g, "").trim()
     } catch {
         // If URL parsing fails, return a fallback or the input
         return url

@@ -215,6 +215,8 @@ export function AuditConsole({
                         scoring: { status: 'complete', data: { authority_score: data.audit.authority_score } }
                     })
                     setTimeout(() => onComplete(data.audit), 500)
+                } else if (data.status === "failed") {
+                    onError(data.error || 'Audit failed')
                 } else {
                     startAudit()
                 }
