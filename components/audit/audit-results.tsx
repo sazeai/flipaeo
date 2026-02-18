@@ -71,7 +71,7 @@ function getScoreLabel(score: number): string {
 
 function KPICard({ title, value, subtext, icon: Icon, trend, className }: { title: string, value: string | number, subtext?: string | React.ReactNode, icon?: any, trend?: { val: string, up: boolean }, className?: string }) {
     return (
-        <div className={cn("bg-white rounded-xl border border-stone-200 p-5 shadow-sm", className)}>
+        <div className={cn("bg-white rounded-xl border border-stone-200 p-5 shadow-xs", className)}>
             <div className="flex justify-between items-start mb-2">
                 <span className="text-sm font-medium text-stone-500">{title}</span>
                 {Icon && <Icon className="w-5 h-5 text-stone-400" />}
@@ -161,7 +161,7 @@ export function AuditResults({
                     <Button
                         onClick={onGeneratePlan}
                         disabled={isGeneratingPlan}
-                        className="bg-stone-900 hover:bg-stone-800 text-white gap-2 shadow-sm"
+                        className="bg-stone-900 hover:bg-stone-800 text-white gap-2 shadow-xs"
                     >
                         {isGeneratingPlan ? (
                             <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating Plan...</>
@@ -212,7 +212,7 @@ export function AuditResults({
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
                 {/* Left Col: Competitive Landscape (8 cols) */}
-                <div className="xl:col-span-8 bg-white border border-stone-200 rounded-xl p-6 shadow-sm">
+                <div className="xl:col-span-8 bg-white border border-stone-200 rounded-xl p-6 shadow-xs">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold flex items-center gap-2">
                             <BarChart3 className="w-5 h-5 text-stone-400" />
@@ -250,7 +250,7 @@ export function AuditResults({
                     </div>
 
                     <div className="mt-8 p-4 bg-stone-50 rounded-lg border border-stone-100 flex items-start gap-3">
-                        <div className="bg-white p-1.5 rounded-md shadow-sm border border-stone-100 shrink-0">
+                        <div className="bg-white p-1.5 rounded-md shadow-xs border border-stone-100 shrink-0">
                             <TrendingUp className="w-4 h-4 text-emerald-600" />
                         </div>
                         <div>
@@ -265,7 +265,7 @@ export function AuditResults({
                 </div>
 
                 {/* Right Col: Critical Gaps (4 cols) */}
-                <div className="xl:col-span-4 bg-white border border-stone-200 rounded-xl p-6 shadow-sm flex flex-col h-full">
+                <div className="xl:col-span-4 bg-white border border-stone-200 rounded-xl p-6 shadow-xs flex flex-col h-full">
                     <h3 className="text-lg font-semibold mb-1 text-rose-700 flex items-center gap-2">
                         <AlertTriangle className="w-5 h-5" />
                         Critical Gaps
@@ -310,16 +310,16 @@ export function AuditResults({
             </div>
 
             {/* --- Pillar Breakdown Table --- */}
-            <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-stone-200 rounded-xl shadow-xs overflow-hidden">
                 <div className="p-6 border-b border-stone-100 bg-stone-50/30">
-                    <h3 className="text-lg font-semibold text-stone-900">Pillar Strategy Breakdown</h3>
-                    <p className="text-sm text-stone-500 mt-1">Detailed analysis of your topical authority by core pillars.</p>
+                    <h3 className="text-lg font-semibold text-stone-900">Content Strategy Breakdown</h3>
+                    <p className="text-sm text-stone-500 mt-1">Detailed analysis of your topical authority.</p>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead className="bg-stone-50 text-stone-500 border-b border-stone-200">
                             <tr>
-                                <th className="px-6 py-3 font-medium w-1/3">Pillar Name</th>
+                                <th className="px-6 py-3 font-medium w-1/3">Content Category</th>
                                 <th className="px-6 py-3 font-medium w-32 text-center">Your Score</th>
                                 <th className="px-6 py-3 font-medium w-32 text-center">Gap Count</th>
                                 <th className="px-6 py-3 font-medium">Status</th>

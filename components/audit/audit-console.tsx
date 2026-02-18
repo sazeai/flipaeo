@@ -239,7 +239,7 @@ export function AuditConsole({
 
             {/* Header: Pulsing Brand Analysis */}
             <div className="text-center mb-12">
-                <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white border border-stone-200 shadow-sm mb-6">
+                <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white border border-stone-200 shadow-xs mb-6">
                     <ShieldCheck className="w-10 h-10 text-stone-900" strokeWidth={1.5} />
                     {isRunning && (
                         <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
@@ -275,7 +275,7 @@ export function AuditConsole({
                             transition={{ delay: index * 0.1 }}
                             className={cn(
                                 "relative flex items-center p-4 rounded-xl border transition-all duration-500",
-                                isActive ? "bg-white border-stone-300 shadow-md scale-[1.02]"
+                                isActive ? "bg-white border-stone-300 scale-[1.02]"
                                     : isComplete ? "bg-stone-50/50 border-stone-200 opacity-60" // Dim completed steps slightly
                                         : "bg-transparent border-transparent opacity-40 grayscale"
                             )}
@@ -324,7 +324,7 @@ export function AuditConsole({
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="px-3 py-1 bg-white border border-stone-200 rounded-full shadow-sm"
+                                    className="px-3 py-1 bg-white border border-stone-200 rounded-full"
                                 >
                                     <span className="text-xs font-bold text-stone-700">
                                         {phase === 'niche_mapping' && `${phases[phase].data.topic_count || 0} Topics`}
