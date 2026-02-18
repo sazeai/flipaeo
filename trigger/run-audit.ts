@@ -30,6 +30,7 @@ export const runAuditTask = task({
         const startTime = Date.now()
 
         // Helper to update audit row status + phase
+        // SELF-HEALING: If update affects 0 rows (row missing), we create it.
         async function updateStatus(
             status: string,
             phase: string | null,
@@ -50,7 +51,29 @@ export const runAuditTask = task({
             if (error) {
                 console.error(`[Audit Task] Failed to update status:`, error)
             } else if (count === 0) {
-                console.warn(`[Audit Task] WARNING: Updated 0 rows! User: ${userId}, Brand: ${brandId}`)
+                console.warn(`[Audit Task] Row missing! Creating new audit row for User: ${userId}, Brand: ${brandId}`)
+
+                // Self-healing: Create the row if it doesn't exist
+                const { error: insertError } = await (supabase as any)
+                    .from("topical_audits")
+                    .insert({
+                        user_id: userId,
+                        brand_id: brandId,
+                        ...updatePayload,
+                        // Defaults for required fields if not in updatePayload
+                        niche_blueprint: updatePayload.niche_blueprint || {},
+                        user_coverage: updatePayload.user_coverage || {},
+                        competitor_coverages: updatePayload.competitor_coverages || [],
+                        gap_matrix: updatePayload.gap_matrix || [],
+                        pillar_suggestions: updatePayload.pillar_suggestions || [],
+                        authority_score: updatePayload.authority_score || 0
+                    })
+
+                if (insertError) {
+                    console.error(`[Audit Task] FATAL: Failed to create missing row:`, insertError)
+                } else {
+                    console.log(`[Audit Task] ✅ Successfully created missing audit row.`)
+                }
             }
         }
 
@@ -172,7 +195,7 @@ export const runAuditTask = task({
             )
 
             // Save complete audit result
-            const { error: saveError, count } = await (supabase as any)
+            const { error: saveError, count: finalCount } = await (supabase as any)
                 .from("topical_audits")
                 .update({
                     generation_status: "completed",
@@ -197,8 +220,33 @@ export const runAuditTask = task({
             if (saveError) {
                 console.error("[Audit Task] Save error:", saveError)
                 throw new Error(`Failed to save audit result: ${saveError.message}`)
-            } else if (count === 0) {
-                console.error(`[Audit Task] CRITICAL: Final save updated 0 rows! User: ${userId}, Brand: ${brandId}`)
+            } else if (finalCount === 0) {
+                console.warn(`[Audit Task] Final save row missing! Inserting...`)
+                // Self-healing insert for final result
+                const { error: finalInsertError } = await (supabase as any)
+                    .from("topical_audits")
+                    .insert({
+                        user_id: userId,
+                        brand_id: brandId,
+                        generation_status: "completed",
+                        niche_blueprint: auditResult.niche_blueprint,
+                        user_coverage: auditResult.user_coverage,
+                        competitor_coverages: auditResult.competitor_coverages,
+                        authority_score: auditResult.authority_score,
+                        pillar_scores: auditResult.pillar_scores,
+                        gap_matrix: auditResult.gap_matrix,
+                        pillar_suggestions: auditResult.pillar_suggestions,
+                        projected_score: auditResult.projected_score_after_plan,
+                        competitors_scanned: auditResult.audit_meta.competitors_scanned,
+                        topics_analyzed: auditResult.audit_meta.topics_analyzed,
+                        user_pages_scanned: auditResult.audit_meta.user_pages_scanned,
+                        updated_at: new Date().toISOString()
+                    })
+
+                if (finalInsertError) {
+                    console.error("[Audit Task] FATAL: Failed to insert final result:", finalInsertError)
+                    throw finalInsertError
+                }
             }
 
             // Save pillar suggestions to brand_details.pillar_recommendations

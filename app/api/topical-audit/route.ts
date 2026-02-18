@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Create or reset the audit row
-        await supabase
+        const { error: upsertError } = await supabase
             .from("topical_audits")
             .upsert({
                 user_id: user.id,
@@ -67,6 +67,11 @@ export async function POST(req: NextRequest) {
             }, {
                 onConflict: "user_id,brand_id"
             })
+
+        if (upsertError) {
+            console.error("[Audit API] Upsert failed:", upsertError)
+            throw new Error(`Failed to create audit record: ${upsertError.message}`)
+        }
 
         // Trigger the background task
         const handle = await tasks.trigger<typeof runAuditTask>("run-topical-audit", {
