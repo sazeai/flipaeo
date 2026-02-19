@@ -1,5 +1,6 @@
 import { tavily } from "@tavily/core"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
+import { buildTavilySearchOptions, TavilySearchPrefs } from "@/lib/tavily-search"
 
 export interface RankingPage {
     url: string
@@ -24,7 +25,8 @@ export interface SERPIntelligence {
  */
 export async function gatherSERPIntelligence(
     seeds: string[],
-    maxSeeds: number = 5
+    maxSeeds: number = 5,
+    searchPrefs?: TavilySearchPrefs
 ): Promise<SERPIntelligence[]> {
     const apiKey = process.env.TAVILY_API_KEY
     if (!apiKey) {
@@ -42,11 +44,12 @@ export async function gatherSERPIntelligence(
     for (const seed of seedsToProcess) {
         try {
             // Fetch top results for this seed
-            const searchResponse = await tvly.search(seed, {
+            const { modifiedQuery, options } = buildTavilySearchOptions(seed, searchPrefs, {
                 searchDepth: "advanced",
                 includeRawContent: "markdown",
                 maxResults: 10
             })
+            const searchResponse = await tvly.search(modifiedQuery, options)
 
             const rawResults = searchResponse.results || []
             if (rawResults.length === 0) {

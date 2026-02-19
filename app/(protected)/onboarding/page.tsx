@@ -226,7 +226,7 @@ export default function OnboardingPage() {
     }
 
     const handleAuditError = (message: string) => {
-        setError(`Audit failed: ${message}. The issue has been reported to the developer. we will fix it ASAP and email you once we are back.`)
+        setError(`Audit failed: The issue has been reported to the developer. we will fix it ASAP and email you once we are back.`)
         // On audit failure, go back to brand step to allow retry
         setStep("brand")
         // Scroll to top to see error
@@ -608,8 +608,64 @@ export default function OnboardingPage() {
                                                     <p className={`text-[10px] text-right text-stone-400`}>Select the style for AI-generated featured images.</p>
                                                 </div>
 
-                                                {/* Continue Button */}
-                                                <div className="pt-4 border-t border-stone-100  sticky bottom-0 bg-white/80 /80 backdrop-blur-sm py-4">
+                                                {/* Continue Button + Research Settings (sticky footer) */}
+                                                <div className="pt-4 border-t border-stone-100  sticky bottom-0 bg-white/80 /80 backdrop-blur-sm py-4 space-y-4">
+                                                    {/* Research Settings */}
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label className="block text-xs font-semibold text-stone-600 mb-1">🌏 Search Country</label>
+                                                            <select
+                                                                className="w-full h-9 rounded-md border px-2 text-sm bg-white border-stone-200 text-stone-900"
+                                                                value={brandData.search_country || ""}
+                                                                onChange={e => updateField('search_country', e.target.value)}
+                                                            >
+                                                                <option value="">Global (No filter)</option>
+                                                                <option value="australia">Australia</option>
+                                                                <option value="united states">United States</option>
+                                                                <option value="united kingdom">United Kingdom</option>
+                                                                <option value="canada">Canada</option>
+                                                                <option value="india">India</option>
+                                                                <option value="germany">Germany</option>
+                                                                <option value="france">France</option>
+                                                                <option value="japan">Japan</option>
+                                                                <option value="brazil">Brazil</option>
+                                                                <option value="netherlands">Netherlands</option>
+                                                                <option value="singapore">Singapore</option>
+                                                                <option value="new zealand">New Zealand</option>
+                                                                <option value="ireland">Ireland</option>
+                                                                <option value="south africa">South Africa</option>
+                                                                <option value="united arab emirates">UAE</option>
+                                                                <option value="sweden">Sweden</option>
+                                                                <option value="switzerland">Switzerland</option>
+                                                                <option value="italy">Italy</option>
+                                                                <option value="spain">Spain</option>
+                                                                <option value="mexico">Mexico</option>
+                                                                <option value="south korea">South Korea</option>
+                                                                <option value="indonesia">Indonesia</option>
+                                                                <option value="philippines">Philippines</option>
+                                                                <option value="malaysia">Malaysia</option>
+                                                                <option value="thailand">Thailand</option>
+                                                                <option value="poland">Poland</option>
+                                                                <option value="nigeria">Nigeria</option>
+                                                                <option value="pakistan">Pakistan</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs font-semibold text-stone-600 mb-1">📚 Topic Source</label>
+                                                            <select
+                                                                className="w-full h-9 rounded-md border px-2 text-sm bg-white border-stone-200 text-stone-900"
+                                                                value={brandData.search_topic || "general"}
+                                                                onChange={e => updateField('search_topic', e.target.value)}
+                                                            >
+                                                                <option value="general">General (Web)</option>
+                                                                <option value="news">News</option>
+                                                                <option value="finance">Finance</option>
+                                                                <option value="journal">Journal (Research)</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[10px] text-stone-400">These settings filter research sources for audits, plans, and articles.</p>
+
                                                     <Button
                                                         onClick={handleSaveBrand}
                                                         disabled={savingBrand}

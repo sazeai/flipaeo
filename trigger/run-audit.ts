@@ -7,6 +7,7 @@ import { discoverCompetitors, scanAllCompetitors } from "@/lib/audit/competitor-
 import { buildGapMatrix, generatePillarSuggestions, assembleAuditResult } from "@/lib/audit/gap-matrix"
 import { resend, EMAIL_FROM } from "@/lib/emails/client"
 import { AuditFailedEmail } from "@/lib/emails/templates/audit-failed"
+import { extractSearchPrefs } from "@/lib/tavily-search"
 
 // ============================================================
 // Run Topical Authority Audit — Trigger.dev Background Task
@@ -81,6 +82,8 @@ export const runAuditTask = task({
 
         try {
             console.log(`[Audit Task] Starting audit for brand: ${brandId}, user: ${userId}`)
+            const searchPrefs = extractSearchPrefs(brandData)
+            console.log(`[Audit Task] Search prefs: country=${searchPrefs.country || 'global'}, topic=${searchPrefs.topic}`)
             await updateStatus("running", "niche_mapping")
 
             // === PHASE 1: NICHE BLUEPRINT ===
@@ -138,7 +141,7 @@ export const runAuditTask = task({
                 console.log(`[Audit Task] Using ${competitors.length} user-provided competitors: ${competitors.map(c => c.name).join(', ')}`)
             } else {
                 // Auto-discover competitors via Tavily + LLM filter
-                competitors = await discoverCompetitors(brandData, 3)
+                competitors = await discoverCompetitors(brandData, 3, searchPrefs)
                 console.log(`[Audit Task] Discovered ${competitors.length} competitors: ${competitors.map(c => c.name).join(', ')}`)
 
                 // Cache discovered competitors for future use
@@ -158,7 +161,8 @@ export const runAuditTask = task({
                     competitors,
                     blueprintEmbeddings,
                     blueprint,
-                    2
+                    2,
+                    searchPrefs
                 )
                 console.log(`[Audit Task] Scanned ${competitorCoverages.length} competitors`)
 

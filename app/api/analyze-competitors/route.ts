@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { tavily } from "@tavily/core"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
 import { jsonrepair } from "jsonrepair"
+import { buildTavilySearchOptions, TavilySearchPrefs } from "@/lib/tavily-search"
 
 export const maxDuration = 300 // 5 minute timeout
 
@@ -95,7 +96,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        const { url, brandContext } = await req.json()
+        const { url, brandContext, searchPrefs } = await req.json() as {
+            url: string
+            brandContext?: string
+            searchPrefs?: TavilySearchPrefs
+        }
 
         if (!url) {
             return NextResponse.json({ error: "URL is required" }, { status: 400 })
@@ -197,11 +202,12 @@ Focus on finding similar products, not niche features.
 
         for (const query of searchQueries.slice(0, 3)) { // Execute top 3 queries for broader coverage
             try {
-                const searchResponse = await tvly.search(query, {
+                const { modifiedQuery, options } = buildTavilySearchOptions(query, searchPrefs, {
                     searchDepth: "advanced",
                     includeRawContent: "markdown",
                     maxResults: 5,
                 })
+                const searchResponse = await tvly.search(modifiedQuery, options)
                 allResults.push(...(searchResponse.results || []))
             } catch (e) {
                 console.error("Search failed for query:", query, e)

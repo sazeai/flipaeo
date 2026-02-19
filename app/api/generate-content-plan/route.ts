@@ -5,6 +5,7 @@ import { generateContentPlan } from "@/lib/plans/generator"
 import { gatherSERPIntelligence, extractCompetitorBrands } from "@/lib/plans/serp-intelligence"
 import { performGapAnalysis } from "@/lib/plans/gap-analysis"
 import { buildTopicHierarchy } from "@/lib/plans/topic-hierarchy"
+import { extractSearchPrefs } from "@/lib/tavily-search"
 
 export const maxDuration = 300 // 5 minute timeout
 
@@ -34,7 +35,8 @@ export async function POST(req: NextRequest) {
         }
 
         // --- PHASE 1: SERP Intelligence (NEW) ---
-        const serpData = await gatherSERPIntelligence(seeds, 3) // Analyze top 3 seeds
+        const searchPrefs = extractSearchPrefs(brandData)
+        const serpData = await gatherSERPIntelligence(seeds, 3, searchPrefs) // Analyze top 3 seeds
 
 
         // Extract competitor brands if not passed OR if passed is empty

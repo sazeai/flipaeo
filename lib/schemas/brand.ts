@@ -19,6 +19,8 @@ export const BrandDetailsSchema = z.object({
   pricing: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   how_it_works: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),
   brand_keywords: z.union([z.array(z.string()), z.string().transform(s => [s])]).default([]),  // Search keywords for competitor discovery
+  search_country: z.string().optional().default(""),       // Tavily search country filter, e.g. "australia"
+  search_topic: z.enum(["general", "news", "finance", "journal"]).optional().default("general"),
   image_style: z.string().optional().default("stock"),
   style_dna: z.union([
     z.string(),

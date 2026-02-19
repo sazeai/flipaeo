@@ -1,5 +1,6 @@
 import { task } from "@trigger.dev/sdk/v3"
 import { tavily } from "@tavily/core"
+import { buildTavilySearchOptions, extractSearchPrefs, TavilySearchPrefs } from "@/lib/tavily-search"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getGeminiClient } from "@/utils/gemini/geminiClient"
 import { CompetitorDataSchema } from "@/lib/schemas/research"
@@ -742,7 +743,8 @@ const performDeepResearch = async (
   genAI: any,
   keyword: string,
   articleType: ArticleType,
-  supportingKeywords: string[] = []
+  supportingKeywords: string[] = [],
+  searchPrefs?: TavilySearchPrefs
 ) => {
   console.log(`[Deep Research] Phase 1: Broad Landscape Search for "${keyword}"`)
 
@@ -752,11 +754,12 @@ const performDeepResearch = async (
 
   // === STEP 1: BROAD LANDSCAPE SEARCH ===
   const broadQuery = `${keyword} ${supportingKeywords.slice(0, 2).join(' ')} `.trim()
-  const broadSearch = await tvly.search(broadQuery, {
+  const { modifiedQuery: broadModifiedQuery, options: broadOptions } = buildTavilySearchOptions(broadQuery, searchPrefs, {
     searchDepth: "advanced",
     includeRawContent: "markdown",
     maxResults: 5,
   })
+  const broadSearch = await tvly.search(broadModifiedQuery, broadOptions)
 
   // Extract and CAP content from Tavily results
   const rawBroadContext = broadSearch.results.map((r: any) => {
@@ -820,16 +823,17 @@ const performDeepResearch = async (
 
     // Execute targeted searches in parallel for speed
     const deepResults = await Promise.all(
-      targetedQueries.slice(0, 4).map((q: string) =>
-        tvly.search(q, {
+      targetedQueries.slice(0, 4).map((q: string) => {
+        const { modifiedQuery: sniperQuery, options: sniperOptions } = buildTavilySearchOptions(q, searchPrefs, {
           searchDepth: "basic",
           includeRawContent: "markdown",
           maxResults: 2
-        }).catch((err: any) => {
+        })
+        return tvly.search(sniperQuery, sniperOptions).catch((err: any) => {
           console.log(`[Deep Research] Sniper query failed: ${q} `, err.message)
           return { results: [] }
         })
-      )
+      })
     )
 
     const allDeepResults = deepResults.flatMap(r => r.results)
@@ -1460,12 +1464,15 @@ export const generateBlogPost = task({
       phase = "research"
 
       // Use the 2-phase deep research: Broad Search → Critic Gap Analysis → Sniper Search → Synthesis
+      const searchPrefs = extractSearchPrefs(brandDetails)
+      console.log(`[Blog Gen] Search prefs: country=${searchPrefs.country || 'global'}, topic=${searchPrefs.topic}`)
       const competitorData = await performDeepResearch(
         tvly,
         genAI,
         keyword,
         articleType,
-        supportingKeywords
+        supportingKeywords,
+        searchPrefs
       )
 
       await supabase

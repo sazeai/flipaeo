@@ -115,6 +115,24 @@ export default function SettingsPage() {
     }
   }
 
+  const handleUpdateSearchPrefs = async (brandId: string, field: 'search_country' | 'search_topic', value: string) => {
+    const brand = brands.find(b => b.id === brandId)
+    if (!brand) return
+    const updatedBrandData = { ...brand.brand_data, [field]: value }
+    try {
+      const { error } = await supabase
+        .from('brand_details')
+        .update({ brand_data: updatedBrandData })
+        .eq('id', brandId)
+      if (error) throw error
+      // Update local state
+      setBrands(prev => prev.map(b => b.id === brandId ? { ...b, brand_data: updatedBrandData } : b))
+      toast.success('Search preference updated')
+    } catch (err: any) {
+      toast.error('Failed to update: ' + (err.message || 'Unknown error'))
+    }
+  }
+
 
 
   if (loading) {
@@ -230,7 +248,47 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Internal Linking Sync Section */}
-                      <div className="px-4 pb-4">
+                      <div className="px-4 pb-4 space-y-3">
+                        {/* Research Settings */}
+                        <div className="p-3 bg-white rounded-lg border border-stone-100 shadow-sm">
+                          <div className="text-[9px] font-bold text-stone-400 uppercase tracking-wider mb-2">Research Sources</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-stone-500 mb-0.5">Country</label>
+                              <select
+                                className="w-full h-8 rounded-md border px-2 text-xs bg-white border-stone-200 text-stone-900"
+                                value={b.brand_data?.search_country || ''}
+                                onChange={e => handleUpdateSearchPrefs(b.id, 'search_country', e.target.value)}
+                              >
+                                <option value="">Global</option>
+                                <option value="australia">Australia</option>
+                                <option value="united states">United States</option>
+                                <option value="united kingdom">UK</option>
+                                <option value="canada">Canada</option>
+                                <option value="india">India</option>
+                                <option value="germany">Germany</option>
+                                <option value="france">France</option>
+                                <option value="singapore">Singapore</option>
+                                <option value="new zealand">New Zealand</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-stone-500 mb-0.5">Source</label>
+                              <select
+                                className="w-full h-8 rounded-md border px-2 text-xs bg-white border-stone-200 text-stone-900"
+                                value={b.brand_data?.search_topic || 'general'}
+                                onChange={e => handleUpdateSearchPrefs(b.id, 'search_topic', e.target.value)}
+                              >
+                                <option value="general">General</option>
+                                <option value="news">News</option>
+                                <option value="finance">Finance</option>
+                                <option value="journal">Journal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Internal Linking */}
                         <div className="p-3 bg-white  rounded-lg border border-stone-100  flex items-center justify-between shadow-sm">
                           <div className="flex items-center gap-3">
                             <div className="p-1.5 bg-stone-50  rounded-md border border-stone-100 ">

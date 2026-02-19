@@ -2,6 +2,7 @@ import { tavily } from "@tavily/core"
 import { BrandDetails } from "@/lib/schemas/brand"
 import { NicheBlueprint, SiteCoverage, TopicEmbedding } from "./types"
 import { fetchAllSitemapUrls, batchExtractTitles, mapCoverageWithEmbeddings } from "./site-scanner"
+import { buildTavilySearchOptions, TavilySearchPrefs } from "@/lib/tavily-search"
 
 // ============================================================
 // Competitor Scanner — Discovers and scans competitor content
@@ -24,7 +25,8 @@ interface DiscoveredCompetitor {
  */
 export async function discoverCompetitors(
     brandData: BrandDetails,
-    maxCompetitors: number = 5
+    maxCompetitors: number = 5,
+    searchPrefs?: TavilySearchPrefs
 ): Promise<DiscoveredCompetitor[]> {
     const apiKey = process.env.TAVILY_API_KEY
     if (!apiKey) {
@@ -68,10 +70,11 @@ export async function discoverCompetitors(
         for (const query of queries) {
             console.log(`[Competitor Scanner] Tavily query: "${query}"`)
             try {
-                const response = await tvly.search(query, {
+                const { modifiedQuery, options } = buildTavilySearchOptions(query, searchPrefs, {
                     maxResults: 20,
                     searchDepth: "basic"
                 })
+                const response = await tvly.search(modifiedQuery, options)
 
                 for (const result of response.results || []) {
                     try {
@@ -199,7 +202,8 @@ Be very selective. 3-5 truly relevant competitors is better than 10 loosely rela
 async function scanCompetitorSite(
     competitor: DiscoveredCompetitor,
     blueprintEmbeddings: TopicEmbedding[],
-    blueprint: NicheBlueprint
+    blueprint: NicheBlueprint,
+    searchPrefs?: TavilySearchPrefs
 ): Promise<SiteCoverage> {
     console.log(`[Competitor Scanner] Scanning ${competitor.name} (${competitor.url})...`)
 
@@ -209,7 +213,7 @@ async function scanCompetitorSite(
     // Strategy 2: If sitemap fails, use Tavily to discover content pages
     if (urls.length === 0) {
         console.log(`[Competitor Scanner] No sitemap for ${competitor.name}, falling back to Tavily`)
-        urls = await discoverContentViaTavily(competitor.domain, competitor.name)
+        urls = await discoverContentViaTavily(competitor.domain, competitor.name, searchPrefs)
     }
 
     if (urls.length === 0) {
@@ -267,7 +271,8 @@ async function scanCompetitorSite(
  */
 async function discoverContentViaTavily(
     domain: string,
-    brandName: string
+    brandName: string,
+    searchPrefs?: TavilySearchPrefs
 ): Promise<string[]> {
     const apiKey = process.env.TAVILY_API_KEY
     if (!apiKey) return []
@@ -276,10 +281,11 @@ async function discoverContentViaTavily(
         const tvly = tavily({ apiKey })
 
         // Search for blog/content pages on the competitor's site
-        const response = await tvly.search(`site:${domain} guide how to`, {
+        const { modifiedQuery, options } = buildTavilySearchOptions(`site:${domain} guide how to`, searchPrefs, {
             maxResults: 10,
             searchDepth: "basic"
         })
+        const response = await tvly.search(modifiedQuery, options)
 
         const urls = (response.results || [])
             .map(r => r.url)
@@ -301,7 +307,8 @@ export async function scanAllCompetitors(
     competitors: DiscoveredCompetitor[],
     blueprintEmbeddings: TopicEmbedding[],
     blueprint: NicheBlueprint,
-    maxConcurrent: number = 2
+    maxConcurrent: number = 2,
+    searchPrefs?: TavilySearchPrefs
 ): Promise<SiteCoverage[]> {
     const results: SiteCoverage[] = []
 
@@ -309,7 +316,7 @@ export async function scanAllCompetitors(
     for (let i = 0; i < competitors.length; i += maxConcurrent) {
         const batch = competitors.slice(i, i + maxConcurrent)
         const batchResults = await Promise.allSettled(
-            batch.map(comp => scanCompetitorSite(comp, blueprintEmbeddings, blueprint))
+            batch.map(comp => scanCompetitorSite(comp, blueprintEmbeddings, blueprint, searchPrefs))
         )
 
         for (const result of batchResults) {
