@@ -29,7 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { marked } from "marked"
-import { ChevronDown, FileText as FileTextIcon, Type } from "lucide-react"
+import { ChevronDown, FileText as FileTextIcon, Type, Code } from "lucide-react"
 
 
 const TipTapEditor = dynamic(() => import("@/components/tiptap/Editor"), { ssr: false })
@@ -179,6 +179,32 @@ export default function ArticleDetailPage() {
         }
     }
 
+    const generateFinalHtml = useCallback(async (markdown: string) => {
+        let finalHtml = await marked.parse(markdown)
+        const baseUrl = window.location.origin
+        finalHtml = finalHtml.replace(/src="(\/api\/images\/[^"]+)"/g, `src="${baseUrl}$1"`)
+        finalHtml = finalHtml.replace(/src="(\/[^"]+\.(?:png|jpg|jpeg|gif|webp))"/gi, `src="${baseUrl}$1"`)
+        return finalHtml
+    }, [])
+
+    const handleCopyHtml = async () => {
+        const markdown = getMarkdownContent()
+        if (!markdown) {
+            toast.error("No content to copy")
+            return
+        }
+
+        try {
+            const html = await generateFinalHtml(markdown)
+            await navigator.clipboard.writeText(html)
+            setIsCopied(true)
+            toast.success("Copied as HTML")
+            setTimeout(() => setIsCopied(false), 2000)
+        } catch (err) {
+            toast.error("Failed to copy")
+        }
+    }
+
     const handleCopyRichText = async () => {
         let markdown = getMarkdownContent()
         if (!markdown) {
@@ -209,7 +235,7 @@ export default function ArticleDetailPage() {
         }
     }
 
-    const handleExport = () => {
+    const handleDownloadMarkdown = () => {
         const markdown = getMarkdownContent()
         if (!markdown) {
             toast.error("No content to export")
@@ -227,6 +253,30 @@ export default function ArticleDetailPage() {
         URL.revokeObjectURL(url)
     }
 
+    const handleDownloadHtml = async () => {
+        const markdown = getMarkdownContent()
+        if (!markdown) {
+            toast.error("No content to export")
+            return
+        }
+
+        try {
+            const html = await generateFinalHtml(markdown)
+            const blob = new Blob([html], { type: "text/plain" })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `${article?.keyword?.replace(/\s+/g, '-') || "article"}-html.txt`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+            toast.success("Downloaded as HTML (.txt)")
+        } catch (err) {
+            toast.error("Failed to download HTML")
+        }
+    }
+
     const handleSave = async () => {
         if (!article) return
 
@@ -239,13 +289,7 @@ export default function ArticleDetailPage() {
                 updatePayload.raw_content = markdownContent
 
                 // Convert to HTML for publishing
-                let finalHtml = await marked.parse(markdownContent)
-
-                // Convert relative image URLs to absolute URLs (same as copy logic)
-                const baseUrl = window.location.origin
-                finalHtml = finalHtml.replace(/src="(\/api\/images\/[^"]+)"/g, `src="${baseUrl}$1"`)
-                finalHtml = finalHtml.replace(/src="(\/[^"]+\.(?:png|jpg|jpeg|gif|webp))"/gi, `src="${baseUrl}$1"`)
-
+                const finalHtml = await generateFinalHtml(markdownContent)
                 updatePayload.final_html = finalHtml
             }
 
@@ -628,17 +672,36 @@ export default function ArticleDetailPage() {
                                     <Type className="w-4 h-4" />
                                     Copy as Rich Text
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleCopyHtml} className="cursor-pointer gap-2">
+                                    <Code className="w-4 h-4" />
+                                    Copy as HTML
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleExport}
-                            className="h-8 w-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                            title="Export as Markdown"
-                        >
-                            <Download className="w-4 h-4" />
-                        </Button>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 px-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 gap-1"
+                                    title="Download"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    <ChevronDown className="w-3 h-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={handleDownloadMarkdown} className="cursor-pointer gap-2">
+                                    <FileTextIcon className="w-4 h-4" />
+                                    Download as Markdown
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleDownloadHtml} className="cursor-pointer gap-2">
+                                    <Code className="w-4 h-4" />
+                                    Download as HTML (.txt)
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
                     <Button
