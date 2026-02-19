@@ -260,16 +260,35 @@ export default function SettingsPage() {
                                 value={b.brand_data?.search_country || ''}
                                 onChange={e => handleUpdateSearchPrefs(b.id, 'search_country', e.target.value)}
                               >
-                                <option value="">Global</option>
+                                <option value="">Global (No filter)</option>
                                 <option value="australia">Australia</option>
                                 <option value="united states">United States</option>
-                                <option value="united kingdom">UK</option>
+                                <option value="united kingdom">United Kingdom</option>
                                 <option value="canada">Canada</option>
                                 <option value="india">India</option>
                                 <option value="germany">Germany</option>
                                 <option value="france">France</option>
+                                <option value="japan">Japan</option>
+                                <option value="brazil">Brazil</option>
+                                <option value="netherlands">Netherlands</option>
                                 <option value="singapore">Singapore</option>
                                 <option value="new zealand">New Zealand</option>
+                                <option value="ireland">Ireland</option>
+                                <option value="south africa">South Africa</option>
+                                <option value="united arab emirates">UAE</option>
+                                <option value="sweden">Sweden</option>
+                                <option value="switzerland">Switzerland</option>
+                                <option value="italy">Italy</option>
+                                <option value="spain">Spain</option>
+                                <option value="mexico">Mexico</option>
+                                <option value="south korea">South Korea</option>
+                                <option value="indonesia">Indonesia</option>
+                                <option value="philippines">Philippines</option>
+                                <option value="malaysia">Malaysia</option>
+                                <option value="thailand">Thailand</option>
+                                <option value="poland">Poland</option>
+                                <option value="nigeria">Nigeria</option>
+                                <option value="pakistan">Pakistan</option>
                               </select>
                             </div>
                             <div>
