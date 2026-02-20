@@ -37,7 +37,7 @@ export default async function AccountPage() {
   // Fetch user's active subscription summary
   const { data: activeSub } = await supabase
     .from('dodo_subscriptions')
-    .select('dodo_subscription_id, status, cancel_at_period_end, next_billing_date, current_period_end, canceled_at, metadata, dodo_pricing_plans(name, credits)')
+    .select('dodo_subscription_id, status, cancel_at_period_end, next_billing_date, current_period_end, canceled_at, metadata, price_snapshot, currency_snapshot, dodo_pricing_plans(name, credits)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -77,6 +77,8 @@ export default async function AccountPage() {
           (activeSub as any)?.current_period_end || undefined,
         canceled_at:
           (activeSub as any)?.canceled_at || undefined,
+        price_snapshot: (activeSub as any)?.price_snapshot ?? null,
+        currency_snapshot: (activeSub as any)?.currency_snapshot ?? null,
       }
       : null
 

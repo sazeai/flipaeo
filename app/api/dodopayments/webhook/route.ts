@@ -218,6 +218,8 @@ async function upsertSubscriptionFromEvent(supabase: ReturnType<typeof createAdm
     dodo_product_id?: string | null
     status: 'pending' | 'active' | 'cancelled' | 'expired'
     raw?: any
+    price_snapshot?: number | null
+    currency_snapshot?: string | null
 }) {
     const { user_id, dodo_subscription_id, dodo_product_id, status, raw } = args
 
@@ -299,6 +301,8 @@ async function upsertSubscriptionFromEvent(supabase: ReturnType<typeof createAdm
                 pricing_plan_id: finalPricingPlanId,
                 status,
                 metadata: raw ? { source: 'webhook', raw } : { source: 'webhook' },
+                ...(args.price_snapshot != null ? { price_snapshot: args.price_snapshot } : {}),
+                ...(args.currency_snapshot ? { currency_snapshot: args.currency_snapshot } : {}),
             },
             { onConflict: 'dodo_subscription_id' },
         )
@@ -550,6 +554,11 @@ export async function POST(req: NextRequest) {
         const rootUserId = payload?.metadata?.user_id
         const effective_user_id = user_id || rootUserId
 
+        const price_snapshot_raw = Number(subscriptionObj?.total_amount ?? data?.total_amount ?? payload?.total_amount)
+        const price_snapshot = Number.isFinite(price_snapshot_raw) ? price_snapshot_raw : null
+        const currency_snapshot_raw = subscriptionObj?.currency ?? data?.currency ?? payload?.currency
+        const currency_snapshot = typeof currency_snapshot_raw === 'string' ? currency_snapshot_raw : null
+
         // Route on event type
         if (eventType === 'subscription.created' || eventType === 'subscription.activated' || eventType === 'subscription.active') {
             if (!effective_user_id || !dodo_subscription_id) {
@@ -565,6 +574,8 @@ export async function POST(req: NextRequest) {
                 dodo_product_id: dodo_product_id ?? null,
                 status,
                 raw: subscriptionObj,
+                price_snapshot,
+                currency_snapshot,
             })
 
             // Complete the latest pending change on activation
@@ -660,6 +671,8 @@ export async function POST(req: NextRequest) {
                 dodo_product_id: dodo_product_id ?? null,
                 status: 'cancelled',
                 raw: subscriptionObj,
+                price_snapshot,
+                currency_snapshot,
             })
             await updateSubscriptionServiceFields(supabase, dodo_subscription_id, subscriptionObj, eventType)
         } else if (eventType === 'subscription.plan_changed') {
@@ -680,6 +693,8 @@ export async function POST(req: NextRequest) {
                     dodo_product_id: dodo_product_id ?? null,
                     status: mapped,
                     raw: subscriptionObj,
+                    price_snapshot,
+                    currency_snapshot,
                 })
                 if (mapped === 'active') {
                     try {
@@ -711,6 +726,8 @@ export async function POST(req: NextRequest) {
                     dodo_product_id: dodo_product_id ?? null,
                     status: mapped,
                     raw: subscriptionObj,
+                    price_snapshot,
+                    currency_snapshot,
                 })
                 if (mapped === 'active') {
                     await setUserCreditsToPlanCredits(supabase, effective_user_id, planCredits ?? null)

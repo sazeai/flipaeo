@@ -38,6 +38,8 @@ interface SubscriptionSummary {
   cancel_at_period_end?: boolean
   current_period_end?: string
   canceled_at?: string
+  price_snapshot?: number | null
+  currency_snapshot?: string | null
 }
 
 interface AccountDashboardProps {

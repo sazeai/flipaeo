@@ -50,7 +50,7 @@ async function getLatestSubscription(userId: string) {
     // Priority 1: Look for an active subscription first
     const { data: activeSub, error: activeError } = await supabase
         .from('dodo_subscriptions')
-        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
+        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at, price_snapshot, currency_snapshot')
         .eq('user_id', userId)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -63,7 +63,7 @@ async function getLatestSubscription(userId: string) {
     // Priority 2: Look for a pending subscription (checkout in progress)
     const { data: pendingSub, error: pendingError } = await supabase
         .from('dodo_subscriptions')
-        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
+        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at, price_snapshot, currency_snapshot')
         .eq('user_id', userId)
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
@@ -76,7 +76,7 @@ async function getLatestSubscription(userId: string) {
     // Priority 3: Fall back to most recent subscription (for cancelled/expired states)
     const { data, error } = await supabase
         .from('dodo_subscriptions')
-        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at')
+        .select('dodo_subscription_id, status, pricing_plan_id, next_billing_date, cancel_at_period_end, current_period_end, canceled_at, price_snapshot, currency_snapshot')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -100,6 +100,8 @@ export default async function SubscribePage() {
         cancel_at_period_end?: boolean
         current_period_end?: string
         canceled_at?: string
+        price_snapshot?: number | null
+        currency_snapshot?: string | null
     } | null = null
 
     if (user) {
@@ -124,6 +126,8 @@ export default async function SubscribePage() {
                 cancel_at_period_end: !!row.cancel_at_period_end,
                 current_period_end: row.current_period_end || undefined,
                 canceled_at: row.canceled_at || undefined,
+                price_snapshot: row.price_snapshot ?? null,
+                currency_snapshot: row.currency_snapshot ?? null,
             }
         }
     }

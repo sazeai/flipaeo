@@ -72,11 +72,11 @@ export function SubscriptionManagement({
                     {currentPlan.status}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {currentPlan.type === `monthly`
+                    {currentPlan.price || (currentPlan.type === `monthly`
                       ? `${currentPlan.plan.currency}${currentPlan.plan.monthlyPrice}/month`
                       : currentPlan.type === `yearly`
                         ? `${currentPlan.plan.yearlyPrice}/year`
-                        : `${currentPlan.price}`}
+                        : `${currentPlan.plan.currency}${currentPlan.plan.monthlyPrice}/month`)}
                   </span>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">

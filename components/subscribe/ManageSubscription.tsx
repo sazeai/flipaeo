@@ -24,6 +24,8 @@ export interface SubscriptionSummary {
     cancel_at_period_end?: boolean
     current_period_end?: string
     canceled_at?: string
+    price_snapshot?: number | null
+    currency_snapshot?: string | null
 }
 
 export interface PlanRow {
@@ -135,8 +137,16 @@ export default function ManageSubscription({ subscription, plans, userEmail }: M
     const dateLabel = localCancelAtPeriodEnd ? 'Plan ends on' : 'Next billing date'
 
     const currentPlanInfo = useMemo<BSDKCurrentPlan>(() => {
-        const sym = currentPlanDisplay?.currency || '$'
-        const priceStr = currentPlanDisplay ? `${sym}${currentPlanDisplay.monthlyPrice}/month` : '—'
+        let sym = currentPlanDisplay?.currency || '$'
+        let priceStr = currentPlanDisplay ? `${sym}${currentPlanDisplay.monthlyPrice}/month` : '—'
+
+        if (subscription.price_snapshot != null) {
+            const snapCurrency = subscription.currency_snapshot || 'USD'
+            sym = currencySymbol(snapCurrency)
+            const amt = subscription.price_snapshot / 100 // assuming price_snapshot is in cents
+            priceStr = `${sym}${amt}/month`
+        }
+
         const status: BSDKCurrentPlan['status'] =
             subscription.status === 'active'
                 ? 'active'
