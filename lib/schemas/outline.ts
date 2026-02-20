@@ -10,7 +10,7 @@ export const ArticleOutlineSchema = z.object({
   title: z.string().min(3).max(200),
   intro: z.object({
     instruction_note: z.string().min(10).max(2000),
-    keywords_to_include: z.array(z.string()).max(20),
+    keywords_to_include: z.array(z.string()).max(20).default([]),
   }),
   sections: z
     .array(
@@ -19,7 +19,7 @@ export const ArticleOutlineSchema = z.object({
         heading: z.string().min(3).max(200),
         level: z.number().int().min(2).max(6).default(2),
         instruction_note: z.string().min(10).max(2000),
-        keywords_to_include: z.array(z.string()).max(20),
+        keywords_to_include: z.array(z.string()).max(20).default([]),
         // Optional external link to include in this section
         external_link: ExternalLinkSchema.optional(),
         // Optional internal link to include in this section

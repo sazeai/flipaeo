@@ -1525,7 +1525,7 @@ export const generateBlogPost = task({
       ]
 
       const outlineStream = await genAI.models.generateContentStream({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         config: outlineConfig,
         contents: outlineContents
       })
@@ -1670,7 +1670,7 @@ CRITICAL EXECUTION RULES:
         ]
 
         const writeStream = await genAI.models.generateContentStream({
-          model: "gemini-2.5-flash-lite",
+          model: "gemini-2.5-flash",
           config: writeConfig,
           contents: writeContents
         })
