@@ -1207,6 +1207,25 @@ ${globalMap}
 
 ### 8. WRITING STYLE & VOICE OF BRAND YOU ARE WRITING FOR (FOLLOW THESE INSTRUCTIONS PRECISELY)
 "${styleDNA}"
+${(() => {
+      const ukSpellingCountries = ["australia", "united kingdom", "new zealand", "south africa", "ireland", "india"]
+      const country = brandDetails?.search_country?.toLowerCase()?.trim() || ""
+      if (ukSpellingCountries.includes(country)) {
+        return `
+**SPELLING CONVENTION (MANDATORY — ${country.toUpperCase()} MARKET):**
+You MUST use British/Australian English spelling throughout the ENTIRE article. This is non-negotiable.
+For Example:
+- "organise" NOT "organize", "organisation" NOT "organization"
+- "colour" NOT "color", "favour" NOT "favor", "behaviour" NOT "behavior"
+- "analyse" NOT "analyze", "recognise" NOT "recognize", "summarise" NOT "summarize"
+- "centre" NOT "center", "metre" NOT "meter", "fibre" NOT "fiber"
+- "defence" NOT "defense", "licence" (noun) NOT "license"
+- "programme" NOT "program" (except computer programs)
+- "catalogue" NOT "catalog", "dialogue" NOT "dialog"
+If you are unsure, default to British English spelling conventions.`
+      }
+      return ""
+    })()}
 
 ### 9. STRATEGY & MINDSET
 - **Goal:** Rank #1 on Google and get cited by ai LLMs by being more specific, helpful, and "human" than the competition to answer the user's question.
@@ -1670,7 +1689,7 @@ CRITICAL EXECUTION RULES:
         ]
 
         const writeStream = await genAI.models.generateContentStream({
-          model: "gemini-2.5-flash",
+          model: "gemini-2.5-flash-lite",
           config: writeConfig,
           contents: writeContents
         })
