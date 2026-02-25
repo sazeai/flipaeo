@@ -921,19 +921,19 @@ ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-3 MAX NATURALLY WHE
 ---
   Before outlining, analyze the "Keyword Intent" to determine the required depth:
 
-1. ** The "Quick Answer" Scope ** (e.g., "how to reset iphone", "what is x", or commerical intent):
-- Structure: Short, direct.
-   - Depth: Mostly H2s, few H3s.
-   - Total Sections: ** 7 - 10 sections ** are sufficient.
-   - GOAL: Speed to solution.
+1. ** The "Quick Answer" Scope ** (e.g., "how to reset iphone", "what is x", or commercial intent):
+- Structure: Short, direct with inverted pyramid delivery (answers first, theory later).
+   - Depth: 3-5 H2s max. Heavy use of H3s for details.
+   - Total Sections: ** 7 - 12 sections ** are sufficient.
+   - GOAL: Speed to solution (snippet baits immediately under H2s).
 
 2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software", "comparison articles", "how to articles", "step by step articles"):
-- Structure: Deep, nested.
-   - Depth: Heavy use of H3s and H4s.
-   - Total Sections: ** 9 - 12 sections **.
-   - GOAL: Exhaustive coverage.
+- Structure: Deep, nested with high-value formatting signals.
+   - Depth: Heavy use of H3s and H4s. (60-70% of all headings MUST be H3/H4).
+   - Total Sections: ** 9 - 16 sections **. 4-7 H2s MAX. The rest must be H3/H4.
+   - GOAL: Exhaustive coverage without section bloat.
 
-** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 12 - section outline for a 8 - section topic.
+** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 12-section outline for an 8-section topic, but NEVER use flat H2s.
 
 ## HEADING STYLE PROTOCOL(MANDATORY - READ CAREFULLY)
 
@@ -957,34 +957,34 @@ If it sounds like a user might be searching for or a Google Search Query, keep i
 ## HEADING HIERARCHY RULES (CRITICAL FOR SEO - MUST FOLLOW)
 
 **LEVEL DEFINITIONS:**
-- **level: 2 (H2)** = Main topic pillars. Wide scope.
-- **level: 3 (H3)** = Specific sub-concepts. Narrower scope.
+- **level: 2 (H2)** = Main topic pillars. Wide scope. (Max 5-8 per article)
+- **level: 3 (H3)** = Specific sub-concepts. Narrower scope. (Where the real substance lives)
 - **level: 4 (H4)** = Granular details, lists, steps, specific features. Deep scope.
 
-** STRUCTURE PATTERN(FOLLOW THIS):**
+** STRUCTURE PATTERN(FOLLOW THIS EXAMPLE EXACTLY):**
 \`\`\`
-H2: Main Topic A
-  H3: Subtopic A.1
-  H3: Subtopic A.2
-    H4: Detail A.2.1 (if needed)
-    H4: Detail A.2.2
-  H3: Subtopic A.3
-H2: Main Topic B
-  H3: Subtopic B.1
-  H3: Subtopic B.2
+H2: What Are X and Why Do They Matter for SEO?
+  [Instruction: 40-word definition paragraph — snippet bait -> Quick comparison table: X vs Y]
+H2: 6 Ways to Achieve Z Without Doing W
+  [Instruction: Numbered summary list — list snippet bait]
+  H3: 1. Find and Fix Broken Links
+    H4: How to Find Opportunities
+    H4: Writing Outreach Emails
+  H3: 2. Pitch Yourself as an Expert
+H2: How to Measure If Your Strategy Is Working
+  [Instruction: KPI table with metrics, what they mean, tools to track]
+H2: Common Mistakes That Kill Results
+  [Instruction: Quick list format — scannable]
 \`\`\`
 
 **HIERARCHY REQUIREMENTS (STRICT):**
-1. **The 60% Rule:** AT LEAST 60% of your sections MUST be level 3 or 4.
-2. **The H4 Mandate:** You MUST use H4s for:
-   - Specific steps in a process
-   - Detailed feature breakdowns
-   - Pros/Cons lists
-   - Comparisons
-   - "Why this matters" deep dives
-3. **NEVER** have back-to-back H2s without at least one H3 in between (unless it's a very simple transition).
-4. **Structure:** The output sections array is flat, but the logic is nested.
-5. **Depth over Breadth:** Prefer fewer H2s with more depth (H3/H4/Listicles/Tables/Quotes/Code Examples) over many shallow H2s.
+1. **The 60-70% Rule:** 60-70% of your sections MUST be level 3 or 4.
+2. **H2 Limit:** NEVER exceed 5-8 H2s total for any article length. H2s are chapters, H3s/H4s are the actual content.
+3. **Snippet Baits:** Immediately under each H2, the instruction MUST demand a specific format (e.g., 40-word definition, comparison table, numbered summary list) for AI citations.
+4. **The H4 Mandate:** You MUST use H4s for specific steps, detailed features, pros/cons, comparisons, and deep dives.
+5. **Formatting Directives:** Every instruction MUST dictate formatting (tables, bullet lists, callouts, bolded entities).
+6. **No Section Bloat:** Consolidate repetitive concepts into tables or lists instead of endless flat H2s.
+7. **No Advertorial Subheadings:** NEVER use explicit brand pitches like "Why Choose [Brand]". Integrate the brand naturally into H3/H4 solution steps instead.
 
 ---
 
@@ -1030,8 +1030,8 @@ ${internalLinks.length > 0 ? internalLinks.map(l => `- Title: ${l.title} | URL: 
    - **Requirement:** You must COPY the specific number/stat from the Fact Sheet into the instruction_note (dont forget anything important, the fact sheet is curated data from the research).
    - **Rule:** Do not reuse the same fact in multiple sections. Assign it to the ONE best spot.
    - **DO NOT** write style instructions. Only focus on the **Substance**.
-5. Keep the instructions note as detaile das possible to avoid any hallucination or misinterpretation by the writer.
-
+5. Keep the instructions note as detailed as possible to avoid any hallucination or misinterpretation by the writer.
+6. Instructions notes must also include the instructions for use of tables, bullet lists, callouts, etc in approx 50% sections, avoid only walls of text.
 ## IN-CONTENT IMAGE SELECTION (IMPORTANT):
 For EACH H2 section, decide if an image would ADD VALUE to the content:
 - Set "needs_image": true if the section would benefit from a visual
@@ -1073,8 +1073,10 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 }
 
 **FINAL CHECK:** Before outputting, verify that:
-- You have adhered to the 60% rule (majority of sections are H3/H4)
-- You have instructed the writer to break down complex topics/Heavy walls of text into LISTICLES, TABLES, CODE EXAMPLES, QUOTES, etc.
+- You have adhered to the 60-70% rule (majority of sections are H3/H4)
+- You have kept the total H2 count strictly between 5 and 8.
+- You have added Snippet Bait formatting instructions immediately under every single H2.
+- You have strictly instructed the writer to break down complex topics into LISTICLES, TABLES, CODE EXAMPLES, QUOTES, etc.
 - Does this outline solve the specific intent of "${keyword}"?
 - Have you instructed the writer to remove unnecessary fluff?
 - Have you assigned 1-2 external links to relevant sections?
