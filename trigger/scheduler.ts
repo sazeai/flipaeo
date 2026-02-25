@@ -109,12 +109,27 @@ export const dailyContentWatchman = schedules.task({
                     .eq("id", plan.brand_id)
                     .single()
 
-                if (!fullPlan?.competitor_seeds || !brand) {
-                    console.warn(`⚠️ Cannot auto-refill plan ${plan.id}: Missing seeds or brand data.`)
+                if (!brand) {
+                    console.warn(`⚠️ Cannot auto-refill plan ${plan.id}: Missing brand data.`)
                     await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
                     completedPlans++
                     continue
                 }
+
+                let parsedSeeds: string[] = []
+                if (fullPlan?.competitor_seeds) {
+                    if (typeof fullPlan.competitor_seeds === 'string') {
+                        try {
+                            parsedSeeds = JSON.parse(fullPlan.competitor_seeds)
+                        } catch (e) { /* ignore parse error */ }
+                    } else if (Array.isArray(fullPlan.competitor_seeds)) {
+                        parsedSeeds = fullPlan.competitor_seeds
+                    }
+                }
+
+                const seeds = parsedSeeds.length
+                    ? parsedSeeds
+                    : (brand.enemy?.length ? brand.enemy : brand.brand_keywords || []);
 
                 // 3. Generate NEW 30-Day Plan
                 console.log(`✨ Auto-generating new 30-day plan for User ${plan.user_id}...`)
@@ -127,7 +142,7 @@ export const dailyContentWatchman = schedules.task({
                         userId: plan.user_id,
                         brandId: plan.brand_id,
                         brandData: brand,
-                        seeds: fullPlan.competitor_seeds,
+                        seeds: seeds,
                         existingContent: [] // We rely on DB coverage now
                     })
 
@@ -138,7 +153,7 @@ export const dailyContentWatchman = schedules.task({
                             user_id: plan.user_id,
                             brand_id: plan.brand_id,
                             plan_data: newPlanItems,
-                            competitor_seeds: fullPlan.competitor_seeds,
+                            competitor_seeds: seeds,
                             automation_status: "active", // Immediately active
                             catch_up_mode: plan.catch_up_mode || "gradual", // Inherit mode
                             created_at: new Date().toISOString()
