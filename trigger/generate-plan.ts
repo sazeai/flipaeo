@@ -123,6 +123,7 @@ async function syncSitemapToInternalLinks(
         '/tutorial/',
         '/how-to/',
         '/tips/',
+        '/use-cases/',
     ]
 
     const blogUrls = sitemapUrls.filter(url => {

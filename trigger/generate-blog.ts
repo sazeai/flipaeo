@@ -930,7 +930,7 @@ ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-3 MAX NATURALLY WHE
 2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software", "comparison articles", "how to articles", "step by step articles"):
 - Structure: Deep, nested with high-value formatting signals.
    - Depth: Heavy use of H3s and H4s. (60-70% of all headings MUST be H3/H4).
-   - Total Sections: ** 9 - 16 sections **. 4-7 H2s MAX. The rest must be H3/H4.
+   - Total Sections: ** 9 - 15 sections **. 4-7 H2s MAX. The rest must be H3/H4.
    - GOAL: Exhaustive coverage without section bloat.
 
 ** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 12-section outline for an 8-section topic, but NEVER use flat H2s.
