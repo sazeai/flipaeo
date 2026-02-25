@@ -414,6 +414,29 @@ async function setUserCreditsToPlanCredits(
     }
 }
 
+async function reactivateUserPlans(supabase: ReturnType<typeof createAdminClient>, user_id: string) {
+    try {
+        const { data } = await supabase
+            .from('content_plans' as any)
+            .select('id, automation_status')
+            .eq('user_id', user_id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+        const latestPlan = data as any;
+        if (latestPlan && (latestPlan.automation_status === 'completed' || latestPlan.automation_status === 'paused')) {
+            await supabase
+                .from('content_plans' as any)
+                .update({ automation_status: 'active', updated_at: new Date().toISOString() })
+                .eq('id', latestPlan.id)
+            console.log(`[Webhook] Reactivated content plan ${latestPlan.id} after payment/renewal.`)
+        }
+    } catch (err) {
+        console.error('[Webhook] Failed to reactivate content plan:', err)
+    }
+}
+
 export async function POST(req: NextRequest) {
     // Read raw body FIRST for signature verification
     const rawBody = await req.text()
@@ -635,27 +658,7 @@ export async function POST(req: NextRequest) {
             // because their previously active subscription lapsed, or "paused" due to 0 credits.
             // By setting their latest plan back to "active", the scheduler will pick it up and
             // either resume processing or auto-generate a new plan if it's exhausted.
-            try {
-                const { data } = await supabase
-                    .from('content_plans' as any)
-                    .select('id, automation_status')
-                    .eq('user_id', effective_user_id)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle()
-
-                const latestPlan = data as any;
-
-                if (latestPlan && (latestPlan.automation_status === 'completed' || latestPlan.automation_status === 'paused')) {
-                    await supabase
-                        .from('content_plans' as any)
-                        .update({ automation_status: 'active', updated_at: new Date().toISOString() })
-                        .eq('id', latestPlan.id)
-                    console.log(`[Webhook] Reactivated content plan ${latestPlan.id} after payment/renewal.`)
-                }
-            } catch (err) {
-                console.error('[Webhook] Failed to reactivate content plan after payment/renewal:', err)
-            }
+            await reactivateUserPlans(supabase, effective_user_id)
 
             // Persist payment record for invoice history
             const paymentObj = data?.payment ?? data
@@ -758,6 +761,7 @@ export async function POST(req: NextRequest) {
                 })
                 if (mapped === 'active') {
                     await setUserCreditsToPlanCredits(supabase, effective_user_id, planCredits ?? null)
+                    await reactivateUserPlans(supabase, effective_user_id)
                     try {
                         await completeLatestPendingChange(
                             supabase,

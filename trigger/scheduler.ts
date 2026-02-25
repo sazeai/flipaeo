@@ -71,16 +71,25 @@ export const dailyContentWatchman = schedules.task({
                 // Plan is complete. Check if we should auto-refill (Infinite Loop).
                 console.log(`🔄 Plan ${plan.id} finished. Checking for auto-refill...`)
 
-                // 1. Check for Active Subscription
+                // 1. Check for Active Subscription OR Available Credits
                 const { data: subscription } = await supabase
                     .from("dodo_subscriptions")
                     .select("status")
                     .eq("user_id", plan.user_id)
                     .eq("status", "active")
+                    .limit(1)
                     .maybeSingle()
 
-                if (!subscription) {
-                    console.log(`⏹️ User ${plan.user_id} has no active subscription. Stopping automation.`)
+                // Check if user has at least 1 credit available (for LTD users who get refilled)
+                const { hasCredits, error: creditCheckError } = await adminHasCredits(plan.user_id, 1)
+
+                if (creditCheckError) {
+                    console.error(`❌ Failed to check credits for plan auto-refill (User ${plan.user_id}): ${creditCheckError}`)
+                    continue // Skip for now to avoid falsely completing the plan due to a DB error
+                }
+
+                if (!subscription && !hasCredits) {
+                    console.log(`⏹️ User ${plan.user_id} has no active subscription and no credits available. Stopping automation.`)
                     await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
                     completedPlans++
                     continue
