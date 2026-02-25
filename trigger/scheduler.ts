@@ -143,7 +143,7 @@ export const dailyContentWatchman = schedules.task({
                         brandId: plan.brand_id,
                         brandData: brand,
                         seeds: seeds,
-                        existingContent: [] // We rely on DB coverage now
+                        existingContent: []
                     })
 
                     // 4. Save New Plan
