@@ -16,7 +16,7 @@ export async function generateNicheBlueprint(
 ): Promise<NicheBlueprint> {
     const client = getGeminiClient()
 
-    const category = brandData.product_identity.literally || brandData.category || "SaaS Software"
+    const category = brandData.product_identity?.literally || brandData.category || "SaaS Software"
     const audience = brandData.audience?.primary || "business professionals"
     const features = brandData.core_features?.join(", ") || "Not specified"
     const enemy = Array.isArray(brandData.enemy) ? brandData.enemy.join(", ") : (brandData.enemy || "Not specified")

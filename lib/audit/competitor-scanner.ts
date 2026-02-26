@@ -115,7 +115,7 @@ export async function discoverCompetitors(
 
 ## THE BRAND WE ARE ANALYZING
 - **Name:** ${brandData.product_name}
-- **What it does:** ${brandData.product_identity.literally}
+- **What it does:** ${brandData.product_identity?.literally || brandData.category || 'Software'}
 - **Category:** ${brandData.category || "N/A"}
 
 ## WEBSITES FOUND IN SEARCH RESULTS
@@ -127,7 +127,7 @@ For EACH website above, ask yourself: "What is this company's PRIMARY product?"
 
 A website is a REAL COMPETITOR only if:
 1. Their PRIMARY business/product is in the SAME category as ${brandData.product_name}
-2. A customer shopping for ${brandData.category || brandData.product_identity.literally} would realistically consider them as an alternative
+2. A customer shopping for ${brandData.category || brandData.product_identity?.literally || 'this type of product'} would realistically consider them as an alternative
 3. The functionality matching ${brandData.product_name} is their CORE offering, not a side feature
 
 You MUST REJECT:

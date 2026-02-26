@@ -634,7 +634,7 @@ ${neededByCategory["Authority Plays"] > 0 ? `- Authority Plays: ${neededByCatego
 ## BRAND CONTEXT
 - Product: ${brandData.product_name}
 - Features: ${brandData.core_features?.join(", ") || "Not specified"}
-- Audience: ${brandData.audience.primary}
+- Audience: ${brandData.audience?.primary || 'business professionals'}
 
 ## EXISTING ARTICLES (DO NOT DUPLICATE)
 ${existingTitles}

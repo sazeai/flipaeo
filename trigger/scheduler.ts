@@ -144,7 +144,7 @@ export const dailyContentWatchman = schedules.task({
                             planId: newPlan.id,
                             userId: plan.user_id,
                             brandId: plan.brand_id,
-                            brandData: brand,
+                            brandData: brand.brand_data,
                             brandUrl: brand.brand_url,
                             isAutoRefill: true
                         }

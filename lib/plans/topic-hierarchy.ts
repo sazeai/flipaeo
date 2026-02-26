@@ -40,8 +40,8 @@ You are a content strategist building a TOPIC HIERARCHY for a 30-day content pla
 
 ## BRAND CONTEXT
 Product: ${brandData.product_name}
-Category: ${brandData.product_identity.literally}
-Audience: ${brandData.audience.primary}
+Category: ${brandData.product_identity?.literally || brandData.category || 'Software'}
+Audience: ${brandData.audience?.primary || 'business professionals'}
 Core Features: ${brandData.core_features?.join(", ") || "Not specified"}
 
 ## COMPETITOR BRANDS (for comparison articles)

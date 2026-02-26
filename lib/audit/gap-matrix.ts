@@ -132,8 +132,8 @@ You are a content architect helping a brand build topical authority through stra
 
 ## BRAND CONTEXT
 - **Product:** ${brandData.product_name}
-- **Category:** ${brandData.category || brandData.product_identity.literally}
-- **Audience:** ${brandData.audience.primary}
+- **Category:** ${brandData.category || brandData.product_identity?.literally || 'Software'}
+- **Audience:** ${brandData.audience?.primary || 'business professionals'}
 
 ## TOP AUTHORITY GAPS (by pillar)
 ${topPillars.map(p => `

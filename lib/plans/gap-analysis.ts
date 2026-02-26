@@ -36,8 +36,8 @@ You are a strategic SEO analyst performing a gap analysis.
 
 ## BRAND CONTEXT
 Product: ${brandData.product_name}
-What it does: ${brandData.product_identity.literally}
-Audience: ${brandData.audience.primary}
+What it does: ${brandData.product_identity?.literally || brandData.category || 'Software'}
+Audience: ${brandData.audience?.primary || 'business professionals'}
 Core features: ${brandData.core_features?.join(", ") || "Not specified"}
 
 ## COMPETITOR COVERAGE (What's Already Ranking)

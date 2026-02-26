@@ -86,10 +86,10 @@ ${brandUrl ? `Website: ${brandUrl}` : ''}
 Current Date: ${currentDate}
 
 ## Brand Intelligence (HIGH-LEVEL ONLY)
-- **Product:** ${brandData.product_name} - ${brandData.product_identity.literally}
-- **What it is (literally):** ${brandData.product_identity.literally}
+- **Product:** ${brandData.product_name} - ${brandData.product_identity?.literally || brandData.category || 'Software'}
+- **What it is (literally):** ${brandData.product_identity?.literally || brandData.category || 'Software'}
 - **Category:** ${brandData.category || 'SaaS Software'}
-- **Primary Audience:** ${brandData.audience.primary}
+- **Primary Audience:** ${brandData.audience?.primary || 'business professionals'}
 - **The Problem We Solve (UVP):** ${Array.isArray(brandData.uvp) ? brandData.uvp.slice(0, 2).join(', ') : brandData.uvp}
 
 ## Internal Product Capabilities (Background Context ONLY)
@@ -465,7 +465,7 @@ CRITICAL RULES:
 
 ## Product Context (Quick Reference)
 - Product: ${brandData.product_name}
-- What it is: ${brandData.product_identity.literally}
+- What it is: ${brandData.product_identity?.literally || brandData.category || 'Software'}
 - Core Features: ${Array.isArray(brandData.core_features) ? brandData.core_features.join(', ') : brandData.core_features}
 
 ## Output Format

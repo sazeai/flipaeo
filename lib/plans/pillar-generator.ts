@@ -31,9 +31,9 @@ You are a content strategist helping a brand establish domain authority through 
 
 ## Brand Context
 - **Product:** ${brandData.product_name}
-- **What it is:** ${brandData.product_identity.literally}
+- **What it is:** ${brandData.product_identity?.literally || brandData.category || 'Software'}
 - **Category:** ${brandData.category || 'SaaS Software'}
-- **Primary Audience:** ${brandData.audience.primary}
+- **Primary Audience:** ${brandData.audience?.primary || 'business professionals'}
 - **Core Problem Solved:** ${Array.isArray(brandData.uvp) ? brandData.uvp[0] : brandData.uvp}
 
 ## Your Task
