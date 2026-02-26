@@ -919,21 +919,31 @@ ${internalLinks.length > 0 ? `### INTERNAL LINKS POOL (USE 1-3 MAX NATURALLY WHE
 "${strategy.outline_instruction}" 
 
 ---
-  Before outlining, analyze the "Keyword Intent" to determine the required depth:
+## ARTICLE SCOPE (DETERMINED BY ARTICLE TYPE: ${articleType.toUpperCase()})
 
-1. ** The "Quick Answer" Scope ** (e.g., "how to reset iphone", "what is x", or commercial intent):
+${articleType === 'informational' ? `
+**YOUR SCOPE: "Quick Answer" (MANDATORY for informational articles)**
 - Structure: Short, direct with inverted pyramid delivery (answers first, theory later).
-   - Depth: 3-5 H2s max. Heavy use of H3s for details.
-   - Total Sections: ** 7 - 12 sections ** are sufficient.
-   - GOAL: Speed to solution (snippet baits immediately under H2s).
-
-2. ** The "Comprehensive Guide" Scope ** (e.g., "ultimate guide to seo", "best crm software", "comparison articles", "how to articles", "step by step articles"):
+- Depth: 3-5 H2s max. Heavy use of H3s for details.
+- Total Sections: **STRICT LIMIT: 7-10 sections. DO NOT exceed 10.**
+- Target Article Length: ~1,800-2,500 words total.
+- GOAL: Speed to solution (snippet baits immediately under H2s).
+` : `
+**YOUR SCOPE: "Comprehensive Guide" (MANDATORY for ${articleType} articles)**
 - Structure: Deep, nested with high-value formatting signals.
-   - Depth: Heavy use of H3s and H4s. (60-70% of all headings MUST be H3/H4).
-   - Total Sections: ** 9 - 15 sections **. 4-7 H2s MAX. The rest must be H3/H4.
-   - GOAL: Exhaustive coverage without section bloat.
+- Depth: Heavy use of H3s and H4s. (60-70% of all headings MUST be H3/H4).
+- Total Sections: **STRICT LIMIT: 10-16 sections. DO NOT exceed 16.** 4-7 H2s MAX. The rest must be H3/H4.
+- Target Article Length: ~2,500-4,000 words total.
+- GOAL: Exhaustive coverage without section bloat.
+`}
 
-** INSTRUCTION:** Adjust your outline length to match the keyword intent. Do not force a 12-section outline for an 8-section topic, but NEVER use flat H2s.
+** SECTION CONSOLIDATION RULE (CRITICAL):**
+- Prefer fewer, richer sections over many thin ones.
+- If two H3 sub-topics can be covered together (e.g., with a comparison table or a combined list), MERGE them into one section.
+- A 300-word section with a table + context is BETTER than three separate 100-word H4 sections.
+- Before adding a new section, ask: "Can this be folded into an existing section?"
+
+** INSTRUCTION:** Stay within the section count and word budget above. Do not force a 12-section outline for an 8-section topic, but NEVER use flat H2s.
 
 ## HEADING STYLE PROTOCOL(MANDATORY - READ CAREFULLY)
 
@@ -1073,6 +1083,8 @@ For EACH H2 section, decide if an image would ADD VALUE to the content:
 }
 
 **FINAL CHECK:** Before outputting, verify that:
+- Your TOTAL section count does NOT exceed the limit for the chosen scope (10 for Quick Answer, 16 for Comprehensive Guide). COUNT THEM.
+- You have NOT created thin H3/H4 sections that could be merged into their parent section.
 - You have adhered to the 60-70% rule (majority of sections are H3/H4)
 - You have kept the total H2 count strictly between 5 and 8.
 - You have added Snippet Bait formatting instructions immediately under every single H2.
@@ -1353,6 +1365,11 @@ You MUST include an internal link to our own content in this section.
 
 ### YOUR TASK: WRITE SECTION "${currentSection.heading}"
 **GOAL:** High-density, skimmable, "human" content.
+
+**LENGTH GUIDANCE (not a hard limit — use judgment):**
+- Aim for 150-300 words. Some data-heavy sections may need more — that's fine if every sentence earns its place.
+- If you find yourself exceeding ~400 words, consider whether the content is too broad for a single section.
+- A tight 200-word section with a table or bullet list beats a 400-word wall of text.
 
 **CONTENT REQUIREMENTS:**
 ${currentSection.instruction_note}
