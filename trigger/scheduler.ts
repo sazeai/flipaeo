@@ -104,9 +104,9 @@ export const dailyContentWatchman = schedules.task({
                     .single()
 
                 const { data: brand } = await supabase
-                    .from("brands")
+                    .from("brand_details")
                     .select("*")
-                    .eq("id", plan.brand_id)
+                    .eq("id", fullPlan?.brand_id || plan.brand_id)
                     .single()
 
                 if (!brand) {
@@ -473,12 +473,12 @@ export const sitemapSyncScheduler = schedules.task({
 
         const supabase = createAdminClient() as any
 
-        // Fetch all brands with a sitemap
+        // Fetch all brands with a valid website_url
         const { data: brands, error } = await supabase
-            .from("brands")
-            .select("id, user_id, sitemap")
-            .not("sitemap", "is", null)
-            .neq("sitemap", "")
+            .from("brand_details")
+            .select("id, user_id, website_url")
+            .not("website_url", "is", null)
+            .neq("website_url", "")
 
         if (error) {
             console.error("❌ Sitemap Scheduler DB Error:", error)
@@ -499,10 +499,11 @@ export const sitemapSyncScheduler = schedules.task({
 
         for (const brand of brands) {
             try {
+                const sitemapUrl = brand.website_url.endsWith('/') ? `${brand.website_url}sitemap.xml` : `${brand.website_url}/sitemap.xml`
                 await syncInternalLinks.trigger({
                     userId: brand.user_id,
                     brandId: brand.id,
-                    sitemapUrl: brand.sitemap
+                    sitemapUrl: sitemapUrl
                 })
                 triggeredCount++
                 // Tiny delay just to be polite to the queueing system

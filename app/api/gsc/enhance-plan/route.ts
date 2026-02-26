@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
         // 6. Get brand name for filtering
         const { data: brand } = await supabase
-            .from("brands")
+            .from("brand_details")
             .select("brand_data")
             .eq("id", existingPlan.brand_id)
             .single()
