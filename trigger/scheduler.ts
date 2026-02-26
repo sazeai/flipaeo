@@ -2,9 +2,7 @@ import { schedules } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { generateBlogPost } from "./generate-blog"
 import { adminHasCredits, adminDeductCredits, adminAddCredits } from "@/lib/credits"
-import { PlanRefilledEmail } from "@/lib/emails/templates/plan-refilled"
 import { BillingAlertEmail } from "@/lib/emails/templates/billing-alert"
-
 import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
 import { render } from "@react-email/components"
 
@@ -95,18 +93,11 @@ export const dailyContentWatchman = schedules.task({
                     continue
                 }
 
-                // 2. Fetch required data for generation (Seeds & Brand)
-                // We need to fetch the plan again with competitor_seeds if not selected initially
-                const { data: fullPlan } = await supabase
-                    .from("content_plans")
-                    .select("competitor_seeds, brand_id")
-                    .eq("id", plan.id)
-                    .single()
-
+                // 2. Fetch brand data for the background task payload
                 const { data: brand } = await supabase
                     .from("brand_details")
                     .select("*")
-                    .eq("id", fullPlan?.brand_id || plan.brand_id)
+                    .eq("id", plan.brand_id)
                     .single()
 
                 if (!brand) {
@@ -116,96 +107,70 @@ export const dailyContentWatchman = schedules.task({
                     continue
                 }
 
-                let parsedSeeds: string[] = []
-                if (fullPlan?.competitor_seeds) {
-                    if (typeof fullPlan.competitor_seeds === 'string') {
-                        try {
-                            parsedSeeds = JSON.parse(fullPlan.competitor_seeds)
-                        } catch (e) { /* ignore parse error */ }
-                    } else if (Array.isArray(fullPlan.competitor_seeds)) {
-                        parsedSeeds = fullPlan.competitor_seeds
-                    }
+                // 3. Create a new pending plan row (mirrors frontend onboarding flow)
+                console.log(`✨ Auto-refilling plan for User ${plan.user_id} via background task...`)
+
+                const { data: newPlan, error: insertError } = await supabase
+                    .from("content_plans")
+                    .insert({
+                        user_id: plan.user_id,
+                        brand_id: plan.brand_id,
+                        plan_data: [],
+                        competitor_seeds: [],
+                        gsc_enhanced: false,
+                        generation_status: "pending",
+                        generation_phase: "sitemap",
+                        automation_status: "active",
+                        catch_up_mode: plan.catch_up_mode || "gradual",
+                    })
+                    .select()
+                    .single()
+
+                if (insertError || !newPlan) {
+                    console.error("❌ Failed to create pending plan for auto-refill:", insertError)
+                    await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
+                    completedPlans++
+                    continue
                 }
 
-                const seeds = parsedSeeds.length
-                    ? parsedSeeds
-                    : (brand.enemy?.length ? brand.enemy : brand.brand_keywords || []);
-
-                // 3. Generate NEW 30-Day Plan
-                console.log(`✨ Auto-generating new 30-day plan for User ${plan.user_id}...`)
-
-                // Dynamic import to avoid circular dep issues if any (though shared lib should be fine)
-                const { generateContentPlan } = await import("@/lib/plans/generator")
-
+                // 4. Trigger the background generation task (same as first-time generation)
                 try {
-                    const { plan: newPlanItems } = await generateContentPlan({
-                        userId: plan.user_id,
-                        brandId: plan.brand_id,
-                        brandData: brand,
-                        seeds: seeds,
-                        existingContent: []
-                    })
+                    const { tasks } = await import("@trigger.dev/sdk/v3")
+                    const { generatePlanTask } = await import("@/trigger/generate-plan")
 
-                    // 4. Save New Plan
-                    const { error: insertError } = await supabase
-                        .from("content_plans")
-                        .insert({
-                            user_id: plan.user_id,
-                            brand_id: plan.brand_id,
-                            plan_data: newPlanItems,
-                            competitor_seeds: seeds,
-                            automation_status: "active", // Immediately active
-                            catch_up_mode: plan.catch_up_mode || "gradual", // Inherit mode
-                            created_at: new Date().toISOString()
-                        })
-
-                    if (insertError) {
-                        console.error("❌ Failed to save auto-refilled plan:", insertError)
-                    } else {
-                        console.log(`✅ Successfully auto-refilled content plan for User ${plan.user_id}`)
-
-                        // --- NOTIFICATION: SEND REFILL EMAIL ---
-                        try {
-                            const { data: userRec } = await supabase.auth.admin.getUserById(plan.user_id)
-                            const user = userRec?.user
-
-                            if (user?.email) {
-                                const emailHtml = await render(PlanRefilledEmail({
-                                    articleCount: newPlanItems.length,
-                                    userName: user.user_metadata?.full_name || user.email.split('@')[0] || "there"
-                                }))
-
-                                await resend.emails.send({
-                                    from: EMAIL_FROM,
-                                    to: user.email,
-                                    subject: `Your content plan was auto-refilled! 📅`,
-                                    html: emailHtml,
-                                    replyTo: EMAIL_REPLY_TO
-                                })
-                                console.log(`📧 Refill email sent to ${user.email}`)
-                            }
-                        } catch (e) {
-                            console.error("Failed to send refill email", e)
+                    await tasks.trigger<typeof generatePlanTask>(
+                        "generate-content-plan",
+                        {
+                            planId: newPlan.id,
+                            userId: plan.user_id,
+                            brandId: plan.brand_id,
+                            brandData: brand,
+                            brandUrl: brand.brand_url,
+                            isAutoRefill: true
                         }
-                    }
+                    )
 
-                    // 5. Mark OLD plan as completed
+                    console.log(`✅ Background plan generation triggered for User ${plan.user_id} (plan ${newPlan.id})`)
+                } catch (triggerError: any) {
+                    console.error("❌ Failed to trigger background plan generation:", triggerError)
+                    // Mark the new plan as failed
                     await supabase
                         .from("content_plans")
-                        .update({ automation_status: "completed" })
-                        .eq("id", plan.id)
-
-                    completedPlans++
-
-                    // Note: The new plan will be picked up in the NEXT hourly run (or this one if we re-fetched, but better to wait)
-                    continue
-
-                } catch (err) {
-                    console.error("❌ Auto-refill generation failed:", err)
-                    // Mark as completed anyway to avoid loop? Or keep active to retry?
-                    // Better to mark completed to avoid infinite error loop, and log error.
-                    await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
+                        .update({
+                            generation_status: "failed",
+                            generation_error: triggerError.message || "Failed to start auto-refill generation"
+                        })
+                        .eq("id", newPlan.id)
                 }
+
+                // 5. Mark OLD plan as completed
+                await supabase
+                    .from("content_plans")
+                    .update({ automation_status: "completed" })
+                    .eq("id", plan.id)
+
+                completedPlans++
+                continue
             }
 
             if (itemsDue.length === 0) continue

@@ -6,6 +6,9 @@ import { deduplicateWithReplacementLoop } from "@/lib/plans/plan-deduplication"
 import { runAuditTask } from "@/trigger/run-audit"
 import Sitemapper from "sitemapper"
 import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
+import { PlanRefilledEmail } from "@/lib/emails/templates/plan-refilled"
+import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
+import { render } from "@react-email/components"
 
 
 interface GeneratePlanPayload {
@@ -16,6 +19,7 @@ interface GeneratePlanPayload {
     brandUrl?: string
     competitorBrands?: Array<{ name: string; url?: string }>
     existingContent?: string[]
+    isAutoRefill?: boolean
 }
 
 /**
@@ -442,6 +446,32 @@ export const generatePlanTask = task({
             }
 
             console.log(`[Generate Plan Task] Complete! Plan saved.`)
+
+            // --- NOTIFICATION: SEND REFILL EMAIL (only for auto-refill) ---
+            if (payload.isAutoRefill) {
+                try {
+                    const { data: userRec } = await supabase.auth.admin.getUserById(userId)
+                    const user = userRec?.user
+
+                    if (user?.email) {
+                        const emailHtml = await render(PlanRefilledEmail({
+                            articleCount: filteredPlan.length,
+                            userName: user.user_metadata?.full_name || user.email.split('@')[0] || "there"
+                        }))
+
+                        await resend.emails.send({
+                            from: EMAIL_FROM,
+                            to: user.email,
+                            subject: `Your content plan was auto-refilled! 📅`,
+                            html: emailHtml,
+                            replyTo: EMAIL_REPLY_TO
+                        })
+                        console.log(`[Generate Plan Task] 📧 Refill email sent to ${user.email}`)
+                    }
+                } catch (emailErr) {
+                    console.error("[Generate Plan Task] Failed to send refill email:", emailErr)
+                }
+            }
 
             return {
                 success: true,
