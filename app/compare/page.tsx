@@ -7,8 +7,8 @@ import { ArrowRight, Zap, Target, PenLine } from 'lucide-react';
 import { StructuredData } from '@/components/seo/StructuredData';
 
 export const metadata: Metadata = {
-    title: 'Best AI SEO Tools Alternative (AEO Directory) | FlipAEO',
-    description: 'Traditional SEO tools optimize for blue links. Bulk AI writers optimize for spam. Discover why FlipAEO is the only platform built natively for Answer Engine Optimization (AEO).',
+    title: 'FlipAEO vs. The Competition — Honest Comparisons | FlipAEO',
+    description: 'Head-to-head comparisons of FlipAEO against traditional SEO tools and bulk AI writers. See exactly where we win, where we don\'t, and who each tool is best for.',
 };
 
 const comparisonData = [
@@ -76,7 +76,7 @@ const faqs = [
     }
 ];
 
-export default function AlternativesHub() {
+export default function CompareHub() {
     return (
         <div className="relative min-h-screen w-full flex flex-col font-sans bg-stone-50/30">
             <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
@@ -90,8 +90,8 @@ export default function AlternativesHub() {
                     data={{
                         "@context": "https://schema.org",
                         "@type": "WebPage",
-                        name: "AI SEO Tools Alternatives Directory | FlipAEO",
-                        description: "The ultimate directory of alternatives to traditional SEO tools and bulk AI writers for Answer Engine Optimization."
+                        name: "FlipAEO vs. The Competition — Honest Comparisons",
+                        description: "Head-to-head comparisons of FlipAEO against traditional SEO tools, bulk AI writers, and prompt wrappers."
                     }}
                 />
 
@@ -142,7 +142,7 @@ export default function AlternativesHub() {
 
                             {/* Mobile Grid View */}
                             <div className="md:hidden flex flex-col">
-                                <Link href="/alternatives/surfer-seo" className="group block">
+                                <Link href="/compare/flipaeo-vs-surfer-seo" className="group block">
                                     <div className="p-8 rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:border-brand-300 hover:bg-stone-50 h-full flex flex-col">
                                         <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-brand-600 transition-colors">Legacy SEO Tools</h3>
                                         <p className="text-stone-500 mb-6 flex-grow">Surfer SEO, Clearscope, Frase</p>
@@ -154,7 +154,7 @@ export default function AlternativesHub() {
                                     </div>
                                 </Link>
 
-                                <Link href="/alternatives/byword" className="group block">
+                                <Link href="/compare/flipaeo-vs-byword" className="group block">
                                     <div className="p-8 rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:border-brand-300 hover:bg-stone-50 h-full flex flex-col">
                                         <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-brand-600 transition-colors">Bulk AI Writers</h3>
                                         <p className="text-stone-500 mb-6 flex-grow">Byword, Journalist AI, Koala</p>
@@ -166,7 +166,7 @@ export default function AlternativesHub() {
                                     </div>
                                 </Link>
 
-                                <Link href="/alternatives/jasper" className="group block">
+                                <Link href="/compare/flipaeo-vs-jasper" className="group block">
                                     <div className="p-8 rounded-2xl border border-stone-200 bg-white transition-all duration-300 hover:border-brand-300 hover:bg-stone-50 h-full flex flex-col">
                                         <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-brand-600 transition-colors">General AI Assistants</h3>
                                         <p className="text-stone-500 mb-6 flex-grow">Jasper, Copy.ai, Writesonic</p>
@@ -187,9 +187,9 @@ export default function AlternativesHub() {
 
                     {/* Section Header */}
                     <div className="text-center max-w-3xl mx-auto">
-                     
+
                         <h2 className="font-serif text-4xl md:text-5xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
-                            Browse Alternatives <br />
+                            Browse Comparisons <br />
                             <span className="italic font-light text-brand-600">by Category</span>
                         </h2>
                         <p className="font-sans text-lg text-stone-500 max-w-2xl mx-auto leading-relaxed text-balance">
@@ -210,7 +210,7 @@ export default function AlternativesHub() {
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {bulkSpamAlternatives.map((alt) => (
-                                <AlternativeCard
+                                <ComparisonCard
                                     key={alt.slug}
                                     name={alt.name}
                                     slug={alt.slug}
@@ -226,7 +226,7 @@ export default function AlternativesHub() {
                     <div className="w-full bg-stone-900 rounded-[20px] p-8 md:p-12 text-center relative overflow-hidden shadow-xl ring-1 ring-white/10">
                         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px]"></div>
                         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-40" />
-                        
+
                         <div className="relative z-10 flex flex-col items-center gap-6">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/50 border border-brand-500/30 text-brand-300 text-xs font-medium uppercase tracking-wider">
                                 Case Study
@@ -237,8 +237,8 @@ export default function AlternativesHub() {
                             <p className="text-stone-300 text-lg md:text-xl max-w-3xl leading-relaxed">
                                 We used FlipAEO to build <span className="text-white font-semibold">Bringback.pro</span>. Result: <span className="text-brand-300 font-bold">1.8k Google Clicks</span> and <span className="text-brand-300 font-bold">500+ ChatGPT Citations</span> in 90 Days.
                             </p>
-                            <Link 
-                                href="https://flipaeo.com/blog/aeo-vs-seo-divergence-case-study" 
+                            <Link
+                                href="https://flipaeo.com/blog/aeo-vs-seo-divergence-case-study"
                                 className="mt-2 inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-full font-medium hover:bg-brand-50 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5 duration-200"
                             >
                                 Read the Case Study
@@ -260,7 +260,7 @@ export default function AlternativesHub() {
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {legacyBlueLinkAlternatives.map((alt) => (
-                                <AlternativeCard
+                                <ComparisonCard
                                     key={alt.slug}
                                     name={alt.name}
                                     slug={alt.slug}
@@ -285,7 +285,7 @@ export default function AlternativesHub() {
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {promptWrapperAlternatives.map((alt) => (
-                                <AlternativeCard
+                                <ComparisonCard
                                     key={alt.slug}
                                     name={alt.name}
                                     slug={alt.slug}
@@ -319,7 +319,7 @@ export default function AlternativesHub() {
     );
 }
 
-function AlternativeCard({
+function ComparisonCard({
     slug,
     name,
     description,
@@ -340,7 +340,7 @@ function AlternativeCard({
 
     return (
         <Link
-            href={`/alternatives/flipaeo-vs-${slug}`}
+            href={`/compare/flipaeo-vs-${slug}`}
             className="block group h-full"
         >
             {/* Outer Shell - Matches Footer/Navbar Aesthetic */}
@@ -368,11 +368,11 @@ function AlternativeCard({
                                 {name.charAt(0)}
                             </div>
                             <div className="text-stone-300 text-sm italic font-medium -mt-0.5">vs</div>
-                             <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 font-bold text-lg leading-none pt-0.5 shadow-sm">
+                            <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 font-bold text-lg leading-none pt-0.5 shadow-sm">
                                 F
                             </div>
                         </div>
-                         <div className={`p-2 rounded-lg ${colorStyles[color]} transition-colors`}>
+                        <div className={`p-2 rounded-lg ${colorStyles[color]} transition-colors`}>
                             {icon}
                         </div>
                     </div>

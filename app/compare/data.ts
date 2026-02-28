@@ -69,7 +69,30 @@ export interface ComparisonData {
         href: string;
     }[];
 
-    // Social Proof / Case Study
+    // New unique sections
+    bestForNiche?: {
+        niche: string;
+        bestTool: 'FlipAEO' | 'Competitor' | 'Tie';
+        reason: string;
+    }[];
+
+    idealUsers?: {
+        flipaeo: {
+            role: string;
+            goal: string;
+            whyFit: string;
+        }[];
+        competitor: {
+            role: string;
+            goal: string;
+            whyFit: string;
+        }[];
+    };
+
+    limitations?: {
+        flipaeo: string[];
+        competitor: string[];
+    };
 
 }
 
@@ -257,8 +280,8 @@ export const comparisons: Record<string, ComparisonData> = {
         moreAlternatives: [
             {
                 title: "Browse All Comparisons",
-                description: "Explore more alternatives across bulk writers, SEO tools, and AI assistants.",
-                href: "/alternatives"
+                description: "Explore more comparisons across bulk writers, SEO tools, and AI assistants.",
+                href: "/compare"
             },
             {
                 title: "FlipAEO Pricing",
@@ -267,6 +290,97 @@ export const comparisons: Record<string, ComparisonData> = {
             },
         ],
 
+        bestForNiche: [
+            {
+                niche: "B2B SaaS & Authority Content",
+                bestTool: "FlipAEO",
+                reason: "FlipAEO's multi-stage expert research and verified citations create the depth B2B buyers expect. Its competitor gap analysis identifies underserved topics in crowded SaaS categories."
+            },
+            {
+                niche: "Programmatic SEO (Location/Template Pages)",
+                bestTool: "Competitor",
+                reason: "Byword's template-based generation with CSV/Google Sheets/Airtable data integration makes it purpose-built for creating thousands of 'Best [service] in [city]' pages."
+            },
+            {
+                niche: "Affiliate & Review Sites",
+                bestTool: "Competitor",
+                reason: "Byword's bulk generation (25-300+ articles/month) and direct CMS publishing to WordPress, Shopify, and 4 other platforms lets affiliate sites scale product pages fast."
+            },
+            {
+                niche: "Ecommerce Product Descriptions",
+                bestTool: "Competitor",
+                reason: "Byword's programmatic templates and Shopify integration are designed for generating unique product descriptions at scale from spreadsheet data."
+            },
+            {
+                niche: "AI Search Visibility (GEO/AEO)",
+                bestTool: "FlipAEO",
+                reason: "FlipAEO is purpose-built for generative engine optimization with answer-first content structure, semantic internal linking, and source-verified citations that LLMs can parse."
+            },
+            {
+                niche: "Multi-Language Content",
+                bestTool: "Competitor",
+                reason: "Byword supports multi-language content generation natively. FlipAEO currently operates in English only."
+            },
+            {
+                niche: "Brand-Voice Technical Content",
+                bestTool: "FlipAEO",
+                reason: "FlipAEO's brand voice calibration system (tone, formality, technical depth sliders) maintains consistent voice across all 30 monthly articles without per-article briefing."
+            }
+        ],
+
+        idealUsers: {
+            flipaeo: [
+                {
+                    role: "B2B SaaS Marketer",
+                    goal: "Build topical authority so the company gets cited by ChatGPT, Perplexity, and Google AI Overviews.",
+                    whyFit: "FlipAEO's 30-day content plan with competitor gap analysis and answer-first article structure is designed specifically for AI search visibility. Each article includes verified citations and semantic internal links."
+                },
+                {
+                    role: "Solo Founder / Small Team",
+                    goal: "Publish consistent, research-backed content without hiring a writer or strategist.",
+                    whyFit: "At $79/month for 30 articles with automated content strategy, brand voice matching, and 1-click CMS publishing to WordPress/Webflow/Shopify, it replaces both the strategist and the writer."
+                },
+                {
+                    role: "Boutique Agency Owner",
+                    goal: "Deliver high-value content retainers with a small team.",
+                    whyFit: "Each FlipAEO article includes multi-stage research, verified citations, and semantic interlinking \u2014 premium deliverables that justify higher retainers without additional headcount."
+                }
+            ],
+            competitor: [
+                {
+                    role: "Programmatic SEO Specialist",
+                    goal: "Generate 500+ templated pages per month from keyword/data spreadsheets.",
+                    whyFit: "Byword's CSV upload, Google Sheets, and Airtable integrations let you define one template and generate unique pages for every data row. Plans go up to unlimited articles at $1,999/month."
+                },
+                {
+                    role: "Affiliate Site Owner",
+                    goal: "Scale product review and comparison content across hundreds of SKUs.",
+                    whyFit: "Byword publishes directly to WordPress, Shopify, Ghost, Webflow, HubSpot, and Notion. Bulk generation and auto-internal-linking let you build topical clusters around product categories."
+                },
+                {
+                    role: "Multi-Language Content Manager",
+                    goal: "Produce SEO content across multiple markets and languages simultaneously.",
+                    whyFit: "Byword's native multi-language support and Zapier/API integration lets you automate content pipelines across regional sites from a single keyword list."
+                }
+            ]
+        },
+
+        limitations: {
+            flipaeo: [
+                "Capped at 30 articles per month on the single $79/mo plan \u2014 no higher tiers for scaling volume.",
+                "No programmatic SEO templates \u2014 cannot generate pages from CSV/spreadsheet data at scale.",
+                "English-only \u2014 does not support multi-language content generation.",
+                "No Zapier integration or public API \u2014 automation limited to built-in CMS publishing (WordPress, Webflow, Shopify, webhooks).",
+                "Newer product with a smaller user community and fewer third-party reviews compared to Byword."
+            ],
+            competitor: [
+                "No built-in competitor gap analysis or content strategy \u2014 you must bring your own keyword list.",
+                "Content often requires manual editing for readability \u2014 reviewers note inconsistent quality and generic introductions.",
+                "No brand voice calibration \u2014 limited customization of writing style beyond basic tone settings.",
+                "No answer-first or GEO-optimized article structure \u2014 articles target traditional keyword SEO, not AI citation.",
+                "Content detectable by AI scanners like Originality.ai despite built-in AI-detection reduction feature."
+            ]
+        },
 
     }
 };

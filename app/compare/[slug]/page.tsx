@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Navbar } from '@/components/landing/Navbar';
 import { Footer } from '@/components/landing/Footer';
 import { GridBackground } from '@/components/landing/GridBackground';
-import { ArrowRight, Check, X, Zap, Target, PenLine } from 'lucide-react';
+import { ArrowRight, Check, X, Zap, Target, PenLine, Users, AlertTriangle } from 'lucide-react';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { comparisons } from '../data';
 
@@ -52,7 +52,10 @@ export default async function ComparisonPage({ params }: Props) {
         finalVerdict,
         moreAlternatives,
         competitorLogo,
-        color
+        color,
+        bestForNiche,
+        idealUsers,
+        limitations
     } = comparison;
 
     const { competitorPlans, flipaeoPlans, verdict: pricingVerdict } = pricing;
@@ -62,7 +65,7 @@ export default async function ComparisonPage({ params }: Props) {
             {
                 title: "Browse All Comparisons",
                 description: "Explore more alternatives across bulk writers, SEO tools, and AI assistants.",
-                href: "/alternatives"
+                href: "/compare"
             }
         ];
 
@@ -94,7 +97,7 @@ export default async function ComparisonPage({ params }: Props) {
                 {/* Section 1: Quick Verdict Header */}
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="text-center mb-10">
-                        <h1 className="font-serif text-3xl md:text-5xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
+                        <h1 className="font-display text-3xl md:text-5xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
                             FlipAEO vs. {competitorName}
                         </h1>
                         <p className="text-stone-500 text-sm">The Honest Comparison for 2026</p>
@@ -103,14 +106,14 @@ export default async function ComparisonPage({ params }: Props) {
                     <div className="bg-white rounded-lg border border-brand-200  overflow-hidden">
                         <div className="bg-brand-50/50 px-6 py-4 border-b border-brand-100 flex items-center gap-2">
                             <Zap className="w-4 h-4 text-brand-600 fill-brand-600" />
-                            <h2 className="text-sm font-bold text-brand-900 uppercase tracking-wider">The 30-Second Verdict</h2>
+                            <h2 className="font-display text-sm text-brand-900 uppercase tracking-wider">The 30-Second Verdict</h2>
                         </div>
-                        
+
                         <div className="p-6 md:p-8">
                             <div className="grid md:grid-cols-2 gap-8 md:gap-12">
                                 {/* Competitor Column */}
                                 <div>
-                                    <h3 className="font-bold text-stone-900 text-lg mb-3 flex items-center gap-2">
+                                    <h3 className="font-display text-stone-900 text-lg mb-3 flex items-center gap-2">
                                         {quickVerdict?.competitorTitle || `For Mass Scale (${competitorName}):`}
                                     </h3>
                                     <p className="text-stone-600 text-sm leading-relaxed">
@@ -120,7 +123,7 @@ export default async function ComparisonPage({ params }: Props) {
 
                                 {/* FlipAEO Column */}
                                 <div>
-                                    <h3 className="font-bold text-brand-700 text-lg mb-3 flex items-center gap-2">
+                                    <h3 className="font-display text-brand-700 text-lg mb-3 flex items-center gap-2">
                                         {quickVerdict?.flipaeoTitle || "For AI Citations (FlipAEO):"}
                                     </h3>
                                     <p className="text-stone-900 text-sm leading-relaxed font-medium">
@@ -136,7 +139,7 @@ export default async function ComparisonPage({ params }: Props) {
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[02]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Feature Comparison</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Feature Comparison</h2>
                     </div>
 
                     <div className="bg-white rounded-lg border border-stone-200 overflow-hidden ">
@@ -192,11 +195,61 @@ export default async function ComparisonPage({ params }: Props) {
                     </div>
                 </section>
 
+                {/* Section 2b: Best For By Niche */}
+                {bestForNiche && bestForNiche.length > 0 && (
+                    <section className="w-full max-w-5xl mx-auto px-6 mb-16">
+                        <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
+                            <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[02b]</span>
+                            <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Best Fit By Niche</h2>
+                        </div>
+
+                        <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
+                            <div className="grid grid-cols-12 bg-stone-50 border-b border-stone-200 divide-x divide-stone-200">
+                                <div className="col-span-4 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Niche / Use Case</div>
+                                <div className="col-span-2 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider text-center">Best Fit</div>
+                                <div className="col-span-6 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Why</div>
+                            </div>
+
+                            <div className="divide-y divide-stone-100">
+                                {bestForNiche.map((item, idx) => (
+                                    <div key={idx} className="grid grid-cols-12 divide-x divide-stone-100 hover:bg-stone-50/50 transition-colors">
+                                        <div className="col-span-4 p-4 text-sm font-medium text-stone-900 flex items-center">
+                                            {item.niche}
+                                        </div>
+                                        <div className="col-span-2 p-4 flex items-center justify-center">
+                                            {item.bestTool === 'FlipAEO' && (
+                                                <div className="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded border border-brand-100">
+                                                    <Target className="w-3 h-3" />
+                                                    FlipAEO
+                                                </div>
+                                            )}
+                                            {item.bestTool === 'Competitor' && (
+                                                <div className="flex items-center gap-1.5 text-xs font-bold text-stone-600 bg-stone-100 px-2 py-1 rounded border border-stone-200">
+                                                    <span className="text-[10px]">{competitorLogo}</span>
+                                                    {competitorName}
+                                                </div>
+                                            )}
+                                            {item.bestTool === 'Tie' && (
+                                                <div className="text-xs font-medium text-stone-400">
+                                                    Draw
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="col-span-6 p-4 text-sm text-stone-500 leading-relaxed flex items-center">
+                                            {item.reason}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* Section 3: Pricing Analysis */}
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[03]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Pricing Analysis</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Pricing Analysis</h2>
                     </div>
 
                     <div className="space-y-6">
@@ -207,7 +260,7 @@ export default async function ComparisonPage({ params }: Props) {
                                         {competitorLogo}
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-stone-900">{competitorName}</h3>
+                                        <h3 className="text-lg font-display text-stone-900">{competitorName}</h3>
                                     </div>
                                 </div>
 
@@ -234,7 +287,7 @@ export default async function ComparisonPage({ params }: Props) {
                                         F
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-stone-900">FlipAEO</h3>
+                                        <h3 className="text-lg font-display text-stone-900">FlipAEO</h3>
                                         <span className="text-sm font-medium text-brand-600">Best Value for AEO</span>
                                     </div>
                                 </div>
@@ -269,14 +322,14 @@ export default async function ComparisonPage({ params }: Props) {
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="flex items-center gap-3 mb-8 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[04]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Detailed Feature Breakdown</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Detailed Feature Breakdown</h2>
                     </div>
 
                     <div className="space-y-6">
                         {features.map((feature, i) => (
                             <div key={i} className="bg-white rounded-lg border border-stone-200 overflow-hidden">
                                 <div className="bg-stone-50/50 px-6 py-4 border-b border-stone-200 flex items-center justify-between">
-                                    <h3 className="text-sm font-bold text-stone-900">{feature.title}</h3>
+                                    <h3 className="text-sm font-display text-stone-900">{feature.title}</h3>
                                     {feature.winner === 'FlipAEO' && (
                                         <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-brand-50 text-brand-700 text-[10px] font-bold uppercase border border-brand-100">
                                             <Target className="w-3 h-3" />
@@ -305,16 +358,116 @@ export default async function ComparisonPage({ params }: Props) {
                     </div>
                 </section>
 
+                {/* Section 4b: Ideal User Profiles */}
+                {idealUsers && (
+                    <section className="w-full max-w-5xl mx-auto px-6 mb-16">
+                        <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
+                            <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[04b]</span>
+                            <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Who Is Each Tool Actually For?</h2>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* FlipAEO Personas */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-6 h-6 rounded bg-brand-100 flex items-center justify-center text-brand-600 text-xs font-bold border border-brand-200">F</div>
+                                    <span className="text-sm font-display text-brand-700">FlipAEO is built for</span>
+                                </div>
+                                {idealUsers.flipaeo.map((user, idx) => (
+                                    <div key={idx} className="bg-white rounded-lg border border-brand-100 p-5 hover:border-brand-200 transition-colors">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Users className="w-4 h-4 text-brand-500" />
+                                            <span className="text-sm font-semibold text-stone-900">{user.role}</span>
+                                        </div>
+                                        <div className="text-xs text-brand-600 font-medium mb-3 pl-6">
+                                            Goal: {user.goal}
+                                        </div>
+                                        <p className="text-sm text-stone-600 leading-relaxed pl-6">
+                                            {user.whyFit}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Competitor Personas */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-6 h-6 rounded bg-stone-100 flex items-center justify-center text-stone-500 text-xs font-bold border border-stone-200">{competitorLogo}</div>
+                                    <span className="text-sm font-display text-stone-700">{competitorName} is built for</span>
+                                </div>
+                                {idealUsers.competitor.map((user, idx) => (
+                                    <div key={idx} className="bg-white rounded-lg border border-stone-200 p-5 hover:border-stone-300 transition-colors">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Users className="w-4 h-4 text-stone-400" />
+                                            <span className="text-sm font-semibold text-stone-900">{user.role}</span>
+                                        </div>
+                                        <div className="text-xs text-stone-500 font-medium mb-3 pl-6">
+                                            Goal: {user.goal}
+                                        </div>
+                                        <p className="text-sm text-stone-500 leading-relaxed pl-6">
+                                            {user.whyFit}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Section 4c: Limitations & Honest Drawbacks */}
+                {limitations && (
+                    <section className="w-full max-w-5xl mx-auto px-6 mb-16">
+                        <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
+                            <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[04c]</span>
+                            <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Honest Limitations</h2>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* FlipAEO Limitations */}
+                            <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
+                                <div className="px-5 py-4 border-b border-stone-200 bg-brand-50/30 flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-brand-500" />
+                                    <h3 className="text-sm font-display text-stone-900">Where FlipAEO Falls Short</h3>
+                                </div>
+                                <ul className="divide-y divide-stone-100">
+                                    {limitations.flipaeo.map((item, idx) => (
+                                        <li key={idx} className="px-5 py-4 flex items-start gap-3">
+                                            <X className="w-4 h-4 text-stone-300 shrink-0 mt-0.5" />
+                                            <span className="text-sm text-stone-600 leading-relaxed">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Competitor Limitations */}
+                            <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
+                                <div className="px-5 py-4 border-b border-stone-200 bg-stone-50 flex items-center gap-2">
+                                    <AlertTriangle className="w-4 h-4 text-stone-400" />
+                                    <h3 className="text-sm font-display text-stone-900">Where {competitorName} Falls Short</h3>
+                                </div>
+                                <ul className="divide-y divide-stone-100">
+                                    {limitations.competitor.map((item, idx) => (
+                                        <li key={idx} className="px-5 py-4 flex items-start gap-3">
+                                            <X className="w-4 h-4 text-stone-300 shrink-0 mt-0.5" />
+                                            <span className="text-sm text-stone-600 leading-relaxed">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* Section 5: Which Should You Choose? */}
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[05]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Which Should You Choose?</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Which One Should You Choose?</h2>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6 bg-white rounded-lg border border-stone-200 overflow-hidden">
-                        <div className="p-8 border-b md:border-b-0 md:border-r border-stone-200 bg-brand-50/10">
-                            <h3 className="text-brand-600 font-bold mb-6">Choose FlipAEO if...</h3>
+                        <div className="p-6 border-b md:border-b-0 md:border-r border-stone-200 bg-brand-50/10">
+                            <h3 className="text-brand-600 font-display mb-6">Choose FlipAEO if...</h3>
                             <ul className="space-y-4">
                                 {verdict.flipaeoIf.map((item, i) => (
                                     <li key={i} className="flex items-start gap-3 text-stone-700 text-sm">
@@ -324,8 +477,8 @@ export default async function ComparisonPage({ params }: Props) {
                                 ))}
                             </ul>
                         </div>
-                        <div className="p-8">
-                            <h3 className="text-stone-900 font-bold mb-6">Choose {competitorName} if...</h3>
+                        <div className="p-6">
+                            <h3 className="text-stone-900 font-display mb-6">Choose {competitorName} if...</h3>
                             <ul className="space-y-4">
                                 {verdict.competitorIf.map((item, i) => (
                                     <li key={i} className="flex items-start gap-3 text-stone-500 text-sm">
@@ -344,13 +497,13 @@ export default async function ComparisonPage({ params }: Props) {
                 <section className="w-full max-w-5xl mx-auto px-6 mb-24">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[06]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Frequently Asked Questions</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Frequently Asked Questions</h2>
                     </div>
 
                     <div className="bg-white rounded-lg border border-stone-200 divide-y divide-stone-100">
                         {faqs.map((faq, idx) => (
                             <div key={idx} className="p-6">
-                                <h3 className="text-sm font-bold text-stone-900 mb-2 flex items-center gap-2">
+                                <h3 className="text-sm font-display text-stone-900 mb-2 flex items-center gap-2">
                                     <span className="text-brand-500">Q.</span>
                                     {faq.question}
                                 </h3>
@@ -365,13 +518,13 @@ export default async function ComparisonPage({ params }: Props) {
                 <section className="w-full max-w-5xl mx-auto px-6 mb-16">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[07]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">Final Verdict</h2>
+                        <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Final Verdict</h2>
                     </div>
 
-                    <div className="bg-white rounded-lg border border-stone-200 overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
                         <div className="px-6 py-4 border-b border-stone-200 flex items-center gap-2">
                             <Target className="w-4 h-4 text-brand-600" />
-                            <h3 className="text-sm font-bold text-stone-900">{finalVerdict.title}</h3>
+                            <h3 className="text-sm font-display text-stone-900">{finalVerdict.title}</h3>
                         </div>
 
                         <div className="p-6 space-y-4">
@@ -410,7 +563,7 @@ export default async function ComparisonPage({ params }: Props) {
                 <section className="w-full max-w-5xl mx-auto px-6 mb-24">
                     <div className="flex items-center gap-3 mb-6 border-b border-stone-200 pb-2">
                         <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">[08]</span>
-                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">More Alternatives</h2>
+                        <h2 className="text-xs font-bold text-stone-400 uppercase tracking-widest">More Comparisons</h2>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-4">
