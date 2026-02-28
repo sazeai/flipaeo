@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { ContentPlanItem } from "@/lib/schemas/content-plan"
 import { generateEmbedding } from "@/lib/gemini-embedding"
+import { scheduleByCluster } from "@/lib/plans/cluster-scheduler"
 
 /**
  * Semantic Deduplication "Bouncer" for Content Plans
@@ -353,6 +354,20 @@ export async function deduplicateWithReplacementLoop(
         console.log(`[Replacement Loop] ⚠️ Trimming plan from ${currentPlan.length} to ${targetCount}`)
         currentPlan = currentPlan.slice(0, targetCount)
     }
+
+    // === RE-SCHEDULE ALL ITEMS WITH CONSECUTIVE DATES ===
+    // After deduplication + replacement, dates have gaps (from removed items)
+    // and replacements may share the same date (LLM picks unreliable day numbers).
+    // Re-schedule using cluster-aware scheduling to get clean, consecutive dates.
+    console.log(`[Replacement Loop] 📅 Re-scheduling ${currentPlan.length} items with consecutive dates...`)
+    const today = new Date()
+    const schedulable = currentPlan.map(item => ({ ...item, cluster: item.cluster || "General" }))
+    const rescheduled = scheduleByCluster(schedulable, today)
+
+    // Preserve any extra fields from ContentPlanItem that ScheduledArticle doesn't have
+    // (scheduleByCluster spreads all fields via ...article, so they're preserved)
+    currentPlan = rescheduled as unknown as ContentPlanItem[]
+    console.log(`[Replacement Loop] ✅ Re-scheduled. First date: ${currentPlan[0]?.scheduled_date}, Last: ${currentPlan[currentPlan.length - 1]?.scheduled_date}`)
 
     console.log(`\n${'#'.repeat(80)}`)
     console.log(`[Replacement Loop] 🏁 REPLACEMENT LOOP COMPLETE`)
