@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { defaultSEO } from '@/config/seo'
 import { getAllPostSlugs } from '@/lib/wordpress'
 import { getAllToolSlugs } from '@/lib/tools'
+import { comparisons } from '@/app/compare/data'
 
 // Regenerate sitemap periodically to auto-include newly published WordPress posts
 export const revalidate = 600 // seconds
@@ -75,7 +76,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }]
 
+  // Dynamically include Comparisons
+  const compareSlugs = Object.keys(comparisons)
+  const comparePages: MetadataRoute.Sitemap = compareSlugs.map((slug) => ({
+    url: `${baseUrl}/compare/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
   // Note: Protected pages like /blog-writer, /account are intentionally excluded
 
-  return [...staticPages, ...additionalPages, ...blogPages, ...toolPages, ...toolsIndexPage]
+  return [...staticPages, ...additionalPages, ...blogPages, ...toolPages, ...toolsIndexPage, ...comparePages]
 }

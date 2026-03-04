@@ -8,6 +8,7 @@ import { GridBackground } from '@/components/landing/GridBackground';
 import { ArrowRight, Check, X, Zap, Target, PenLine, Users, AlertTriangle } from 'lucide-react';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { comparisons } from '../data';
+import { defaultSEO } from '@/config/seo';
 
 interface Props {
     params: Promise<{
@@ -28,6 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
         title: `${comparison.heroTitle} | FlipAEO`,
         description: comparison.sonicBoomSummary,
+        alternates: {
+            canonical: `${defaultSEO.siteUrl}/compare/${slug}`
+        }
     };
 }
 
@@ -77,9 +81,68 @@ export default async function ComparisonPage({ params }: Props) {
                 <StructuredData
                     data={{
                         "@context": "https://schema.org",
-                        "@type": "WebPage",
-                        name: heroTitle,
+                        "@type": "Article",
+                        headline: heroTitle,
                         description: sonicBoomSummary,
+                        author: {
+                            "@type": "Organization",
+                            name: "FlipAEO",
+                            url: defaultSEO.siteUrl
+                        },
+                        about: [
+                            {
+                                "@type": "SoftwareApplication",
+                                name: "FlipAEO",
+                                applicationCategory: "BusinessApplication",
+                                operatingSystem: "Any",
+                                ...(verdict?.flipaeoIf?.length ? {
+                                    positiveNotes: {
+                                        "@type": "ItemList",
+                                        itemListElement: verdict.flipaeoIf.map((item, index) => ({
+                                            "@type": "ListItem",
+                                            position: index + 1,
+                                            name: item
+                                        }))
+                                    }
+                                } : {}),
+                                ...(limitations?.flipaeo?.length ? {
+                                    negativeNotes: {
+                                        "@type": "ItemList",
+                                        itemListElement: limitations.flipaeo.map((item, index) => ({
+                                            "@type": "ListItem",
+                                            position: index + 1,
+                                            name: item
+                                        }))
+                                    }
+                                } : {})
+                            },
+                            {
+                                "@type": "SoftwareApplication",
+                                name: competitorName,
+                                applicationCategory: "BusinessApplication",
+                                operatingSystem: "Any",
+                                ...(verdict?.competitorIf?.length ? {
+                                    positiveNotes: {
+                                        "@type": "ItemList",
+                                        itemListElement: verdict.competitorIf.map((item, index) => ({
+                                            "@type": "ListItem",
+                                            position: index + 1,
+                                            name: item
+                                        }))
+                                    }
+                                } : {}),
+                                ...(limitations?.competitor?.length ? {
+                                    negativeNotes: {
+                                        "@type": "ItemList",
+                                        itemListElement: limitations.competitor.map((item, index) => ({
+                                            "@type": "ListItem",
+                                            position: index + 1,
+                                            name: item
+                                        }))
+                                    }
+                                } : {})
+                            }
+                        ],
                         mainEntity: {
                             "@type": "FAQPage",
                             mainEntity: faqs.map(faq => ({
