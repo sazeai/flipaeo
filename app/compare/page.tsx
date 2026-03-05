@@ -47,7 +47,12 @@ const bulkSpamAlternatives = [
     { slug: 'article-forge', name: 'Article Forge', microCopy: "If your goal is to push a button and have an AI instantly spit out complete, hands-off SEO articles in bulk, Article Forge is a legacy staple." },
     { slug: 'autoblogging-ai', name: 'Autoblogging.ai', microCopy: "If you run programmatic niche sites and want to bulk-publish 100 articles a day on autopilot, Autoblogging.ai is incredibly efficient." },
     { slug: 'seo-ai', name: 'SEO.ai', microCopy: "If you want an autopilot tool to generate traditional, keyword-stuffed SEO blogs for a local business, SEO.ai is a solid system." },
-    { slug: 'cuppa-ai', name: 'Cuppa.ai', microCopy: "If you want to plug in your own API keys to mass-generate thousands of programmatic or local SEO pages for pennies, Cuppa.ai is fantastic." }
+    { slug: 'cuppa-ai', name: 'Cuppa.ai', microCopy: "If you want to plug in your own API keys to mass-generate thousands of programmatic or local SEO pages for pennies, Cuppa.ai is fantastic." },
+    { slug: 'contentbase-ai', name: 'ContentBase AI', microCopy: "If you want AI-generated SEO content with automated keyword targeting and a simple dashboard, ContentBase AI is a convenient choice." },
+    { slug: 'getgenie', name: 'GetGenie', microCopy: "If you want a WordPress-native AI assistant that generates SEO blog posts with built-in keyword research and SERP analysis, GetGenie is a solid pick." },
+    { slug: 'aiclicks', name: 'AIClicks', microCopy: "If you want a lightweight AI tool to quickly generate SEO-optimized blog posts and landing page copy at scale, AIClicks is an efficient option." },
+    { slug: 'blogseo', name: 'BlogSEO', microCopy: "If you want a streamlined AI writer focused on generating keyword-targeted blog articles with minimal setup, BlogSEO is a fast and focused engine." },
+    { slug: 'blogbuster', name: 'BlogBuster', microCopy: "If you want to automate blog content creation with AI-driven outlines and SEO scoring for rapid publishing, BlogBuster is a handy tool." }
 ];
 
 const legacyBlueLinkAlternatives = [
@@ -56,13 +61,17 @@ const legacyBlueLinkAlternatives = [
     { name: 'Clearscope', slug: 'clearscope', description: "If you have an in-house team of writers and a massive budget to manually grade and optimize articles for Google's traditional SERPs, Clearscope is the gold standard." },
     { name: 'Dashword', slug: 'dashword', description: "If you want a clean, user-friendly text editor to manually generate briefs and grade your writing against Google's top 10 results, Dashword is an excellent tool." },
     { name: 'MarketMuse', slug: 'marketmuse', description: "If you run an enterprise content team and need to audit a massive website to build manual topic clusters and content briefs, MarketMuse is world-class." },
+    { name: 'Scalenut', slug: 'scalenut', description: "If you want an all-in-one SEO platform that combines keyword planning, NLP-optimized content briefs, and a Cruise Mode for bulk article generation, Scalenut is a strong contender." },
+    { name: 'GrowthBar', slug: 'growthbar', description: "If you want a Chrome extension-friendly SEO tool that generates AI blog posts with built-in keyword research and competitor analysis, GrowthBar is a practical choice." },
+    { name: 'Outranking', slug: 'outranking', description: "If you want an AI-driven content strategy tool that automates briefs, outlines, and on-page optimization based on SERP analysis, Outranking is a powerful workflow engine." },
+    { name: 'Outrank.so', slug: 'outrank-so', description: "If you want an AI SEO writer that auto-generates optimized articles with internal linking and schema markup for traditional Google rankings, Outrank.so is a solid option." },
 ];
 
 const promptWrapperAlternatives = [
     { name: 'Jasper AI', slug: 'jasper-ai', description: 'General purpose AI marketing writer.' },
     { name: 'Copy.ai', slug: 'copy-ai', description: 'Generative AI for marketing copy.' },
     { name: 'Writesonic', slug: 'writesonic', description: 'AI writer for articles and ads.' },
-    { name: 'Rytr', slug: 'rytr', description: 'AI writing assistant and content generator.' },
+    { name: 'Rytr', slug: 'rytr-ai', description: 'AI writing assistant and content generator.' },
 ];
 
 const faqs = [
@@ -283,7 +292,7 @@ export default function CompareHub() {
                                 <Zap className="w-6 h-6" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-semibold text-stone-900">vs. Prompt Wrappers</h2>
+                                <h2 className="text-2xl font-semibold text-stone-900">vs. Content Generators</h2>
                                 <p className="text-stone-500 mt-1">Move beyond chat interfaces to programmatic workflows.</p>
                             </div>
                         </div>

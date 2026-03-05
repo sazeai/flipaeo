@@ -223,52 +223,104 @@ export default async function ComparisonPage({ params }: Props) {
                         <h2 className="text-xs font-display text-stone-400 uppercase tracking-widest">Feature Comparison</h2>
                     </div>
 
-                    <div className="bg-white rounded-lg border border-stone-200 overflow-hidden ">
-                        {/* Table Header */}
-                        <div className="grid grid-cols-12 bg-stone-50 border-b border-stone-200 divide-x divide-stone-200">
-                            <div className="col-span-4 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Feature</div>
-                            <div className="col-span-3 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center gap-2">
-                                <span className="w-4 h-4 rounded bg-stone-200 flex items-center justify-center text-[8px] text-stone-600">{competitorLogo}</span>
-                                {competitorName}
+                    <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block">
+                            <div className="grid grid-cols-12 bg-stone-50 border-b border-stone-200 divide-x divide-stone-200">
+                                <div className="col-span-4 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Feature</div>
+                                <div className="col-span-3 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center gap-2">
+                                    <span className="w-4 h-4 rounded bg-stone-200 flex items-center justify-center text-[8px] text-stone-600">{competitorLogo}</span>
+                                    {competitorName}
+                                </div>
+                                <div className="col-span-3 p-4 text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-2 bg-brand-50/30">
+                                    <span className="w-4 h-4 rounded bg-brand-200 flex items-center justify-center text-[8px] text-brand-700">F</span>
+                                    FlipAEO
+                                </div>
+                                <div className="col-span-2 p-4 text-xs font-bold text-stone-400 uppercase tracking-wider text-center">Winner</div>
                             </div>
-                            <div className="col-span-3 p-4 text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-2 bg-brand-50/30">
-                                <span className="w-4 h-4 rounded bg-brand-200 flex items-center justify-center text-[8px] text-brand-700">F</span>
-                                FlipAEO
+
+                            <div className="divide-y divide-stone-100">
+                                {Object.entries(matrix).map(([key, value], idx) => (
+                                    <div key={key} className="grid grid-cols-12 divide-x divide-stone-100 hover:bg-stone-50/50 transition-colors">
+                                        <div className="col-span-4 p-4 text-sm font-medium text-stone-900 flex items-center">
+                                            {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </div>
+                                        <div className="col-span-3 p-4 text-sm text-stone-500 leading-tight flex items-center">
+                                            {value.competitor}
+                                        </div>
+                                        <div className="col-span-3 p-4 text-sm font-medium text-stone-900 bg-brand-50/5 leading-tight flex items-center border-l border-brand-100/50">
+                                            {value.flipaeo}
+                                        </div>
+                                        <div className="col-span-2 p-4 flex items-center justify-center">
+                                            {value.winner === 'FlipAEO' && (
+                                                <div className="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded border border-brand-100">
+                                                    <Target className="w-3 h-3" />
+                                                    FlipAEO
+                                                </div>
+                                            )}
+                                            {value.winner === 'Competitor' && (
+                                                <div className="flex items-center gap-1.5 text-xs font-bold text-stone-600 bg-stone-100 px-2 py-1 rounded border border-stone-200">
+                                                    <span className="text-[10px]">{competitorLogo}</span>
+                                                    {competitorName}
+                                                </div>
+                                            )}
+                                            {value.winner === 'Tie' && (
+                                                <div className="text-xs font-medium text-stone-400">
+                                                    Draw
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="col-span-2 p-4 text-xs font-bold text-stone-400 uppercase tracking-wider text-center">Winner</div>
                         </div>
 
-                        {/* Table Body */}
-                        <div className="divide-y divide-stone-100">
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-stone-100">
                             {Object.entries(matrix).map(([key, value], idx) => (
-                                <div key={key} className="grid grid-cols-12 divide-x divide-stone-100 hover:bg-stone-50/50 transition-colors">
-                                    <div className="col-span-4 p-4 text-sm font-medium text-stone-900 flex items-center">
-                                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                <div key={key} className="p-5 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-xs font-bold text-stone-400 uppercase tracking-wider">
+                                            {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </div>
+                                        <div>
+                                            {value.winner === 'FlipAEO' && (
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">
+                                                    Winner: FlipAEO
+                                                </div>
+                                            )}
+                                            {value.winner === 'Competitor' && (
+                                                <div className="flex items-center gap-1 text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
+                                                    Winner: {competitorName}
+                                                </div>
+                                            )}
+                                            {value.winner === 'Tie' && (
+                                                <div className="text-[10px] font-medium text-stone-400 px-2 py-0.5 bg-stone-50 rounded border border-stone-100">
+                                                    Draw
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="col-span-3 p-4 text-sm text-stone-500 leading-tight flex items-center">
-                                        {value.competitor}
-                                    </div>
-                                    <div className="col-span-3 p-4 text-sm font-medium text-stone-900 bg-brand-50/5 leading-tight flex items-center border-l border-brand-100/50">
-                                        {value.flipaeo}
-                                    </div>
-                                    <div className="col-span-2 p-4 flex items-center justify-center">
-                                        {value.winner === 'FlipAEO' && (
-                                            <div className="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded border border-brand-100">
-                                                <Target className="w-3 h-3" />
-                                                FlipAEO
-                                            </div>
-                                        )}
-                                        {value.winner === 'Competitor' && (
-                                            <div className="flex items-center gap-1.5 text-xs font-bold text-stone-600 bg-stone-100 px-2 py-1 rounded border border-stone-200">
-                                                <span className="text-[10px]">{competitorLogo}</span>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-stone-400 uppercase">
+                                                <span className="w-3.5 h-3.5 rounded bg-stone-100 flex items-center justify-center text-[7px] text-stone-500 border border-stone-200">{competitorLogo}</span>
                                                 {competitorName}
                                             </div>
-                                        )}
-                                        {value.winner === 'Tie' && (
-                                            <div className="text-xs font-medium text-stone-400">
-                                                Draw
+                                            <div className="text-sm text-stone-600 leading-tight">
+                                                {value.competitor}
                                             </div>
-                                        )}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-brand-600 uppercase">
+                                                <span className="w-3.5 h-3.5 rounded bg-brand-100 flex items-center justify-center text-[7px] text-brand-700 border border-brand-200">F</span>
+                                                FlipAEO
+                                            </div>
+                                            <div className="text-sm text-stone-900 font-medium leading-tight">
+                                                {value.flipaeo}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -285,40 +337,74 @@ export default async function ComparisonPage({ params }: Props) {
                         </div>
 
                         <div className="bg-white rounded-lg border border-stone-200 overflow-hidden">
-                            <div className="grid grid-cols-12 bg-stone-50 border-b border-stone-200 divide-x divide-stone-200">
-                                <div className="col-span-4 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Niche / Use Case</div>
-                                <div className="col-span-2 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider text-center">Best Fit</div>
-                                <div className="col-span-6 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Why</div>
+                            {/* Desktop Table View */}
+                            <div className="hidden md:block">
+                                <div className="grid grid-cols-12 bg-stone-50 border-b border-stone-200 divide-x divide-stone-200">
+                                    <div className="col-span-4 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Niche / Use Case</div>
+                                    <div className="col-span-2 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider text-center">Best Fit</div>
+                                    <div className="col-span-6 p-4 text-xs font-bold text-stone-500 uppercase tracking-wider">Why</div>
+                                </div>
+
+                                <div className="divide-y divide-stone-100">
+                                    {bestForNiche.map((item, idx) => (
+                                        <div key={idx} className="grid grid-cols-12 divide-x divide-stone-100 hover:bg-stone-50/50 transition-colors">
+                                            <div className="col-span-4 p-4 text-sm font-medium text-stone-900 flex items-center">
+                                                {item.niche}
+                                            </div>
+                                            <div className="col-span-2 p-4 flex items-center justify-center">
+                                                {item.bestTool === 'FlipAEO' && (
+                                                    <div className="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded border border-brand-100">
+                                                        <Target className="w-3 h-3" />
+                                                        FlipAEO
+                                                    </div>
+                                                )}
+                                                {item.bestTool === 'Competitor' && (
+                                                    <div className="flex items-center gap-1.5 text-xs font-bold text-stone-600 bg-stone-100 px-2 py-1 rounded border border-stone-200">
+                                                        <span className="text-[10px]">{competitorLogo}</span>
+                                                        {competitorName}
+                                                    </div>
+                                                )}
+                                                {item.bestTool === 'Tie' && (
+                                                    <div className="text-xs font-medium text-stone-400">
+                                                        Draw
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="col-span-6 p-4 text-sm text-stone-500 leading-relaxed flex items-center">
+                                                {item.reason}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div className="divide-y divide-stone-100">
+                            {/* Mobile Card View */}
+                            <div className="md:hidden divide-y divide-stone-100">
                                 {bestForNiche.map((item, idx) => (
-                                    <div key={idx} className="grid grid-cols-12 divide-x divide-stone-100 hover:bg-stone-50/50 transition-colors">
-                                        <div className="col-span-4 p-4 text-sm font-medium text-stone-900 flex items-center">
-                                            {item.niche}
+                                    <div key={idx} className="p-5 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-bold text-stone-900">{item.niche}</div>
+                                            <div>
+                                                {item.bestTool === 'FlipAEO' && (
+                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100">
+                                                        Best: FlipAEO
+                                                    </div>
+                                                )}
+                                                {item.bestTool === 'Competitor' && (
+                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">
+                                                        Best: {competitorName}
+                                                    </div>
+                                                )}
+                                                {item.bestTool === 'Tie' && (
+                                                    <div className="text-[10px] font-medium text-stone-400 px-2 py-0.5 bg-stone-50 rounded border border-stone-100">
+                                                        Draw
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="col-span-2 p-4 flex items-center justify-center">
-                                            {item.bestTool === 'FlipAEO' && (
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded border border-brand-100">
-                                                    <Target className="w-3 h-3" />
-                                                    FlipAEO
-                                                </div>
-                                            )}
-                                            {item.bestTool === 'Competitor' && (
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-stone-600 bg-stone-100 px-2 py-1 rounded border border-stone-200">
-                                                    <span className="text-[10px]">{competitorLogo}</span>
-                                                    {competitorName}
-                                                </div>
-                                            )}
-                                            {item.bestTool === 'Tie' && (
-                                                <div className="text-xs font-medium text-stone-400">
-                                                    Draw
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="col-span-6 p-4 text-sm text-stone-500 leading-relaxed flex items-center">
+                                        <p className="text-sm text-stone-500 leading-relaxed">
                                             {item.reason}
-                                        </div>
+                                        </p>
                                     </div>
                                 ))}
                             </div>
