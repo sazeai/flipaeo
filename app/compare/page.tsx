@@ -39,19 +39,23 @@ const comparisonData = [
 ];
 
 const bulkSpamAlternatives = [
-    { slug: 'byword', name: 'Byword.ai', microCopy: 'Swap bulk programmatic spam for highly structured RAG-ready content clusters.' },
-    { slug: 'koala-writer', name: 'Koala Writer', microCopy: 'Upgrade from affiliate spam to authoritative, citable entities.' },
-    { slug: 'agility-writer', name: 'Agility Writer', microCopy: 'Move beyond generic AI drafts to structurally perfect AEO articles.' },
-    { slug: 'content-at-scale', name: 'Content at Scale', microCopy: 'Replace high-volume fluff with high-impact answer engine dominance.' },
-    { slug: 'seowriting', name: 'SEOwriting.ai', microCopy: 'Stop guessing on keywords. Start structuring for LLM retrieval.' },
+    { slug: 'byword', name: 'Byword', microCopy: "If you want to generate 1,000 generic, programmatic SEO articles for pennies, Byword is an excellent high-volume engine." },
+    { slug: 'agility-writer', name: 'Agility Writer', microCopy: "If your goal is to spin up hundreds of high-volume Amazon affiliate reviews, Agility Writer is a great tool." },
+    { slug: 'koala-writer', name: 'Koala Writer', microCopy: "If you are an affiliate marketer trying to pump out rapid-fire product reviews, Koala Writer is heavily optimized for that." },
+    { slug: 'seowriting-ai', name: 'SEOwriting.ai', microCopy: "If you want to one-click publish hundreds of auto-generated WordPress articles for local SEO, SEOwriting.ai is a fast engine." },
+    { slug: 'surgegraph', name: 'SurgeGraph', microCopy: "If your goal is to generate 5,000-word SEO articles in bulk to capture long-tail Google search volume, SurgeGraph is a powerhouse." },
+    { slug: 'article-forge', name: 'Article Forge', microCopy: "If your goal is to push a button and have an AI instantly spit out complete, hands-off SEO articles in bulk, Article Forge is a legacy staple." },
+    { slug: 'autoblogging-ai', name: 'Autoblogging.ai', microCopy: "If you run programmatic niche sites and want to bulk-publish 100 articles a day on autopilot, Autoblogging.ai is incredibly efficient." },
+    { slug: 'seo-ai', name: 'SEO.ai', microCopy: "If you want an autopilot tool to generate traditional, keyword-stuffed SEO blogs for a local business, SEO.ai is a solid system." },
+    { slug: 'cuppa-ai', name: 'Cuppa.ai', microCopy: "If you want to plug in your own API keys to mass-generate thousands of programmatic or local SEO pages for pennies, Cuppa.ai is fantastic." }
 ];
 
 const legacyBlueLinkAlternatives = [
-    { name: 'Surfer SEO', slug: 'surfer-seo', description: 'Legacy keyword density optimization tool.' },
-    { name: 'Frase', slug: 'frase', description: 'Content brief and optimization platform.' },
-    { name: 'Clearscope', slug: 'clearscope', description: 'Entity-based content optimization.' },
-    { name: 'Dashword', slug: 'dashword', description: 'SEO content briefs and writing assistant.' },
-    { name: 'MarketMuse', slug: 'marketmuse', description: 'AI content planning and optimization.' },
+    { name: 'Surfer SEO', slug: 'surfer-seo', description: "If you want the industry standard for traditional Google rankings—analyzing top competitors to hit the perfect NLP keyword density score—Surfer SEO is king." },
+    { name: 'Frase', slug: 'frase', description: "If you have an in-house team of writers who need a powerful AI text editor to manually optimize articles for Google, Frase is incredible." },
+    { name: 'Clearscope', slug: 'clearscope', description: "If you have an in-house team of writers and a massive budget to manually grade and optimize articles for Google's traditional SERPs, Clearscope is the gold standard." },
+    { name: 'Dashword', slug: 'dashword', description: "If you want a clean, user-friendly text editor to manually generate briefs and grade your writing against Google's top 10 results, Dashword is an excellent tool." },
+    { name: 'MarketMuse', slug: 'marketmuse', description: "If you run an enterprise content team and need to audit a massive website to build manual topic clusters and content briefs, MarketMuse is world-class." },
 ];
 
 const promptWrapperAlternatives = [

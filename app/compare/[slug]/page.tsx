@@ -63,15 +63,33 @@ export default async function ComparisonPage({ params }: Props) {
     } = comparison;
 
     const { competitorPlans, flipaeoPlans, verdict: pricingVerdict } = pricing;
-    const moreAlternativeCards = (moreAlternatives && moreAlternatives.length > 0)
-        ? moreAlternatives
-        : [
-            {
-                title: "Browse All Comparisons",
-                description: "Explore more alternatives across bulk writers, SEO tools, and AI assistants.",
-                href: "/compare"
-            }
-        ];
+
+    // Dynamically generate "More Comparisons" cards
+    const allSlugs = Object.keys(comparisons) as (keyof typeof comparisons)[];
+
+    let relatedSlugs = allSlugs.filter(
+        (s) => s !== slug && comparisons[s].category === comparison.category
+    );
+
+    if (relatedSlugs.length < 3) {
+        const otherSlugs = allSlugs.filter(
+            (s) => s !== slug && comparisons[s].category !== comparison.category
+        );
+        relatedSlugs = [...relatedSlugs, ...otherSlugs];
+    }
+
+    const selectedSlugs = relatedSlugs.slice(0, 3);
+
+    const moreAlternativeCards = selectedSlugs.map((s) => {
+        const comp = comparisons[s];
+        return {
+            title: `FlipAEO vs. ${comp.competitorName}`,
+            description: comp.sonicBoomSummary.length > 110
+                ? comp.sonicBoomSummary.substring(0, 110).trim() + '...'
+                : comp.sonicBoomSummary,
+            href: `/compare/${s}`
+        };
+    });
 
     return (
         <div className="relative min-h-screen w-full flex flex-col font-sans bg-stone-50/20">
