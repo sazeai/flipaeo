@@ -113,24 +113,33 @@ export default async function ComparisonPage({ params }: Props) {
                                 name: "FlipAEO",
                                 applicationCategory: "BusinessApplication",
                                 operatingSystem: "Any",
-                                ...(verdict?.flipaeoIf?.length ? {
-                                    positiveNotes: {
-                                        "@type": "ItemList",
-                                        itemListElement: verdict.flipaeoIf.map((item, index) => ({
-                                            "@type": "ListItem",
-                                            position: index + 1,
-                                            name: item
-                                        }))
-                                    }
-                                } : {}),
-                                ...(limitations?.flipaeo?.length ? {
-                                    negativeNotes: {
-                                        "@type": "ItemList",
-                                        itemListElement: limitations.flipaeo.map((item, index) => ({
-                                            "@type": "ListItem",
-                                            position: index + 1,
-                                            name: item
-                                        }))
+                                ...(verdict?.flipaeoIf?.length || limitations?.flipaeo?.length ? {
+                                    review: {
+                                        "@type": "Review",
+                                        author: {
+                                            "@type": "Organization",
+                                            name: "FlipAEO"
+                                        },
+                                        ...(verdict?.flipaeoIf?.length ? {
+                                            positiveNotes: {
+                                                "@type": "ItemList",
+                                                itemListElement: verdict.flipaeoIf.map((item, index) => ({
+                                                    "@type": "ListItem",
+                                                    position: index + 1,
+                                                    name: item
+                                                }))
+                                            }
+                                        } : {}),
+                                        ...(limitations?.flipaeo?.length ? {
+                                            negativeNotes: {
+                                                "@type": "ItemList",
+                                                itemListElement: limitations.flipaeo.map((item, index) => ({
+                                                    "@type": "ListItem",
+                                                    position: index + 1,
+                                                    name: item
+                                                }))
+                                            }
+                                        } : {})
                                     }
                                 } : {})
                             },
@@ -139,24 +148,33 @@ export default async function ComparisonPage({ params }: Props) {
                                 name: competitorName,
                                 applicationCategory: "BusinessApplication",
                                 operatingSystem: "Any",
-                                ...(verdict?.competitorIf?.length ? {
-                                    positiveNotes: {
-                                        "@type": "ItemList",
-                                        itemListElement: verdict.competitorIf.map((item, index) => ({
-                                            "@type": "ListItem",
-                                            position: index + 1,
-                                            name: item
-                                        }))
-                                    }
-                                } : {}),
-                                ...(limitations?.competitor?.length ? {
-                                    negativeNotes: {
-                                        "@type": "ItemList",
-                                        itemListElement: limitations.competitor.map((item, index) => ({
-                                            "@type": "ListItem",
-                                            position: index + 1,
-                                            name: item
-                                        }))
+                                ...(verdict?.competitorIf?.length || limitations?.competitor?.length ? {
+                                    review: {
+                                        "@type": "Review",
+                                        author: {
+                                            "@type": "Organization",
+                                            name: "FlipAEO"
+                                        },
+                                        ...(verdict?.competitorIf?.length ? {
+                                            positiveNotes: {
+                                                "@type": "ItemList",
+                                                itemListElement: verdict.competitorIf.map((item, index) => ({
+                                                    "@type": "ListItem",
+                                                    position: index + 1,
+                                                    name: item
+                                                }))
+                                            }
+                                        } : {}),
+                                        ...(limitations?.competitor?.length ? {
+                                            negativeNotes: {
+                                                "@type": "ItemList",
+                                                itemListElement: limitations.competitor.map((item, index) => ({
+                                                    "@type": "ListItem",
+                                                    position: index + 1,
+                                                    name: item
+                                                }))
+                                            }
+                                        } : {})
                                     }
                                 } : {})
                             }
