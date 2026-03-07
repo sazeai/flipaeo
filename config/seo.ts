@@ -240,7 +240,7 @@ export const schemaTemplates = {
   },
   softwareApplication: {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
+    '@type': 'WebApplication',
     name: defaultSEO.siteName,
     description: 'Strategic Content Engine for Generative Engine Optimization (GEO). Generate authority-building articles that AI search engines cite and recommend.',
     url: defaultSEO.siteUrl,

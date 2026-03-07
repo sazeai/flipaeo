@@ -3,7 +3,8 @@ import { defaultSEO } from '@/config/seo'
 import { getAllPostSlugs } from '@/lib/wordpress'
 import { getAllToolSlugs } from '@/lib/tools'
 import { comparisons } from '@/app/compare/data'
-
+import { solutions } from '@/app/solutions/data'
+import { features } from '@/app/features/data'
 // Regenerate sitemap periodically to auto-include newly published WordPress posts
 export const revalidate = 600 // seconds
 
@@ -85,7 +86,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  // Dynamically include Solutions
+  const solutionSlugs = Object.keys(solutions)
+  const solutionPages: MetadataRoute.Sitemap = solutionSlugs.map((slug) => ({
+    url: `${baseUrl}/solutions/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+  const solutionsIndexPage: MetadataRoute.Sitemap = [{
+    url: `${baseUrl}/solutions`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }]
+
+  // Dynamically include Features
+  const featureSlugs = Object.keys(features)
+  const featurePages: MetadataRoute.Sitemap = featureSlugs.map((slug) => ({
+    url: `${baseUrl}/features/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+  const featuresIndexPage: MetadataRoute.Sitemap = [{
+    url: `${baseUrl}/features`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }]
+
   // Note: Protected pages like /blog-writer, /account are intentionally excluded
 
-  return [...staticPages, ...additionalPages, ...blogPages, ...toolPages, ...toolsIndexPage, ...comparePages]
+  return [...staticPages, ...additionalPages, ...blogPages, ...toolPages, ...toolsIndexPage, ...comparePages, ...solutionsIndexPage, ...solutionPages, ...featuresIndexPage, ...featurePages]
 }
