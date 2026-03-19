@@ -192,7 +192,7 @@ const HowItWorksSection: React.FC = () => {
         </div>
 
         {/* Premium Wireframe Grid */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 border-x border-stone-200 bg-white relative">
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 border-x border-stone-200  relative bg-stone-50/50">
 
           {/* Main Grid Corners */}
           <CornerSquare className="-left-[5px] -top-[5px]" />
@@ -215,7 +215,7 @@ const HowItWorksSection: React.FC = () => {
           </div>
 
           {/* Step 1 Card */}
-          <div className="w-full p-8 md:p-12 border-b md:border-r border-stone-200 flex flex-col gap-8 group transition-colors hover:bg-stone-50/50">
+          <div className="w-full p-8 md:p-12 border-b md:border-r border-stone-200 flex flex-col gap-8 group">
             <div className="w-full h-40 overflow-hidden rounded-lg relative border border-stone-100 bg-stone-50">
               <DiscoveryVisual />
             </div>

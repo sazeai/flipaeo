@@ -10,23 +10,27 @@ const AnalysisVisual = () => (
   <div className="w-full mt-8 px-2 md:px-4 pb-2">
     <div className="relative flex flex-col gap-3">
       {/* Decorative connecting line */}
-      <div className="absolute left-[19px] top-4 bottom-8 w-px bg-stone-200"></div>
-
-      {/* Competitor 1 (Background) */}
-      <div className="relative flex items-center gap-4 opacity-40">
-        <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
-          2
-        </div>
-        <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg"></div>
-      </div>
-
-      {/* Competitor 2 (Background) */}
-      <div className="relative flex items-center gap-4 opacity-40">
-        <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
-          3
-        </div>
-        <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg"></div>
-      </div>
+      <div className="absolute left-[19.5px] top-4 bottom-8 w-0 border-l border-dashed border-stone-300 z-0"></div>
+ 
+       {/* Competitor 1 (Background) */}
+       <div className="relative flex items-center gap-4 opacity-70">
+         <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
+           2
+         </div>
+         <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg p-3 flex items-center">
+            <div className="w-2/3 h-1.5 bg-stone-200/50 rounded-full"></div>
+         </div>
+       </div>
+ 
+       {/* Competitor 2 (Background) */}
+       <div className="relative flex items-center gap-4 opacity-70">
+         <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-serif text-sm relative z-10 shadow-sm">
+           3
+         </div>
+         <div className="flex-1 h-10 bg-stone-50 border border-stone-100 rounded-lg p-3 flex items-center">
+            <div className="w-1/2 h-1.5 bg-stone-200/50 rounded-full"></div>
+         </div>
+       </div>
 
       {/* Hero Card (Your Brand) */}
       <div className="relative flex items-center gap-4 mt-1">
@@ -288,17 +292,17 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 1: Clear Visibility (Large 2/3 width) */}
-          <div className="md:col-span-4 bg-white p-8 md:p-12 flex flex-col justify-between relative md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
+          <div className="md:col-span-4 bg-stone-50/30 p-8 md:p-12 flex flex-col justify-between relative md:border-r border-b border-stone-200 group transition-colors hover:bg-transparent">
             {/* Junctions at bottom of Card 1 */}
             <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction */}
             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 1, 2, 4 */}
 
             <div className="max-w-lg z-10 relative">
               <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
-                  <Sparkles size={14} className="text-brand-500" />
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
+                  <Sparkles size={14} />
                 </div>
-                <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase">Visibility</div>
+                <div className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Visibility</div>
               </div>
               <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
                 Rank in <span className="italic text-stone-500">AI Overviews</span> & Search
@@ -314,11 +318,16 @@ const SolutionSection: React.FC = () => {
           <div className="md:col-span-2 bg-stone-50/30 p-8 flex flex-col items-center text-center border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction */}
             <div className="mb-auto w-full">
-              <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Market Share</div>
-              <h3 className="font-serif text-xl text-stone-900 leading-tight mb-2">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
+                  <TrendingUp size={14} />
+                </div>
+                <div className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Market Share</div>
+              </div>
+              <h3 className="font-serif text-2xl md:text-3xl text-stone-900 leading-tight mb-3">
                 Steal Competitor Traffic
               </h3>
-              <p className="text-stone-500 leading-relaxed text-xs px-2">
+              <p className="text-stone-500 leading-relaxed text-sm px-2">
                 Find the lucrative search gaps your competitors are ignoring and capture their missed audience with content that perfectly matches user intent.
               </p>
             </div>
@@ -326,35 +335,40 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 3: Authority Building (Small 1/3 width) */}
-          <div className="md:col-span-2  p-8 flex flex-col md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+          <div className="md:col-span-2 p-8 flex flex-col md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
             <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 1/2 junction at 33.3% */}
             <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction Row 2/3 */}
             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 3, 4, 5 */}
-            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Authority</div>
-            <h3 className="font-serif text-xl text-stone-900 mb-2">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
+                <Check size={14} />
+              </div>
+              <div className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Authority</div>
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 leading-tight mb-3">
               Become the Industry Guide
             </h3>
-            <p className="text-xs text-stone-500 mb-2">
+            <p className="font-sans text-sm text-stone-500 leading-relaxed mb-4">
               Build unshakable brand trust. Content compounds over time, making your site the definitive, go-to resource in your specific niche.
             </p>
             <NetworkVisual />
           </div>
 
           {/* Card 4: Articles that Answer (Large 2/3 width) */}
-          <div className="md:col-span-4 bg-white p-8 flex flex-col md:flex-row gap-8 items-center border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+          <div className="md:col-span-4 bg-stone-50/30 p-8 flex flex-col md:flex-row gap-8 items-center border-b border-stone-200 group transition-colors hover:bg-transparent relative">
             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction Row 2/3 */}
             <div className="flex-1 order-2 md:order-1">
               <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
-                  <Check size={14} className="text-brand-500" />
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
+                  <Check size={14} />
                 </div>
-                <div className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Conversion</div>
+                <div className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Conversion</div>
               </div>
               <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
                 Build Trust & <span className="italic text-stone-500">Convert Readers</span>
               </h3>
               <p className="text-stone-500 leading-relaxed text-sm mb-4">
-                Stop publishing content that bounces. Every article fully resolves the reader's question with authority, gently guiding them towards becoming a loyal customer.
+                Every article fully resolves the reader's question with authority, gently guiding them towards becoming a loyal customer.
               </p>
             </div>
             <div className="flex-1 w-full order-1 md:order-2">
@@ -363,19 +377,19 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 6: Friction / Velocity (Wide Bottom Strip) */}
-          <div className="md:col-span-4 hover:bg-stone-50/30 p-8 flex flex-col md:flex-row items-center justify-between relative group md:border-r border-b border-stone-200 transition-colors hover:bg-stone-50/50 relative bg-white">
+          <div className="md:col-span-4 bg-stone-50/30 p-8 flex flex-col md:flex-row items-center justify-between group md:border-r border-b border-stone-200 transition-colors hover:bg-transparent relative">
             <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 2/3 junction at 66.6% */}
             <div className="relative z-10 pr-6 flex-1 mb-6 md:mb-0">
               <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-600">
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
                   <Zap size={14} fill="currentColor" />
                 </div>
-                <span className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Time Savings</span>
+                <span className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Time Savings</span>
               </div>
-              <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">
+              <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
                 Save 40+ Hours Every Single Month
               </h3>
-              <p className="text-stone-500 text-sm max-w-md">
+              <p className="text-stone-500 text-sm max-w-md leading-relaxed">
                 Eliminate the endless friction of planning, writing, formatting, and publishing. Put your entire SEO engine on autopilot and focus on growing your business.
               </p>
             </div>
@@ -386,11 +400,16 @@ const SolutionSection: React.FC = () => {
 
           {/* Card 5: ROI (Small 1/3 width) */}
           <div className="md:col-span-2 bg-stone-50/30 p-8 flex flex-col border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
-            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Pipeline</div>
-            <h3 className="font-serif text-xl text-stone-900 mb-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-500">
+                <Sparkles size={14} />
+              </div>
+              <div className="text-[10px] font-bold tracking-widest text-brand-500 uppercase">Pipeline</div>
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
               Measure Real Revenue Impact
             </h3>
-            <p className="text-xs text-stone-500 mb-4">
+            <p className="font-sans text-sm text-stone-500 leading-relaxed mb-4">
               Vanity traffic doesn't pay bills. We target high-intent topics that bring buyers directly to your acquisition pages.
             </p>
             <ROIGraphVisual />

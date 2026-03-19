@@ -377,7 +377,7 @@ const FEATURES = [
   {
     id: '04',
     title: 'Publish to your CMS on autopilot',
-    description: 'Skip the endless copy-pasting and formatting nightmare. FlipAEO pushes fully rendered, structurally flawless articles—complete with ai images and rich text styling—directly to your WordPress, Shopify, or Webflow site.',
+    description: 'Skip the endless copy-pasting and formatting nightmare. FlipAEO pushes fully aeo/seo optimized, structurally flawless articles—complete with ai images and strtuctred content formatting—directly to your WordPress, Shopify, or Webflow site.',
     visual: CMSVisual,
     colSpan: 'col-span-1'
   }
@@ -453,7 +453,7 @@ const FeaturesSection: React.FC = () => {
         </div>
 
         {/* 2-Column Grid Matrix */}
-        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 bg-white relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-stone-200  relative bg-stone-50/50">
 
           {/* Main Grid Corners */}
           <CornerSquare className="-left-[5px] -top-[5px]" />
@@ -471,12 +471,12 @@ const FeaturesSection: React.FC = () => {
 
           {FEATURES.map((feature, index) => (
             <div key={index} className="relative">
-                 {/* Dynamic Junction Markers */}
-                 {index === 0 && <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Left Edge */}
-                 {index === 0 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Absolute Center */}
-                 {index === 1 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Right Edge */}
-                 
-                 <FeatureCard feature={feature} index={index} />
+              {/* Dynamic Junction Markers */}
+              {index === 0 && <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Left Edge */}
+              {index === 0 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Absolute Center */}
+              {index === 1 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Right Edge */}
+
+              <FeatureCard feature={feature} index={index} />
             </div>
           ))}
         </div>

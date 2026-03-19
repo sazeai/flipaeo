@@ -52,7 +52,7 @@ const PricingSection: React.FC = () => {
                 </div>
 
                 {/* Premium Wireframe Grid */}
-                <div className="w-full grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 bg-white relative">
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 border-x border-stone-200  relative">
 
                     {/* Main Grid Corners */}
                     <CornerSquare className="-left-[5px] -top-[5px]" />
@@ -69,7 +69,7 @@ const PricingSection: React.FC = () => {
                     </div>
 
                     {/* Left Side: Pricing & CTA */}
-                    <div className="w-full border-b md:border-b-0 md:border-r border-stone-200 p-8 md:p-16 flex flex-col justify-center items-center text-center bg-stone-50/30">
+                    <div className="w-full border-b md:border-b-0 md:border-r border-stone-200 p-8 md:p-16 flex flex-col justify-center items-center text-center ">
 
                         <div className="mb-8">
                             <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-[10px] font-bold uppercase tracking-widest mb-6 border border-stone-200 rounded-sm">
@@ -107,7 +107,7 @@ const PricingSection: React.FC = () => {
                     </div>
 
                     {/* Right Side: Features */}
-                    <div className="w-full p-8 md:p-16 border-b border-stone-200 bg-white">
+                    <div className="w-full p-8 md:p-16 border-b border-stone-200 bg-stone-50/50">
                         <h3 className="font-sans text-[10px] font-bold text-brand-500 uppercase tracking-widest mb-8 border-b border-stone-100 pb-4 inline-block w-full">
                             Included Powerhouse Access
                         </h3>

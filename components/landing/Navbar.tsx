@@ -6,6 +6,13 @@ import Button from './Button';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const NAV_LINKS = [
+  { label: 'How it works', href: '/#how-it-works' },
+  { label: 'Benefits', href: '/#benefits' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Pricing', href: '/#pricing' },
+];
+
 export const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
@@ -46,13 +53,14 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-stone-600">
-            <a href="#how-it-works" className="hover:text-stone-900 transition-colors">How it works</a>
-            <span className="text-stone-300">•</span>
-            <a href="#benefits" className="hover:text-stone-900 transition-colors">Benefits</a>
-            <span className="text-stone-300">•</span>
-            <a href="#features" className="hover:text-stone-900 transition-colors">Features</a>
-            <span className="text-stone-300">•</span>
-            <a href="#pricing" className="hover:text-stone-900 transition-colors">Pricing</a>
+            {NAV_LINKS.map((link, idx) => (
+              <React.Fragment key={link.href}>
+                <Link href={link.href} className="hover:text-stone-900 transition-colors">
+                  {link.label}
+                </Link>
+                {idx < NAV_LINKS.length - 1 && <span className="text-stone-300">•</span>}
+              </React.Fragment>
+            ))}
           </div>
 
           {/* Right Side Actions */}
@@ -61,7 +69,7 @@ export const Navbar: React.FC = () => {
             {/* Social/Tool Icons (Desktop only) */}
             <div className="hidden sm:flex items-center gap-2 pr-2 border-r border-stone-200/50 mr-1">
 
-              <Link href="https://x.com/flipaeo">
+              <Link href="https://x.com/flipaeo" target="_blank">
                 <button className="
                           cursor-pointer group relative w-9 h-10 flex items-center justify-center 
                           bg-white border border-gray-300 rounded-lg text-stone-700
@@ -120,14 +128,19 @@ export const Navbar: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="absolute top-24 left-4 right-4 bg-white rounded-2xl shadow-2xl border border-stone-100 p-2 z-40 flex flex-col animate-in fade-in slide-in-from-top-2 origin-top lg:hidden">
           <div className="bg-stone-50 rounded-xl p-2 flex flex-col gap-1">
-            {['How it works', 'Benefits', 'Features', 'Pricing'].map((item) => (
-              <a key={item} href="#" className="cursor-pointer px-4 py-3 rounded-lg hover:bg-white hover:shadow-sm text-stone-600 font-medium text-base transition-all">
-                {item}
-              </a>
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="cursor-pointer px-4 py-3 rounded-lg hover:bg-white hover:shadow-sm text-stone-600 font-medium text-base transition-all"
+              >
+                {link.label}
+              </Link>
             ))}
           </div>
           <div className="p-2 mt-1">
-            <Link href="/login">
+            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
               <Button className="w-full justify-center bg-stone-900 text-brand-50 shadow-none rounded-lg py-3">
                 Start Ranking Now
               </Button>

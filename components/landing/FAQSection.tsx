@@ -39,61 +39,32 @@ const FAQS = [
 ];
 
 const FAQItem = ({ item }: { item: typeof FAQS[0] }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    // Outer Container (The "Halo" or "Frame")
-    <div
-      className={`
-                group w-full rounded-[20px] p-1 transition-all duration-300 cursor-pointer
-                ${isOpen
-          ? 'bg-brand-100 shadow-[inset_0_0_0_1px_#c4b5fd]'
-          : 'bg-white border border-stone-200 hover:border-brand-200 hover:shadow-xs'
-        }
-            `}
-      onClick={() => setIsOpen(!isOpen)}
+    <details
+      className="group w-full rounded-[20px] p-1 transition-all duration-300 open:bg-brand-100 open:shadow-[inset_0_0_0_1px_#c4b5fd] bg-white border border-stone-200 hover:border-brand-200"
     >
-      {/* Inner Container (The "Canvas") */}
-      <div className={`
-                w-full bg-stone-100 rounded-[17px] border-stone-200 border transition-all duration-300 overflow-hidden relative
-                ${isOpen ? 'border-brand-100' : 'border-stone-100'}
-            `}>
-
-        {/* Clickable Header Area - Adjusted padding for better vertical balance */}
-        <div className="flex items-center justify-between px-6 py-5">
-          <h3 className={`font-sans font-medium text-base md:text-xl pr-8 leading-snug transition-colors duration-300 ${isOpen ? 'text-stone-900' : 'text-stone-600 group-hover:text-stone-900'}`}>
+      <summary className="list-none outline-none cursor-pointer flex items-center justify-between">
+        {/* Inner Container (The "Canvas") */}
+        <div className="w-full bg-stone-100 rounded-[17px] border border-stone-100 transition-all duration-300 flex items-center justify-between px-6 py-3.5 relative overflow-hidden group-open:border-brand-100">
+          <h3 className="font-sans font-medium text-base md:text-xl pr-8 leading-snug transition-colors duration-300 text-stone-600 group-hover:text-stone-900 group-open:text-stone-900">
             {item.question}
           </h3>
 
           {/* Interactive Icon */}
-          <div className={`
-                        flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border transition-all duration-300
-                        ${isOpen
-              ? 'bg-brand-50 border-brand-200 text-brand-600 rotate-90'
-              : 'bg-stone-50 border-stone-200 text-stone-400 rotate-0 group-hover:bg-brand-50 group-hover:border-brand-200 group-hover:text-brand-500'}
-                    `}>
-            {isOpen ? <X size={16} strokeWidth={2.5} /> : <Plus size={16} strokeWidth={2.5} />}
+          <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border transition-all duration-300 bg-stone-50 border-stone-200 text-stone-400 rotate-0 group-hover:bg-brand-50 group-hover:border-brand-200 group-hover:text-brand-500 group-open:bg-brand-50 group-open:border-brand-200 group-open:text-brand-600 group-open:rotate-90">
+            <Plus size={16} strokeWidth={2.5} className="group-open:hidden transition-transform duration-300" />
+            <X size={16} strokeWidth={2.5} className="hidden group-open:block transition-transform duration-300" />
           </div>
         </div>
+      </summary>
 
-        {/* Expandable Content Area */}
-        <div
-          className={`
-                        grid transition-all duration-500 ease-in-out
-                        ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}
-                    `}
-        >
-          <div className="overflow-hidden px-6 pb-6">
-
-            <p className="text-stone-500 leading-relaxed text-base font-medium">
-              {item.answer}
-            </p>
-
-          </div>
-        </div>
-
+      {/* Expandable Content Area */}
+      <div className="px-6 py-5 bg-stone-100/50 rounded-b-[17px] -mt-4 pt-8 transition-all duration-500 opacity-0 group-open:opacity-100">
+        <p className="text-stone-500 leading-relaxed text-base font-medium">
+          {item.answer}
+        </p>
       </div>
-    </div>
+    </details>
   );
 };
 
@@ -150,7 +121,7 @@ export const FAQSection: React.FC = () => {
           </div>
 
           {/* FAQ List wrapped in the wireframe border */}
-          <div className="w-full border-x border-stone-200 bg-white p-8 md:p-16 relative">
+          <div className="w-full border-x border-stone-200  p-8 md:p-16 relative">
             <CornerSquare className="-left-[5px] -top-[5px]" />
             <CornerSquare className="-right-[5px] -top-[5px]" />
             <CornerSquare className="-left-[5px] -bottom-[5px]" />

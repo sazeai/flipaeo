@@ -6,7 +6,7 @@ import { CornerSquare } from './CornerSquare';
 
 const CTASection: React.FC = () => {
   return (
-    <section id="cta" className="w-full py-24 relative z-10 mb-32 md:mb-48">
+    <section id="cta" className="w-full py-24 relative z-10 mb-12">
       <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
         {/* Horizontal Pattern Bar Above */}
