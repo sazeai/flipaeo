@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { CornerSquare } from './CornerSquare';
 
 const PROOF_POINTS = [
     {
@@ -52,50 +52,53 @@ const PROOF_POINTS = [
 
 export const AICitations: React.FC = () => {
     return (
-        <section className="w-full py-24 px-4 border-t border-stone-100 relative">
-            <div className="absolute top-0 right-[20%] lg:right-[35%] translate-y-1/2 flex flex-col items-center md:rotate-6 pointer-events-none ">
-                <p className="font-hand text-base md:text-lg text-stone-500 mb-2 w-40 text-center leading-none">
-                    Testimonials? But we have proofs!
-                </p>
-                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" className="w-[30px] h-[30px] md:w-[60px] md:h-[60px] text-stone-700 ml-8">
-                    <path
-                        d="M20,20 Q60,10 60,60"
-                        strokeWidth="2"
-                        fill="none"
-                        markerEnd="url(#arrowhead)"
-                    />
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
-                        </marker>
-                    </defs>
-                </svg>
-            </div>
-            <div className="max-w-[1126px] mx-auto ">
-                {/* "Human" Break Element */}
+        <section className="w-full pt-24 relative z-10">
 
+            <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
+                {/* Horizontal separator from Hero */}
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
 
-                {/* Header */}
-                <div className="text-center mb-16 max-w-3xl mx-auto items-center">
-                    <span className="font-sans text-xs font-bold tracking-widest text-stone-400 uppercase mb-4 block">
-                        Live Case Study
-                    </span>
-
-                    <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-                        We Drink Our<br /><span className='italic text-stone-500'>Own Champagne</span>
-                    </h2>
-                    <p className="font-sans text-stone-500 text-lg leading-relaxed ">
-                        We didn’t just build a tool - we proved it. We used FlipAEO to <span className="text-stone-900 font-medium">scale</span> our own SaaS, <a href="https://bringback.pro" target="_blank" className="text-stone-900 font-medium underline decoration-stone-300 hover:decoration-stone-900 transition-all">BringBack.pro</a>, from zero to market leader. No ads, no backlinks - just pure, high-intent authority.
-                    </p>
                 </div>
 
-                {/* Grid - 3 Up / 2 Up */}
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-x-6 gap-y-10">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+                    {/* Left: Badge & Title */}
+                    <div className="flex-1">
+                        <span className="font-sans text-xs font-bold tracking-widest text-stone-400 uppercase mb-4 block">
+                            Live Case Study
+                        </span>
+                        <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
+                            We Drink Our<br /><span className='italic text-stone-500'>Own Champagne</span>
+                        </h2>
+                    </div>
+
+                    {/* Right: Description */}
+                    <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+                        <p className="font-sans text-stone-500 text-lg leading-relaxed">
+                            We didn’t just build a tool - we proved it. We used FlipAEO to <span className="text-stone-900 font-medium">scale</span> our own SaaS, <a href="https://bringback.pro" target="_blank" className="text-stone-900 font-medium underline decoration-stone-300 hover:decoration-stone-900 transition-all">BringBack.pro</a>, from zero to market leader. No ads, no backlinks - just pure, high-intent authority.
+                        </p>
+                    </div>
+                </div>
+
+                {/* Horizontal Pattern Bar Top */}
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+
+                </div>
+
+                {/* Grid - Border-Only Seamless Style */}
+                <div className="grid grid-cols-1 md:grid-cols-6 border-l border-r border-stone-200 relative">
+
+
                     {PROOF_POINTS.map((item, i) => (
-                        <div key={i} className={`flex flex-col gap-4 group ${item.span || "md:col-span-2"}`}>
+                        <div key={i} className={`flex flex-col p-6 md:p-10 group border-b border-stone-200 ${item.span || "md:col-span-2"} ${i === 2 || i === 4 ? '' : 'md:border-r'} relative`}>
+                            
+                            {/* Corner Markers for dynamic intersections */}
+                            {i === 0 && <CornerSquare className="-right-[5px] -bottom-[5px] hidden md:block" />}
+                            {i === 1 && <CornerSquare className="-right-[5px] -bottom-[5px] hidden md:block" />}
+                            {i === 3 && <CornerSquare className="-right-[5px] -top-[5px] hidden md:block" />}
 
                             {/* Image Container */}
-                            <div className={`relative w-full aspect-[16/10] bg-stone-50 rounded-2xl overflow-hidden border border-stone-100`}>
+                            <div className={`relative w-full aspect-[16/10] overflow-hidden mb-6`}>
                                 <Image
                                     src={item.image}
                                     alt={item.alt || item.title}
@@ -105,12 +108,12 @@ export const AICitations: React.FC = () => {
                             </div>
 
                             {/* Content */}
-                            <div className="space-y-2 px-1">
-                                <div className="flex items-center justify-between">
+                            <div className="space-y-3 mt-auto">
+                                <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-2 sm:gap-0">
                                     <h3 className="font-serif text-xl text-stone-900 tracking-tight">
                                         {item.title}
                                     </h3>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 border border-stone-200 px-2 py-0.5 rounded-full whitespace-nowrap bg-stone-50">
                                         {item.tag}
                                     </span>
                                 </div>
@@ -121,6 +124,9 @@ export const AICitations: React.FC = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Horizontal Pattern Bar Bottom */}
+                <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
 
 

@@ -1,18 +1,19 @@
 import React from 'react';
 import { Bot, Zap, Globe, Image as ImageIcon, Link2, ShieldCheck } from 'lucide-react';
 import Button from './Button';
-import Link from 'next/link'
+import Link from 'next/link';
+import { CornerSquare } from './CornerSquare';
 
 const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
     <div className="flex gap-4 items-start group">
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white border border-brand-100 flex items-center justify-center text-brand-500">
+        <div className="flex-shrink-0 w-10 h-10 rounded-[6px] bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-700">
             <Icon size={20} strokeWidth={1.5} />
         </div>
         <div className="flex-1">
             <h4 className="font-serif text-lg text-stone-900 leading-tight mb-1">
                 {title}
             </h4>
-            <p className="text-sm text-stone-500 leading-relaxed">
+            <p className="font-sans text-sm text-stone-500 leading-relaxed">
                 {description}
             </p>
         </div>
@@ -21,74 +22,95 @@ const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: str
 
 const PricingSection: React.FC = () => {
     return (
-        <section id="pricing" className="w-full max-w-5xl mx-auto px-6 py-20 md:py-32 relative">
+        <section id="pricing" className="w-full py-24 relative z-10">
+            <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
-            {/* Section Header */}
-            <div className="flex flex-col items-center text-center mb-16">
-                <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-                    Stop Renting SEO Writers. <br /><span className='italic text-stone-500'>Own an AI Visibility Engine.</span>
-                </h2>
+                {/* Horizontal Pattern Bar Above Header */}
+                <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
-                <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-3xl">
-                    Get the output of a $2,500/mo SEO Agency for the price of a dinner. <br className="hidden md:block" />
-                    We don't just write 'blogs'—we build the Strategic Content Infrastructure your brand needs.
-                </p>
-            </div>
+                {/* Header - Left/Right Premium Setup */}
+                <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+                    <div className="flex-1">
+                        <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
+                            Pricing
+                        </span>
+                        <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
+                            Stop Renting SEO Writers.  <br /><span className='italic text-stone-500'>Own an AI Engine.</span>
+                        </h2>
+                    </div>
+                    <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+                        <p className="font-sans text-stone-500 text-lg leading-relaxed">
+                            Get the output of a $2,500/mo SEO Agency for the price of a dinner. We don't just write 'blogs'—we build the Strategic Content Infrastructure your brand needs.
+                        </p>
+                    </div>
+                </div>
 
-            {/* Wrapper Card (Two-Layer Effect) */}
-            <div className="w-full bg-brand-200 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
+                {/* Horizontal Pattern Bar Top (Grid Boundary) */}
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
 
-                {/* The Inner Pricing Card */}
-                <div className="relative w-full bg-[#fffaf5] border border-brand-100/50 rounded-[17px] overflow-hidden flex flex-col md:flex-row">
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                </div>
 
+                {/* Premium Wireframe Grid */}
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 bg-white relative">
 
+                    {/* Main Grid Corners */}
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+
+                    {/* Junctions */}
+                    <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                    </div>
+                    <div className="hidden md:block absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                    </div>
 
                     {/* Left Side: Pricing & CTA */}
-                    <div className="w-full md:w-[40%] bg-gradient-to-b from-brand-100/80 to-white border-b md:border-b-0 md:border-r border-brand-100 p-8 md:p-12 flex flex-col items-center text-center relative">
+                    <div className="w-full border-b md:border-b-0 md:border-r border-stone-200 p-8 md:p-16 flex flex-col justify-center items-center text-center bg-stone-50/30">
 
-
-
-                        <div className="mb-6 mt-4">
-                            <span className="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-bold uppercase tracking-wider mb-4 border border-brand-200">
+                        <div className="mb-8">
+                            <span className="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-[10px] font-bold uppercase tracking-widest mb-6 border border-stone-200 rounded-sm">
                                 All In One
                             </span>
-                            <h3 className="font-serif text-2xl text-stone-900">
-                                The Authority Engine Plan
+                            <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl text-stone-900 leading-none">
+                                The Authority Engine
                             </h3>
                         </div>
 
-                        <div className="flex items-baseline justify-center gap-3 mb-2">
-                            <span className="text-xl text-stone-400 line-through decoration-brand-300/50 decoration-2">
+                        <div className="flex items-baseline justify-center gap-4 mb-2">
+                            <span className="text-2xl text-stone-400 line-through decoration-stone-300 decoration-2">
                                 $149
                             </span>
-                            <span className="text-6xl md:text-7xl font-serif text-stone-900 tracking-tighter">
+                            <span className="text-[80px] font-serif text-stone-900 tracking-tighter leading-none">
                                 $79
                             </span>
                         </div>
-                        <p className="text-stone-500 text-sm mb-10">per month</p>
+                        <p className="text-stone-500 text-sm font-bold tracking-widest uppercase mb-12">per month</p>
 
 
-
-                        <div className="flex justify-center">
-                            <Link href="/login">
-                                <Button variant="primary" className="w-full px-10 py-4 text-lg">
+                        <div className="flex flex-col items-center w-full max-w-sm">
+                            <Link href="/login" className="w-full">
+                                <Button variant="primary" className="w-full px-10 py-5 text-lg">
                                     Deploy My Content Engine
                                 </Button>
                             </Link>
+
+                            <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+                                <ShieldCheck size={14} className="text-stone-400" />
+                                14-day money-back guarantee
+                            </div>
                         </div>
 
-                        <div className="mt-6 flex items-center gap-2 text-xs text-stone-400 font-medium">
-                            <ShieldCheck size={14} className="text-green-500" />
-                            14-day money-back guarantee
-                        </div>
                     </div>
 
                     {/* Right Side: Features */}
-                    <div className="flex-1 p-8 md:p-12 bg-white">
-                        <h3 className="font-sans text-xs font-bold text-stone-400 uppercase tracking-widest mb-8 border-b border-stone-100 pb-4">
+                    <div className="w-full p-8 md:p-16 border-b border-stone-200 bg-white">
+                        <h3 className="font-sans text-[10px] font-bold text-brand-500 uppercase tracking-widest mb-8 border-b border-stone-100 pb-4 inline-block w-full">
                             Included Powerhouse Access
                         </h3>
-                        <div className="space-y-6">
+                        <div className="space-y-8 mt-4">
                             <FeatureItem
                                 icon={Bot}
                                 title="30 Citation-Optimized Authority Articles"
@@ -120,12 +142,13 @@ const PricingSection: React.FC = () => {
                                 description="Visuals generated to match your brand's unique style automatically for every post." />
                         </div>
                     </div>
+
                 </div>
+
+                {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
+                <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+
             </div>
-
-            {/* Decorative background blur behind the card */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[90%] bg-brand-100/30 blur-3xl -z-10 rounded-full"></div>
-
         </section>
     );
 };

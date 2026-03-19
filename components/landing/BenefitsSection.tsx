@@ -232,142 +232,165 @@ const VelocityVisual = () => (
   </div>
 )
 
+import { CornerSquare } from './CornerSquare';
+
 const SolutionSection: React.FC = () => {
   return (
-    <section id="benefits" className="w-full max-w-5xl mx-auto py-20 md:py-32 px-6">
+    <section id="benefits" className="w-full py-24 relative z-10">
+      <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
-      {/* Section Header */}
-      <div className="flex flex-col items-center text-center mb-16">
-        <span className="text-xs font-bold tracking-[0.2em] text-brand-500 uppercase mb-4 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
-          The Solution
-        </span>
+        {/* Horizontal Pattern Bar Above Header */}
+        <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
-
-        <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-          We write for humans and  <br /><span className='italic text-stone-500'>modern AI search.</span>
-        </h2>
-
-        <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
-          FlipAEO doesn't just write articles. We reverse-engineer how AI models think to put your brand inside the answer.
-        </p>
-      </div>
-
-      {/* Premium Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[minmax(280px,auto)] mb-16">
-
-        {/* Card 1: Clear Visibility (Large 2/3 width) */}
-        <div className="md:col-span-4 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden">
-          <div className="max-w-lg z-10 relative">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 bg-brand-100 rounded-md">
-                <Sparkles size={14} className="text-brand-500" />
-              </div>
-              <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase">Analysis</div>
+        {/* Header - Left/Right Premium Setup */}
+        <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+          <div className="flex-1">
+            <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
+              The Outcomes
+            </span>
+            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-tight">
+              Drive Real ROI from your  <br /><span className='italic text-stone-500'>Content Strategy.</span>
+            </h2>
+          </div>
+          <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+            <p className="font-sans text-stone-500 text-lg leading-relaxed">
+              FlipAEO doesn't just write articles. We build an automated pipeline that turns organic search into sustainable revenue.
+            </p>
+            {/* Premium Layout: CTA right under the descriptive text */}
+            <div className="mt-8">
+              <Link href="/login">
+                <Button variant="primary" className="px-8 py-3 text-sm">
+                  Build My Winning Strategy
+                </Button>
+              </Link>
             </div>
-            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
-              Clear visibility into <span className="italic text-stone-500">where you win</span>
-            </h3>
-            <p className="text-stone-500 leading-relaxed text-sm max-w-sm">
-              We analyze how AI search engines answer questions in your category and build the strategy to fill the gaps where your brand is missing.
-            </p>
           </div>
-          <AnalysisVisual />
         </div>
 
-        {/* Card 2: Competitor Gap (Small 1/3 width) */}
-        <div className="md:col-span-2 bg-brand-50/50 border border-brand-200 rounded-2xl p-8 flex flex-col items-center text-center">
-          <div className="mb-auto w-full">
-            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Strategy</div>
-            <h3 className="font-serif text-xl text-stone-900 leading-tight mb-2">
-              Gap Domination
-            </h3>
-            <p className="text-stone-500 leading-relaxed text-xs px-2">
-              Your competitors aren’t winning by publishing more. They’re winning by answering better questions. We analyze what they cover, what they miss, where authority is still unclaimed and we exploit it.
-            </p>
-          </div>
-          <GapVisual />
-        </div>
+        {/* Horizontal Pattern Bar Top (Grid Boundary) */}
+        <div className="w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
-        {/* Card 3: Authority Building (Small 1/3 width) */}
-        <div className="md:col-span-2 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col">
-          <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Structure</div>
-          <h3 className="font-serif text-xl text-stone-900 mb-2">
-            Semantic Authority
-          </h3>
-          <p className="text-xs text-stone-500 mb-2">
-            Every article is part of a connected system. Topics are ordered intentionally to compound trust, coverage, and credibility over time. Nothing random. Nothing isolated.
+        {/* Premium Wireframe Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-6 border-x border-stone-200 relative">
 
-          </p>
-          <NetworkVisual />
-        </div>
+          {/* Main Grid Corners */}
+          <CornerSquare className="-left-[5px] -bottom-[5px]" />
+          <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
-        {/* Card 4: Articles that Answer (Large 2/3 width) */}
-        <div className="md:col-span-4 bg-white border border-brand-200 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden">
-          <div className="flex-1 order-2 md:order-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 bg-brand-100 rounded-md">
-                <Check size={14} className="text-brand-500" />
+          {/* Card 1: Clear Visibility (Large 2/3 width) */}
+          <div className="md:col-span-4 bg-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
+            {/* Junctions at bottom of Card 1 */}
+            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction */ }
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 1, 2, 4 */ }
+            
+            <div className="max-w-lg z-10 relative">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
+                  <Sparkles size={14} className="text-brand-500" />
+                </div>
+                <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase">Visibility</div>
               </div>
-              <div className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Quality</div>
+              <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
+                Rank in <span className="italic text-stone-500">AI Overviews</span> & Search
+              </h3>
+              <p className="text-stone-500 leading-relaxed text-sm max-w-sm">
+                Stop guessing what AI and search engines want. We reverse-engineer the exact answers they look for, putting your brand at the top of the results.
+              </p>
             </div>
-            <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
-              Content that <span className="italic text-stone-500">actually</span> answers
+            <AnalysisVisual />
+          </div>
+
+          {/* Card 2: Competitor Gap (Small 1/3 width) */}
+          <div className="md:col-span-2 bg-stone-50/30 p-8 flex flex-col items-center text-center border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction */ }
+            <div className="mb-auto w-full">
+              <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Market Share</div>
+              <h3 className="font-serif text-xl text-stone-900 leading-tight mb-2">
+                Steal Competitor Traffic
+              </h3>
+              <p className="text-stone-500 leading-relaxed text-xs px-2">
+                Find the lucrative search gaps your competitors are ignoring and capture their missed audience with content that perfectly matches user intent.
+              </p>
+            </div>
+            <GapVisual />
+          </div>
+
+          {/* Card 3: Authority Building (Small 1/3 width) */}
+          <div className="md:col-span-2 bg-white p-8 flex flex-col md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 1/2 junction at 33.3% */ }
+            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction Row 2/3 */ }
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 3, 4, 5 */ }
+            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Authority</div>
+            <h3 className="font-serif text-xl text-stone-900 mb-2">
+              Become the Industry Guide
             </h3>
-            <p className="text-stone-500 leading-relaxed text-sm mb-4">
-              Most AI content reads like a Wikipedia summary. Ours explains. Each article is built to fully resolve a real user question with clarity humans trust and AI systems recognize as authority.
-
-
+            <p className="text-xs text-stone-500 mb-2">
+              Build unshakable brand trust. Content compounds over time, making your site the definitive, go-to resource in your specific niche.
             </p>
+            <NetworkVisual />
           </div>
-          <div className="flex-1 w-full order-1 md:order-2">
-            <ComparisonVisual />
-          </div>
-        </div>
-        {/* Card 6: Friction / Velocity (Wide Bottom Strip) */}
-        <div className="md:col-span-4 bg-gradient-to-br from-white to-brand-50/50 border border-brand-200 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group">
 
-          <div className="relative z-10 pr-6 flex-1 mb-6 md:mb-0">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 bg-brand-100 rounded-md text-brand-600">
-                <Zap size={14} fill="currentColor" />
+          {/* Card 4: Articles that Answer (Large 2/3 width) */}
+          <div className="md:col-span-4 bg-white p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction Row 2/3 */ }
+             <div className="flex-1 order-2 md:order-1">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
+                  <Check size={14} className="text-brand-500" />
+                </div>
+                <div className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Conversion</div>
               </div>
-              <span className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Velocity</span>
+              <h3 className="font-serif text-2xl md:text-3xl text-stone-900 mb-3 leading-tight">
+                Build Trust & <span className="italic text-stone-500">Convert Readers</span>
+              </h3>
+              <p className="text-stone-500 leading-relaxed text-sm mb-4">
+                Stop publishing content that bounces. Every article fully resolves the reader's question with authority, gently guiding them towards becoming a loyal customer.
+              </p>
             </div>
-            <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">
-              Content that doesn't slow you down
+            <div className="flex-1 w-full order-1 md:order-2">
+              <ComparisonVisual />
+            </div>
+          </div>
+
+          {/* Card 6: Friction / Velocity (Wide Bottom Strip) */}
+          <div className="md:col-span-4 bg-stone-50/30 p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group md:border-r border-b border-stone-200 transition-colors hover:bg-stone-50/50 relative">
+            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 2/3 junction at 66.6% */ }
+            <div className="relative z-10 pr-6 flex-1 mb-6 md:mb-0">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-600">
+                  <Zap size={14} fill="currentColor" />
+                </div>
+                <span className="text-[10px] font-bold tracking-widest text-stone-400 uppercase">Time Savings</span>
+              </div>
+              <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-3">
+                Save 40+ Hours Every Single Month
+              </h3>
+              <p className="text-stone-500 text-sm max-w-md">
+                Eliminate the endless friction of planning, writing, formatting, and publishing. Put your entire SEO engine on autopilot and focus on growing your business.
+              </p>
+            </div>
+            <div className="relative z-10 w-full md:w-auto flex-1">
+              <VelocityVisual />
+            </div>
+          </div>
+
+          {/* Card 5: ROI (Small 1/3 width) */}
+          <div className="md:col-span-2 bg-stone-50/30 p-8 flex flex-col border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
+            <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Pipeline</div>
+            <h3 className="font-serif text-xl text-stone-900 mb-1">
+              Measure Real Revenue Impact
             </h3>
-            <p className="text-stone-500 text-sm max-w-md">
-              Writing, formatting, publishing — it all becomes friction. We remove the overhead so content stops being a task and starts being leverage.
+            <p className="text-xs text-stone-500 mb-4">
+              Vanity traffic doesn't pay bills. We target high-intent topics that bring buyers directly to your acquisition pages.
             </p>
+            <ROIGraphVisual />
           </div>
 
-          <div className="relative z-10 w-full md:w-auto flex-1">
-            <VelocityVisual />
-          </div>
-        </div>
-        {/* Card 5: ROI (Small 1/3 width) */}
-        <div className="md:col-span-2 bg-gradient-to-b from-white to-brand-50/30 border border-brand-200 rounded-2xl p-8 flex flex-col">
-          <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Growth</div>
-          <h3 className="font-serif text-xl text-stone-900 mb-1">
-            Real Traffic ROI
-          </h3>
-          <p className="text-xs text-stone-500 mb-4">
-            Ranking without clicks is a dead end. We focus on intent clarity, structure, and depth so impressions turn into engagement and growth.
-          </p>
-          <ROIGraphVisual />
         </div>
 
+        {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
+        <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
-
-      </div>
-
-      {/* CTA */}
-      <div className="flex justify-center">
-        <Link href="/login">
-          <Button variant="primary" className="px-10 py-4 text-lg">
-            Build My Winning Strategy
-          </Button>
-        </Link>
       </div>
 
     </section>

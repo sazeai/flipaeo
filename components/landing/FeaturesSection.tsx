@@ -355,136 +355,134 @@ const CMSVisual = () => (
 const FEATURES = [
   {
     id: '01',
-    title: 'AI Readiness & Category Intelligence',
-    description: 'We analyze how search engines and AI models understand your category. Find the exact gaps where competitors are winning and your brand is invisible.',
+    title: 'Find your brand\'s blind spots',
+    description: 'We analyze exactly how AI models understand your category. Instead of summarizing the internet, we surface the missing data and verified claims your competitors avoid, exposing the exact gaps where your brand is currently invisible.',
     visual: ReadinessVisual,
     colSpan: 'col-span-1'
   },
   {
     id: '02',
-    title: 'Brand Voice Consistency',
-    description: 'Your tone, positioning, and language stay consistent across every article. No generic AI voice. No reset every month.',
-    visual: VoiceVisual,
-    colSpan: 'col-span-1'
-  },
-  {
-    id: '03',
-    title: "Multi-Stage 'Expert' Research",
-    description: 'We do not summarize the internet. We verify claims, surface missing data, and fill the gaps competitors avoid. This is what turns content into something AI systems trust enough to cite.',
+    title: 'Write content that LLMs actually cite',
+    description: 'We engineer your articles specifically for LLM parsers using \'Answer-First\' architecture and high entity density. By filtering out AI fluff and enforcing strict factual citations, we format your content exactly how modern search engines want to read it.',
     visual: ResearchVisual,
     colSpan: 'col-span-1'
   },
   {
-    id: '04',
-    title: 'Semantic Internal Linking',
-    description: 'Every article knows why it exists and what it supports. We connect content by intent and meaning, Not random links or SEO templates. Nothing published stands alone.',
+    id: '03',
+    title: 'Build compounding topical authority',
+    description: 'Stop competing against yourself. Our memory engine uses vector embeddings to map your entire site, aggressively deduplicating topics and injecting context-aware internal links to build a massive, interconnected topical map.',
     visual: LinkingVisual,
     colSpan: 'col-span-1'
   },
   {
-    id: '05',
-    title: 'Instant Credibility & Trust',
-    description: 'Every important claim is backed by real sources. Not after publishing, Not manually. Authority is part of the content, not an afterthought.',
-    visual: CredibilityVisual,
-    colSpan: 'col-span-1'
-  },
-  {
-    id: '06',
-    title: '30-Day Authority-Driven Content Plan',
-    description: 'We do not ask “What should we write this month?” We decide What comes first, What unlocks the next article and what should wait. This is how authority compounds instead of stalling.',
-    visual: PlanVisual,
-    colSpan: 'col-span-1'
-  },
-  {
-    id: '07',
-    title: 'Answer-First Generation',
-    description: 'Articles are written to explain clearly and completely, not to pad keywords. Built for how humans read and how AI systems evaluate trust.',
-    visual: AnswerFirstVisual,
-    colSpan: 'col-span-1'
-  },
-  {
-    id: '08',
-    title: 'Automated CMS Publishing',
-    description: 'Automatically publish to Wordpress, Webflow, Shopify or export clean markdown. No formatting fixes. No workflow friction.',
+    id: '04',
+    title: 'Publish to your CMS on autopilot',
+    description: 'Skip the endless copy-pasting and formatting nightmare. FlipAEO pushes fully rendered, structurally flawless articles—complete with ai images and rich text styling—directly to your WordPress, Shopify, or Webflow site.',
     visual: CMSVisual,
     colSpan: 'col-span-1'
   }
 ];
 
-const FeatureCard: React.FC<{ feature: typeof FEATURES[0] }> = ({ feature }) => (
-  <div className="h-full bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd] group hover:-translate-y-1 transition-transform duration-300">
+const FeatureCard: React.FC<{ feature: typeof FEATURES[0]; index: number }> = ({ feature, index }) => (
+  <div className={`flex flex-col p-8 md:p-12 border-b border-stone-200 group transition-colors hover:bg-stone-50/50 ${index % 2 === 0 ? 'md:border-r' : ''}`}>
 
-    {/* Inner White Card Base */}
-    <div className="h-full bg-white rounded-[17px] overflow-hidden border border-white flex flex-col shadow-sm relative">
-
-      {/* 1. Visual Area (Top ~55%) */}
-      {/* Clean white stage for the graphic to pop */}
-      <div className="h-64 w-full relative flex items-center justify-center bg-white">
-        {/* Subtle active grid pattern on hover */}
-        <div className="absolute inset-0 opacity-0.15 transition-opacity duration-500"
-          style={{ backgroundImage: 'radial-gradient(#e7e5e4 1px, transparent 1px)', backgroundSize: '16px 16px' }}>
-        </div>
-        <div className="scale-90 transform transition-transform duration-500 group-hover:scale-95">
-          {feature.visual && <feature.visual />}
-        </div>
+    {/* Visual Area */}
+    <div className="h-64 w-full relative flex items-center justify-center bg-white border border-stone-100 rounded-lg overflow-hidden mb-8">
+      {/* Subtle active grid pattern on hover */}
+      <div className="absolute inset-0 opacity-[0.05] transition-opacity duration-500"
+        style={{ backgroundImage: 'radial-gradient(#e7e5e4 1px, transparent 1px)', backgroundSize: '16px 16px' }}>
       </div>
-
-      {/* 2. Ingested Content Card (Bottom) */}
-      {/* The "Gray Box" idea: Creating a 'Card within a Card' look for the technical specs */}
-      <div className="flex-1 px-2 pb-2">
-        <div className="h-full bg-[#fafaf9] rounded-[17px] p-6 border border-stone-100 flex flex-col justify-between group-hover:bg-brand-100/50 group-hover:border-brand-100/70 transition-colors duration-300">
-
-          <div>
-            {/* Header Row */}
-            <div className="flex items-center gap-3 mb-3">
-              {/* Feature Number Pill */}
-              <span className="flex items-center justify-center h-6 px-2 rounded-md bg-white border border-stone-200 text-[10px] font-bold tracking-wider text-stone-400 shadow-sm group-hover:text-brand-500 group-hover:border-brand-200 transition-colors">
-                {feature.id}
-              </span>
-            </div>
-
-            <h3 className="font-serif text-2xl text-stone-900 leading-[1.1] mb-3 group-hover:text-stone-950">
-              {feature.title}
-            </h3>
-
-            <p className="font-sans text-[13px] text-stone-500 leading-relaxed font-medium">
-              {feature.description}
-            </p>
-          </div>
-
-
-        </div>
+      <div className="scale-90 transform transition-transform duration-500 group-hover:scale-100 z-10 w-full h-full flex items-center justify-center">
+        {feature.visual && <feature.visual />}
       </div>
-
     </div>
+
+    {/* Content Area */}
+    <div className="flex flex-col mt-auto">
+      <div className="flex items-center gap-3 mb-4">
+        {/* Feature Number Pill */}
+        <span className="flex items-center justify-center h-6 px-2.5 rounded-[4px] border border-brand-200 bg-brand-50 text-[10px] font-bold tracking-wider text-brand-600 shadow-sm transition-colors">
+          {feature.id}
+        </span>
+      </div>
+
+      <h3 className="font-serif text-2xl text-stone-900 leading-tight mb-3">
+        {feature.title}
+      </h3>
+
+      <p className="font-sans text-sm text-stone-500 leading-relaxed">
+        {feature.description}
+      </p>
+    </div>
+
   </div>
 );
 
+import { CornerSquare } from './CornerSquare';
+
 const FeaturesSection: React.FC = () => {
   return (
-    <section id="features" className="w-full max-w-5xl mx-auto py-20 md:py-32 px-6">
+    <section id="features" className="w-full py-24 relative z-10">
+      <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
-      {/* Section Header */}
-      <div className="flex flex-col items-center text-center mb-16">
+        {/* Horizontal Pattern Bar Above Header */}
+        <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
+        {/* Header - Left/Right Premium Setup */}
+        <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+          <div className="flex-1">
+            <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
+              The Toolkit
+            </span>
+            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
+              Everything you need to <br /><span className='italic text-stone-500'>start capturing traffic.</span>
+            </h2>
+          </div>
+          <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+            <p className="font-sans text-stone-500 text-lg leading-relaxed">
+              We stripped away all the confusing SEO bloat. Here's exactly what you get out-of-the-box to make AI search work for you, instantly.
+            </p>
+          </div>
+        </div>
 
-        <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-          How we make you win <br /><span className='italic text-stone-500'>Modern AI Search</span>
-        </h2>
+        {/* Horizontal Pattern Bar Top (Grid Boundary) */}
+        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
 
-        <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-2xl">
-          A focused system that removes guesswork from growth. Every feature exists to answer one question “What should exist next for this brand to win”
+          <CornerSquare className="-left-[5px] -bottom-[5px]" />
+          <CornerSquare className="-right-[5px] -bottom-[5px]" />
+        </div>
 
-        </p>
+        {/* 2-Column Grid Matrix */}
+        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 bg-white relative">
+
+          {/* Main Grid Corners */}
+          <CornerSquare className="-left-[5px] -bottom-[5px]" />
+          <CornerSquare className="-right-[5px] -bottom-[5px]" />
+
+          {/* Vertical Divider Junctions (Static Edges) */}
+          <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+            <CornerSquare className="-left-[4px] -top-[4px]" />
+          </div>
+          <div className="hidden md:block absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+            <CornerSquare className="-left-[4px] -top-[4px]" />
+          </div>
+
+          {FEATURES.map((feature, index) => (
+            <div key={index} className="relative">
+                 {/* Dynamic Junction Markers */}
+                 {index === 0 && <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Left Edge */}
+                 {index === 0 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Absolute Center */}
+                 {index === 1 && <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" />} {/* Center Right Edge */}
+                 
+                 <FeatureCard feature={feature} index={index} />
+            </div>
+          ))}
+        </div>
+
+        {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
+        <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+
       </div>
-
-      {/* 2-Column Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {FEATURES.map((feature, index) => (
-          <FeatureCard key={index} feature={feature} />
-        ))}
-      </div>
-
     </section>
   );
 };

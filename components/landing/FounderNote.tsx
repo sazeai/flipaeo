@@ -3,125 +3,137 @@
 import Button from './Button';
 import { Quote } from 'lucide-react';
 import Link from 'next/link';
+import { CornerSquare } from './CornerSquare';
 
 export default function FounderNote() {
     return (
-        <section className="w-full py-20 px-4 md:px-6 flex justify-center relative">
+        <section className="w-full py-24 relative z-10">
+            <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
-            {/* Background Decoration - Subtle blur behind the letter */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-4xl h-[80%] bg-orange-100/40 blur-3xl -z-10 rounded-full opacity-60"></div>
+                {/* Horizontal Pattern Bar Above Header */}
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+                    <CornerSquare className="-left-[5px] -top-[5px]" />
+                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                </div>
 
-            {/* Main Letter Container */}
-            <div className="w-full max-w-4xl relative">
+                {/* Header - Left/Right Premium Setup */}
+                <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+                    <div className="flex-1">
+                        <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
+                            A Personal Note
+                        </span>
+                        <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
+                            Let's build this  <br /><span className='italic text-stone-500'>Together.</span>
+                        </h2>
+                    </div>
+                    <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+                        <p className="font-sans text-stone-500 text-lg leading-relaxed">
+                            FlipAEO isn't just an automated tool. It's a genuine partnership designed to help you capture the most valuable real estate on the internet.
+                        </p>
+                    </div>
+                </div>
 
-                {/* The "Paper" Card */}
-                <div className="
-                    relative w-full bg-white 
-                    border border-stone-300/50 
-                    rounded-[15px] 
-                    p-1
-                    overflow-hidden
-                    relative w-full
-            
-                "> <div className="
-              w-full bg-stone-100/50 backdrop-blur-sm
-              rounded-[12px] p-6 sm:p-8
-              border border-stone-100
-            ">
+                {/* Horizontal Pattern Bar Top (Grid Boundary) */}
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+                    <CornerSquare className="-left-[5px] -top-[5px]" />
+                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                </div>
 
+                {/* Premium Wireframe Monolithic Letter Block */}
+                <div className="w-full border-x border-stone-200 bg-stone-50/30 p-8 md:p-24 relative overflow-hidden flex justify-center">
+                    
+                    {/* Main Grid Corners */}
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
+                    {/* Watermark Icon */}
+                    <div className="absolute top-12 left-12 opacity-[0.03] pointer-events-none">
+                        <Quote size={200} className="text-stone-900" />
+                    </div>
 
-                        {/* Watermark Icon */}
-                        <div className="absolute top-12 left-12 opacity-[0.03] pointer-events-none">
-                            <Quote size={120} className="text-stone-900" />
-                        </div>
+                    <div className="relative z-10 flex flex-col items-center text-center max-w-4xl w-full">
 
-                        <div className="relative z-10 flex flex-col items-center text-center">
+                        {/* The Message */}
+                        <blockquote className="mb-20">
+                            <p className="font-serif text-3xl md:text-5xl lg:text-[54px] leading-[1.2] text-stone-900 mb-8 tracking-tight">
+                                "Your first two articles are on me. If you love the quality, we can talk business."
+                            </p>
+                            <p className="font-serif text-xl md:text-2xl leading-relaxed text-stone-500 italic">
+                                "If not — no hard feelings. That’s okay too."
+                            </p>
+                        </blockquote>
 
-                            {/* Header */}
-                            <div className="mb-8">
-                                <div className="inline-block w-12 h-1 bg-gradient-to-r from-brand-400 to-brand-100 rounded-full mb-6"></div>
-                                <h3 className="font-sans text-xs font-bold tracking-[0.2em] text-stone-400 uppercase">
-                                    A personal note
-                                </h3>
-                            </div>
+                        {/* Signature Block */}
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16 w-full border-t border-stone-200 pt-16">
 
-                            {/* The Message */}
-                            <blockquote className="max-w-2xl mb-12">
-                                <p className="font-serif text-3xl md:text-4xl leading-[1.3] text-stone-800 mb-6">
-                                    "Your first two articles are on me. If you love the quality, we can talk business."
-                                </p>
-                                <p className="font-serif text-xl md:text-2xl leading-relaxed text-stone-400 italic">
-                                    "If not — no hard feelings. That’s okay too."
-                                </p>
-                            </blockquote>
-
-                            {/* Signature Block */}
-                            <div className="flex flex-col items-center gap-8 w-full border-t border-stone-100 pt-10">
-
-                                <div className="flex items-center gap-4">
-                                    {/* Avatar */}
-                                    <div className="relative w-14 h-14">
-                                        <div className="absolute inset-0 bg-stone-100 rounded-full animate-pulse"></div>
-                                        <img
-                                            src="/founder.webp"
-                                            alt="Harvansh"
-                                            className="w-full h-full object-cover rounded-full border-2 border-white shadow-md relative z-10"
-                                        />
-                                        {/* Verified Check */}
-                                        <div className="absolute -bottom-1 -right-1 bg-white p-0.5 rounded-full z-20">
-                                            <div className="bg-brand-500 rounded-full p-0.5">
-                                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
-                                                    <path d="M20 6L9 17l-5-5" />
-                                                </svg>
-                                            </div>
+                            {/* Author Info */}
+                            <div className="flex items-center gap-6 text-left">
+                                {/* Avatar */}
+                                <div className="relative w-16 h-16">
+                                    <div className="absolute inset-0 bg-stone-200 rounded-full animate-pulse"></div>
+                                    <img
+                                        src="/founder.webp"
+                                        alt="Harvansh"
+                                        className="w-full h-full object-cover rounded-full border border-stone-200 shadow-sm relative z-10"
+                                    />
+                                    {/* Verified Check */}
+                                    <div className="absolute -bottom-1 -right-1 bg-white p-0.5 rounded-full z-20 shadow-sm border border-stone-100">
+                                        <div className="bg-brand-500 rounded-full p-0.5">
+                                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-white">
+                                                <path d="M20 6L9 17l-5-5" />
+                                            </svg>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="text-left">
-                                        <div className="font-serif text-lg text-stone-900 leading-none mb-1">
-                                            Harvansh
-                                        </div>
-                                        <div className="font-sans text-xs font-medium text-stone-400 uppercase tracking-wide">
-                                            Founder of FlipAEO
-                                        </div>
-                                    </div>
-
-                                    {/* Vertical Divider */}
-                                    <div className="h-8 w-px bg-stone-200 mx-2 hidden sm:block"></div>
-
-                                    {/* Handwriting Signature */}
-                                    <div className="hidden sm:block font-hand text-3xl text-stone-400 -rotate-2 transform translate-y-1">
+                                <div className="flex flex-col">
+                                    <div className="font-serif text-2xl text-stone-900 leading-none mb-2">
                                         Harvansh
                                     </div>
+                                    <div className="font-sans text-[10px] font-bold text-stone-500 uppercase tracking-widest">
+                                        Founder of FlipAEO
+                                    </div>
                                 </div>
-
-                                {/* CTA Action */}
-                                <div className="flex flex-col items-center gap-3">
-                                    <Link href="/login">
-                                        <Button
-                                            variant="primary"
-                                            className="px-10 py-3 text-base shadow-hero "
-
-                                        >
-                                            Claim My 2 Free Articles
-                                        </Button>
-                                    </Link>
-
-                                    <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider">
-                                        No credit card required
-                                    </p>
-                                </div>
-
                             </div>
+
+                            {/* Divider & Signature (Desktop) */}
+                            <div className="hidden md:flex items-center gap-8">
+                                <div className="h-12 w-px bg-stone-200"></div>
+                                {/* Handwriting Signature */}
+                                <div className="font-hand text-5xl text-stone-400 -rotate-[4deg] transform translate-y-2 opacity-80">
+                                    Harvansh
+                                </div>
+                            </div>
+
+                            {/* CTA Action */}
+                            <div className="flex flex-col items-center md:items-end gap-3">
+                                <Link href="/login">
+                                    <Button
+                                        variant="primary"
+                                        className="px-8 py-3.5 text-sm"
+                                    >
+                                        Claim My 2 Free Articles
+                                    </Button>
+                                </Link>
+                                <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest text-center">
+                                    No credit card required
+                                </p>
+                            </div>
+
                         </div>
                     </div>
 
                 </div>
 
-                {/* Decorative Elements - "Papers" underneath to give depth */}
-                <div className="absolute top-2 left-4 right-4 bottom-[-10px] bg-white border border-stone-200 rounded-[32px] -z-10 scale-[0.98] opacity-60"></div>
-                <div className="absolute top-4 left-8 right-8 bottom-[-20px] bg-white border border-stone-200 rounded-[32px] -z-20 scale-[0.96] opacity-30"></div>
+                {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
+                <div className="relative w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
+                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                </div>
 
             </div>
         </section>

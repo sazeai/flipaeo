@@ -97,6 +97,8 @@ const FAQItem = ({ item }: { item: typeof FAQS[0] }) => {
   );
 };
 
+import { CornerSquare } from './CornerSquare';
+
 export const FAQSection: React.FC = () => {
   // Generate FAQ Schema for SEO
   const faqSchema = {
@@ -114,26 +116,54 @@ export const FAQSection: React.FC = () => {
 
   return (
     <>
-      <section className="w-full max-w-3xl mx-auto px-6 py-20 md:py-32">
+      <section id="faq" className="w-full py-24 relative z-10">
+        <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
-        {/* Header */}
-        <div className="flex flex-col items-center text-center mb-16">
+          {/* Horizontal Pattern Bar Above Header */}
+          <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
 
-          <h2 className="font-serif text-4xl md:text-6xl text-stone-900 mb-6 tracking-tight font-normal">
-            Doubts about FlipAEO?<br /><span className='italic text-stone-500'>Let's clear them</span>
-          </h2>
-          <p className="font-sans text-stone-500 text-lg leading-relaxed max-w-lg">
-            We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and authority.
-          </p>
+          {/* Header - Left/Right Premium Setup */}
+          <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
+            <div className="flex-1">
+              <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
+                Common Questions
+              </span>
+              <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
+                Doubts about FlipAEO?<br /><span className='italic text-stone-500'>Let's clear them.</span>
+              </h2>
+            </div>
+            <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
+              <p className="font-sans text-stone-500 text-lg leading-relaxed">
+                We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and authority.
+              </p>
+            </div>
+          </div>
+
+          {/* Horizontal Pattern Bar Top (Grid Boundary) */}
+          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+
+            <CornerSquare className="-left-[5px] -bottom-[5px]" />
+            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+          </div>
+
+          {/* FAQ List wrapped in the wireframe border */}
+          <div className="w-full border-x border-stone-200 bg-white p-8 md:p-16 relative">
+            <CornerSquare className="-left-[5px] -bottom-[5px]" />
+            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+
+            <div className="max-w-3xl mx-auto flex flex-col gap-4">
+              {FAQS.map((faq, index) => (
+                <FAQItem key={index} item={faq} />
+              ))}
+            </div>
+          </div>
+
+          {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
+          <div className="relative w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+
+          </div>
+
         </div>
-
-        {/* FAQ List */}
-        <div className="flex flex-col gap-4">
-          {FAQS.map((faq, index) => (
-            <FAQItem key={index} item={faq} />
-          ))}
-        </div>
-
       </section>
 
       {/* FAQ Schema for SEO */}
@@ -146,3 +176,4 @@ export const FAQSection: React.FC = () => {
 };
 
 export default FAQSection;
+
