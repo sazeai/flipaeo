@@ -274,15 +274,25 @@ const SolutionSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-6 border-x border-stone-200 relative">
 
           {/* Main Grid Corners */}
+          <CornerSquare className="-left-[5px] -top-[5px]" />
+          <CornerSquare className="-right-[5px] -top-[5px]" />
           <CornerSquare className="-left-[5px] -bottom-[5px]" />
           <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
+          {/* Top Junctions */}
+          <div className="hidden md:block absolute top-0 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-30">
+            <CornerSquare className="-left-[4px] -top-[4px]" />
+          </div>
+          <div className="hidden md:block absolute bottom-0 left-[66.66%] -translate-x-1/2 translate-y-1/2 z-30">
+            <CornerSquare className="-left-[4px] -top-[4px]" />
+          </div>
+
           {/* Card 1: Clear Visibility (Large 2/3 width) */}
-          <div className="md:col-span-4 bg-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
+          <div className="md:col-span-4 bg-white p-8 md:p-12 flex flex-col justify-between relative md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50">
             {/* Junctions at bottom of Card 1 */}
-            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction */ }
-            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 1, 2, 4 */ }
-            
+            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction */}
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 1, 2, 4 */}
+
             <div className="max-w-lg z-10 relative">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
@@ -302,7 +312,7 @@ const SolutionSection: React.FC = () => {
 
           {/* Card 2: Competitor Gap (Small 1/3 width) */}
           <div className="md:col-span-2 bg-stone-50/30 p-8 flex flex-col items-center text-center border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
-            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction */ }
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction */}
             <div className="mb-auto w-full">
               <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Market Share</div>
               <h3 className="font-serif text-xl text-stone-900 leading-tight mb-2">
@@ -316,10 +326,10 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 3: Authority Building (Small 1/3 width) */}
-          <div className="md:col-span-2 bg-white p-8 flex flex-col md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
-            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 1/2 junction at 33.3% */ }
-            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction Row 2/3 */ }
-            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 3, 4, 5 */ }
+          <div className="md:col-span-2  p-8 flex flex-col md:border-r border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 1/2 junction at 33.3% */}
+            <CornerSquare className="-left-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Left Junction Row 2/3 */}
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Intersection Card 3, 4, 5 */}
             <div className="text-[10px] font-bold tracking-widest text-brand-400 uppercase mb-2">Authority</div>
             <h3 className="font-serif text-xl text-stone-900 mb-2">
               Become the Industry Guide
@@ -331,9 +341,9 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 4: Articles that Answer (Large 2/3 width) */}
-          <div className="md:col-span-4 bg-white p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
-             <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction Row 2/3 */ }
-             <div className="flex-1 order-2 md:order-1">
+          <div className="md:col-span-4 bg-white p-8 flex flex-col md:flex-row gap-8 items-center border-b border-stone-200 group transition-colors hover:bg-stone-50/50 relative">
+            <CornerSquare className="-right-[5px] -bottom-[5px] z-30 hidden md:block" /> { /* Edge Right Junction Row 2/3 */}
+            <div className="flex-1 order-2 md:order-1">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md">
                   <Check size={14} className="text-brand-500" />
@@ -353,8 +363,8 @@ const SolutionSection: React.FC = () => {
           </div>
 
           {/* Card 6: Friction / Velocity (Wide Bottom Strip) */}
-          <div className="md:col-span-4 bg-stone-50/30 p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group md:border-r border-b border-stone-200 transition-colors hover:bg-stone-50/50 relative">
-            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 2/3 junction at 66.6% */ }
+          <div className="md:col-span-4 hover:bg-stone-50/30 p-8 flex flex-col md:flex-row items-center justify-between relative group md:border-r border-b border-stone-200 transition-colors hover:bg-stone-50/50 relative bg-white">
+            <CornerSquare className="-right-[5px] -top-[5px] z-30 hidden md:block" /> { /* Row 2/3 junction at 66.6% */}
             <div className="relative z-10 pr-6 flex-1 mb-6 md:mb-0">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-1.5 bg-brand-50 border border-brand-100 rounded-md text-brand-600">
@@ -389,7 +399,13 @@ const SolutionSection: React.FC = () => {
         </div>
 
         {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-        <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+          <CornerSquare className="-left-[5px] -top-[5px]" />
+          <CornerSquare className="-right-[5px] -top-[5px]" />
+          <div className="hidden md:block absolute top-0 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-30">
+            <CornerSquare className="-left-[4px] -top-[4px]" />
+          </div>
+        </div>
 
       </div>
 

@@ -195,6 +195,8 @@ const HowItWorksSection: React.FC = () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-3 border-x border-stone-200 bg-white relative">
 
           {/* Main Grid Corners */}
+          <CornerSquare className="-left-[5px] -top-[5px]" />
+          <CornerSquare className="-right-[5px] -top-[5px]" />
           <CornerSquare className="-left-[5px] -bottom-[5px]" />
           <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
@@ -275,7 +277,7 @@ const HowItWorksSection: React.FC = () => {
         </div>
 
         {/* Quote Section incorporated into the Wireframe */}
-        <div className="w-full bg-stone-50/30 border-x border-b border-stone-200 p-8 md:p-16 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="w-full bg-stone-50/30 border-x border-b border-stone-200 p-8 md:p-16 flex flex-col items-center justify-center relative">
           {/* Corners */}
           <CornerSquare className="-left-[5px] -bottom-[5px]" />
           <CornerSquare className="-right-[5px] -bottom-[5px]" />
@@ -295,7 +297,10 @@ const HowItWorksSection: React.FC = () => {
         </div>
 
         {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-        <div className="w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+          <CornerSquare className="-left-[5px] -top-[5px]" />
+          <CornerSquare className="-right-[5px] -top-[5px]" />
+        </div>
 
       </div>
     </section>

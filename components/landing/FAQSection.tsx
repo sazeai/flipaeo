@@ -120,7 +120,10 @@ export const FAQSection: React.FC = () => {
         <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
           {/* Horizontal Pattern Bar Above Header */}
-          <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+            <CornerSquare className="-left-[5px] -bottom-[5px]" />
+            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+          </div>
 
           {/* Header - Left/Right Premium Setup */}
           <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
@@ -148,6 +151,8 @@ export const FAQSection: React.FC = () => {
 
           {/* FAQ List wrapped in the wireframe border */}
           <div className="w-full border-x border-stone-200 bg-white p-8 md:p-16 relative">
+            <CornerSquare className="-left-[5px] -top-[5px]" />
+            <CornerSquare className="-right-[5px] -top-[5px]" />
             <CornerSquare className="-left-[5px] -bottom-[5px]" />
             <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
@@ -159,8 +164,9 @@ export const FAQSection: React.FC = () => {
           </div>
 
           {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-          <div className="relative w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-
+          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+            <CornerSquare className="-left-[5px] -top-[5px]" />
+            <CornerSquare className="-right-[5px] -top-[5px]" />
           </div>
 
         </div>

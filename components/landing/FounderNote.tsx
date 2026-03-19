@@ -12,8 +12,6 @@ export default function FounderNote() {
 
                 {/* Horizontal Pattern Bar Above Header */}
                 <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
                     <CornerSquare className="-left-[5px] -bottom-[5px]" />
                     <CornerSquare className="-right-[5px] -bottom-[5px]" />
                 </div>
@@ -37,16 +35,16 @@ export default function FounderNote() {
 
                 {/* Horizontal Pattern Bar Top (Grid Boundary) */}
                 <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
                     <CornerSquare className="-left-[5px] -bottom-[5px]" />
                     <CornerSquare className="-right-[5px] -bottom-[5px]" />
                 </div>
 
                 {/* Premium Wireframe Monolithic Letter Block */}
-                <div className="w-full border-x border-stone-200 bg-stone-50/30 p-8 md:p-24 relative overflow-hidden flex justify-center">
+                <div className="w-full border-x border-stone-200 bg-stone-50/30 p-8 md:p-24 relative flex justify-center">
                     
                     {/* Main Grid Corners */}
+                    <CornerSquare className="-left-[5px] -top-[5px]" />
+                    <CornerSquare className="-right-[5px] -top-[5px]" />
                     <CornerSquare className="-left-[5px] -bottom-[5px]" />
                     <CornerSquare className="-right-[5px] -bottom-[5px]" />
 
@@ -130,9 +128,9 @@ export default function FounderNote() {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-b border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+                    <CornerSquare className="-left-[5px] -top-[5px]" />
+                    <CornerSquare className="-right-[5px] -top-[5px]" />
                 </div>
 
             </div>
