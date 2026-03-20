@@ -1,158 +1,146 @@
 import React from 'react';
-import { CheckCircle2, Sparkles } from 'lucide-react';
 import { CornerSquare } from './CornerSquare';
 
 const DiscoveryVisual = () => (
-  <div className="w-full h-40 bg-stone-50/50 border border-stone-100 rounded-lg overflow-hidden relative flex items-center justify-center">
-    {/* Clean Grid Background */}
-    <div className="absolute inset-0 opacity-40"
-      style={{ backgroundImage: 'radial-gradient(#a8a29e 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-    </div>
+  <div className="w-full h-[320px] bg-stone-50/20 border-none relative flex justify-center items-end overflow-hidden pt-12 px-4 group/card">
 
-    {/* The Data Landscape */}
-    <div className="relative w-full h-full group">
-      {/* Distraction/Noise Dots (Subtle) */}
-      <div className="absolute top-8 left-12 w-1.5 h-1.5 bg-stone-300 rounded-full opacity-50"></div>
-      <div className="absolute top-16 left-24 w-1 h-1 bg-stone-300 rounded-full opacity-50"></div>
-      <div className="absolute bottom-10 right-16 w-1.5 h-1.5 bg-stone-300 rounded-full opacity-50"></div>
-      <div className="absolute top-12 right-10 w-1 h-1 bg-stone-300 rounded-full opacity-50"></div>
+    {/* Stacked Cards - 3 visible layers including front */}
+    <div className="absolute top-7 left-1/2 -translate-x-1/2 w-[65%] h-full bg-stone-100/50 border border-stone-200/40 rounded-t-[2rem] z-0 transition-transform duration-700 ease-out group-hover/card:-translate-y-0.5 shadow-sm"></div>
+    <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[80%] h-full bg-stone-50/80 border border-stone-200/40 rounded-t-[2rem] z-10 transition-transform duration-700 ease-out delay-75 group-hover/card:-translate-y-1 shadow-sm"></div>
 
-      {/* The Target: Perfectly Centered */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-        <div className="relative cursor-default">
-          {/* Active Pulse Ring */}
-          <div className="absolute -inset-6 bg-brand-100/50 rounded-full animate-pulse"></div>
-          <div className="absolute -inset-2 bg-brand-200/50 rounded-full animate-ping opacity-20"></div>
+    {/* Main Card */}
+    <div className="relative z-20 w-[94%] bg-white ring-1 ring-stone-200/50 rounded-t-[2rem] shadow-[0_4px_24px_rgb(0,0,0,0.03)] p-5 flex flex-col gap-3 text-sm h-[270px] transition-transform duration-700 ease-out delay-150 group-hover/card:-translate-y-1.5">
 
-          {/* Core Dot */}
-          <div className="relative w-3.5 h-3.5 bg-brand-500 rounded-full shadow-[0_2px_8px_rgba(249,115,22,0.4)] border-2 border-white z-20"></div>
+      <div className="w-full bg-stone-50/50 border border-stone-100/50 rounded-xl p-3 flex gap-2 items-center mb-1 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
+        <svg className="w-4 h-4 text-stone-400 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <div className="text-stone-500 text-xs font-mono tracking-widest uppercase">Ecosystem Map</div>
+      </div>
 
-          {/* High-Fidelity Data Tooltip */}
-          <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-white border border-stone-200 shadow-xl rounded-lg p-3 w-40 flex flex-col gap-2 z-30 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <div className="flex justify-between items-center border-b border-stone-100 pb-1.5">
-              <span className="text-[9px] uppercase tracking-widest text-stone-500 font-bold">Keyword Opportunity</span>
-            </div>
-            <div className="flex items-center justify-between text-[10px] gap-2">
-              <div className="flex flex-col">
-                <span className="text-stone-400 font-medium text-[9px]">Volume</span>
-                <span className="text-stone-900 font-bold">12,400</span>
-              </div>
-              <div className="w-px h-4 bg-stone-100"></div>
-              <div className="flex flex-col items-end">
-                <span className="text-stone-400 font-medium text-[9px]">Difficulty</span>
-                <span className="text-green-600 font-bold bg-green-50 px-1 rounded">Low</span>
-              </div>
-            </div>
-            {/* Arrow Pointer */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[5px] w-2.5 h-2.5 bg-white border-b border-r border-stone-200 transform rotate-45"></div>
+      <div className="flex justify-between items-center p-3 rounded-xl bg-white border border-stone-100/60 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+        <div className="text-stone-600 font-medium text-xs line-clamp-1 pr-2">"What is SEO?"</div>
+        <div className="text-[10px] font-semibold text-stone-500 bg-stone-100/80 px-2 py-0.5 rounded-md shrink-0 shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)]">Over-covered</div>
+      </div>
+
+      <div className="flex justify-between items-center p-3 rounded-xl bg-white border border-stone-100/60 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+        <div className="text-stone-600 font-medium text-xs line-clamp-1 pr-2">"Traditional vs AI SEO"</div>
+        <div className="text-[10px] font-semibold text-stone-500 bg-stone-100/80 px-2 py-0.5 rounded-md shrink-0 shadow-[inset_0_1px_1px_rgba(0,0,0,0.02)]">Cluttered</div>
+      </div>
+
+      <div className="flex flex-col gap-2 p-3 mt-1 rounded-xl bg-gradient-to-b from-white to-orange-50/30 border border-orange-200/50 shadow-[0_4px_12px_rgba(249,115,22,0.03)] relative overflow-hidden group/item">
+        <div className="absolute right-0 top-0 w-24 h-24 bg-brand-500/5 blur-2xl rounded-full"></div>
+        <div className="flex justify-between items-center relative z-10">
+          <div className="text-stone-900 font-bold font-serif italic text-sm">"How to optimize for LLMs?"</div>
+          <div className="text-[10px] font-bold text-brand-600 bg-white border border-brand-100 px-2 py-0.5 rounded-md flex gap-1 items-center shadow-[0_2px_6px_rgba(249,115,22,0.08)] shrink-0">
+            <svg className="w-3 h-3 text-brand-500" fill="currentColor" viewBox="0 0 24 24"><path d="M11 2v4.25a.75.75 0 01-1.5 0V2h1.5zm0 15.75V22h1.5v-4.25a.75.75 0 01-1.5 0zM4.12 6.24l2.12 2.12a.75.75 0 11-1.06 1.06L3.06 7.3a.75.75 0 011.06-1.06zm13.64 12.58l-2.12-2.12a.75.75 0 011.06-1.06l2.12 2.12a.75.75 0 01-1.06 1.06zM2 12.5h4.25a.75.75 0 010-1.5H2v1.5zm15.75 0H22v-1.5h-4.25a.75.75 0 010 1.5zM6.24 19.88l2.12-2.12a.75.75 0 111.06 1.06l-2.12 2.12a.75.75 0 11-1.06-1.06zm12.58-13.64l-2.12 2.12a.75.75 0 01-1.06-1.06l2.12-2.12a.75.75 0 011.06 1.06zM11.75 8a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" /></svg> Gap
           </div>
+        </div>
+        <div className="text-[11px] text-stone-500 leading-snug relative z-10 pr-2">
+          High priority opportunity. Missing from authoritative sets.
         </div>
       </div>
     </div>
   </div>
 );
 
-/**
- * Visual 2: The "Symmetrical Architecture"
- * A perfectly centered tree diagram showing flow from Pillar to Clusters.
- */
 const StrategyVisual = () => (
-  <div className="w-full h-40 bg-white border border-stone-100 rounded-lg overflow-hidden relative flex flex-col items-center justify-center pt-2">
-    {/* Background Web Pattern */}
-    <div className="absolute inset-0 opacity-[0.03]"
-      style={{ backgroundImage: 'radial-gradient(#000 0.5px, transparent 0.5px)', backgroundSize: '12px 12px' }}>
-    </div>
+  <div className="w-full h-[320px] bg-stone-50/20 border-none relative flex justify-center items-end overflow-hidden pt-12 px-4 group/card">
+    <div className="absolute top-7 left-1/2 -translate-x-1/2 w-[65%] h-full bg-stone-100/50 border border-stone-200/40 rounded-t-[2rem] z-0 transition-transform duration-700 ease-out group-hover/card:-translate-y-0.5 shadow-sm"></div>
+    <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[80%] h-full bg-stone-50/80 border border-stone-200/40 rounded-t-[2rem] z-10 transition-transform duration-700 ease-out delay-75 group-hover/card:-translate-y-1 shadow-sm"></div>
 
-    {/* Pillar Node (Parent) */}
-    <div className="relative z-10 mb-6">
-      <div className="flex items-center gap-2 px-4 py-2 bg-white border border-brand-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] rounded-full">
-        <div className="w-2 h-2 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]"></div>
-        <div className="text-[10px] font-bold text-stone-800 tracking-tight">Core Pillar Page</div>
+    <div className="relative z-20 w-[94%] bg-white ring-1 ring-stone-200/50 rounded-t-[2rem] shadow-[0_4px_24px_rgb(0,0,0,0.03)] p-6 flex flex-col gap-0 text-sm h-[270px] transition-transform duration-700 ease-out delay-150 group-hover/card:-translate-y-1.5">
+
+      <div className="font-medium text-stone-900 text-base mb-1 flex items-center">
+        <span className="bg-gradient-to-br from-brand-50 to-brand-100/50 px-2 py-0.5 ring-1 ring-brand-200/50 rounded-md text-brand-800 mr-2 shadow-[inner_0_1px_1px_rgba(255,255,255,0.5)]">Authority</span>Map
       </div>
-    </div>
+      <div className="text-stone-500 text-xs mb-6 pr-4">
+        Establishing foundational coverage before competing for high-value core terms.
+      </div>
 
-    {/* Tree Connectors (SVG) */}
-    <div className="relative w-48 h-10 -mt-6 mb-0 pointer-events-none z-0">
-      <svg className="w-full h-full overflow-visible">
-        {/* Main Stem */}
-        <path d="M96,15 L96,35" stroke="#e7e5e4" strokeWidth="1.5" fill="none" />
-        {/* Crossbar */}
-        <path d="M24,35 L168,35" stroke="#e7e5e4" strokeWidth="1.5" fill="none" />
-        {/* Drops */}
-        <path d="M24,35 L24,45" stroke="#e7e5e4" strokeWidth="1.5" fill="none" />
-        <path d="M96,35 L96,45" stroke="#e7e5e4" strokeWidth="1.5" fill="none" />
-        <path d="M168,35 L168,45" stroke="#e7e5e4" strokeWidth="1.5" fill="none" />
-
-        {/* Moving Energy Particles */}
-        <circle r="1.5" fill="#f97316">
-          <animateMotion dur="3s" repeatCount="indefinite" path="M96,15 L96,35 L24,35 L24,45" keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
-        </circle>
-        <circle r="1.5" fill="#f97316">
-          <animateMotion dur="3s" repeatCount="indefinite" path="M96,15 L96,35 L168,35 L168,45" keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
-        </circle>
-      </svg>
-    </div>
-
-    {/* Cluster Nodes (Children) */}
-    <div className="grid grid-cols-3 gap-6 w-56 relative z-10">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="h-8 bg-stone-50 border border-stone-100 rounded-md flex items-center justify-center shadow-sm relative group">
-          <div className="w-8 h-1.5 bg-stone-200 rounded-full group-hover:bg-brand-200 transition-colors"></div>
-          {/* Hover tooltip for effect */}
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      <div className="flex w-full h-5 bg-stone-50/80 ring-1 ring-stone-200/60 rounded-lg overflow-hidden relative mb-6 group/bar shadow-[inset_0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="w-[35%] h-full bg-brand-500 flex items-center justify-center text-[9px] text-white font-bold tracking-widest relative z-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]">
+          PHASE 1
         </div>
-      ))}
+        <div className="w-[45%] h-full bg-stone-100/80 border-l border-white/50 flex items-center justify-center text-[9px] text-stone-400 font-bold tracking-widest" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, #f5f5f4, #f5f5f4 2px, transparent 2px, transparent 6px)' }}>
+          PENDING
+        </div>
+        <div className="w-[20%] h-full bg-stone-50/50 border-l border-white/50 flex items-center justify-center text-[9px] text-stone-400/70 font-bold tracking-widest shadow-inner">
+          LOCKED
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 rounded-md flex shrink-0 items-center justify-center ring-1 ring-brand-200/60 bg-gradient-to-b from-brand-50 to-white shadow-[0_2px_4px_rgba(249,115,22,0.05)] relative overflow-hidden">
+            <svg className="w-3 h-3 text-brand-500 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <div className="flex flex-col">
+            <div className="text-xs font-bold text-stone-800 leading-tight mb-0.5">Foundational Answers</div>
+            <div className="text-[10px] text-stone-400">Long-tail specific queries</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 rounded-md flex shrink-0 items-center justify-center ring-1 ring-stone-200/80 bg-gradient-to-b from-white to-stone-50 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand-400 shadow-[0_0_4px_rgba(249,115,22,0.3)] animate-pulse"></div>
+          </div>
+          <div className="flex flex-col">
+            <div className="text-xs font-bold text-stone-800 leading-tight mb-0.5">Pillar Guides</div>
+            <div className="text-[10px] text-stone-400">Connecting definitions</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 opacity-60">
+          <div className="w-6 h-6 rounded-md flex shrink-0 items-center justify-center ring-1 ring-stone-200/50 bg-stone-50 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)]">
+            <svg className="w-3 h-3 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </div>
+          <div className="flex flex-col">
+            <div className="text-xs font-bold text-stone-800 leading-tight mb-0.5">Core Industry Terms</div>
+            <div className="text-[10px] text-stone-400">Needs domain authority</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 );
 
-/**
- * Visual 3: The "Chat Interaction"
- * A realistic AI Chat interface showing the brand being cited. 
- * Replaces the "dummy" lines with readable, context-aware content.
- */
 const ExecutionVisual = () => (
-  <div className="w-full h-40 bg-stone-50/50 border border-stone-100 rounded-lg overflow-hidden relative flex items-center justify-center">
+  <div className="w-full h-[320px] bg-stone-50/20 border-none relative flex justify-center items-end overflow-hidden pt-12 px-4 group/card">
+    <div className="absolute top-7 left-1/2 -translate-x-1/2 w-[65%] h-full bg-stone-100/50 border border-stone-200/40 rounded-t-[2rem] z-0 transition-transform duration-700 ease-out group-hover/card:-translate-y-0.5 shadow-sm"></div>
+    <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[80%] h-full bg-stone-50/80 border border-stone-200/40 rounded-t-[2rem] z-10 transition-transform duration-700 ease-out delay-75 group-hover/card:-translate-y-1 shadow-sm"></div>
 
-    {/* Chat Container */}
-    <div className="w-full max-w-[260px] flex flex-col gap-3 p-4">
+    <div className="relative z-20 w-[94%] bg-white ring-1 ring-stone-200/50 rounded-t-[2rem] shadow-[0_4px_24px_rgb(0,0,0,0.03)] p-6 flex flex-col gap-0 text-sm h-[270px] transition-transform duration-700 ease-out delay-150 group-hover/card:-translate-y-1.5">
 
-      {/* User Message */}
-      <div className="self-end flex items-center gap-2 max-w-[90%] animate-in fade-in slide-in-from-right-4 duration-500">
-        <div className="bg-white border border-stone-100 text-stone-600 text-[9px] px-3 py-2 rounded-2xl rounded-tr-sm shadow-sm">
-          How do I increase organic traffic?
-        </div>
-        <div className="w-5 h-5 bg-stone-200 rounded-full border border-white shadow-sm flex-shrink-0"></div>
-      </div>
+      <div className="relative space-y-7 before:absolute before:inset-y-3 before:left-[17.5px] before:w-[1.5px] before:bg-gradient-to-b before:from-stone-200 before:to-transparent mt-2">
 
-      {/* AI Response */}
-      <div className="self-start flex items-start gap-2 max-w-[95%] animate-in fade-in slide-in-from-left-4 duration-700 delay-100">
-        <div className="w-5 h-5 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full border border-white shadow-sm flex items-center justify-center flex-shrink-0 text-white">
-          <Sparkles size={8} fill="currentColor" />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          {/* AI Text Bubble */}
-          <div className="bg-white border border-stone-100 p-2.5 rounded-2xl rounded-tl-sm shadow-sm relative overflow-hidden">
-            <p className="text-[9px] text-stone-600 leading-relaxed">
-              The most effective method is <span className="text-stone-900 font-bold bg-brand-100/50 px-1 rounded">Answer Engine Optimization</span>. It focuses on...
-            </p>
+        <div className="flex items-start gap-4 relative">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-stone-200/80 bg-gradient-to-b from-white to-stone-50 shadow-[0_2px_6px_rgba(0,0,0,0.02),inset_0_1px_1px_rgba(255,255,255,1)] z-10 text-stone-500">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           </div>
-
-          {/* The Citation Card (The Hero Element) */}
-          <div className="flex items-center gap-2 pl-1">
-            <div className="w-3 h-px bg-stone-300"></div>
-            <div className="flex items-center gap-2 bg-white border border-brand-200 pl-1.5 pr-2.5 py-1 rounded-full shadow-sm hover:scale-105 transition-transform cursor-default">
-              <div className="w-3.5 h-3.5 bg-brand-500 rounded-full flex items-center justify-center text-white text-[6px] font-bold">
-                F
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-[7px] font-bold text-stone-900">Source: FlipAEO</span>
-              </div>
-              <CheckCircle2 size={8} className="text-green-500 ml-1" />
-            </div>
+          <div className="flex flex-col pt-1.5">
+            <div className="text-stone-800 font-bold text-xs mb-0.5">Brief Generated</div>
+            <div className="text-[10px] text-stone-400 leading-tight">Structured to resolve specific query</div>
           </div>
         </div>
+
+        <div className="flex items-start gap-4 relative">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-brand-200/60 bg-gradient-to-b from-brand-50 to-white shadow-[0_4px_8px_rgba(249,115,22,0.05),inset_0_1px_1px_rgba(255,255,255,1)] z-10 text-brand-600">
+            <svg className="w-4 h-4 drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+          </div>
+          <div className="flex flex-col pt-1.5">
+            <div className="text-stone-900 font-bold text-sm mb-1">Authentic Expert Draft</div>
+            <div className="text-[11px] text-stone-500 leading-relaxed pr-2">Brand voice applied. Fluff strictly removed. Direct answer prioritized.</div>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-4 relative opacity-60">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-stone-200/50 bg-stone-50 shadow-[inset_0_1px_3px_rgba(0,0,0,0.02)] z-10 text-stone-400">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <div className="flex flex-col pt-1.5">
+            <div className="text-stone-700 font-bold text-xs mb-0.5">Ready for CMS</div>
+            <div className="text-[10px] text-stone-400 leading-tight">Publish instantly clean code</div>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -215,8 +203,8 @@ const HowItWorksSection: React.FC = () => {
           </div>
 
           {/* Step 1 Card */}
-          <div className="w-full p-8 md:p-12 border-b md:border-r border-stone-200 flex flex-col gap-8 group">
-            <div className="w-full h-40 overflow-hidden rounded-lg relative border border-stone-100 bg-stone-50">
+          <div className="w-full p-4 md:p-8 border-b md:border-r border-stone-200 flex flex-col gap-8 group">
+            <div className="w-full h-[320px] overflow-hidden rounded-lg relative border border-stone-100 bg-stone-50">
               <DiscoveryVisual />
             </div>
             <div className="flex flex-col gap-4 mt-auto">
@@ -235,8 +223,8 @@ const HowItWorksSection: React.FC = () => {
           </div>
 
           {/* Step 2 Card */}
-          <div className="w-full p-8 md:p-12 border-b md:border-r border-stone-200 flex flex-col gap-8 group transition-colors hover:bg-stone-50/50">
-            <div className="w-full h-40 overflow-hidden rounded-lg bg-white border border-stone-100 relative">
+          <div className="w-full p-4 md:p-8 border-b md:border-r border-stone-200 flex flex-col gap-8 group transition-colors hover:bg-stone-50/50">
+            <div className="w-full h-[320px] overflow-hidden rounded-lg border border-stone-100 relative">
               <StrategyVisual />
             </div>
             <div className="flex flex-col gap-4 mt-auto">
@@ -255,8 +243,8 @@ const HowItWorksSection: React.FC = () => {
           </div>
 
           {/* Step 3 Card */}
-          <div className="w-full p-8 md:p-12 border-b border-stone-200 flex flex-col gap-8 group transition-colors hover:bg-stone-50/50">
-            <div className="w-full h-40 overflow-hidden rounded-lg border border-stone-100 relative bg-stone-50">
+          <div className="w-full p-4 md:p-8 border-b border-stone-200 flex flex-col gap-8 group transition-colors hover:bg-stone-50/50">
+            <div className="w-full h-[320px] overflow-hidden rounded-lg border border-stone-100 relative bg-stone-50">
               <ExecutionVisual />
             </div>
             <div className="flex flex-col gap-4 mt-auto">
