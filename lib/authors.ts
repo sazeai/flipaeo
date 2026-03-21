@@ -17,6 +17,7 @@ export const authors: Record<string, Author> = {
   },
 } as const;
 
+
 export type AuthorKey = keyof typeof authors;
 
 export function getAuthor(key: AuthorKey): Author {
