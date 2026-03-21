@@ -6,6 +6,9 @@
         "trigger.dev@latest",
         "mcp"
       ]
+    },
+    "supabase": {
+      "serverUrl": "https://mcp.supabase.com/mcp?project_ref=toftajqocetadulwyvvy"
     }
   }
 }

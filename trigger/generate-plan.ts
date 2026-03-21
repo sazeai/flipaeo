@@ -9,6 +9,7 @@ import { extractTitleFromUrl, generateEmbedding } from "@/lib/internal-linking"
 import { PlanRefilledEmail } from "@/lib/emails/templates/plan-refilled"
 import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
 import { render } from "@react-email/components"
+import { generateSprintPlanInBatches } from "@/lib/plans/sprint-strategy"
 
 
 interface GeneratePlanPayload {
@@ -244,6 +245,13 @@ export const generatePlanTask = task({
             existingContent
         } = payload
         const supabase = createAdminClient()
+        const { data: currentPlanRow } = await (supabase as any)
+            .from("content_plans")
+            .select("id, plan_mode, user_sprint_id")
+            .eq("id", planId)
+            .maybeSingle()
+
+        const isSprintMode = currentPlanRow?.plan_mode === "sprint_90_day" && !!currentPlanRow?.user_sprint_id
 
         console.log(`[Generate Plan Task] Starting for plan: ${planId}`)
 
@@ -390,14 +398,42 @@ export const generatePlanTask = task({
             await updateStatus("generating", "plan")
             console.log(`[Generate Plan Task] Phase 2: Strategic plan generation...`)
 
-            const result = await generateStrategicPlan({
-                brandData,
-                brandUrl,
-                competitorBrands,
-                existingContent: allExistingContent,
-                auditGaps,
-                auditPillarSuggestions
-            })
+            let sprintTargets = { totalNew: 50, totalRefresh: 25 }
+            if (isSprintMode) {
+                const { data: sprintRow } = await (supabase as any)
+                    .from("user_sprints")
+                    .select("id, sprint_packages(quota_new_articles, quota_refresh_articles)")
+                    .eq("id", currentPlanRow.user_sprint_id)
+                    .maybeSingle()
+
+                const quotaNew = Number((sprintRow as any)?.sprint_packages?.quota_new_articles ?? 50)
+                const quotaRefresh = Number((sprintRow as any)?.sprint_packages?.quota_refresh_articles ?? 25)
+                sprintTargets = {
+                    totalNew: Number.isFinite(quotaNew) ? quotaNew : 50,
+                    totalRefresh: Number.isFinite(quotaRefresh) ? quotaRefresh : 25,
+                }
+            }
+
+            const result = isSprintMode
+                ? {
+                    plan: await generateSprintPlanInBatches({
+                        userSprintId: currentPlanRow.user_sprint_id,
+                        userId,
+                        brandData,
+                        existingContent: allExistingContent,
+                        totalNew: sprintTargets.totalNew,
+                        totalRefresh: sprintTargets.totalRefresh,
+                    }),
+                    categoryDistribution: {},
+                }
+                : await generateStrategicPlan({
+                    brandData,
+                    brandUrl,
+                    competitorBrands,
+                    existingContent: allExistingContent,
+                    auditGaps,
+                    auditPillarSuggestions
+                })
 
             console.log(`[Generate Plan Task] Plan generated: ${result.plan.length} articles`)
 
@@ -410,16 +446,23 @@ export const generatePlanTask = task({
                 totalRejected,
                 replacementsGenerated,
                 attempts
-            } = await deduplicateWithReplacementLoop(
-                result.plan,
-                userId,
-                brandData,
-                {
-                    brandId,
-                    targetCount: 30, // Always aim for exactly 30 articles
-                    maxAttempts: 3
+            } = isSprintMode
+                ? {
+                    finalPlan: result.plan,
+                    totalRejected: 0,
+                    replacementsGenerated: 0,
+                    attempts: 1,
                 }
-            )
+                : await deduplicateWithReplacementLoop(
+                    result.plan,
+                    userId,
+                    brandData,
+                    {
+                        brandId,
+                        targetCount: 30, // Legacy mode target count
+                        maxAttempts: 3
+                    }
+                )
 
             // Detailed logging for Trigger.dev dashboard
             console.log(`[Generate Plan Task] Deduplication Loop Results:`)

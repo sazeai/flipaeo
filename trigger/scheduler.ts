@@ -2,6 +2,7 @@ import { schedules } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { generateBlogPost } from "./generate-blog"
 import { adminHasCredits, adminDeductCredits, adminAddCredits } from "@/lib/credits"
+import { consumeSprintQuota, getActiveSprint, getSprintQuotaBalance } from "@/lib/sprint-entitlements"
 import { BillingAlertEmail } from "@/lib/emails/templates/billing-alert"
 import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
 import { render } from "@react-email/components"
@@ -31,7 +32,7 @@ export const dailyContentWatchman = schedules.task({
         // Fetch ALL active plans with catch_up_mode and updated_at for grace period check
         const { data: plans, error } = await supabase
             .from("content_plans")
-            .select("id, user_id, brand_id, plan_data, catch_up_mode, updated_at")
+            .select("id, user_id, brand_id, plan_data, catch_up_mode, updated_at, plan_mode, user_sprint_id")
             .eq("automation_status", "active")
 
         if (error) {
@@ -53,6 +54,7 @@ export const dailyContentWatchman = schedules.task({
         for (const plan of plans) {
             const items = (plan.plan_data as any[]) || []
             const catchUpMode = plan.catch_up_mode || "gradual"
+            const isSprintMode = plan.plan_mode === "sprint_90_day"
 
             // Find items that are:
             // A) Scheduled for TODAY or earlier (catch missed items)
@@ -66,6 +68,13 @@ export const dailyContentWatchman = schedules.task({
                 item.status === "published" || item.status === "skipped"
             )
             if (allDone && items.length > 0) {
+                if (isSprintMode) {
+                    console.log(`🏁 Sprint plan ${plan.id} completed. Marking as completed (no auto-refill).`)
+                    await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
+                    completedPlans++
+                    continue
+                }
+
                 // Plan is complete. Check if we should auto-refill (Infinite Loop).
                 console.log(`🔄 Plan ${plan.id} finished. Checking for auto-refill...`)
 
@@ -179,7 +188,116 @@ export const dailyContentWatchman = schedules.task({
             const itemsToProcess = catchUpMode === "gradual" ? [itemsDue[0]] : itemsDue
             console.log(`📋 Plan ${plan.id}: ${itemsDue.length} due, processing ${itemsToProcess.length} (mode: ${catchUpMode})`)
 
-            // Check credits for the user (only need 1 credit at a time for gradual mode)
+            // Sprint mode: entitlement/expiry gate is based on user sprint quotas
+            if (isSprintMode) {
+                let sprintId: string | null = plan.user_sprint_id || null
+                if (!sprintId) {
+                    const activeSprint = await getActiveSprint(plan.user_id)
+                    sprintId = activeSprint.data?.id || null
+                }
+
+                if (!sprintId) {
+                    console.warn(`⚠️ Plan ${plan.id} is sprint mode but user has no active sprint. Pausing.`)
+                    await supabase.from("content_plans").update({ automation_status: "paused" }).eq("id", plan.id)
+                    continue
+                }
+
+                const { data: sprint } = await supabase
+                    .from("user_sprints")
+                    .select("id, ends_at")
+                    .eq("id", sprintId)
+                    .maybeSingle()
+
+                if (!sprint) {
+                    await supabase.from("content_plans").update({ automation_status: "paused" }).eq("id", plan.id)
+                    continue
+                }
+
+                if (sprint.ends_at && new Date(sprint.ends_at) <= new Date()) {
+                    console.log(`⌛ Sprint expired for plan ${plan.id}. Marking completed.`)
+                    await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
+                    await supabase.from("user_sprints").update({ status: "expired" }).eq("id", sprint.id)
+                    continue
+                }
+
+                const quotaBalance = await getSprintQuotaBalance(sprint.id)
+                if (!quotaBalance.success) {
+                    console.error(`❌ Failed to load sprint quota for plan ${plan.id}: ${quotaBalance.error}`)
+                    continue
+                }
+
+                if (quotaBalance.newRemaining <= 0 && quotaBalance.refreshRemaining <= 0) {
+                    console.log(`⏹️ Sprint quota exhausted for plan ${plan.id}. Marking completed.`)
+                    await supabase.from("content_plans").update({ automation_status: "completed" }).eq("id", plan.id)
+                    await supabase.from("user_sprints").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", sprint.id)
+                    completedPlans++
+                    continue
+                }
+
+                for (const item of itemsToProcess) {
+                    const quotaType = item.content_action === "refresh" ? "refresh" : "new"
+                    const consumed = await consumeSprintQuota({
+                        userSprintId: sprint.id,
+                        quotaType,
+                        reason: `Automated ${quotaType} content: ${item.main_keyword}`,
+                        contentPlanItemId: item.id,
+                    })
+
+                    if (!consumed.success) {
+                        console.warn(`⚠️ Skipping ${item.id} due to sprint quota: ${consumed.error}`)
+                        continue
+                    }
+
+                    try {
+                        let articleId = item.article_id
+                        if (!articleId) {
+                            const { data: newArticle, error: articleError } = await supabase
+                                .from("articles")
+                                .insert({
+                                    brand_id: plan.brand_id,
+                                    keyword: item.main_keyword,
+                                    status: "queued",
+                                    user_id: plan.user_id,
+                                })
+                                .select("id")
+                                .single()
+
+                            if (articleError || !newArticle) {
+                                console.error(`❌ Failed to create article for "${item.title}":`, articleError)
+                                continue
+                            }
+                            articleId = newArticle.id
+                        }
+
+                        const updatedPlanData = items.map((i: any) =>
+                            i.id === item.id ? { ...i, article_id: articleId, status: "writing" } : i
+                        )
+                        await supabase
+                            .from("content_plans")
+                            .update({ plan_data: updatedPlanData })
+                            .eq("id", plan.id)
+
+                        await generateBlogPost.trigger({
+                            articleId: articleId,
+                            keyword: item.main_keyword,
+                            brandId: plan.brand_id,
+                            title: item.title,
+                            articleType: item.article_type || "informational",
+                            supportingKeywords: item.supporting_keywords || [],
+                            cluster: item.cluster || "",
+                            planId: plan.id,
+                            itemId: item.id,
+                        })
+
+                        triggeredCount++
+                    } catch (e) {
+                        console.error(`❌ Failed to trigger sprint automation for item ${item.id}`, e)
+                    }
+                }
+                continue
+            }
+
+            // Legacy mode: credits/subscription gate
             const creditsNeeded = catchUpMode === "gradual" ? 1 : itemsToProcess.length
             const { hasCredits: userHasCredits, currentBalance, error: creditError } = await adminHasCredits(plan.user_id, creditsNeeded)
 

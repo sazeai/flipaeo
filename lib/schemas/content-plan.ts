@@ -47,6 +47,17 @@ export const ContentPlanItemSchema = z.object({
         "Transactional",
         "Commercial Investigation"
     ]).optional(),
+    // Sprint mode fields for net-new vs refresh routing
+    content_action: z.enum(["new", "refresh"]).default("new"),
+    target_url: z.string().optional(), // Existing URL to refresh
+    target_post_id: z.string().optional(), // Platform-specific post/item id
+    registry_topic_id: z.string().optional(), // Accepted topic from topic_registry
+    gsc_baseline_metrics: z.object({
+        clicks: z.number().optional(),
+        impressions: z.number().optional(),
+        ctr: z.number().optional(),
+        position: z.number().optional(),
+    }).optional(),
 })
 
 export type ContentPlanItem = z.infer<typeof ContentPlanItemSchema>
@@ -73,6 +84,8 @@ export const ContentPlanSchema = z.object({
     automation_status: AutomationStatusSchema,
     // How to handle missed articles when resuming
     catch_up_mode: CatchUpModeSchema,
+    plan_mode: z.enum(["legacy_monthly", "sprint_90_day"]).default("legacy_monthly"),
+    user_sprint_id: z.string().optional(),
     created_at: z.string().optional(),
     updated_at: z.string().optional(),
 })

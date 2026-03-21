@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { createHmac, timingSafeEqual, createHash } from 'crypto'
 import { Webhook } from 'standardwebhooks'
+import { createOrActivateSprintFromPayment } from '@/lib/sprint-entitlements'
 
 export const runtime = 'nodejs'
 
@@ -663,6 +664,12 @@ export async function POST(req: NextRequest) {
             // Persist payment record for invoice history
             const paymentObj = data?.payment ?? data
             const dodo_payment_id = paymentObj?.payment_id || data?.payment_id
+            const paymentProductId =
+                paymentObj?.product_id ||
+                paymentObj?.product?.id ||
+                data?.product_id ||
+                subscriptionObj?.product_id ||
+                subscriptionObj?.plan?.product_id
             const paymentAmount = Number(paymentObj?.total_amount ?? data?.total_amount ?? 0)
             const paymentCurrency = (paymentObj?.currency || data?.currency || 'USD') as string
             const paymentTimestamp = payload?.timestamp || new Date().toISOString()
@@ -687,6 +694,27 @@ export async function POST(req: NextRequest) {
                     console.error('Failed to upsert payment record for invoice history:', paymentErr)
                     // Non-blocking: don't fail the entire webhook for invoice tracking
                 }
+            }
+
+            // Sprint-mode entitlement activation for one-time checkout payments.
+            // This is safe to run repeatedly; helper no-ops if an active sprint already exists.
+            try {
+                if (effective_user_id) {
+                    const sprintPackageCode =
+                        (meta?.sprint_package_code as string | undefined) ||
+                        (payload?.metadata?.sprint_package_code as string | undefined) ||
+                        'sprint_497'
+
+                    await createOrActivateSprintFromPayment({
+                        userId: String(effective_user_id),
+                        dodoProductId: paymentProductId ? String(paymentProductId) : null,
+                        dodoPaymentId: dodo_payment_id ? String(dodo_payment_id) : null,
+                        dodoCheckoutId: subscriptionObj?.checkout_id || data?.checkout_id || null,
+                        fallbackPackageCode: sprintPackageCode,
+                    })
+                }
+            } catch (sprintErr) {
+                console.error('Failed to activate sprint entitlement from payment event:', sprintErr)
             }
         } else if (eventType === 'subscription.cancelled' || eventType === 'subscription.canceled') {
             // Handle cancellation

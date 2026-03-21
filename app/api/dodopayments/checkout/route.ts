@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDodoClient } from '@/lib/dodopayments-server'
 import { createClient } from '@/utils/supabase/server'
+import { isFlagEnabled } from '@/lib/feature-flags'
 
 /**
  * POST /api/dodopayments/checkout
@@ -36,20 +37,47 @@ export async function POST(req: NextRequest) {
         const body = await req.json().catch(() => ({}))
         const {
             product_cart,
+            sprint_package_code,
             customer,
             billing_address,
             return_url,
             metadata,
         } = body || {}
 
+        let resolvedProductCart = product_cart as any[] | undefined
+        let resolvedSprintCode: string | null = null
+
+        // New sprint checkout path: package code -> dodo product mapping
+        if ((!Array.isArray(resolvedProductCart) || resolvedProductCart.length === 0) && sprint_package_code) {
+            if (!isFlagEnabled("billingSprintMode")) {
+                return NextResponse.json({ error: 'Sprint billing mode is not enabled' }, { status: 403 })
+            }
+            const { data: sprintPackage, error: sprintPackageError } = await supabase
+                .from('sprint_packages')
+                .select('code, dodo_product_id')
+                .eq('code', sprint_package_code)
+                .eq('is_active', true)
+                .maybeSingle()
+
+            if (sprintPackageError || !sprintPackage?.dodo_product_id) {
+                return NextResponse.json(
+                    { error: 'Invalid sprint package or missing Dodo product mapping' },
+                    { status: 400 },
+                )
+            }
+
+            resolvedProductCart = [{ product_id: sprintPackage.dodo_product_id, quantity: 1 }]
+            resolvedSprintCode = sprintPackage.code
+        }
+
         // Basic validation
-        if (!Array.isArray(product_cart) || product_cart.length === 0) {
+        if (!Array.isArray(resolvedProductCart) || resolvedProductCart.length === 0) {
             return NextResponse.json(
-                { error: 'product_cart is required and must be a non-empty array' },
+                { error: 'product_cart (or sprint_package_code) is required' },
                 { status: 400 },
             )
         }
-        for (const item of product_cart) {
+        for (const item of resolvedProductCart) {
             if (!item?.product_id || typeof item.product_id !== 'string') {
                 return NextResponse.json(
                     { error: 'Each product_cart item must include a valid product_id' },
@@ -83,12 +111,15 @@ export async function POST(req: NextRequest) {
         if (!Object.prototype.hasOwnProperty.call(finalMetadata, 'user_id')) {
             finalMetadata.user_id = user.id
         }
+        if (resolvedSprintCode && !Object.prototype.hasOwnProperty.call(finalMetadata, 'sprint_package_code')) {
+            finalMetadata.sprint_package_code = resolvedSprintCode
+        }
 
         const client = getDodoClient()
 
         // Build params for Dodo Checkout Session
         const params: any = {
-            product_cart,
+            product_cart: resolvedProductCart,
             return_url,
             metadata: finalMetadata,
         }
@@ -105,7 +136,7 @@ export async function POST(req: NextRequest) {
         // Optional: Track a pending subscription change (audit trail)
         // Attempt to map the first product to a local pricing plan
         try {
-            const firstProductId: string | undefined = product_cart?.[0]?.product_id
+            const firstProductId: string | undefined = resolvedProductCart?.[0]?.product_id
             let to_plan_id: string | null = null
 
             if (firstProductId) {
@@ -127,7 +158,8 @@ export async function POST(req: NextRequest) {
                 change_type: 'new',
                 metadata: {
                     source: 'api.dodopayments.checkout',
-                    product_cart,
+                    product_cart: resolvedProductCart,
+                    sprint_package_code: resolvedSprintCode,
                 },
             })
         } catch (auditErr) {
