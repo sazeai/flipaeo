@@ -9,63 +9,63 @@ import { FAQItem } from './FAQItem'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
-  title: 'Pricing',
-  description: 'Stop Renting SEO Writers. Own an AI Visibility Engine. Get the output of a $2,500/mo SEO Agency for the price of a dinner.',
-  keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost', 'article generation pricing'],
+  title: 'Pricing — PinLoop AI',
+  description: 'Deploy an autonomous Pinterest marketing engine for $79/mo. Generate lifestyle pins, publish on autopilot, and drive traffic to your store.',
+  keywords: ['PinLoop pricing', 'Pinterest marketing pricing', 'automated Pinterest pins', 'Pinterest traffic tool'],
   canonical: '/pricing',
 })
 
 const planFeatures = [
-  "30 Citation-Optimized Authority Articles",
-  "Competitor Research & Gap-Analysis",
-  "Google and LLM-Ready Structure",
-  "Answer-first content structure",
-  "Automated content strategy",
-  "1-Click CMS Publishing",
-  "On-brand Featured Images",
-  "Semantic Internal Linking",
+  "Unlimited AI Lifestyle Pin Generation",
+  "Autonomous Drip Publishing to Pinterest",
+  "Self-Improving Prompt Engine (Closed-Loop AI)",
+  "Account Warmup & Shadow Ban Prevention",
+  "Pinterest SEO Title & Description Generation",
+  "10 Premium Brand Font Options",
+  "Cloudflare R2 Image Storage",
+  "Weekly Performance Report Emails",
   "24x7 Priority Support"
 ]
 
 const faqs = [
   {
-    question: "WHAT'S INCLUDED IN THE $79/MONTH PLAN?",
-    answer: "You get 30 AI-generated articles per month, automated content strategy, CMS integration, on-brand AI images, smart internal linking, and priority support. Everything you need to dominate AI search."
+    question: "WHAT'S INCLUDED IN THE $79/MONTH?",
+    answer: "PinLoop AI generates unlimited lifestyle pins from your product catalog, publishes them to Pinterest on autopilot, and self-optimizes over time. You also get account warmup protection, weekly reports, and priority support."
   },
   {
     question: "IS THIS A SUBSCRIPTION?",
-    answer: "Yes, FlipAEO is a monthly subscription. You can cancel anytime from your dashboard, and you'll retain access until the end of your billing period."
+    answer: "Yes, PinLoop AI is a monthly subscription. You can cancel anytime from your dashboard, and you'll retain access until the end of your billing period."
   },
   {
     question: "WHAT'S YOUR REFUND POLICY?",
-    answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the quality of your articles, we'll refund you in full."
+    answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the quality of your generated pins, we'll refund you in full."
   },
   {
-    question: "WILL GOOGLE PENALIZE AI CONTENT?",
-    answer: "No. Google rewards helpful, authoritative content regardless of how it's produced. FlipAEO focuses on real research, verified citations, and \"Information Gain\"—exactly what Google values."
+    question: "WILL PINTEREST FLAG MY ACCOUNT?",
+    answer: "No. PinLoop AI includes a built-in 3-phase warmup protocol that mimics organic human behavior. Our shadow ban detection automatically throttles publishing if any risk is detected."
   },
   {
-    question: "WHAT CMS PLATFORMS DO YOU SUPPORT?",
-    answer: "We support WordPress, Webflow, and Shopify with 1-click publishing. We also support custom webhooks for other platforms."
+    question: "WHAT STORES ARE SUPPORTED?",
+    answer: "We support Shopify, Etsy, and manual product uploads. Connect your store and PinLoop will automatically sync your catalog and start generating pins."
   }
 ]
 
 const comparisonData = {
   traditional: [
-    { aspect: "Cost", traditional: "$500–$2000+ per article (agencies)", flipaeo: "$79/month for 30 articles" },
-    { aspect: "Research Quality", traditional: "Varies by writer/agency", flipaeo: "Multi-stage AI research with real citations" },
-    { aspect: "Turnaround Time", traditional: "Days to weeks per article", flipaeo: "Minutes to hours" },
-    { aspect: "Strategy", traditional: "Separate strategist required", flipaeo: "Built-in 30-day content planning" },
-    { aspect: "Brand Voice", traditional: "Requires detailed briefs each time", flipaeo: "Learns and maintains your voice" },
-    { aspect: "Publishing", traditional: "Manual formatting and upload", flipaeo: "1-click CMS publishing" },
+    { aspect: "Cost", traditional: "$500–2000/mo (VA or agency)", flipaeo: "$79/month, fully autonomous" },
+    { aspect: "Pin Quality", traditional: "Generic Canva templates", flipaeo: "AI lifestyle photography with brand fonts" },
+    { aspect: "Publishing", traditional: "Manual daily pinning", flipaeo: "Autonomous drip publishing 24/7" },
+    { aspect: "Strategy", traditional: "Guesswork or paid audits", flipaeo: "Self-optimizing based on click data" },
+    { aspect: "Account Safety", traditional: "Risk of shadow ban from over-pinning", flipaeo: "3-phase warmup + auto-throttle" },
+    { aspect: "Scaling", traditional: "Hire more VAs", flipaeo: "Add products, engine scales automatically" },
   ],
   generic: [
-    { aspect: "Purpose", generic: "General-purpose chatbot", flipaeo: "Purpose-built for GEO & authority" },
-    { aspect: "Research", generic: "Relies on training data (may be outdated)", flipaeo: "Real-time research with verified sources" },
-    { aspect: "Strategy", generic: "None - you decide what to write.", flipaeo: "Autonomous Agent. We analyze your niche and tell YOU what to write to win." },
-    { aspect: "Internal Linking", generic: "Manual", flipaeo: "Semantic auto-linking" },
-    { aspect: "Citations", generic: "Often hallucinated or missing", flipaeo: "Verified, high-authority sources" },
-    { aspect: "Publishing", generic: "Copy-paste required", flipaeo: "Direct CMS integration" },
+    { aspect: "Purpose", generic: "Generic social media scheduler", flipaeo: "Purpose-built for Pinterest e-commerce" },
+    { aspect: "Images", generic: "Upload your own images", flipaeo: "AI generates lifestyle scenes from product photos" },
+    { aspect: "Copy", generic: "Write your own captions", flipaeo: "Pinterest SEO optimized automatically" },
+    { aspect: "Optimization", generic: "A/B test manually", flipaeo: "Closed-loop AI learns what converts" },
+    { aspect: "Account Health", generic: "No protection", flipaeo: "Shadow ban detection + warmup protocol" },
+    { aspect: "Setup", generic: "Hours of configuration", flipaeo: "Connect store → engine runs" },
   ]
 }
 
@@ -82,10 +82,10 @@ export default function PricingPage() {
               <span className="font-bold tracking-widest uppercase">Simple Pricing</span>
             </div>
             <h1 className="font-serif text-stone-900 text-4xl sm:text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6">
-              Stop Renting SEO Writers. <br className="hidden md:block " /> <span className="italic text-stone-500">Own an AI Visibility Engine.</span>
+              Stop Pinning Manually. <br className="hidden md:block " /> <span className="italic text-stone-500">Deploy an Autonomous Pin Engine.</span>
             </h1>
             <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-10">
-              Get the output of a $2,500/mo SEO Agency for the price of a dinner. We don't just write 'blogs'—we build the Strategic Content Infrastructure your brand needs to rank in Perplexity, ChatGPT, and Google.
+              Get the output of a full-time Pinterest VA for the price of a dinner. PinLoop AI generates stunning lifestyle pins, publishes them on autopilot, and self-optimizes based on real click data.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 md:gap-6">
@@ -138,7 +138,7 @@ export default function PricingPage() {
                     All In One
                   </span>
                   <h2 className="font-serif text-2xl text-stone-900">
-                    The Authority Engine Plan
+                    The PinLoop Engine Plan
                   </h2>
                 </div>
 
@@ -154,7 +154,7 @@ export default function PricingPage() {
                 <div className="w-full relative z-10">
                   <Link href="/login">
                     <Button variant="primary" className="max-w-2xl px-2 py-4 text-md justify-center">
-                      Deploy My Content Engine
+                      Deploy My Pin Engine
                     </Button>
                   </Link>
                   <div className="mt-4 flex items-center justify-center gap-2 text-xs text-stone-400 font-medium">
@@ -196,7 +196,7 @@ export default function PricingPage() {
 
               <h3 className="font-serif text-3xl md:text-4xl mb-4 text-stone-900">The Math is Simple</h3>
               <p className="font-sans text-stone-500 mb-10 max-w-lg mx-auto leading-relaxed">
-                Why FlipAEO is the obvious choice for founders.
+                Why PinLoop AI is the obvious choice for e-commerce brands.
               </p>
 
               <div className="space-y-4 font-sans text-left">
@@ -206,12 +206,12 @@ export default function PricingPage() {
                   <div className="flex items-center gap-4 w-full md:w-auto">
                     <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-bold shadow-sm flex-shrink-0">A</div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">Freelancers</span>
-                      <span className="text-stone-700 font-medium">Pay per article ($200 × 30)</span>
+                      <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pinterest VA</span>
+                      <span className="text-stone-700 font-medium">Hire someone to pin daily</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <span className="text-xl font-bold text-stone-900">$6,000<span className="text-sm font-normal text-stone-400">/mo</span></span>
+                    <span className="text-xl font-bold text-stone-900">$1,500<span className="text-sm font-normal text-stone-400">/mo</span></span>
                     <span className="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-100 uppercase tracking-wide">Expensive</span>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export default function PricingPage() {
                     <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 font-bold shadow-sm flex-shrink-0">B</div>
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-0.5">Do It Yourself</span>
-                      <span className="text-stone-700 font-medium">Manually writing 30 articles</span>
+                      <span className="text-stone-700 font-medium">Manually creating pins in Canva</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 w-full md:w-auto justify-end">
@@ -238,9 +238,9 @@ export default function PricingPage() {
                     <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold flex-shrink-0">C</div>
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-brand-600 uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                        FlipAEO Authority Engine <Check className="w-3 h-3" />
+                        PinLoop AI Engine <Check className="w-3 h-3" />
                       </span>
-                      <span className="text-stone-900 font-bold text-lg">Strategy + 30 Articles + Citations</span>
+                      <span className="text-stone-900 font-bold text-lg">AI Pins + Auto-Publish + Self-Optimize</span>
                     </div>
                   </div>
 
@@ -251,7 +251,7 @@ export default function PricingPage() {
 
                 <div className="text-center mt-6">
                   <p className="text-sm text-stone-400 italic">
-                    "Even if you only publish the top 5 articles we generate, you are still saving $900/mo compared to a human writer."
+                    "Even if PinLoop drives just 10 clicks/day to your store, that's 300 potential customers/month you weren't reaching before."
                   </p>
                 </div>
 
@@ -275,7 +275,7 @@ export default function PricingPage() {
             <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
               <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
                 <div className="bg-stone-50/50 border-b border-stone-100 p-6">
-                  <h3 className="font-serif text-xl text-stone-900">Why pay for 'Hours' when you can pay for 'Outcome'?</h3>
+                  <h3 className="font-serif text-xl text-stone-900">Why hire a VA when an AI engine never sleeps?</h3>
                 </div>
                 <div className="p-0">
                   <table className="w-full text-left border-collapse">
@@ -283,7 +283,7 @@ export default function PricingPage() {
                       <tr>
                         <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
                         <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Them</th>
-                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">FlipAEO</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">PinLoop AI</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -306,7 +306,7 @@ export default function PricingPage() {
             <div className="bg-brand-100 rounded-[20px] p-2 shadow-[inset_0_0_0_1px_#c4b5fd]">
               <div className="bg-white rounded-[17px] overflow-hidden border border-white h-full">
                 <div className="bg-stone-50/50 border-b border-stone-100 p-6">
-                  <h3 className="font-serif text-xl text-stone-900">Why Chatbots fail at SEO (and we don't).</h3>
+                  <h3 className="font-serif text-xl text-stone-900">Why generic tools fail at Pinterest (and we don't).</h3>
                 </div>
                 <div className="p-0">
                   <table className="w-full text-left border-collapse">
@@ -314,7 +314,7 @@ export default function PricingPage() {
                       <tr>
                         <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
                         <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Generic</th>
-                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">FlipAEO</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">PinLoop AI</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -342,7 +342,7 @@ export default function PricingPage() {
               Questions? Answered.
             </h2>
             <p className="font-sans text-stone-500 text-lg max-w-2xl mx-auto">
-              Everything you need to know about FlipAEO.
+              Everything you need to know about PinLoop AI.
             </p>
           </div>
 
@@ -395,8 +395,8 @@ export default function PricingPage() {
             data: {
               "@context": "https://schema.org",
               "@type": "Product",
-              "name": "FlipAEO All-in-One Plan",
-              "description": "Strategic Content Engine for Generative Engine Optimization. 30 articles/month with automated strategy, CMS integration, and AI-powered research.",
+              "name": "PinLoop AI Engine Plan",
+              "description": "Autonomous Pinterest Marketing Engine. Unlimited AI lifestyle pins, auto-publishing, self-optimizing prompt system, and account warmup protection.",
               "offers": {
                 "@type": "Offer",
                 "price": 79,
