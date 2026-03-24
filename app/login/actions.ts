@@ -119,7 +119,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect('/content-plan')
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -145,5 +145,5 @@ export async function signup(formData: FormData) {
     }
   }
 
-  redirect('/content-plan')
+  redirect('/dashboard')
 }

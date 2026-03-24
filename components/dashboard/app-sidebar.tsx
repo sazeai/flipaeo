@@ -108,11 +108,7 @@ export function AppSidebar({
       url: "/settings/brand",
       icon: Palette,
     },
-    {
-      title: "Integrations",
-      url: "/integrations",
-      icon: Plug,
-    },
+
   ], [])
 
   return (
