@@ -26,15 +26,15 @@ const ProblemSection: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end py-16 w-full px-4 md:px-8">
           <div className="flex-1">
             <span className="font-sans text-xs font-bold tracking-widest text-stone-400 uppercase mb-4 block">
-              The Hard Reality
+              The Old Way
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-              Why AI Engines are <br /><span className='italic text-stone-500'>Ghosting Your Brand</span>
+            <h2 className="font-serif text-4xl md:text-5xl lg:text-5xl text-stone-900 tracking-tight font-normal leading-tight">
+              Why traditional Pinterest marketing <br /><span className='italic text-stone-500'>is costing you traffic.</span>
             </h2>
           </div>
           <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
             <p className="font-sans text-stone-500 text-lg leading-relaxed">
-              You’re publishing more than ever, yet your brand is nowhere to be found in ChatGPT, Perplexity, or Gemini. You aren’t just losing rankings; you’re losing the trust of the engines that control the answers.
+              Pinterest has evolved into a pure visual AI algorithm. If you are still relying on bulk-scheduling generic Canva templates, you are actively burying your own products.
             </p>
           </div>
         </div>
@@ -71,10 +71,10 @@ const ProblemSection: React.FC = () => {
             </div>
             <div className="mt-auto">
               <h3 className="font-serif text-2xl text-stone-900 mb-4 tracking-tight">
-                Tracking your failure won't fix it
+                The "Cluttered Design" Trap
               </h3>
               <p className="text-stone-500 leading-relaxed text-sm lg:text-base">
-                Knowing you are invisible in a "Visibility Tracker" is like weighing yourself every hour while you're starving. A scorecard doesn't tell you how to be found, it just confirms you’re being ignored while your competitors take the traffic.
+                Pinterest is a Visual Search Engine. When humans manually design pins, they often use heavy text overlays and neon graphics. Pinterest's AI vision models struggle to read this, flagging the pin as "low-relevance" ad material and burying it.
               </p>
             </div>
           </div>
@@ -86,10 +86,10 @@ const ProblemSection: React.FC = () => {
             </div>
             <div className="mt-auto">
               <h3 className="font-serif text-2xl text-stone-900 mb-4 tracking-tight">
-                Your Authority has "Holes."
+                The "White Background" Blindness
               </h3>
               <p className="text-stone-500 leading-relaxed text-sm lg:text-base">
-                AI search engines ignore you because your topical coverage is incomplete. When a user asks a real question, the LLM spots a "semantic gap" in your content and recommends a competitor who sounds more like an expert. You’re a partial source in a world that only cites the "Guru".
+                Syncing your standard e-commerce catalog directly to Pinterest doesn't work. Users come to Pinterest for aesthetic inspiration, not a product catalog. Pure white backgrounds are actively scrolled past by actual users.
               </p>
             </div>
           </div>
@@ -101,10 +101,10 @@ const ProblemSection: React.FC = () => {
             </div>
             <div className="mt-auto">
               <h3 className="font-serif text-2xl text-stone-900 mb-4 tracking-tight">
-                Generic content is just background noise.
+                The "Volume" Penalty
               </h3>
               <p className="text-stone-500 leading-relaxed text-sm lg:text-base">
-                One-click AI articles that read like Wikipedia summaries are killing your growth. They have no unique data, no brand voice, and no "soul". LLMs spot generic bot-filler in 3 seconds and skip you for content that actually provides a real answer.
+                Traditional scheduling tools encourage you to blast the same URL 30 times a day with the exact same image. In 2026, Pinterest's strict spam filters flag this repetitive behavior, silently restricting your account's reach.
               </p>
             </div>
           </div>

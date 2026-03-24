@@ -45,30 +45,28 @@ export default function Hero() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-brand-500">
           <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" stroke="none" />
         </svg>
-        <span>THE AUTONOMOUS PINTEREST AGENT</span>
+        <span>BUILT FOR SHOPIFY & ETSY BRANDS</span>
       </div>
 
       {/* Main Headline */}
-      <h1 className="font-serif text-4xl md:text-7xl lg:text-8xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
-        Put your Pinterest <br />
-        <span className="italic font-light">on complete autopilot</span>
+      <h1 className="font-serif text-4xl md:text-7xl lg:text-7xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
+        Stop Managing Software. <br />
+        <span className="italic font-light">Hire an Autonomous Pinterest Agent.</span>
       </h1>
 
       {/* Subheadline */}
       <p className="font-sans text-lg md:text-xl text-stone-500 max-w-2xl leading-snug mb-6 px-2">
-        PinLoop AI is the autonomous marketing agent for e-commerce. We turn your product catalog into beautiful, viral pins and 
-        <strong className="text-black font-normal">{" "}use real analytics to double down on winning aesthetics.</strong>
+        The era of manual pin design and bulk scheduling is over. PinLoop AI automatically turns your plain product photos into photorealistic lifestyle scenes, formats them for Pinterest’s visual algorithm, and <strong className="text-black font-normal">optimizes for Outbound Clicks while you sleep.</strong>
       </p>
 
       {/* CTA Button Container */}
-      <div className="relative group z-10">
+      <div className="flex flex-col items-center gap-3 relative group z-10">
         <Link href="/login">
-          <Button variant="primary" className="text-brand-600">
-            Start Your Free Warmup
+          <Button variant="primary" className="text-brand-600 px-8">
+            Connect Your Store (Takes 2 Mins)
           </Button>
         </Link>
-
-
+        <span className="text-[11px] text-stone-400 font-medium">Start your 7-day free trial. Cancel anytime.</span>
       </div>
 
       {/* Testimonial */}

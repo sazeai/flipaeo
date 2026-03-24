@@ -5,37 +5,17 @@ import { Plus, X } from 'lucide-react';
 
 const FAQS = [
   {
-    question: "Will Google penalize this content?",
-    answer: "No. Google rewards helpful, authoritative content regardless of how it's produced. Unlike generic AI that hallucinates, our engine performs deep research, cites real sources, and focuses on 'Information Gain'—the exact signals Google's algorithms prioritize."
+    question: "Will the AI alter or distort my actual product?",
+    answer: "No. PinLoop utilizes advanced ControlNet architecture. We do not generate your product from scratch; we precisely extract your physical item and generate the environment around it. Your product's branding, shape, and details remain 100% accurate."
   },
   {
-    question: "How is this different from other AI blog writers?",
-    answer: "Other AI writers are just tools. FlipAEO is a system that grows your SEO muscle over time. Every article we create links back to your previous articles, cites authoritative sources, and strengthens your entire site's authority. The more you publish, the more powerful each new article becomes. It's not just writing—it's a system that grows your SEO muscle over time."
+    question: "Why don't I get a drag-and-drop editor to design my pins?",
+    answer: "PinLoop is designed for performance, not manual design. We enforce strict, algorithm-approved editorial layouts because they are mathematically proven to pass Pinterest's visual OCR scanners. We remove the guesswork so you can focus on your store."
   },
   {
-    question: "Why does the content feel so human?",
-    answer: "We built an 'Anti-AI Filter' into every article. It blocks robotic words like 'unleash', 'seamless', and 'cutting-edge'. It forces sentence variety—short punches mixed with longer thoughts. Every paragraph starts with a direct answer, not fluff. And we pull real data from live research, so there's no hallucination. The result? Content that reads like a senior marketer wrote it, not a chatbot."
-  },
-  {
-    question: "Do I need to edit the articles?",
-    answer: "Our users typically spend 2-5 minutes polishing. Because we handle the research, formatting, and internal linking automatically, you're acting more like an Editor-in-Chief than a writer. The heavy lifting is 100% done for you."
-  },
-  {
-    question: "Does it integrate with my site?",
-    answer: "Yes. We have direct 1-click publishing integrations for WordPress, Shopify and Webflow. Images, formatting, and meta tags are all synced automatically."
-  },
-  {
-    question: "Can I cancel if it's not for me?",
-    answer: "Absolutely. We offer a 14-day money-back guarantee. If you don't see the quality in your initial articles, we'll refund you. No questions asked."
-  },
-  {
-    question: "Is the content plagiarism-free?",
-    answer: "Yes. Every article is generated from scratch based on real-time research. We also run a built-in uniqueness check to ensure your content is original and safe to publish."
-  },
-  {
-    question: "What languages do you support?",
-    answer: "Currently, we specialize in high-quality English (US/UK) content to ensure maximum nuance and authority. Multi-language support is on our roadmap for Q4."
-  },
+    question: "Will posting AI content hurt my account standing?",
+    answer: "No. In fact, repetitive manual scheduling of the exact same image often triggers spam filters. Because PinLoop generates 100% unique pixel arrangements and unique AI copywriting for every single post, it mimics high-quality, organic creation perfectly."
+  }
 ];
 
 const FAQItem = ({ item }: { item: typeof FAQS[0] }) => {
@@ -103,12 +83,12 @@ export const FAQSection: React.FC = () => {
                 Common Questions
               </span>
               <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-                Doubts about FlipAEO?<br /><span className='italic text-stone-500'>Let's clear them.</span>
+                Doubts about PinLoop AI?<br /><span className='italic text-stone-500'>Let's clear them.</span>
               </h2>
             </div>
             <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
               <p className="font-sans text-stone-500 text-lg leading-relaxed">
-                We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and authority.
+                We know you've been burned by "magic buttons" before. Here is exactly how we protect your brand and account.
               </p>
             </div>
           </div>
