@@ -52,11 +52,11 @@ export const shopifyProductSync = task({
     let hasMore = true
 
     while (hasMore) {
-      const url = pageInfo
+      const url: string = pageInfo
         ? `${shopifyBase}/products.json?limit=50&page_info=${pageInfo}`
         : `${shopifyBase}/products.json?limit=50&status=active`
 
-      const res = await fetch(url, {
+      const res: Response = await fetch(url, {
         headers: {
           "X-Shopify-Access-Token": access_token,
           "Content-Type": "application/json",
@@ -152,8 +152,8 @@ export const shopifyProductSync = task({
       }
 
       // Handle pagination via Link header
-      const linkHeader = res.headers.get("link") || ""
-      const nextMatch = linkHeader.match(/<[^>]*page_info=([^>&]+)[^>]*>;\s*rel="next"/)
+      const linkHeader: string = res.headers.get("link") || ""
+      const nextMatch: RegExpMatchArray | null = linkHeader.match(/<[^>]*page_info=([^>&]+)[^>]*>;\s*rel="next"/)
       if (nextMatch) {
         pageInfo = nextMatch[1]
       } else {

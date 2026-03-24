@@ -45,26 +45,26 @@ export default function Hero() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-brand-500">
           <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" stroke="none" />
         </svg>
-        <span>THE POST-SEO ERA</span>
+        <span>THE AUTONOMOUS PINTEREST AGENT</span>
       </div>
 
       {/* Main Headline */}
       <h1 className="font-serif text-4xl md:text-7xl lg:text-8xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
-        Don’t just rank <br />
-        <span className="italic font-light">Be the Source AI cites</span>
+        Put your Pinterest <br />
+        <span className="italic font-light">on complete autopilot</span>
       </h1>
 
       {/* Subheadline */}
       <p className="font-sans text-lg md:text-xl text-stone-500 max-w-2xl leading-snug mb-6 px-2">
-        FlipAEO is the Strategic Content Engine for dominating AEO and GEO. We engineer the exact content required to
-        <strong className="text-black font-normal">{" "}make your brand the #1 citation in AI search results.</strong>
+        PinLoop AI is the autonomous marketing agent for e-commerce. We turn your product catalog into beautiful, viral pins and 
+        <strong className="text-black font-normal">{" "}use real analytics to double down on winning aesthetics.</strong>
       </p>
 
       {/* CTA Button Container */}
       <div className="relative group z-10">
         <Link href="/login">
           <Button variant="primary" className="text-brand-600">
-            Audit My Authority Gaps
+            Start Your Free Warmup
           </Button>
         </Link>
 
@@ -74,7 +74,7 @@ export default function Hero() {
       {/* Testimonial */}
       <div className="mt-8 flex flex-col items-center gap-4 animate-fade-in-up">
         <p className="text-stone-600 font-normal text-center max-w-xl italic text-[12px] leading-relaxed px-4">
-          “The output quality is honestly great. I’ve already started using it for both of my SaaS products. It’s rare to find a tool this production-ready so early.”
+          “It's like having a full-time social media manager who never sleeps, never runs out of creative ideas, and constantly learns what drives sales.”
         </p>
         <div className="flex items-center gap-3 mt-2">
           <img
@@ -83,7 +83,7 @@ export default function Hero() {
             className="w-6 h-6 rounded-full object-cover border border-stone-200"
           />
           <div className="text-sm text-stone-500">
-            <span className="font-semibold text-stone-900">Krzysztof </span>, Founder at LaunchDirectories
+            <span className="font-semibold text-stone-900">Krzysztof </span>, E-commerce Founder
           </div>
         </div>
       </div>

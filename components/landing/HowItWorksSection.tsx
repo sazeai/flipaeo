@@ -162,12 +162,12 @@ const HowItWorksSection: React.FC = () => {
               The Process
             </span>
             <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-              A Proven System for  <br /><span className='italic text-stone-500'>Compounding Traffic</span>
+              A Proven Loop for <br /><span className='italic text-stone-500'>Viral E-Commerce</span>
             </h2>
           </div>
           <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
             <p className="font-sans text-stone-500 text-lg leading-relaxed">
-              Clear answers, real authority, and active publishing perfectly designed for modern AI search engines and human readers.
+              Automated ingestion, AI-driven aesthetic generation, and a closed-loop analytic engine that learns what drives Pinterest sales.
             </p>
           </div>
         </div>
@@ -214,10 +214,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                We map the questions that matter
+                Connect your product catalog
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                We understand your category the way AI systems and real users do. What questions already exist. What’s over-covered. What’s missing entirely. This becomes the foundation.
+                Sync your Shopify or Etsy store with one click. We automatically pull in your product images, titles, tags, and pricing to build the foundation for your pins.
               </p>
             </div>
           </div>
@@ -234,10 +234,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                We build a strategy that compounds
+                AI generates aesthetic pins
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                Not everything should be written now. We decide what comes first, what supports it, and what unlocks authority later. Each topic earns the right for the next one to exist.
+                Our Art Director (powered by Gemini) places your products in stunning, lifestyle-appropriate contexts using multiple distinct visual styles and perfect typography.
               </p>
             </div>
           </div>
@@ -254,10 +254,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                Deliver answer-first authentic content
+                Drip publish & learn what works
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                Once the strategy is clear, execution becomes simple. Articles are written to fully resolve the question, match your brand voice, and publish cleanly without friction.
+                Pins are published safely on a 24-hour drip schedule. Our analytics engine polls your actual clicks and uses Bayesian updates to double-down on the visual styles that sell.
               </p>
             </div>
           </div>
@@ -277,8 +277,8 @@ const HowItWorksSection: React.FC = () => {
 
           <div className="text-center max-w-4xl relative z-10 mt-4">
             <p className="font-serif text-2xl md:text-3xl text-stone-800 leading-relaxed italic">
-              This is not only content automation for speed. It’s a system designed to earn <span className="relative inline-block px-2 italic font-medium text-stone-900">
-                <span className="relative z-10">visibility, trust, and long-term growth.</span>
+              This is not just an image generator. It’s a closed-loop system designed to <span className="relative inline-block px-2 italic font-medium text-stone-900">
+                <span className="relative z-10">create compounding e-commerce growth.</span>
               </span>
             </p>
           </div>

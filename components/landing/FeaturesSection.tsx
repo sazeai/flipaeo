@@ -355,29 +355,29 @@ const CMSVisual = () => (
 const FEATURES = [
   {
     id: '01',
-    title: 'Find your brand\'s blind spots',
-    description: 'We analyze exactly how AI models understand your category. Instead of summarizing the internet, we surface the missing data and verified claims your competitors avoid, exposing the exact gaps where your brand is currently invisible.',
+    title: 'Visual lifestyle generation',
+    description: 'Stop posting boring product shots on white backgrounds. We use advanced diffusion models to place your products in stunning, aspirational lifestyle environments that Pinterest users actively save and click.',
     visual: ReadinessVisual,
     colSpan: 'col-span-1'
   },
   {
     id: '02',
-    title: 'Write content that LLMs actually cite',
-    description: 'We engineer your articles specifically for LLM parsers using \'Answer-First\' architecture and high entity density. By filtering out AI fluff and enforcing strict factual citations, we format your content exactly how modern search engines want to read it.',
+    title: 'Smart typographical rendering',
+    description: 'Pins without text get lost in the feed. Our render engine automatically extracts compelling SEO copy and layers striking typography directly onto the image using your brand fonts and aesthetic boundaries.',
     visual: ResearchVisual,
     colSpan: 'col-span-1'
   },
   {
     id: '03',
-    title: 'Build compounding topical authority',
-    description: 'Stop competing against yourself. Our memory engine uses vector embeddings to map your entire site, aggressively deduplicating topics and injecting context-aware internal links to build a massive, interconnected topical map.',
+    title: 'Automated Account Warmup',
+    description: 'Keep your Pinterest account safe from algorithm flags. Our intelligent warmup manager uses a 3-phase progression schema and shadow ban detection to safely scale your account publishing velocity.',
     visual: LinkingVisual,
     colSpan: 'col-span-1'
   },
   {
     id: '04',
-    title: 'Publish to your CMS on autopilot',
-    description: 'Skip the endless copy-pasting and formatting nightmare. FlipAEO pushes fully aeo/seo optimized, structurally flawless articles—complete with ai images and strtuctred content formatting—directly to your WordPress, Shopify, or Webflow site.',
+    title: 'Closed-Loop Analytic Brain',
+    description: 'This is the PinLoop moat. We pull your real 30-day Pinterest analytics to find out which visual styles drive actual outbound clicks to your store—then we automatically weight the prompt engine to generate more of what works.',
     visual: CMSVisual,
     colSpan: 'col-span-1'
   }
@@ -432,15 +432,15 @@ const FeaturesSection: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
           <div className="flex-1">
             <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
-              The Toolkit
+              The Engine Room
             </span>
             <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-              Everything you need to <br /><span className='italic text-stone-500'>start capturing traffic.</span>
+              Everything you need to <br /><span className='italic text-stone-500'>dominate Pinterest.</span>
             </h2>
           </div>
           <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
             <p className="font-sans text-stone-500 text-lg leading-relaxed">
-              We stripped away all the confusing SEO bloat. Here's exactly what you get out-of-the-box to make AI search work for you, instantly.
+              We stripped away all the confusing social media bloat. Here's exactly what you get out-of-the-box to make Pinterest work for you, instantly.
             </p>
           </div>
         </div>
