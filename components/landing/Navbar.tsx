@@ -8,8 +8,8 @@ import Image from 'next/image';
 
 const NAV_LINKS = [
   { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Benefits', href: '/#benefits' },
-  { label: 'Features', href: '/#features' },
+  { label: 'The Visual Proof', href: '/#aha' },
+  { label: 'ROI', href: '/#roi' },
   { label: 'Pricing', href: '/#pricing' },
 ];
 
@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
             <Link href="/" className="flex items-center gap-2">
               <Image src="/site-logo.png" alt="Logo" width={36} height={36} />
               <span className="font-bold text-2xl tracking-tight text-stone-900 leading-none pb-1">
-                FlipAEO
+                PinLoop AI
               </span>
             </Link>
           </div>
@@ -69,7 +69,7 @@ export const Navbar: React.FC = () => {
             {/* Social/Tool Icons (Desktop only) */}
             <div className="hidden sm:flex items-center gap-2 pr-2 border-r border-stone-200/50 mr-1">
 
-              <Link href="https://x.com/flipaeo" target="_blank">
+              <Link href="https://x.com/pinloop" target="_blank">
                 <button className="
                           cursor-pointer group relative w-9 h-10 flex items-center justify-center 
                           bg-white border border-gray-300 rounded-lg text-stone-700
@@ -98,7 +98,7 @@ export const Navbar: React.FC = () => {
                        px-2 sm:px-5 pt-1 sm:pt-2 pb-2 sm:pb-3 rounded-lg
                        transition-all duration-150 ease-out
                      ">
-                <span className="text-gray-600 font-semibold text-xs sm:text-sm">Start Ranking in AI</span>
+                <span className="text-gray-600 font-semibold text-xs sm:text-sm">Connect Your Store</span>
               </button>
             </Link>
             {/* Mobile Menu Toggle (only visible on mobile) */}
@@ -142,7 +142,7 @@ export const Navbar: React.FC = () => {
           <div className="p-2 mt-1">
             <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
               <Button className="w-full justify-center bg-stone-900 text-brand-50 shadow-none rounded-lg py-3">
-                Start Ranking Now
+                Connect Your Store
               </Button>
             </Link>
           </div>

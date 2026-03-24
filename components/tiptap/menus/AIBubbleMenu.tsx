@@ -296,7 +296,7 @@ export function AIBubbleMenu({ editor }: AIBubbleMenuProps) {
                     {isLoading ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
-                        <Sparkles className="h-3 w-3 text-purple-500" />
+                        <Sparkles className="h-3 w-3 text-brand-500" />
                     )}
                     <span className="text-[10px] md:text-xs font-medium">AI</span>
                     <ChevronDown className="h-2.5 w-2.5" />

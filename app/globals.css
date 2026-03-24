@@ -188,13 +188,13 @@ html {
   --color-slate-11: var(--slate-11);
   --color-slate-12: var(--slate-12);
 
-  --shadow-tactile: 0 4px 0 0 #7c3aed, 0 8px 16px -4px rgba(124, 58, 237, 0.4);
-  --shadow-tactile-active: 0 2px 0 0 #7c3aed, 0 1px 4px -4px rgba(124, 58, 237, 0.4);
+  --shadow-tactile: 0 4px 0 0 #eb6f00, 0 8px 16px -4px rgba(235, 111, 0, 0.4);
+  --shadow-tactile-active: 0 2px 0 0 #eb6f00, 0 1px 4px -4px rgba(235, 111, 0, 0.4);
   --shadow-tactile-gray: inset 0 -3px 0 0 #d6d3d1, 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-tactile-gray-active: inset 0 -1px 0 0 #d6d3d1, 0 1px 1px 0 rgba(0, 0, 0, 0.05);
-  --shadow-hero: 0 1px 4px -4px #6d28d9, inset 0 -3px 0 0 #7e5ede, inset 0 3px 0 0 #ffffff40;
-  --shadow-hero-active: 0 2px 4px -2px #6d28d9, inset 0 -1px 0 0 #7e5ede, inset 0 3px 0 0 #ffffff40;
-  --shadow-badge: inset 0 -3px 0 0 #7e5ede, 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-hero: 0 1px 4px -4px #c2540c, inset 0 -3px 0 0 #fb7829, inset 0 3px 0 0 #ffffff40;
+  --shadow-hero-active: 0 2px 4px -2px #c2540c, inset 0 -1px 0 0 #fb7829, inset 0 3px 0 0 #ffffff40;
+  --shadow-badge: inset 0 -3px 0 0 #fb7829, 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-canvas: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 
   --font-serif: var(--font-playfair-display);
@@ -208,16 +208,16 @@ html {
   --color-stone-800: #292524;
   --color-stone-900: #1c1917;
 
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
+  --color-brand-50: #fff6ee;
+  --color-brand-100: #ffeadd;
+  --color-brand-200: #ffd3b9;
+  --color-brand-300: #ffb88f;
+  --color-brand-400: #fe985c;
+  --color-brand-500: #fb7829;
+  --color-brand-600: #eb6f00;
+  --color-brand-700: #c2540c;
+  --color-brand-800: #9a4413;
+  --color-brand-900: #7d3914;
 
   /* Brand Colors (Tailwind v4 - Auto-generates bg-brand-yellow, text-brand-orange, etc.) */
   --color-brand-yellow: #FCD34D;
