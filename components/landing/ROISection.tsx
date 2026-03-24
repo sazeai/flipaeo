@@ -1,5 +1,5 @@
 import React from 'react';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 import { BarChart2, TrendingUp, Sparkles, AlertCircle } from 'lucide-react';
 
 const ReportMockupVisual = () => (
@@ -53,20 +53,20 @@ const ROISection: React.FC = () => {
             <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
                 {/* Horizontal Pattern Bar Above Header */}
-                <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+                <div className="w-full h-px bg-stone-200 mb-16"></div>
 
                 {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                 </div>
 
                 {/* Premium Wireframe Layout */}
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 relative bg-stone-50/30">
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
 
                     {/* Left Column (Copy) */}
                     <div className="p-8 md:p-16 md:border-r border-b md:border-b-0 border-stone-200 flex flex-col justify-center">
@@ -94,9 +94,9 @@ const ROISection: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
                 </div>
 
             </div>

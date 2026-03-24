@@ -2,7 +2,7 @@ import React from 'react';
 import Button from './Button';
 import Link from 'next/link';
 
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 const CTASection: React.FC = () => {
   return (
@@ -10,10 +10,10 @@ const CTASection: React.FC = () => {
       <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
         {/* Horizontal Pattern Bar Above */}
-        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-24" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+        <div className="relative w-full h-px bg-stone-200 mb-24">
 
-          <CornerSquare className="-left-[5px] -bottom-[5px]" />
-          <CornerSquare className="-right-[5px] -bottom-[5px]" />
+          <CornerDot className="-left-[10px] -bottom-[10px]" />
+          <CornerDot className="-right-[10px] -bottom-[10px]" />
         </div>
 
         <div className="flex flex-col items-center justify-center">
@@ -112,9 +112,9 @@ const CTASection: React.FC = () => {
         </div>
 
         {/* Horizontal Pattern Bar Below */}
-        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mt-32" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-          <CornerSquare className="-left-[5px] -top-[5px]" />
-          <CornerSquare className="-right-[5px] -top-[5px]" />
+        <div className="relative w-full h-px bg-stone-200 mt-32">
+          <CornerDot className="-left-[10px] -top-[10px]" />
+          <CornerDot className="-right-[10px] -top-[10px]" />
 
         </div>
 

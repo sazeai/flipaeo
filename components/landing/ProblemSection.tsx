@@ -1,5 +1,5 @@
 import React from 'react';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 const DotGridIcon = () => (
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-brand-300">
@@ -40,9 +40,9 @@ const ProblemSection: React.FC = () => {
         </div>
 
         {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-          <CornerSquare className="-left-[5px] -bottom-[5px]" />
-          <CornerSquare className="-right-[5px] -bottom-[5px]" />
+        <div className="relative w-full h-px bg-stone-200">
+          <CornerDot className="-left-[10px] -bottom-[10px]" />
+          <CornerDot className="-right-[10px] -bottom-[10px]" />
         </div>
 
         {/* Problem Grid - Bordered Bento Style */}
@@ -52,16 +52,16 @@ const ProblemSection: React.FC = () => {
 
           {/* Junctions */}
           <div className="hidden md:block absolute top-0 left-[33.33%] -translate-x-1/2 -translate-y-1/2 z-30">
-            <CornerSquare className="-left-[4px] -top-[4px]" />
+            <CornerDot className="-left-[10px] -top-[10px]" />
           </div>
           <div className="hidden md:block absolute top-0 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-30">
-            <CornerSquare className="-left-[4px] -top-[4px]" />
+            <CornerDot className="-left-[10px] -top-[10px]" />
           </div>
           <div className="hidden md:block absolute bottom-0 left-[33.33%] -translate-x-1/2 -translate-y-1/2 z-30">
-            <CornerSquare className="-left-[4px] -top-[4px]" />
+            <CornerDot className="-left-[10px] -top-[10px]" />
           </div>
           <div className="hidden md:block absolute bottom-0 left-[66.66%] -translate-x-1/2 -translate-y-1/2 z-30">
-            <CornerSquare className="-left-[4px] -top-[4px]" />
+            <CornerDot className="-left-[10px] -top-[10px]" />
           </div>
 
           {/* Item 1 */}
@@ -112,9 +112,9 @@ const ProblemSection: React.FC = () => {
         </div>
 
         {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-        <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-          <CornerSquare className="-left-[5px] -top-[5px]" />
-          <CornerSquare className="-right-[5px] -top-[5px]" />
+        <div className="relative w-full h-px bg-stone-200">
+          <CornerDot className="-left-[10px] -top-[10px]" />
+          <CornerDot className="-right-[10px] -top-[10px]" />
         </div>
 
       </div>

@@ -3,7 +3,7 @@
 import Button from './Button';
 import { Quote } from 'lucide-react';
 import Link from 'next/link';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 export default function FounderNote() {
     return (
@@ -11,9 +11,9 @@ export default function FounderNote() {
             <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
                 {/* Horizontal Pattern Bar Above Header */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200 mb-16">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                 </div>
 
                 {/* Header - Left/Right Premium Setup */}
@@ -34,19 +34,19 @@ export default function FounderNote() {
                 </div>
 
                 {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                 </div>
 
                 {/* Premium Wireframe Monolithic Letter Block */}
                 <div className="w-full border-x border-stone-200 bg-stone-50/30 p-8 md:p-24 relative flex justify-center">
                     
                     {/* Main Grid Corners */}
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
 
                     {/* Watermark Icon */}
                     <div className="absolute top-12 left-12 opacity-[0.03] pointer-events-none">
@@ -128,9 +128,9 @@ export default function FounderNote() {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
                 </div>
 
             </div>

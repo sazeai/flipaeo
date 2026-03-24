@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 const PROOF_POINTS = [
     {
@@ -56,7 +56,7 @@ export const AICitations: React.FC = () => {
 
             <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
                 {/* Horizontal separator from Hero */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+                <div className="relative w-full h-px bg-stone-200 mb-16">
 
                 </div>
 
@@ -81,14 +81,14 @@ export const AICitations: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Top */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                     <div className="hidden md:block absolute bottom-0 left-[33.33%] -translate-x-1/2 translate-y-1/2 z-30">
-                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                        <CornerDot className="-left-[10px] -top-[10px]" />
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-[66.66%] -translate-x-1/2 translate-y-1/2 z-30">
-                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                        <CornerDot className="-left-[10px] -top-[10px]" />
                     </div>
                 </div>
 
@@ -100,11 +100,11 @@ export const AICitations: React.FC = () => {
                         <div key={i} className={`flex flex-col p-6 md:p-10 group border-b border-stone-200 ${item.span || "md:col-span-2"} ${i === 2 || i === 4 ? '' : 'md:border-r'} relative`}>
                             
                             {/* Corner Markers for dynamic intersections */}
-                            {i === 0 && <CornerSquare className="-left-[5px] -bottom-[5px] hidden md:block" />} { /* Left Edge Mid */ }
-                            {i === 0 && <CornerSquare className="-right-[5px] -bottom-[5px] hidden md:block" />}
-                            {i === 1 && <CornerSquare className="-right-[5px] -bottom-[5px] hidden md:block" />}
-                            {i === 2 && <CornerSquare className="-right-[5px] -bottom-[5px] hidden md:block" />} { /* Right Edge Mid */ }
-                            {i === 3 && <CornerSquare className="-right-[5px] -top-[5px] hidden md:block" />}
+                            {i === 0 && <CornerDot className="-left-[10px] -bottom-[10px] hidden md:block" />} { /* Left Edge Mid */ }
+                            {i === 0 && <CornerDot className="-right-[10px] -bottom-[10px] hidden md:block" />}
+                            {i === 1 && <CornerDot className="-right-[10px] -bottom-[10px] hidden md:block" />}
+                            {i === 2 && <CornerDot className="-right-[10px] -bottom-[10px] hidden md:block" />} { /* Right Edge Mid */ }
+                            {i === 3 && <CornerDot className="-right-[10px] -top-[10px] hidden md:block" />}
 
                             {/* Image Container */}
                             <div className={`relative w-full aspect-[16/10] overflow-hidden mb-6`}>
@@ -135,11 +135,11 @@ export const AICitations: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
                     <div className="hidden md:block absolute top-0 left-[50%] -translate-x-1/2 -translate-y-1/2 z-30">
-                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                        <CornerDot className="-left-[10px] -top-[10px]" />
                     </div>
                 </div>
 

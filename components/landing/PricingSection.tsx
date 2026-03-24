@@ -2,7 +2,7 @@ import React from 'react';
 import { Bot, Zap, Globe, Image as ImageIcon, Link2, ShieldCheck, Check } from 'lucide-react';
 import Button from './Button';
 import Link from 'next/link';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 const FeatureItem = ({ text }: { text: string }) => (
     <div className="flex gap-3 items-start group">
@@ -23,7 +23,7 @@ const PricingSection: React.FC = () => {
             <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
                 {/* Horizontal Pattern Bar Above Header */}
-                <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+                <div className="w-full h-px bg-stone-200 mb-16"></div>
 
                 {/* Header - Left/Right Premium Setup */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
@@ -43,26 +43,26 @@ const PricingSection: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                 </div>
 
                 {/* Premium Wireframe Grid */}
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 border-x border-stone-200 relative">
 
                     {/* Main Grid Corners */}
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
 
                     {/* Junctions */}
                     <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                        <CornerDot className="-left-[10px] -top-[10px]" />
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-                        <CornerSquare className="-left-[4px] -top-[4px]" />
+                        <CornerDot className="-left-[10px] -top-[10px]" />
                     </div>
 
                     {/* Tier 1: Growth Agent */}
@@ -129,9 +129,9 @@ const PricingSection: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
                 </div>
 
             </div>

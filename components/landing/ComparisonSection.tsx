@@ -1,5 +1,5 @@
 import React from 'react';
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 import { Check, X } from 'lucide-react';
 
 const COMPARISON_DATA = [
@@ -63,7 +63,7 @@ const ComparisonSection: React.FC = () => {
             <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
                 {/* Horizontal Pattern Bar Above Header */}
-                <div className="w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}></div>
+                <div className="w-full h-px bg-stone-200 mb-16"></div>
 
                 {/* Header - Left/Right Premium Setup */}
                 <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-end mb-16 w-full px-4 md:px-8">
@@ -78,17 +78,17 @@ const ComparisonSection: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
                 </div>
 
                 {/* Premium Wireframe Table */}
                 <div className="w-full border-x border-stone-200 relative bg-white">
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
-                    <CornerSquare className="-left-[5px] -bottom-[5px]" />
-                    <CornerSquare className="-right-[5px] -bottom-[5px]" />
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
+                    <CornerDot className="-left-[10px] -bottom-[10px]" />
+                    <CornerDot className="-right-[10px] -bottom-[10px]" />
 
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse min-w-[700px]">
@@ -140,9 +140,9 @@ const ComparisonSection: React.FC = () => {
                 </div>
 
                 {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-                <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-                    <CornerSquare className="-left-[5px] -top-[5px]" />
-                    <CornerSquare className="-right-[5px] -top-[5px]" />
+                <div className="relative w-full h-px bg-stone-200">
+                    <CornerDot className="-left-[10px] -top-[10px]" />
+                    <CornerDot className="-right-[10px] -top-[10px]" />
                 </div>
 
             </div>

@@ -48,7 +48,7 @@ const FAQItem = ({ item }: { item: typeof FAQS[0] }) => {
   );
 };
 
-import { CornerSquare } from './CornerSquare';
+import { CornerDot } from './CornerDot';
 
 export const FAQSection: React.FC = () => {
   // Generate FAQ Schema for SEO
@@ -71,9 +71,9 @@ export const FAQSection: React.FC = () => {
         <div className="w-full max-w-[1250px] mx-auto px-3 sm:px-5">
 
           {/* Horizontal Pattern Bar Above Header */}
-          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200 mb-16" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-            <CornerSquare className="-left-[5px] -bottom-[5px]" />
-            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+          <div className="relative w-full h-px bg-stone-200 mb-16">
+            <CornerDot className="-left-[10px] -bottom-[10px]" />
+            <CornerDot className="-right-[10px] -bottom-[10px]" />
           </div>
 
           {/* Header - Left/Right Premium Setup */}
@@ -94,18 +94,18 @@ export const FAQSection: React.FC = () => {
           </div>
 
           {/* Horizontal Pattern Bar Top (Grid Boundary) */}
-          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
+          <div className="relative w-full h-px bg-stone-200">
 
-            <CornerSquare className="-left-[5px] -bottom-[5px]" />
-            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+            <CornerDot className="-left-[10px] -bottom-[10px]" />
+            <CornerDot className="-right-[10px] -bottom-[10px]" />
           </div>
 
           {/* FAQ List wrapped in the wireframe border */}
           <div className="w-full border-x border-stone-200  p-8 md:p-16 relative">
-            <CornerSquare className="-left-[5px] -top-[5px]" />
-            <CornerSquare className="-right-[5px] -top-[5px]" />
-            <CornerSquare className="-left-[5px] -bottom-[5px]" />
-            <CornerSquare className="-right-[5px] -bottom-[5px]" />
+            <CornerDot className="-left-[10px] -top-[10px]" />
+            <CornerDot className="-right-[10px] -top-[10px]" />
+            <CornerDot className="-left-[10px] -bottom-[10px]" />
+            <CornerDot className="-right-[10px] -bottom-[10px]" />
 
             <div className="max-w-3xl mx-auto flex flex-col gap-4">
               {FAQS.map((faq, index) => (
@@ -115,9 +115,9 @@ export const FAQSection: React.FC = () => {
           </div>
 
           {/* Horizontal Pattern Bar Bottom (Grid Boundary) */}
-          <div className="relative w-full h-3 sm:h-4 border-y border-stone-200" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 6px, #e7e5e4 6px, #e7e5e4 7px)' }}>
-            <CornerSquare className="-left-[5px] -top-[5px]" />
-            <CornerSquare className="-right-[5px] -top-[5px]" />
+          <div className="relative w-full h-px bg-stone-200">
+            <CornerDot className="-left-[10px] -top-[10px]" />
+            <CornerDot className="-right-[10px] -top-[10px]" />
           </div>
 
         </div>
