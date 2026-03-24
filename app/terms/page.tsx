@@ -7,7 +7,7 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Terms of Service',
-  description: 'Review the terms and conditions for using FlipAEO, the Strategic Content Engine for Generative Engine Optimization.',
+  description: 'Review the terms and conditions for using PinLoop AI, the Autonomous Pinterest Marketing Agent.',
   canonical: '/terms',
 })
 
@@ -23,7 +23,7 @@ export default function TermsOfService() {
               <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Terms of Service</h1>
-            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Review the terms and conditions for using FlipAEO.</p>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Review the terms and conditions for using PinLoop AI.</p>
           </div>
         </section>
 
@@ -33,7 +33,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. Introduction</h2>
               <p>
-                Welcome to <strong>FlipAEO</strong> ("we," "our," "us"). By accessing or using our website at
+                Welcome to <strong>PinLoop AI</strong> ("we," "our," "us"). By accessing or using our website at
                 <a href="https://flipaeo.com" className="text-indigo-600"> https://flipaeo.com</a>
                 ("Site"), you agree to comply with and be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Site.
               </p>
@@ -42,7 +42,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. Use of Our Service</h2>
               <p>
-                <strong>FlipAEO</strong> is a Strategic Content Engine for Generative Engine Optimization (GEO) that helps businesses create authority-building content to improve visibility in AI search results.
+                <strong>PinLoop AI</strong> is an Autonomous Pinterest Marketing Agent that helps e-commerce businesses generate and publish lifestyle imagery.
                 Users must adhere to all applicable laws and agree not to misuse our services. Any violations of these rules can result in the termination of access to the platform.
               </p>
             </div>
@@ -58,7 +58,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Subscription and Billing</h2>
               <p>
-                <strong>FlipAEO</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated articles per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
+                <strong>PinLoop AI</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of autonomous pins generated per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
                 <a href="https://flipaeo.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
               </p>
             </div>
@@ -66,14 +66,14 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Content Ownership and License</h2>
               <p>
-                All content generated through FlipAEO is owned by you upon publication. You receive a full commercial license to use, modify, and distribute the generated content for your business purposes. We retain no rights to your generated content once it is delivered to you.
+                All images generated through PinLoop AI are owned by you upon publication. You receive a full commercial license to use, modify, and distribute the generated content for your business purposes. We retain no rights to your generated content once it is delivered to you.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Data Retention and Deletion</h2>
               <p>
-                We value your privacy. Brand profiles and content strategies are stored to improve your experience. Generated articles are retained for 30 days after creation. Users may request the deletion of their data at any time by contacting us at
+                We value your privacy. Brand settings and product catalogs are stored to improve your experience. Generated pins are retained for tracking and publishing. Users may request the deletion of their data at any time by contacting us at
                 <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
                 For more information, please review our
                 <a href="https://flipaeo.com/privacy-policy" className="text-indigo-600"> Privacy Policy</a>.
@@ -83,7 +83,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Third-Party Services</h2>
               <p>
-                <strong>FlipAEO</strong> uses third-party services for AI content generation, research, and payment processing. By using our service, you agree to be bound by the terms and policies of these third parties. Payment processing is handled securely by our payment provider.
+                <strong>PinLoop AI</strong> uses third-party services for AI image generation, official API publishing (Pinterest), and payment processing. By using our service, you agree to be bound by the terms and policies of these third parties. Payment processing is handled securely by our payment provider.
               </p>
             </div>
 
@@ -91,7 +91,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Limitation of Liability</h2>
               <p>
-                To the maximum extent permitted by law, <strong>FlipAEO</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to search ranking results, traffic changes, or business outcomes.
+                To the maximum extent permitted by law, <strong>PinLoop AI</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to social media reach, traffic changes, account restrictions by third-party platforms, or business outcomes.
               </p>
             </div>
 
@@ -113,14 +113,14 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Digital Delivery</h2>
               <p>
-                FlipAEO provides a fully digital service. All generated articles and content are delivered digitally through your dashboard or directly to your connected CMS (WordPress, Webflow, Shopify). There are no physical products or shipping involved.
+                PinLoop AI provides a fully digital service. All generated images and content are delivered digitally through your dashboard and published directly to Pinterest. There are no physical products or shipping involved.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">13. Acceptable Use</h2>
               <p>
-                You agree not to use FlipAEO to generate content that:
+                You agree not to use PinLoop AI to generate content that:
               </p>
               <ul className="list-disc list-inside pl-5 mt-2">
                 <li>Violates any applicable laws or regulations</li>

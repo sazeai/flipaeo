@@ -7,7 +7,7 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Privacy Policy',
-  description: 'Learn how FlipAEO collects, uses, and protects your personal data.',
+  description: 'Learn how PinLoop AI collects, uses, and protects your personal data.',
   canonical: '/privacy-policy',
 })
 
@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
               <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Privacy Policy</h1>
-            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how FlipAEO collects, uses, and protects your personal data.</p>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how PinLoop AI collects, uses, and protects your personal data.</p>
           </div>
         </section>
 
@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
           <div className="space-y-8 ">
             <div className="">
               <p>
-                At <strong>FlipAEO</strong>, accessible from{' '}
+                At <strong>PinLoop AI</strong>, accessible from{' '}
                 <a
                   href="https://flipaeo.com"
                   className="text-blue-500 hover:underline"
@@ -53,8 +53,9 @@ export default function PrivacyPolicy() {
               <h3 className="text-lg font-semibold mb-2">1.1 Personal Information (Provided by You)</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li><strong>Email Address</strong> (for account creation and communication).</li>
-                <li><strong>Brand Information</strong> (company name, website URL, brand voice preferences for content generation).</li>
-                <li><strong>Competitor URLs</strong> (for competitive analysis and content strategy).</li>
+                <li><strong>Brand Information</strong> (company name, store URL, aesthetic guidelines for image generation).</li>
+                <li><strong>Product Catalog Data</strong> (product images, descriptions, pricing synced securely via Shopify/Etsy API).</li>
+                <li><strong>Pinterest Account Data</strong> (tokens securely stored via OAuth to drip-publish content).</li>
                 <li><strong>Payment Information</strong> (processed securely via third-party payment providers).</li>
               </ul>
               <h3 className="text-lg font-semibold mb-2">1.2 Automatically Collected Data</h3>
@@ -70,7 +71,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. How We Use Your Information</h2>
               <p className="mb-4">We process your data for the following purposes:</p>
               <ul className="list-disc list-inside pl-5">
-                <li>✅ <strong>Content Generation:</strong> To analyze your brand, competitors, and create strategic content.</li>
+                <li>✅ <strong>Pinterest Publishing:</strong> To generate product lifestyle images and automatically publish them to Pinterest.</li>
                 <li>✅ <strong>Account Management:</strong> To enable login, profile settings, and service customization.</li>
                 <li>✅ <strong>Payment Processing:</strong> To process subscription payments securely.</li>
                 <li>✅ <strong>Customer Support:</strong> To address inquiries and technical issues.</li>
@@ -84,8 +85,8 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">3. Data Storage & Retention</h2>
               <ul className="list-disc list-inside pl-5">
                 <li>📌 <strong>Account Data:</strong> Stored in <strong>Supabase</strong> until account deletion.</li>
-                <li>📌 <strong>Brand Profiles:</strong> Retained to improve content consistency across articles.</li>
-                <li>📌 <strong>Generated Articles:</strong> Retained for <strong>30 days</strong> after creation for access and revisions.</li>
+                <li>📌 <strong>Brand Settings:</strong> Retained to improve generation consistency across your products.</li>
+                <li>📌 <strong>Generated Pins:</strong> Retained on secure R2 buckets for publishing and historical records.</li>
                 <li>📌 <strong>Payment Data:</strong> Not stored by us; processed by <strong>secure third-party payment providers</strong>.</li>
                 <li>📌 <strong>Logs & Analytics:</strong> Retained for performance monitoring but anonymized after 30 days.</li>
               </ul>
@@ -117,9 +118,9 @@ export default function PrivacyPolicy() {
               <p className="mb-4">We <strong>do not sell</strong> your personal data. However, we may share data with:</p>
               <ul className="list-disc list-inside pl-5">
                 <li><strong>AI Content Generation:</strong> AI providers for content creation and research.</li>
-                <li><strong>Cloud Storage:</strong> Supabase for secure data storage.</li>
+                <li><strong>Cloud Storage:</strong> Cloudflare R2 and Supabase for secure data storage.</li>
                 <li><strong>Payment Processors:</strong> DodoPayments (for secure subscription processing).</li>
-                <li><strong>CMS Platforms:</strong> WordPress, Webflow, Shopify (for content publishing, at your request).</li>
+                <li><strong>Integrations:</strong> Shopify & Etsy (for product ingestion) and Pinterest (for official API publishing).</li>
                 <li><strong>Analytics & Performance Monitoring:</strong> To improve user experience.</li>
                 <li><strong>Legal & Compliance Reasons:</strong> If required by law or court order.</li>
               </ul>
@@ -128,7 +129,7 @@ export default function PrivacyPolicy() {
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Google Services Integration</h2>
-              <p className="mb-4">FlipAEO integrates with the following Google services to provide our core functionality:</p>
+              <p className="mb-4">PinLoop AI integrates with the following services to provide our core automated functionality:</p>
 
               <h3 className="text-lg font-semibold mb-2">6.1 Google Authentication (OAuth 2.0)</h3>
               <p className="mb-4">
@@ -145,7 +146,7 @@ export default function PrivacyPolicy() {
 
               <h3 className="text-lg font-semibold mb-2">6.2 Google API Services User Data Policy Compliance</h3>
               <p className="mb-4">
-                FlipAEO's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
+                PinLoop AI's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
               </p>
             </div>
 
@@ -161,7 +162,7 @@ export default function PrivacyPolicy() {
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Cookies & Tracking Technologies</h2>
-              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on FlipAEO.</p>
+              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on PinLoop AI.</p>
               <h3 className="text-lg font-semibold mb-2">8.1 What Cookies Do We Use?</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li>🔐 <strong>Authentication Cookies:</strong> Used by Supabase to keep you logged in after signing in via email or Google login.</li>
@@ -192,7 +193,7 @@ export default function PrivacyPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Changes to This Privacy Policy</h2>
               <p className="mb-4">
-                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of FlipAEO signifies your acceptance of the changes.
+                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of PinLoop AI signifies your acceptance of the changes.
               </p>
             </div>
 
