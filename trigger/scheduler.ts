@@ -1,6 +1,7 @@
 import { schedules } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { generateBlogPost } from "./generate-blog"
+import { refreshBlogPost } from "./refresh-blog"
 import { adminHasCredits, adminDeductCredits, adminAddCredits } from "@/lib/credits"
 import { consumeSprintQuota, getActiveSprint, getSprintQuotaBalance } from "@/lib/sprint-entitlements"
 import { BillingAlertEmail } from "@/lib/emails/templates/billing-alert"
@@ -193,7 +194,7 @@ export const dailyContentWatchman = schedules.task({
                 let sprintId: string | null = plan.user_sprint_id || null
                 if (!sprintId) {
                     const activeSprint = await getActiveSprint(plan.user_id)
-                    sprintId = activeSprint.data?.id || null
+                    sprintId = (activeSprint.data as any)?.id || null
                 }
 
                 if (!sprintId) {
@@ -251,6 +252,7 @@ export const dailyContentWatchman = schedules.task({
                     try {
                         let articleId = item.article_id
                         if (!articleId) {
+                            const contentMode = item.content_action === "refresh" ? "refresh" : "new"
                             const { data: newArticle, error: articleError } = await supabase
                                 .from("articles")
                                 .insert({
@@ -258,6 +260,9 @@ export const dailyContentWatchman = schedules.task({
                                     keyword: item.main_keyword,
                                     status: "queued",
                                     user_id: plan.user_id,
+                                    user_sprint_id: sprint.id,
+                                    content_mode: contentMode,
+                                    original_url: item.target_url || null,
                                 })
                                 .select("id")
                                 .single()
@@ -277,17 +282,33 @@ export const dailyContentWatchman = schedules.task({
                             .update({ plan_data: updatedPlanData })
                             .eq("id", plan.id)
 
-                        await generateBlogPost.trigger({
-                            articleId: articleId,
-                            keyword: item.main_keyword,
-                            brandId: plan.brand_id,
-                            title: item.title,
-                            articleType: item.article_type || "informational",
-                            supportingKeywords: item.supporting_keywords || [],
-                            cluster: item.cluster || "",
-                            planId: plan.id,
-                            itemId: item.id,
-                        })
+                        // Route to appropriate task based on content action
+                        if (item.content_action === "refresh" && item.target_url) {
+                            await refreshBlogPost.trigger({
+                                articleId: articleId,
+                                keyword: item.main_keyword,
+                                brandId: plan.brand_id,
+                                title: item.title,
+                                targetUrl: item.target_url,
+                                supportingKeywords: item.supporting_keywords || [],
+                                planId: plan.id,
+                                itemId: item.id,
+                                gscMetrics: item.gsc_baseline_metrics || undefined,
+                                decayReason: item.reason || undefined,
+                            })
+                        } else {
+                            await generateBlogPost.trigger({
+                                articleId: articleId,
+                                keyword: item.main_keyword,
+                                brandId: plan.brand_id,
+                                title: item.title,
+                                articleType: item.article_type || "informational",
+                                supportingKeywords: item.supporting_keywords || [],
+                                cluster: item.cluster || "",
+                                planId: plan.id,
+                                itemId: item.id,
+                            })
+                        }
 
                         triggeredCount++
                     } catch (e) {

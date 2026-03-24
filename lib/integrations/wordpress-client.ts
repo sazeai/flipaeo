@@ -3,7 +3,7 @@
  * Uses Application Passwords for authentication
  */
 
-interface WordPressCredentials {
+export interface WordPressCredentials {
     siteUrl: string
     username: string
     appPassword: string
@@ -619,4 +619,133 @@ export async function uploadContentImagesToWordPress(
 // Helper to escape special regex characters
 function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * Update an existing WordPress post by ID.
+ * Used for content refresh flow — replaces content/title/excerpt of an existing post.
+ */
+export async function updatePost(
+    credentials: WordPressCredentials,
+    postId: number,
+    params: Partial<CreatePostParams>
+): Promise<{ success: boolean; post?: WordPressPost; error?: string }> {
+    const { siteUrl, username, appPassword } = credentials
+
+    try {
+        const baseUrl = siteUrl.replace(/\/+$/, '')
+        const apiUrl = `${baseUrl}/wp-json/wp/v2/posts/${postId}`
+
+        const postBody: Record<string, unknown> = {}
+        if (params.title) postBody.title = params.title
+        if (params.content) postBody.content = params.content
+        if (params.excerpt !== undefined) postBody.excerpt = params.excerpt
+        if (params.status) postBody.status = params.status
+        if (params.featured_media) postBody.featured_media = params.featured_media
+
+        const response = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': createAuthHeader(username, appPassword),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postBody),
+        })
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            console.error('[WP Client] Failed to update post:', JSON.stringify(errorData))
+            return {
+                success: false,
+                error: (errorData as any).message || `Failed to update post: ${response.status}`
+            }
+        }
+
+        const post = await response.json()
+        return {
+            success: true,
+            post: {
+                id: post.id,
+                link: post.link,
+                status: post.status,
+                title: post.title,
+            }
+        }
+    } catch (error: any) {
+        console.error('[WP Client] Error updating post:', error)
+        return {
+            success: false,
+            error: error.message || 'Failed to update post'
+        }
+    }
+}
+
+/**
+ * Look up a WordPress post ID by its URL slug.
+ * Fallback for when we have the URL but not the post ID.
+ */
+export async function lookupPostByUrl(
+    credentials: WordPressCredentials,
+    pageUrl: string
+): Promise<number | null> {
+    const { siteUrl, username, appPassword } = credentials
+
+    try {
+        // Extract slug from URL
+        const url = new URL(pageUrl)
+        const pathSegments = url.pathname.split('/').filter(Boolean)
+        const slug = pathSegments[pathSegments.length - 1]
+        if (!slug) return null
+
+        const baseUrl = siteUrl.replace(/\/+$/, '')
+        const apiUrl = `${baseUrl}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&per_page=1`
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': createAuthHeader(username, appPassword),
+                'Content-Type': 'application/json',
+            },
+        })
+
+        if (!response.ok) return null
+        const posts = await response.json()
+        return Array.isArray(posts) && posts.length > 0 ? posts[0].id : null
+    } catch {
+        return null
+    }
+}
+
+/**
+ * Full refresh flow: upload featured image + update existing post.
+ * Used for content refresh articles where we update an already-published page.
+ */
+export async function refreshExistingPost(
+    credentials: WordPressCredentials,
+    postId: number,
+    article: {
+        title: string
+        content: string
+        excerpt?: string
+        featuredImageUrl?: string | null
+    }
+): Promise<{ success: boolean; post?: WordPressPost; error?: string }> {
+    let featuredMediaId: number | undefined
+
+    // 1. Upload new featured image if provided
+    if (article.featuredImageUrl) {
+        const filename = `refresh-${postId}-${Date.now()}.webp`
+        const mediaResult = await uploadMedia(credentials, article.featuredImageUrl, filename)
+        if (mediaResult) {
+            featuredMediaId = mediaResult.id
+        }
+    }
+
+    // 2. Update the existing post
+    return updatePost(credentials, postId, {
+        title: article.title,
+        content: article.content,
+        excerpt: article.excerpt,
+        featured_media: featuredMediaId,
+        status: 'publish', // Keep it published (it was already live)
+    })
 }

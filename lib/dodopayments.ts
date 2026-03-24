@@ -1,6 +1,9 @@
 /**
  * Client-side wrapper for calling our Dodo Payments API routes.
  * NOTE: Do not import the server SDK here. These functions run in the browser.
+ * 
+ * PIVOT: Primary flow is now one-time sprint checkout. Subscription functions
+ * are deprecated and kept only for legacy compatibility.
  */
 
 type ProductCartItem = { product_id: string; quantity: number; amount?: number }
@@ -20,7 +23,8 @@ type BillingAddress = {
 }
 
 /**
- * Create hosted Checkout Session and return the checkout_url and session_id
+ * Create hosted Checkout Session and return the checkout_url and session_id.
+ * For sprint purchases, pass the sprint product_id in the cart with quantity 1.
  */
 export async function checkout(
     product_cart: ProductCartItem[],
@@ -32,7 +36,7 @@ export async function checkout(
     if (!return_url) {
         throw new Error('return_url is required')
     }
-    const payload: any = {
+    const payload: Record<string, unknown> = {
         product_cart,
         return_url,
         metadata,
@@ -54,12 +58,40 @@ export async function checkout(
 }
 
 /**
- * Trigger cancellation at next billing date for the user's subscription.
- * subscription_id is optional; if omitted, the API resolves the user's active subscription.
+ * Convenience: create a sprint checkout session.
+ * Wraps checkout() with sprint-specific metadata (user_id, tier, brand_id).
  */
+export async function checkoutSprint(params: {
+    productId: string
+    tierCode: string
+    userId: string
+    brandId?: string
+    customerEmail: string
+    customerName?: string
+    returnUrl: string
+}): Promise<{ checkout_url: string; session_id: string }> {
+    return checkout(
+        [{ product_id: params.productId, quantity: 1 }],
+        { email: params.customerEmail, name: params.customerName },
+        undefined,
+        params.returnUrl,
+        {
+            user_id: params.userId,
+            tier: params.tierCode,
+            brand_id: params.brandId || '',
+            checkout_type: 'sprint',
+        },
+    )
+}
+
+// ---- DEPRECATED: Subscription management ----
+// These are kept for legacy users still on $79/month plans.
+// They will be removed when all legacy subscribers are migrated.
+
+/** @deprecated Use checkoutSprint instead */
 export async function cancelSubscription(
     subscription_id?: string,
-): Promise<{ ok: boolean; subscription_id: string; remote: any }> {
+): Promise<{ ok: boolean; subscription_id: string; remote: unknown }> {
     const res = await fetch('/api/dodopayments/subscription/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,11 +104,7 @@ export async function cancelSubscription(
     return data
 }
 
-/**
- * Create a customer portal session so the user can update their default payment method.
- * subscription_id is optional; if omitted, the API resolves the user's active subscription.
- * return_url is optional; defaults to /account.
- */
+/** @deprecated */
 export async function updatePaymentMethod(
     subscription_id?: string,
     return_url?: string,
@@ -90,7 +118,6 @@ export async function updatePaymentMethod(
     if (!res.ok) {
         throw new Error(data?.error || 'Failed to create customer portal session')
     }
-    // API may return { url } OR { emailed: true, message }
     return {
         url: data?.url || data?.link,
         emailed: Boolean(data?.emailed),
@@ -98,43 +125,7 @@ export async function updatePaymentMethod(
     }
 }
 
-/**
- * Placeholders for future server endpoints. These are imported by hooks/useBilling.ts.
- * They will throw informative errors until implemented.
- */
-
-export async function getProducts(): Promise<never> {
-    throw new Error('getProducts is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function getProduct(_product_id: string): Promise<never> {
-    throw new Error('getProduct is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function getCustomer(_customer_id: string): Promise<never> {
-    throw new Error('getCustomer is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function getCustomerSubscriptions(_customer_id: string): Promise<never> {
-    throw new Error('getCustomerSubscriptions is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function getCustomerPayments(_customer_id: string): Promise<never> {
-    throw new Error('getCustomerPayments is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function createCustomer(_customer: any): Promise<never> {
-    throw new Error('createCustomer is not implemented yet. Please implement a server route and wire it here.')
-}
-
-export async function updateCustomer(_customer_id: string, _customer: any): Promise<never> {
-    throw new Error('updateCustomer is not implemented yet. Please implement a server route and wire it here.')
-}
-// ---- Additional helpers for Subscription management via API routes ----
-
-/**
- * Restore a subscription (unset cancel_at_next_billing_date) using our API route.
- */
+/** @deprecated */
 export async function restoreSubscription(
     subscription_id?: string
 ): Promise<{ ok: boolean; subscription_id: string }> {
@@ -150,9 +141,7 @@ export async function restoreSubscription(
     return data
 }
 
-/**
- * Change plan for a subscription using our API route.
- */
+/** @deprecated */
 export async function changeSubscriptionPlan(
     subscription_id: string | undefined,
     product_id: string,
@@ -175,3 +164,12 @@ export async function changeSubscriptionPlan(
     }
     return data
 }
+
+// Placeholders (kept for interface compat)
+export async function getProducts(): Promise<never> { throw new Error('Not implemented') }
+export async function getProduct(_id: string): Promise<never> { throw new Error('Not implemented') }
+export async function getCustomer(_id: string): Promise<never> { throw new Error('Not implemented') }
+export async function getCustomerSubscriptions(_id: string): Promise<never> { throw new Error('Not implemented') }
+export async function getCustomerPayments(_id: string): Promise<never> { throw new Error('Not implemented') }
+export async function createCustomer(_c: unknown): Promise<never> { throw new Error('Not implemented') }
+export async function updateCustomer(_id: string, _c: unknown): Promise<never> { throw new Error('Not implemented') }

@@ -5,7 +5,6 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { getUserBrandStatus } from "@/actions/brand"
 import { getUserDefaults, setDefaultBrand } from "@/actions/preferences"
 import { createClient } from "@/utils/supabase/client"
-import { getBrandLinkCountAction } from "@/actions/internal-linking"
 import { Check, Globe, Plus, Edit, Settings2, Loader2, Link2, RefreshCcw, ExternalLink, AlertCircle } from "lucide-react"
 import BrandOnboarding from "@/components/brand-onboarding"
 import { toast } from "sonner"
@@ -65,20 +64,8 @@ export default function SettingsPage() {
     init()
   }, [supabase, router])
 
-  const fetchLinkCounts = async (brandsList: BrandInfo[]) => {
-    const counts: Record<string, number> = {}
-    await Promise.all(brandsList.map(async (b) => {
-      const res = await getBrandLinkCountAction(b.id)
-      if (res.success) counts[b.id] = res.count
-    }))
-    setLinkCounts(counts)
-  }
 
-  useEffect(() => {
-    if (brands.length > 0) {
-      fetchLinkCounts(brands)
-    }
-  }, [brands])
+
 
   const refreshBrands = async () => {
     const status = await getUserBrandStatus()
@@ -90,30 +77,6 @@ export default function SettingsPage() {
     setBrandCount(status.count)
   }
 
-  const handleSyncLinks = async (brandId: string, websiteUrl: string) => {
-    setSyncingId(brandId)
-    try {
-      // Clean URL and assume /sitemap.xml
-      let sitemapUrl = websiteUrl.endsWith('/') ? `${websiteUrl}sitemap.xml` : `${websiteUrl}/sitemap.xml`
-
-      const res = await fetch('/api/content-plan/sync-links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sitemapUrl, brandId })
-      })
-
-      if (!res.ok) throw new Error("Failed to start sync")
-
-      toast.success("Sync started! This may take a few minutes for deep indexing.")
-
-      // Update count after a delay (optimistic or just let user refresh)
-      setTimeout(() => fetchLinkCounts(brands), 3000)
-    } catch (error: any) {
-      toast.error(error.message || "Failed to sync links")
-    } finally {
-      setSyncingId(null)
-    }
-  }
 
   const handleUpdateSearchPrefs = async (brandId: string, field: 'search_country' | 'search_topic', value: string) => {
     const brand = brands.find(b => b.id === brandId)
@@ -321,20 +284,7 @@ export default function SettingsPage() {
                             </div>
                           </div>
 
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="h-8 text-[10px] gap-1.5 px-3 font-bold bg-stone-100  hover:bg-stone-200 text-stone-900 border-none"
-                            onClick={() => handleSyncLinks(b.id, b.website_url)}
-                            disabled={syncingId === b.id}
-                          >
-                            {syncingId === b.id ? (
-                              <RefreshCcw className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <RefreshCcw className="w-3 h-3" />
-                            )}
-                            {syncingId === b.id ? 'SYNCING...' : 'SYNC SITE'}
-                          </Button>
+
                         </div>
                       </div>
                     </div>

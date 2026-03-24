@@ -37,10 +37,15 @@ export const ContentPlanItemSchema = z.object({
     connected_to: z.array(z.string()).optional(), // Day numbers or article IDs this links to
     hook: z.string().optional(), // One-sentence value proposition
     phase: z.enum([
+        // Legacy 30-day phases
         "Foundation",   // Days 1-7: Establish authority
         "Use-Case",     // Days 8-14: Capture specific personas
         "Technical",    // Days 15-21: LLM optimization, "how it works"
-        "Trust"         // Days 22-30: Overcome objections, build confidence
+        "Trust",        // Days 22-30: Overcome objections, build confidence
+        // Sprint 90-day phases
+        "Growth",       // Days 21-45: Persona-specific, use-case content
+        "Expansion",    // Days 46-70: Commercial content, comparisons
+        "Authority",    // Days 71-90: Thought leadership, data studies
     ]).optional(),
     user_intent: z.enum([
         "Informational",

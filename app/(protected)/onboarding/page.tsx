@@ -13,8 +13,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { CustomSpinner } from "@/components/CustomSpinner"
 import { PillInput } from "@/components/ui/pill-input"
-import { AuditConsole } from "@/components/audit/audit-console"
-import { AuditResults } from "@/components/audit/audit-results"
 
 const STORAGE_KEYS = {
     STEP: 'onboarding_step',
@@ -693,59 +691,6 @@ export default function OnboardingPage() {
                                     </motion.div>
                                 )}
 
-                                {step === "audit" && brandData && brandId && (
-                                    <motion.div
-                                        key="audit-step"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="p-6"
-                                    >
-                                        <AuditConsole
-                                            brandData={brandData}
-                                            brandId={brandId}
-                                            brandUrl={`https://${url.trim()}`}
-                                            onComplete={handleAuditComplete}
-                                            onError={handleAuditError}
-                                        />
-                                    </motion.div>
-                                )}
-
-                                {step === "audit-results" && (
-                                    <motion.div
-                                        key="audit-results-step"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                        className="p-6"
-                                    >
-                                        {auditResult ? (
-                                            <AuditResults
-                                                auditResult={auditResult}
-                                                brandName={brandData?.product_name || "Your Site"}
-                                                onGeneratePlan={handleGeneratePlan}
-                                                isGeneratingPlan={isGeneratingPlan}
-                                            />
-                                        ) : (
-                                            <div className="text-center py-8 space-y-4">
-                                                <p className="text-stone-500 text-sm">
-                                                    Audit data not available. You can still generate a content plan.
-                                                </p>
-                                                <Button
-                                                    onClick={handleGeneratePlan}
-                                                    disabled={isGeneratingPlan}
-                                                    className="bg-stone-900 text-white hover:bg-stone-800"
-                                                >
-                                                    {isGeneratingPlan ? (
-                                                        <><Loader2 className="w-4 h-4 animate-spin mr-2" />Generating...</>
-                                                    ) : (
-                                                        <>Generate Content Plan <ArrowRight className="w-4 h-4 ml-2" /></>
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                )}
 
                             </AnimatePresence>
                         </div>

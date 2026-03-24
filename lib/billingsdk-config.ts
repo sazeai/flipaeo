@@ -1,140 +1,96 @@
-export interface Plan {
-  id: string;
-  title: string;
-  description: string;
-  highlight?: boolean;
-  type?: "monthly" | "yearly";
-  currency?: string;
-  monthlyPrice: string;
-  yearlyPrice: string;
-  buttonText: string;
-  badge?: string;
-  features: {
-    name: string;
-    icon: string;
-    iconColor?: string;
-  }[];
+/**
+ * Sprint tier definitions for the 90-Day Sprint model.
+ * 
+ * IMPORTANT: Set NEXT_PUBLIC_DODO_STARTER_PRODUCT_ID and NEXT_PUBLIC_DODO_GROWTH_PRODUCT_ID
+ * in your .env after creating the products in the DodoPayments dashboard.
+ */
+
+export type SprintTier = {
+  id: string
+  code: string
+  title: string
+  price: number
+  currency: string
+  totalNewArticles: number
+  totalRefreshArticles: number
+  totalArticles: number
+  durationDays: number
+  dodoProductId: string
+  highlight?: boolean
+  badge?: string
+  features: string[]
 }
 
-export interface CurrentPlan {
-  plan: Plan;
-  type: "monthly" | "yearly" | "custom";
-  price?: string;
-  nextBillingDate: string;
-  paymentMethod: string;
-  status: "active" | "inactive" | "past_due" | "cancelled";
-}
-
-export const plans: Plan[] = [
+export const sprintTiers: SprintTier[] = [
   {
-    id: "starter",
-    title: "Starter",
-    description: "For developers testing out Liveblocks locally.",
-    currency: "$",
-    monthlyPrice: "0",
-    yearlyPrice: "0",
-    buttonText: "Start today for free",
+    id: 'starter',
+    code: 'sprint_497',
+    title: '90-Day Sprint — Starter',
+    price: 497,
+    currency: 'USD',
+    totalNewArticles: 50,
+    totalRefreshArticles: 25,
+    totalArticles: 75,
+    durationDays: 90,
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_STARTER_PRODUCT_ID || '',
     features: [
-      {
-        name: "Presence",
-        icon: "check",
-        iconColor: "text-green-500",
-      },
-      {
-        name: "Comments",
-        icon: "check",
-        iconColor: "text-brand-500",
-      },
-      {
-        name: "Notifications",
-        icon: "check",
-        iconColor: "text-teal-500",
-      },
-      {
-        name: "Text Editor",
-        icon: "check",
-        iconColor: "text-blue-500",
-      },
-      {
-        name: "Sync Datastore",
-        icon: "check",
-        iconColor: "text-zinc-500",
-      },
+      '50 net-new SEO articles',
+      '25 content refreshes (GSC-powered)',
+      '90-day automated publishing sprint',
+      'Full brand DNA analysis & topical audit',
+      'Automated daily CMS publishing',
     ],
   },
   {
-    id: "pro",
-    title: "Pro",
-    description: "For companies adding collaboration in production.",
-    currency: "$",
-    monthlyPrice: "20",
-    yearlyPrice: "199",
-    buttonText: "Sign up",
-    badge: "Most popular",
+    id: 'growth',
+    code: 'sprint_897',
+    title: '90-Day Sprint — Growth',
+    price: 897,
+    currency: 'USD',
+    totalNewArticles: 100,
+    totalRefreshArticles: 50,
+    totalArticles: 150,
+    durationDays: 90,
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_GROWTH_PRODUCT_ID || '',
     highlight: true,
+    badge: 'Best Value',
     features: [
-      {
-        name: "Presence",
-        icon: "check",
-        iconColor: "text-green-500",
-      },
-      {
-        name: "Comments",
-        icon: "check",
-        iconColor: "text-brand-500",
-      },
-      {
-        name: "Notifications",
-        icon: "check",
-        iconColor: "text-teal-500",
-      },
-      {
-        name: "Text Editor",
-        icon: "check",
-        iconColor: "text-blue-500",
-      },
-      {
-        name: "Sync Datastore",
-        icon: "check",
-        iconColor: "text-zinc-500",
-      },
+      '100 net-new SEO articles',
+      '50 content refreshes (GSC-powered)',
+      '90-day automated publishing sprint',
+      'Full brand DNA analysis & topical audit',
+      'Automated daily CMS publishing',
+      'Priority support',
     ],
   },
-  {
-    id: "enterprise",
-    title: "Enterprise",
-    description:
-      "For organizations that need more support and compliance features.",
-    currency: "$",
-    monthlyPrice: "Custom",
-    yearlyPrice: "Custom",
-    buttonText: "Contact sales",
-    features: [
-      {
-        name: "Presence",
-        icon: "check",
-        iconColor: "text-green-500",
-      },
-      {
-        name: "Comments",
-        icon: "check",
-        iconColor: "text-brand-500",
-      },
-      {
-        name: "Notifications",
-        icon: "check",
-        iconColor: "text-teal-500",
-      },
-      {
-        name: "Text Editor",
-        icon: "check",
-        iconColor: "text-blue-500",
-      },
-      {
-        name: "Sync Datastore",
-        icon: "check",
-        iconColor: "text-zinc-500",
-      },
-    ],
-  },
-];
+]
+
+/** Get a sprint tier by its DodoPayments product ID */
+export function getSprintTierByProductId(productId: string): SprintTier | undefined {
+  return sprintTiers.find((t) => t.dodoProductId === productId)
+}
+
+/** Get a sprint tier by its code (e.g., 'sprint_497') */
+export function getSprintTierByCode(code: string): SprintTier | undefined {
+  return sprintTiers.find((t) => t.code === code)
+}
+
+// ---- Legacy types kept for backward compat during migration ----
+
+export type Plan = {
+  name: string
+  description: string
+  priceMonthly: number
+  priceYearly: number
+  features: string[]
+  popular: boolean
+  id?: string
+}
+
+export type CurrentPlan = {
+  name: string
+  type: string
+  startDate: string
+  amount: string
+  invoiceHistory?: Array<{ date: string; amount: string; status: string }>
+}
