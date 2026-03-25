@@ -56,7 +56,7 @@ export function DynamicBreadcrumb() {
       <BreadcrumbList>
         {/* Home link */}
         <BreadcrumbItem className="hidden md:block text-xs md:text-sm">
-          <BreadcrumbLink href="/content-plan">
+          <BreadcrumbLink href="/dashboard">
             Home
           </BreadcrumbLink>
         </BreadcrumbItem>

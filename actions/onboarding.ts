@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server"
 
 /**
  * Checks if the current user is allowed to access the onboarding page.
- * Users with BOTH a brand AND a content plan should be redirected to /content-plan.
+ * Users with BOTH a brand AND a content plan should be redirected to /dashboard.
  * Users with only a brand (no plan) should be allowed to continue onboarding.
  * 
  * @param currentStep - The current onboarding step. If in GSC flow, allows access.
@@ -48,7 +48,7 @@ export async function canAccessOnboarding(currentStep?: string): Promise<{ allow
 
     if (hasBrand && hasPlan) {
         // User has BOTH brand AND plan → redirect to content plan
-        return { allowed: false, redirectTo: "/content-plan" }
+        return { allowed: false, redirectTo: "/dashboard" }
     }
 
     // User has brand but NO plan → allow onboarding to continue from where they left off

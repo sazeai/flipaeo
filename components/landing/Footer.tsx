@@ -35,12 +35,12 @@ export function Footer() {
             <div className="lg:w-1/3 flex flex-col items-start gap-6">
               <div className="flex items-center gap-2">
                 <span className="font-serif font-bold text-2xl tracking-tight text-stone-900 leading-none">
-                  FlipAEO
+                  PinLoop
                 </span>
               </div>
 
               <p className="font-sans text-stone-500 text-sm leading-relaxed max-w-sm">
-                The first strategic content engine designed to reverse-engineer AI search models. Win the answer, not just the link.
+                PinLoop AI automatically turns your plain product photos into photorealistic lifestyle scenes, formats them for Pinterest’s visual algorithm, and optimizes for Outbound Clicks while you sleep
               </p>
 
 
@@ -77,13 +77,13 @@ export function Footer() {
           {/* Bottom Bar */}
           <div className="relative z-10 pt-8 border-t border-stone-200/60 flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="font-sans text-sm text-stone-400">
-              © {currentYear} FlipAEO. All rights reserved.
+              © {currentYear} PinLoop. All rights reserved.
             </p>
 
             {/* Socials */}
             <div className="flex items-center gap-4">
               <Link
-                href="https://x.com/flipaeo"
+                href="https://x.com/pinloop"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"

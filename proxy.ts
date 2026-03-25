@@ -70,7 +70,7 @@ export async function proxy(request: NextRequest) {
   )
 
   // Protected routes - ONLY these require authentication
-  const protectedRoutes = ['/content-plan', '/seo-health', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account', '/api']
+  const protectedRoutes = ['/dashboard', '/seo-health', '/reports', '/settings', '/articles', '/integrations', '/subscribe', '/onboarding', '/account', '/api']
   const isProtectedRoute = protectedRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
   ) && !isPublicApiRoute // Exclude public API routes from protection
@@ -95,7 +95,7 @@ export async function proxy(request: NextRequest) {
 
   // If authenticated and trying to access login, redirect to dashboard
   if (request.nextUrl.pathname === '/login' && user) {
-    return NextResponse.redirect(new URL('/content-plan', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return response
