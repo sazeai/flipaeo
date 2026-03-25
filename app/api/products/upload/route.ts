@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       await putR2Object(r2Key, buffer, imageFile.type || "image/jpeg", "public, max-age=31536000")
       imageR2Key = r2Key
 
-      const r2PublicDomain = process.env.R2_PUBLIC_DOMAIN || ""
+      const r2PublicDomain = (process.env.R2_PUBLIC_DOMAIN || "").replace(/^https?:\/\//, "").replace(/\/+$/, "")
       if (r2PublicDomain) {
         imageUrl = `https://${r2PublicDomain}/${r2Key}`
       }

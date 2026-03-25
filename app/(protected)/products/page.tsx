@@ -196,7 +196,7 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Product Grid */}
+      {/* Product Masonry Grid */}
       {products.length === 0 ? (
         <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
           <Package className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
@@ -212,44 +212,62 @@ export default function ProductsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
+
           {products.map(product => (
-            <div key={product.id} className="bg-white border rounded-2xl overflow-hidden group hover:shadow-sm transition-shadow">
-              {/* Image */}
-              <div className="aspect-square bg-neutral-100 relative">
+            <div
+              key={product.id}
+              style={{ breakInside: 'avoid' }}
+              className="mb-4 bg-white border border-neutral-200/80 rounded-2xl overflow-hidden group hover:border-neutral-300 hover:shadow-md transition-all duration-200"
+            >
+              {/* Image — natural aspect ratio */}
+              <div className="relative bg-neutral-50">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                  <img
+                    src={product.image_url}
+                    alt={product.title}
+                    className="w-full h-auto block"
+                    loading="lazy"
+                    style={{ minHeight: '120px' }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ShoppingBag className="w-12 h-12 text-neutral-300" />
+                  <div className="w-full flex items-center justify-center py-16">
+                    <ShoppingBag className="w-10 h-10 text-neutral-200" />
                   </div>
                 )}
-                <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs px-2 py-1 rounded-full font-medium capitalize">
+                {/* Source badge */}
+                <span className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-sm text-[10px] px-2 py-0.5 rounded-md font-semibold capitalize text-neutral-600 shadow-sm border border-neutral-100">
                   {product.source}
                 </span>
               </div>
+
               {/* Info */}
-              <div className="p-4">
-                <h3 className="font-medium truncate">{product.title}</h3>
+              <div className="px-3.5 py-3 border-t border-neutral-100">
+                <h3 className="font-semibold text-sm text-neutral-900 line-clamp-2 leading-snug">
+                  {product.title}
+                </h3>
                 {product.price && (
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    ${product.price.toFixed(2)} {product.currency}
+                  <p className="text-xs text-neutral-500 mt-1 font-medium">
+                    ${Number(product.price).toFixed(2)} {product.currency}
                   </p>
                 )}
-                <div className="flex items-center gap-2 mt-3">
+                <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-neutral-50">
                   {product.product_url && (
                     <a
                       href={product.product_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                      className="text-[11px] text-neutral-500 hover:text-neutral-800 flex items-center gap-1 font-medium transition-colors"
                     >
                       <ExternalLink className="w-3 h-3" /> View
                     </a>
                   )}
                   <button
                     onClick={() => handleDelete(product.id)}
-                    className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="text-[11px] text-neutral-400 hover:text-red-500 flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-all font-medium"
                   >
                     <Trash2 className="w-3 h-3" /> Remove
                   </button>

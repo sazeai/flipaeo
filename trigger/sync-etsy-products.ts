@@ -126,7 +126,7 @@ export const etsyProductSync = task({
             : null
           const currency = listing.price?.currency_code || "USD"
 
-          const r2PublicDomain = process.env.R2_PUBLIC_DOMAIN || ""
+          const r2PublicDomain = (process.env.R2_PUBLIC_DOMAIN || "").replace(/^https?:\/\//, "").replace(/\/+$/, "")
           const imageUrl = imageR2Key && r2PublicDomain
             ? `https://${r2PublicDomain}/${imageR2Key}`
             : primaryImageUrl
