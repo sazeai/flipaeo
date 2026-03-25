@@ -86,7 +86,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* CTA Button */}
-            <Link href="/content-plan">
+            <Link href="/dashboard">
               <button
                 id="nav-cta-btn"
                 className="
