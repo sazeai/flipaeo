@@ -7,7 +7,7 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Terms of Service',
-  description: 'Review the terms and conditions for using PinLoop AI, the Autonomous Pinterest Marketing Agent.',
+  description: 'Review the terms and conditions for using PinLoop AI, the AI-assisted Pinterest Marketing Tool.',
   canonical: '/terms',
 })
 
@@ -42,7 +42,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. Use of Our Service</h2>
               <p>
-                <strong>PinLoop AI</strong> is an Autonomous Pinterest Marketing Agent that helps e-commerce businesses generate and publish lifestyle imagery.
+                <strong>PinLoop AI</strong> is an AI-assisted Pinterest marketing tool that helps e-commerce businesses generate, review, and schedule lifestyle imagery. You maintain full creative control and are responsible for reviewing and approving content before it is published.
                 Users must adhere to all applicable laws and agree not to misuse our services. Any violations of these rules can result in the termination of access to the platform.
               </p>
             </div>
@@ -58,7 +58,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Subscription and Billing</h2>
               <p>
-                <strong>PinLoop AI</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of autonomous pins generated per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
+                <strong>PinLoop AI</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated pins per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
                 <a href="https://flipaeo.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
               </p>
             </div>
@@ -83,27 +83,27 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Third-Party Services</h2>
               <p>
-                <strong>PinLoop AI</strong> uses third-party services for AI image generation, official API publishing (Pinterest), and payment processing. By using our service, you agree to be bound by the terms and policies of these third parties. Payment processing is handled securely by our payment provider.
+                <strong>PinLoop AI</strong> uses third-party services for AI image and text generation (Google GenAI, fal.ai, Tavily Search), official API publishing (Pinterest), e-commerce integrations (Shopify, Etsy), infrastructure and background processing (Supabase, Trigger.dev, Upstash, Cloudflare R2), analytics (Microsoft Clarity), and payment processing (DodoPayments). By using our service, you agree to be bound by the terms and policies of these third parties.
               </p>
             </div>
 
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Limitation of Liability</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Limitation of Liability</h2>
               <p>
                 To the maximum extent permitted by law, <strong>PinLoop AI</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to social media reach, traffic changes, account restrictions by third-party platforms, or business outcomes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Changes to the Terms</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">9. Changes to the Terms</h2>
               <p>
                 We reserve the right to update these Terms at any time. Any changes will be posted on this page, with the updated date. Continued use of the Site after any changes constitutes acceptance of those changes.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Contact Us</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Contact Us</h2>
               <p>
                 If you have any questions about these Terms, please contact us at
                 <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
@@ -111,26 +111,30 @@ export default function TermsOfService() {
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Digital Delivery</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Digital Delivery</h2>
               <p>
                 PinLoop AI provides a fully digital service. All generated images and content are delivered digitally through your dashboard and published directly to Pinterest. There are no physical products or shipping involved.
               </p>
             </div>
 
             <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">13. Acceptable Use</h2>
+              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Acceptable Use</h2>
               <p>
                 You agree not to use PinLoop AI to generate content that:
               </p>
-              <ul className="list-disc list-inside pl-5 mt-2">
+              <ul className="list-disc list-inside pl-5 mt-2 mb-4">
                 <li>Violates any applicable laws or regulations</li>
                 <li>Infringes on intellectual property rights of others</li>
                 <li>Contains misleading or false information presented as fact</li>
                 <li>Promotes illegal activities or harmful behavior</li>
                 <li>Impersonates other individuals or organizations</li>
+                <li>Engages in spam, automated bulk posting without oversight, or inauthentic behavior that violates Pinterest's Community Guidelines</li>
               </ul>
-              <p className="mt-2">
-                We reserve the right to suspend or terminate accounts that violate these guidelines.
+              <p className="mt-2 text-stone-800 font-medium">
+                <strong>Pinterest API Compliance:</strong> You acknowledge that you act as the publisher of all content. PinLoop AI facilitates your content creation and scheduling workflows, but you are solely responsible for ensuring that your publishing frequency, scheduling, and content quality adhere absolutely to Pinterest's Developer and API Guidelines.
+              </p>
+              <p className="mt-4">
+                We reserve the right to suspend or terminate accounts that violate these guidelines or misuse the Pinterest API.
               </p>
             </div>
           </div>

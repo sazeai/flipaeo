@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
 
         {/* Content */}
         <section className="max-w-5xl mx-auto px-4 py-12 w-full">
-          <p className="text-gray-600 mb-6">Effective Date: January 20, 2026</p>
+          <p className="text-gray-600 mb-6">Effective Date: March 25, 2026</p>
 
           <div className="space-y-8 ">
             <div className="">
@@ -55,7 +55,7 @@ export default function PrivacyPolicy() {
                 <li><strong>Email Address</strong> (for account creation and communication).</li>
                 <li><strong>Brand Information</strong> (company name, store URL, aesthetic guidelines for image generation).</li>
                 <li><strong>Product Catalog Data</strong> (product images, descriptions, pricing synced securely via Shopify/Etsy API).</li>
-                <li><strong>Pinterest Account Data</strong> (tokens securely stored via OAuth to drip-publish content).</li>
+                <li><strong>Pinterest Account Data</strong> (tokens securely stored via OAuth to facilitate your approved pin scheduling and analytics).</li>
                 <li><strong>Payment Information</strong> (processed securely via third-party payment providers).</li>
               </ul>
               <h3 className="text-lg font-semibold mb-2">1.2 Automatically Collected Data</h3>
@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. How We Use Your Information</h2>
               <p className="mb-4">We process your data for the following purposes:</p>
               <ul className="list-disc list-inside pl-5">
-                <li>✅ <strong>Pinterest Publishing:</strong> To generate product lifestyle images and automatically publish them to Pinterest.</li>
+                <li>✅ <strong>Pinterest Publishing:</strong> To generate product lifestyle images and facilitate user-approved scheduling and publishing to Pinterest.</li>
                 <li>✅ <strong>Account Management:</strong> To enable login, profile settings, and service customization.</li>
                 <li>✅ <strong>Payment Processing:</strong> To process subscription payments securely.</li>
                 <li>✅ <strong>Customer Support:</strong> To address inquiries and technical issues.</li>
@@ -117,11 +117,12 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Data Sharing & Third-Party Services</h2>
               <p className="mb-4">We <strong>do not sell</strong> your personal data. However, we may share data with:</p>
               <ul className="list-disc list-inside pl-5">
-                <li><strong>AI Content Generation:</strong> AI providers for content creation and research.</li>
-                <li><strong>Cloud Storage:</strong> Cloudflare R2 and Supabase for secure data storage.</li>
+                <li><strong>AI Content Generation:</strong> Google GenAI and fal.ai for content creation, Tavily for search and research.</li>
+                <li><strong>Cloud Storage & Infrastructure:</strong> Cloudflare R2 and Supabase for secure data storage. Trigger.dev and Upstash for background processing and serverless queuing.</li>
                 <li><strong>Payment Processors:</strong> DodoPayments (for secure subscription processing).</li>
                 <li><strong>Integrations:</strong> Shopify & Etsy (for product ingestion) and Pinterest (for official API publishing).</li>
-                <li><strong>Analytics & Performance Monitoring:</strong> To improve user experience.</li>
+                <li><strong>Analytics & Performance Monitoring:</strong> Microsoft Clarity to capture and analyze user interactions.</li>
+                <li><strong>Email Communications:</strong> Resend for sending transactional notifications and reports.</li>
                 <li><strong>Legal & Compliance Reasons:</strong> If required by law or court order.</li>
               </ul>
               <p className="mt-4">Each provider follows <strong>industry-standard security measures</strong> and <strong>GDPR compliance policies</strong>.</p>
