@@ -24,12 +24,16 @@ export async function POST(req: NextRequest) {
     let productContext = '';
     let weightedPromptId: string | null = null;
     let aestheticBasePrompt: string | null = null;
+    let targetAngle: string | null = null;
+    let angleEmbedding: number[] | null = null;
 
     if (contentType.includes('application/json')) {
       // --- Autonomous mode: product_id from background task ---
       const body = await req.json();
       productId = body.product_id;
       userId = body.user_id;
+      targetAngle = body.target_angle || null;
+      angleEmbedding = body.angle_embedding || null;
 
       if (!productId || !userId) {
         return NextResponse.json({ error: 'product_id and user_id required' }, { status: 400 });
@@ -99,9 +103,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Build the Art Director system prompt
-    const aestheticGuidance = aestheticBasePrompt
-      ? `\n\nUse this as aesthetic inspiration for the environment: "${aestheticBasePrompt}"`
-      : '';
+    let aestheticGuidance = '';
+    if (targetAngle) {
+      aestheticGuidance = `\n\nCRITICAL CONTEXT: The specific lifestyle angle you MUST use for this image is: "${targetAngle}". You MUST design the entire environment, lighting, and aesthetic strictly around this angle.`;
+    } else if (aestheticBasePrompt) {
+      aestheticGuidance = `\n\nUse this as aesthetic inspiration for the environment: "${aestheticBasePrompt}"`;
+    }
 
     // 1. Call Gemini 2.5 Flash to act as the "Art Director"
     const planResponse = await ai.models.generateContent({
@@ -207,6 +214,8 @@ export async function POST(req: NextRequest) {
           brand_settings_id: brandSettingsId,
           art_director_prompt: dynamicImagePrompt,
           image_prompt_used: aestheticBasePrompt || null,
+          target_angle: targetAngle,
+          angle_embedding: angleEmbedding ? `[${angleEmbedding.join(",")}]` : null, // Postgres vector representation
           template_id: templateId,
           pin_title: generatedTitle,
           status: 'generating',

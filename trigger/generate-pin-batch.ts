@@ -2,6 +2,8 @@ import { schedules, logger } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
+import { getValidAccessToken, getTrendingKeywords } from "@/lib/pinterest-api"
+import { generateUniqueAngle } from "@/lib/context-matrix"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 
@@ -25,7 +27,26 @@ export const generatePinBatch = schedules.task({
 
     const supabase = createAdminClient() as any
 
-    // Get all users with brand settings (they've completed onboarding)
+    // Fetch global trends from Pinterest once per batch to avoid rate limits
+    let globalTrends: string[] = []
+    try {
+      const { data: anyConn } = await supabase.from("pinterest_connections").select("user_id").limit(1).maybeSingle()
+      if (anyConn) {
+        const token = await getValidAccessToken(anyConn.user_id)
+        if (token) {
+          globalTrends = await getTrendingKeywords(token, 'US', 'growing')
+          logger.info(`Fetched Pinterest Trends: ${globalTrends.slice(0, 5).join(", ")}...`)
+        }
+      }
+    } catch (e) {
+      logger.warn("Could not fetch live trends, using fallbacks")
+    }
+    
+    if (globalTrends.length === 0) {
+      globalTrends = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
+    }
+
+    // Get all users with brand settings
     const { data: brands, error } = await supabase
       .from("brand_settings")
       .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused")
@@ -99,6 +120,14 @@ export const generatePinBatch = schedules.task({
           try {
             logger.info(`Generating pin for product: ${product.title}`)
 
+            // Generate unique Context Matrix angle (Semantic De-Duplication)
+            const { angle: targetAngle, embedding: angleEmbedding } = await generateUniqueAngle(
+              { id: product.id, title: product.title },
+              globalTrends,
+              brand.aesthetic_boundaries
+            )
+            logger.info(`Selected semantic angle: "${targetAngle}"`)
+
             // Step 1: Call generate-pin API (Art Director + Image Gen)
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000'
             const generateRes = await fetch(`${appUrl}/api/generate-pin`, {
@@ -107,6 +136,8 @@ export const generatePinBatch = schedules.task({
               body: JSON.stringify({
                 product_id: product.id,
                 user_id: brand.user_id,
+                target_angle: targetAngle,
+                angle_embedding: Array.from(angleEmbedding),
               }),
             })
 

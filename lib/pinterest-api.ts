@@ -172,6 +172,33 @@ export async function getAccountInfo(accessToken: string): Promise<PinterestUser
 }
 
 /**
+ * Fetch top trending keywords from Pinterest.
+ * Useful for the Autonomous Trends Engine to intercept high-volume searches.
+ */
+export async function getTrendingKeywords(
+  accessToken: string,
+  region: string = 'US',
+  trendType: string = 'growing'
+): Promise<string[]> {
+  try {
+    const data = await pinterestFetch(accessToken, `/trends/keywords/${region}/top/${trendType}?limit=15`)
+    
+    // Check if the response matches what we expect from the API
+    if (data && data.trends && Array.isArray(data.trends)) {
+      // Map to just the keyword strings
+      return data.trends.map((t: any) => t.keyword || t.term || '').filter(Boolean)
+    }
+    
+    return []
+  } catch (err) {
+    console.error('Failed to fetch Pinterest trends:', err)
+    // Return safe fallback so the batch doesn't crash if Pinterest API changes or fails
+    return ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
+  }
+}
+
+
+/**
  * Create a pin on Pinterest.
  * Uses an external image URL (our R2 public URL).
  */
