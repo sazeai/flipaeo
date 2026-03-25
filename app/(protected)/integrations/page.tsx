@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { Globe, Link2, CheckCircle2, AlertCircle, Loader2, ExternalLink } from "lucide-react"
+import { Link2, CheckCircle2, Loader2, Store } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GlobalCard } from "@/components/ui/global-card"
 import { CustomSpinner } from "@/components/CustomSpinner"
@@ -21,9 +21,43 @@ export default function IntegrationsPage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [connections, setConnections] = useState<Connection[]>([])
+  const [showShopifyModal, setShowShopifyModal] = useState(false)
+  const [shopifyDomain, setShopifyDomain] = useState("")
+  const [connecting, setConnecting] = useState(false)
 
   useEffect(() => {
     loadConnections()
+
+    // Check URL params for connection results
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("shopify") === "connected") {
+      toast.success("Shopify store connected! Products are syncing in the background.")
+      window.history.replaceState({}, "", "/integrations")
+    }
+    if (params.get("etsy") === "connected") {
+      toast.success("Etsy shop connected! Products are syncing in the background.")
+      window.history.replaceState({}, "", "/integrations")
+    }
+    if (params.get("pinterest") === "connected") {
+      toast.success("Pinterest Business account connected!")
+      window.history.replaceState({}, "", "/integrations")
+    }
+    // Handle errors
+    const shopifyErr = params.get("shopify_error")
+    const etsyErr = params.get("etsy_error")
+    const pinterestErr = params.get("pinterest_error")
+    if (shopifyErr) {
+      toast.error(`Shopify connection failed: ${shopifyErr}`)
+      window.history.replaceState({}, "", "/integrations")
+    }
+    if (etsyErr) {
+      toast.error(`Etsy connection failed: ${etsyErr}`)
+      window.history.replaceState({}, "", "/integrations")
+    }
+    if (pinterestErr) {
+      toast.error(`Pinterest connection failed: ${pinterestErr}`)
+      window.history.replaceState({}, "", "/integrations")
+    }
   }, [])
 
   async function loadConnections() {
@@ -49,6 +83,24 @@ export default function IntegrationsPage() {
           status: "connected",
           connectedAt: pinterest.created_at,
           meta: `Warmup: ${pinterest.warmup_phase === "full" ? "Full Speed 🚀" : pinterest.warmup_phase === "warmup_partial" ? "Warming Up 🌡️" : "Building Trust 🌱"}`,
+        })
+      }
+
+      // Shopify
+      const { data: shopify } = await supabase
+        .from("shopify_connections")
+        .select("id, store_name, store_domain, created_at")
+        .eq("user_id", user.id)
+        .maybeSingle()
+
+      if (shopify) {
+        conns.push({
+          id: shopify.id,
+          platform: "shopify",
+          username: shopify.store_name || shopify.store_domain,
+          status: "connected",
+          connectedAt: shopify.created_at,
+          meta: shopify.store_domain,
         })
       }
 
@@ -78,13 +130,32 @@ export default function IntegrationsPage() {
   const handleConnect = (platform: string) => {
     if (platform === "pinterest") {
       window.location.href = "/api/auth/pinterest"
-    } else {
-      toast.info(`${platform} integration coming soon!`)
+    } else if (platform === "etsy") {
+      window.location.href = "/api/auth/etsy"
+    } else if (platform === "shopify") {
+      setShowShopifyModal(true)
     }
   }
 
+  const handleShopifyConnect = () => {
+    if (!shopifyDomain.trim()) {
+      toast.error("Please enter your Shopify store domain")
+      return
+    }
+    setConnecting(true)
+    // Redirect to our OAuth initiation route with the shop domain
+    window.location.href = `/api/auth/shopify?shop=${encodeURIComponent(shopifyDomain.trim())}`
+  }
+
   const handleDisconnect = async (platform: string, id: string) => {
-    const table = platform === "pinterest" ? "pinterest_connections" : "etsy_connections"
+    const tableMap: Record<string, string> = {
+      pinterest: "pinterest_connections",
+      shopify: "shopify_connections",
+      etsy: "etsy_connections",
+    }
+    const table = tableMap[platform]
+    if (!table) return
+
     const { error } = await supabase.from(table).delete().eq("id", id)
     if (error) {
       toast.error("Failed to disconnect")
@@ -224,6 +295,81 @@ export default function IntegrationsPage() {
           })}
         </div>
       </GlobalCard>
+
+      {/* Shopify Domain Modal */}
+      {showShopifyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl border border-stone-200 w-full max-w-md mx-4 overflow-hidden">
+            <div className="px-6 py-5 border-b border-stone-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-stone-50 border border-stone-100 flex items-center justify-center text-xl">
+                  🛍️
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-stone-900">Connect Shopify</h2>
+                  <p className="text-xs text-stone-500">Enter your Shopify store domain to get started</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-stone-700 mb-1.5">
+                  Store Domain
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                    <input
+                      type="text"
+                      value={shopifyDomain}
+                      onChange={(e) => setShopifyDomain(e.target.value)}
+                      placeholder="your-store"
+                      className="w-full pl-9 pr-36 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                      onKeyDown={(e) => e.key === "Enter" && handleShopifyConnect()}
+                      autoFocus
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-stone-400 font-medium pointer-events-none">
+                      .myshopify.com
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-stone-400 mt-1.5">
+                  Find this in your Shopify Admin → Settings → Domains
+                </p>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-stone-50 border-t border-stone-100 flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 text-sm"
+                onClick={() => { setShowShopifyModal(false); setShopifyDomain("") }}
+                disabled={connecting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="h-9 text-sm bg-stone-900 text-white hover:bg-stone-800"
+                onClick={handleShopifyConnect}
+                disabled={connecting || !shopifyDomain.trim()}
+              >
+                {connecting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  "Connect Store"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
