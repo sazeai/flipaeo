@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         // 2. Fetch the Shopify connection
         const { data: connection, error: connectionError } = await supabase
             .from("shopify_connections")
-            .select("id, store_domain, access_token, blog_id, store_name")
+            .select("id, store_domain, access_token, store_name")
             .eq("id", connectionId)
             .eq("user_id", user.id)
             .single()
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 storeDomain: connection.store_domain,
                 accessToken: connection.access_token,
             },
-            connection.blog_id,
+            "", // Legacy: blog_id removed in PinLoop pivot
             {
                 title: article.outline?.title || 'Untitled',
                 content: processedContent,

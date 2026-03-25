@@ -7,8 +7,6 @@ interface ShopifyConnection {
     id: string
     store_name: string
     store_domain: string
-    blog_id: string
-    blog_title: string | null
     is_default: boolean
     created_at: string
 }
@@ -26,7 +24,7 @@ export async function getShopifyConnections(): Promise<{
 
     const { data, error } = await supabase
         .from("shopify_connections")
-        .select("id, store_name, store_domain, blog_id, blog_title, is_default, created_at")
+        .select("id, store_name, store_domain, is_default, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
 
@@ -80,8 +78,6 @@ export async function addShopifyConnection(params: {
     storeDomain: string
     accessToken: string
     storeName: string
-    blogId: string
-    blogTitle: string
 }): Promise<{ success: boolean; connectionId?: string; error?: string }> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -118,8 +114,6 @@ export async function addShopifyConnection(params: {
             store_name: params.storeName,
             store_domain: params.storeDomain,
             access_token: params.accessToken,
-            blog_id: params.blogId,
-            blog_title: params.blogTitle,
             is_default: isFirst,
         })
         .select()

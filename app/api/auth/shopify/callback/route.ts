@@ -70,7 +70,6 @@ export async function GET(req: NextRequest) {
         store_name: shopInfo.name,
         store_domain: shopInfo.myshopify_domain,
         access_token: tokens.access_token,
-        blog_id: "", // Legacy field, not used by PinLoop
         is_default: true,
         updated_at: new Date().toISOString(),
       }, {
