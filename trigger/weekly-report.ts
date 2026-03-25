@@ -51,6 +51,12 @@ export const weeklyReport = schedules.task({
           .eq("user_id", brand.user_id)
           .gte("created_at", weekAgo)
 
+        const { count: pendingApproval } = await supabase
+          .from("pins")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", brand.user_id)
+          .eq("status", "pending_approval")
+
         const { count: pinsPublished } = await supabase
           .from("pins")
           .select("id", { count: "exact", head: true })
@@ -102,6 +108,7 @@ export const weeklyReport = schedules.task({
           brandName: brand.brand_name,
           pinsGenerated: pinsGenerated || 0,
           pinsPublished: pinsPublished || 0,
+          pendingApproval: pendingApproval || 0,
           totalClicks,
           totalImpressions,
           totalSaves,
@@ -141,6 +148,7 @@ function buildReportEmail(data: {
   brandName: string
   pinsGenerated: number
   pinsPublished: number
+  pendingApproval: number
   totalClicks: number
   totalImpressions: number
   totalSaves: number
@@ -226,7 +234,7 @@ function buildReportEmail(data: {
 
     <!-- Footer -->
     <p style="color: #a8a29e; font-size: 12px; text-align: center; margin-top: 32px;">
-      Your PinLoop engine is running autonomously.<br>
+      Your PinLoop engine is working for you.${data.pendingApproval && data.pendingApproval > 0 ? `<br>You have <strong>${data.pendingApproval} pins</strong> awaiting your approval.` : ''}<br>
       Log in to your dashboard anytime to fine-tune your settings.
     </p>
 

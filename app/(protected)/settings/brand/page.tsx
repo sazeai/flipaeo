@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Save, Loader2 } from 'lucide-react'
+import { Save, Loader2, PauseCircle, PlayCircle } from 'lucide-react'
 
 const FONT_OPTIONS = [
   'Playfair Display',
@@ -37,6 +37,7 @@ interface BrandSettingsData {
   logo_url: string
   font_choice: string
   aesthetic_boundaries: string[]
+  automation_paused: boolean
 }
 
 export default function BrandSettingsPage() {
@@ -51,6 +52,7 @@ export default function BrandSettingsPage() {
     logo_url: '',
     font_choice: 'Playfair Display',
     aesthetic_boundaries: [],
+    automation_paused: false,
   })
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export default function BrandSettingsPage() {
           logo_url: data.logo_url || '',
           font_choice: data.font_choice || 'Playfair Display',
           aesthetic_boundaries: (data.aesthetic_boundaries as string[]) || [],
+          automation_paused: data.automation_paused || false,
         })
       }
       setLoading(false)
@@ -107,6 +110,7 @@ export default function BrandSettingsPage() {
       logo_url: form.logo_url,
       font_choice: form.font_choice,
       aesthetic_boundaries: form.aesthetic_boundaries,
+      automation_paused: form.automation_paused,
     }
 
     if (settingsId) {
@@ -138,6 +142,44 @@ export default function BrandSettingsPage() {
         <p className="text-muted-foreground text-sm mt-1">
           Configure your brand identity. This controls how your pins look and feel.
         </p>
+      </div>
+
+      {/* Automation Control */}
+      <div className={`rounded-2xl border-2 p-5 transition-colors ${
+        form.automation_paused
+          ? 'border-amber-300 bg-amber-50/50'
+          : 'border-emerald-200 bg-emerald-50/30'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {form.automation_paused ? (
+              <PauseCircle className="w-6 h-6 text-amber-600" />
+            ) : (
+              <PlayCircle className="w-6 h-6 text-emerald-600" />
+            )}
+            <div>
+              <h3 className="font-semibold text-sm">
+                {form.automation_paused ? 'Automation Paused' : 'Automation Active'}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {form.automation_paused
+                  ? 'All AI generation and publishing is paused. Your account is in sleep mode.'
+                  : 'Your PinLoop engine is generating and queuing pins for approval.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm(p => ({ ...p, automation_paused: !p.automation_paused }))}
+            className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+              form.automation_paused ? 'bg-amber-400' : 'bg-emerald-500'
+            }`}
+          >
+            <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+              form.automation_paused ? 'translate-x-1' : 'translate-x-6'
+            }`} />
+          </button>
+        </div>
       </div>
 
       {/* Form */}

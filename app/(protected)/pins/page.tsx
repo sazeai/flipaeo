@@ -64,8 +64,10 @@ export default function PinsPage() {
   const statusStyles: Record<string, string> = {
     generating: 'bg-amber-100 text-amber-700',
     rendered: 'bg-blue-100 text-blue-700',
+    pending_approval: 'bg-orange-100 text-orange-700',
     queued: 'bg-brand-100 text-brand-700',
     published: 'bg-emerald-100 text-emerald-700',
+    rejected: 'bg-red-100/60 text-red-600',
     failed: 'bg-red-100 text-red-700',
   }
 
@@ -94,7 +96,7 @@ export default function PinsPage() {
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">
-        {['all', 'generating', 'rendered', 'queued', 'published', 'failed'].map(f => (
+        {['all', 'pending_approval', 'generating', 'rendered', 'queued', 'published', 'rejected', 'failed'].map(f => (
           <button
             key={f}
             onClick={() => { setLoading(true); setFilter(f) }}

@@ -43,6 +43,8 @@ Progressive trust escalation over time:
 - Can be reverted at any time
 - Autopilot still logs everything for the user to review retroactively
 
+## But we need a universal automation button which will compeltly pause evertyhign and acount goes to sleep mode. no trigger, no automation we will have to plan this in way that user dont confuses in these two type of automations.
+
 ---
 
 ## 📦 Content Volume: The Context Matrix
@@ -54,7 +56,7 @@ Progressive trust escalation over time:
 ### Feature 4: Context Matrix Generator
 
 For each product, the AI generates pins across a **matrix of:**
-- **Aesthetics** (Minimalist, Dark Academia, Scandi, Cottagecore, Streetwear...)
+- **Aesthetics** (Minimalist, Dark Academia, Scandi, Cottagecore, Streetwear...)- these shouldnt be hard coded other wise the system wont work for different type of product,,,becuase we dont know who will be our users and what their products will be. something like we can use AI to generate these aesthetics based on the product type. adn same for the seasons.
 - **Seasons** (Spring Collection, Holiday Gift Guide, Back to School...)
 - **Long-tail keywords** (from Pinterest Trends API — see Feature 8)
 
@@ -69,8 +71,7 @@ Example for "Black Leather Tote Bag":
 Prevent the AI from generating identical pins across weeks.
 
 - **Database state tracking:** Every generated pin logs `sku_id` + `aesthetic_tag` + `template_id` + `target_keyword`
-- **Exclusion injection:** Before generating, query previous pins for that SKU and inject into the prompt:
-  > _"Do NOT use these aesthetics: [Scandi, Dark Academia]. Do NOT target these keywords: [Minimalist Desk]. Choose a completely new visual environment."_
+- **Exclusion injection:** Before generating, query previous pins for that SKU (we will ahve to use gemini embeddings for this for semantic similarity , we cant inject whole prompt data of previous month at once. we can't  inject all data at once to ai model. so we will have to use gemini embeddings for this for semantic similarity)
 - Guarantees **programmatic uniqueness** without relying on AI memory
 
 ---
@@ -79,13 +80,13 @@ Prevent the AI from generating identical pins across weeks.
 
 ### Feature 6: Fair Use Rejection Cap
 
-**Don't** deduct rejected pins from the user's 100-pin quota.
+**Don't** deduct rejected pins from the user's 100-pin/300 pin(subscribed plan) quota.
 
-- COGS per pin: ~$0.05 (fal.ai ~$0.03 + LLM ~$0.001 + Satori $0.00)
-- 100 pins = $5.00 base cost → **96% gross margin** at $99/mo
-- Set a **150-generation hard cap** per billing cycle (100 published + 50 redraws)
+- COGS per pin: ~$0.05 (gemini ~$0.08 + LLM ~$0.001 + Satori $0.00)
+- 100 pins = $8.00 base cost → **96% gross margin** at $99/mo
+- Set a **150-generation hard cap** per billing cycle(which will be 12$) (100 published + 50 redraws)
 - If cap is hit: pause generation and prompt user to update Brand Settings (AI is misaligned)
-- Maximum loss per user per month: ~$7.50
+- Maximum loss per user per month: ~$12.00
 
 ### Feature 7: Asset Vault Billing Model
 

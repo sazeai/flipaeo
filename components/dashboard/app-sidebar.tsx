@@ -9,6 +9,7 @@ import {
   ImageIcon,
   Palette,
   Plug,
+  CheckCircle,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -94,6 +95,11 @@ export function AppSidebar({
       isActive: true,
     },
     {
+      title: "Approval",
+      url: "/approval",
+      icon: CheckCircle,
+    },
+    {
       title: "Products",
       url: "/products",
       icon: ShoppingBag,
@@ -108,7 +114,11 @@ export function AppSidebar({
       url: "/settings/brand",
       icon: Palette,
     },
-
+    {
+      title: "Integrations",
+      url: "/integrations",
+      icon: Plug,
+    },
   ], [])
 
   return (

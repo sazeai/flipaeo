@@ -41,6 +41,18 @@ export const publishPins = schedules.task({
       try {
         const { user_id, warmup_phase, trust_score } = connection
 
+        // Check if user has paused automation
+        const { data: brandCheck } = await supabase
+          .from("brand_settings")
+          .select("automation_paused")
+          .eq("user_id", user_id)
+          .maybeSingle()
+
+        if (brandCheck?.automation_paused) {
+          logger.info(`User ${user_id}: automation paused, skipping publish`)
+          continue
+        }
+
         // Determine max pins per batch based on warmup phase
         let maxPinsPerBatch: number
         switch (warmup_phase) {

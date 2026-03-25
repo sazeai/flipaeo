@@ -28,7 +28,7 @@ export const generatePinBatch = schedules.task({
     // Get all users with brand settings (they've completed onboarding)
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries")
+      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No users with brand settings found")
@@ -39,6 +39,12 @@ export const generatePinBatch = schedules.task({
 
     for (const brand of brands) {
       try {
+        // Skip users who have paused automation
+        if (brand.automation_paused) {
+          logger.info(`User ${brand.user_id}: automation paused, skipping generation`)
+          continue
+        }
+
         logger.info(`Processing brand: ${brand.brand_name} (user: ${brand.user_id})`)
 
         // Check if user has a subscription (basic entitlement check)
@@ -171,20 +177,14 @@ Return ONLY the description text, nothing else.`
                 rendered_image_url: renderedImageUrl,
                 rendered_image_r2_key: renderedR2Key,
                 pin_description: pinDescription,
-                status: "rendered",
+                status: "pending_approval",
               })
               .eq("id", pinId)
 
-            // Step 6: Add to pin queue
-            await supabase.from("pin_queue").insert({
-              user_id: brand.user_id,
-              pin_id: pinId,
-              priority: 0,
-              status: "pending",
-            })
+            // Pin now waits for user approval before entering publish queue
 
             totalGenerated++
-            logger.info(`✅ Pin generated + queued: ${pinId} for "${product.title}"`)
+            logger.info(`✅ Pin generated → pending approval: ${pinId} for "${product.title}"`)
 
           } catch (productError: any) {
             logger.error(`Error generating pin for ${product.title}: ${productError.message}`)
