@@ -34,7 +34,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. Introduction</h2>
               <p>
                 Welcome to <strong>PinLoop AI</strong> ("we," "our," "us"). By accessing or using our website at
-                <a href="https://flipaeo.com" className="text-indigo-600"> https://flipaeo.com</a>
+                <a href="https://flipaeo.vercel.app" className="text-indigo-600"> PinLoop</a>
                 ("Site"), you agree to comply with and be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Site.
               </p>
             </div>
@@ -59,7 +59,7 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Subscription and Billing</h2>
               <p>
                 <strong>PinLoop AI</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated pins per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
-                <a href="https://flipaeo.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
+                <a href="https://flipaeo.vercel.app/refund-policy" className="text-indigo-600"> Refund Policy</a>.
               </p>
             </div>
 
@@ -70,15 +70,7 @@ export default function TermsOfService() {
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Data Retention and Deletion</h2>
-              <p>
-                We value your privacy. Brand settings and product catalogs are stored to improve your experience. Generated pins are retained for tracking and publishing. Users may request the deletion of their data at any time by contacting us at
-                <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
-                For more information, please review our
-                <a href="https://flipaeo.com/privacy-policy" className="text-indigo-600"> Privacy Policy</a>.
-              </p>
-            </div>
+
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Third-Party Services</h2>
@@ -102,13 +94,7 @@ export default function TermsOfService() {
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">10. Contact Us</h2>
-              <p>
-                If you have any questions about these Terms, please contact us at
-                <a href="mailto:support@flipaeo.com" className="text-indigo-600"> support@flipaeo.com</a>.
-              </p>
-            </div>
+
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Digital Delivery</h2>

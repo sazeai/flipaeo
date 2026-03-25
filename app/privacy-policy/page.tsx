@@ -34,16 +34,7 @@ export default function PrivacyPolicy() {
           <div className="space-y-8 ">
             <div className="">
               <p>
-                At <strong>PinLoop AI</strong>, accessible from{' '}
-                <a
-                  href="https://flipaeo.com"
-                  className="text-blue-500 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://flipaeo.com
-                </a>
-                , we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, how we process user data, and your rights under <strong>applicable privacy laws, including the General Data Protection Regulation (GDPR)</strong>. By using our services, you agree to the practices described in this Privacy Policy.
+                At <strong>PinLoop AI</strong>, we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, how we process user data, and your rights under <strong>applicable privacy laws, including the General Data Protection Regulation (GDPR)</strong>. By using our services, you agree to the practices described in this Privacy Policy.
               </p>
             </div>
 
@@ -105,12 +96,7 @@ export default function PrivacyPolicy() {
                 <li>🔹 <strong>Right to Object:</strong> Stop processing for marketing purposes.</li>
                 <li>🔹 <strong>Right to Withdraw Consent:</strong> If data processing is based on consent, you can withdraw it at any time.</li>
               </ul>
-              <p className="mt-4">
-                📩 <strong>To exercise your rights, contact us at:</strong>{' '}
-                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
-                  support@flipaeo.com
-                </a>. We will respond within <strong>14 days</strong> as per GDPR guidelines.
-              </p>
+
             </div>
 
             <div className="">
@@ -172,10 +158,7 @@ export default function PrivacyPolicy() {
               </ul>
               <h3 className="text-lg font-semibold mb-2">8.2 Managing Cookies</h3>
               <p className="mb-4">
-                You can control or disable cookies through your browser settings. However, disabling authentication cookies may log you out or limit certain features. For any questions regarding our use of cookies, contact us at{' '}
-                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
-                  support@flipaeo.com
-                </a>.
+                You can control or disable cookies through your browser settings. However, disabling authentication cookies may log you out or limit certain features.
               </p>
             </div>
 
@@ -198,22 +181,7 @@ export default function PrivacyPolicy() {
               </p>
             </div>
 
-            <div className="">
-              <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Contact Information</h2>
-              <p>
-                For any questions or privacy-related concerns, contact us:
-                <br />
-                📧 <strong>Email:</strong>{' '}
-                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">
-                  support@flipaeo.com
-                </a>
-                <br />
-                🌍 <strong>Website:</strong>{' '}
-                <a href="https://flipaeo.com" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
-                  https://flipaeo.com
-                </a>
-              </p>
-            </div>
+
           </div>
         </section>
       </main>
