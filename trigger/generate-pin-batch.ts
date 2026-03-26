@@ -330,7 +330,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
 
             // Step 4: Upload rendered image to R2
             const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
-            const renderedR2Key = `pin-images/${brand.user_id}/${pinId}-final.webp`
+            const renderedR2Key = `pin-images/${brand.user_id}/${pinId}-final.png`
             await putR2Object(renderedR2Key, renderedBuffer, "image/png")
 
             const renderedImageUrl = r2Domain ? `${r2Domain}/${renderedR2Key}` : renderedR2Key
