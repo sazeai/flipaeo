@@ -122,13 +122,13 @@ export const generatePinBatch = schedules.task({
           continue
         }
 
-        // Get products that need pins (active products with fewer than 10 pins)
+        // Get products that need pins (active products that have an image)
         const { data: products } = await supabase
           .from("products")
-          .select("id, title, image_r2_key")
+          .select("id, title, image_r2_key, image_url")
           .eq("user_id", brand.user_id)
           .eq("is_active", true)
-          .not("image_r2_key", "is", null)
+          .not("image_url", "is", null)
 
         if (!products || products.length === 0) {
           logger.info(`No products with images for user ${brand.user_id}`)
@@ -173,7 +173,12 @@ export const generatePinBatch = schedules.task({
 
             // Step 1: Call Gemini Art Director & Fal.ai Inline
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
-            const sourceImageUrl = r2Domain && product.image_r2_key ? `${r2Domain}/${product.image_r2_key}` : ""
+            const sourceImageUrl = product.image_url || (r2Domain && product.image_r2_key ? `${r2Domain}/${product.image_r2_key}` : "")
+            
+            if (!sourceImageUrl) {
+              logger.error(`Skipping product ${product.title} because no valid image URL could be resolved`)
+              continue
+            }
             
             const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director.
 Product: "${product.title}"
@@ -374,16 +379,12 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
           // Step 2: Fal.ai Generation
           logger.info(`Starting fal.ai Mood Board generation for ${brand.brand_name}...`)
-          const mbResult: any = await fal.subscribe("fal-ai/nano-banana-2/edit", {
+          const mbResult: any = await fal.subscribe("fal-ai/flux/dev", {
             input: {
               prompt: mbPrompt,
               num_images: 1,
-              aspect_ratio: "2:3",
+              image_size: { width: 1000, height: 1500 },
               output_format: "png",
-              safety_tolerance: "4",
-              resolution: "1K",
-              limit_generations: true,
-              thinking_level: "minimal"
             },
           })
 
