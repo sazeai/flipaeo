@@ -203,7 +203,14 @@ export default function BrandSettingsPage() {
             </div>
             <button
               type="button"
-              onClick={() => setForm(p => ({ ...p, automation_paused: !p.automation_paused }))}
+              onClick={async () => {
+                const newValue = !form.automation_paused
+                setForm(p => ({ ...p, automation_paused: newValue }))
+                if (settingsId) {
+                  const supabase = createClient()
+                  await supabase.from('brand_settings').update({ automation_paused: newValue }).eq('id', settingsId)
+                }
+              }}
               className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
                 form.automation_paused ? 'bg-red-400' : 'bg-emerald-500'
               }`}
@@ -242,7 +249,14 @@ export default function BrandSettingsPage() {
             <button
               type="button"
               disabled={approvedPinsCount < 50}
-              onClick={() => setForm(p => ({ ...p, autopilot_enabled: !p.autopilot_enabled }))}
+              onClick={async () => {
+                const newValue = !form.autopilot_enabled
+                setForm(p => ({ ...p, autopilot_enabled: newValue }))
+                if (settingsId) {
+                  const supabase = createClient()
+                  await supabase.from('brand_settings').update({ autopilot_enabled: newValue }).eq('id', settingsId)
+                }
+              }}
               className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed ${
                 form.autopilot_enabled ? 'bg-indigo-500' : 'bg-neutral-300'
               }`}
