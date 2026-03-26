@@ -263,6 +263,12 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
             const rawImageUrl = r2Domain ? `${r2Domain}/${rawR2Key}` : rawR2Key
 
+            // Save the raw image to DB immediately so it's not lost on render failure
+            await supabase.from("pins").update({
+              generated_image_url: rawImageUrl,
+              generated_image_r2_key: rawR2Key
+            }).eq("id", pinId)
+
             // Step 2: Generate premium Pinterest SEO copy (title + description) — ALL modes
             // The metadata is now the PRIMARY driver of discovery for organic pins.
             const copyRes = await ai.models.generateContent({
@@ -300,21 +306,20 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               logger.warn(`SEO copy parse failed for ${product.title}, using Art Director title`)
             }
 
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000'
+            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
             const layoutMode = brand.pin_layout_mode || 'organic'
-            const renderRes = await fetch(`${appUrl}/api/render-pin`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                imageUrl: rawImageUrl,
-                title: genTitle,
-                templateId: genTemplateId,
-                fontChoice: brand.font_choice || "Playfair Display",
-                storeUrl: brand.store_url || "",
-                pinId,
-                layoutMode,
-              }),
+            
+            const renderParams = new URLSearchParams({
+              imageUrl: rawImageUrl,
+              title: genTitle,
+              templateId: genTemplateId,
+              fontChoice: brand.font_choice || "Playfair Display",
+              storeUrl: brand.store_url || "",
+              pinId,
+              layoutMode,
             })
+            
+            const renderRes = await fetch(`${appUrl}/api/render-pin?${renderParams.toString()}`)
 
             if (!renderRes.ok) {
               const errText = await renderRes.text().catch(() => "Unable to read error text")
@@ -430,28 +435,26 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
           })
           const mbDescription = copyRes.text?.trim() || `Discover ${mbTitle}`
 
-          // Step 4: Render Pin
-          const renderRes = await fetch(`${appUrl}/api/render-pin`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              imageUrl: mbRawImageUrl,
-              title: mbTitle,
-              templateId: mbTemplateId,
-              fontChoice: brand.font_choice || "Playfair Display",
-              storeUrl: brand.store_url || "",
-              pinId: mbPinId,
-              layoutMode: "editorial", // Usually moodboards have text
-            }),
+          // Step 4: Render Mood Board with Template
+          const mbRenderParams = new URLSearchParams({
+            imageUrl: mbRawImageUrl,
+            title: mbTitle,
+            templateId: mbTemplateId,
+            fontChoice: brand.font_choice || "Playfair Display",
+            storeUrl: brand.store_url || "",
+            pinId: mbPinId,
+            layoutMode: brand.pin_layout_mode || 'organic',
           })
+          
+          const mbRenderRes = await fetch(`${appUrl.replace(/\/$/, '')}/api/render-pin?${mbRenderParams.toString()}`)
 
-          if (!renderRes.ok) {
+          if (!mbRenderRes.ok) {
             await supabase.from("pins").update({ status: "failed", error_message: "Render failed" }).eq("id", mbPinId)
             throw new Error(`Render failed for mb pin ${mbPinId}`)
           }
 
           // Step 5: Save Rendered to R2 & Update DB
-          const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
+          const renderedBuffer = Buffer.from(await mbRenderRes.arrayBuffer())
           const renderedR2Key = `pin-images/${brand.user_id}/${mbPinId}-final.png`
           await putR2Object(renderedR2Key, renderedBuffer, "image/png")
           const renderedImageUrl = r2DomainMb ? `${r2DomainMb}/${renderedR2Key}` : renderedR2Key

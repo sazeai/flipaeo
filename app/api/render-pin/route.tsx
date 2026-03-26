@@ -15,13 +15,19 @@ const FONT_URLS: Record<string, string> = {
   'DM Sans': 'https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAkpFhR0i2Gw.ttf',
 };
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { imageUrl, title, templateId, fontChoice, storeUrl, pinId, layoutMode } = body;
+    const { searchParams } = new URL(req.url);
+    const imageUrl = searchParams.get('imageUrl');
+    const title = searchParams.get('title');
+    const templateId = searchParams.get('templateId');
+    const fontChoice = searchParams.get('fontChoice');
+    const storeUrl = searchParams.get('storeUrl');
+    const pinId = searchParams.get('pinId');
+    const layoutMode = searchParams.get('layoutMode');
 
     if (!imageUrl) {
-      return new Response('Missing imageUrl in request body', { status: 400 });
+      return new Response('Missing imageUrl in search params', { status: 400 });
     }
 
     const displayTitle = title || 'Aesthetic Collection';
