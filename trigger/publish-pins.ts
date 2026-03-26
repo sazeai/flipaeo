@@ -41,10 +41,10 @@ export const publishPins = schedules.task({
       try {
         const { user_id, warmup_phase, trust_score } = connection
 
-        // Check if user has paused automation
+        // Check brand settings and account age for Entropy calculations
         const { data: brandCheck } = await supabase
           .from("brand_settings")
-          .select("automation_paused")
+          .select("automation_paused, created_at, account_age_type, is_account_warmed_up")
           .eq("user_id", user_id)
           .maybeSingle()
 
@@ -53,26 +53,51 @@ export const publishPins = schedules.task({
           continue
         }
 
-        // Determine max pins per batch based on warmup phase
-        let maxPinsPerBatch: number
-        switch (warmup_phase) {
-          case "warmup_no_url":
-            logger.info(`User ${user_id}: warmup_no_url phase — skipping URL pin publishing`)
-            continue // Don't publish URL pins during warmup
-          case "warmup_partial":
-            maxPinsPerBatch = 1 // Very conservative
-            break
-          case "full":
-            maxPinsPerBatch = 4 // ~16/day across 4 batches
-            break
-          default:
-            maxPinsPerBatch = 1
+        // -------------------------------------------------------------
+        // The Human Entropy Publisher Logic
+        // -------------------------------------------------------------
+        
+        // 1. Calculate Account Age
+        const createdAt = brandCheck.created_at ? new Date(brandCheck.created_at) : new Date()
+        const daysSinceSignup = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+        const weekIndex = Math.floor(daysSinceSignup / 7)
+        
+        let powIdx = weekIndex % 4
+        let wrmIdx = Math.min(weekIndex, 3)
+
+        // Map UTC Day of Week (0 = Monday, 6 = Sunday for our arrays)
+        const dayOfWeek = new Date().getUTCDay()
+        const dow = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+
+        const warmupMatrices: Record<number, number[]> = {
+          0: [1, 0, 1, 0, 2, 0, 1], // ~5 pins/wk
+          1: [2, 0, 1, 3, 0, 2, 2], // ~10 pins/wk
+          2: [1, 3, 2, 0, 4, 2, 3], // ~15 pins/wk
+          3: [2, 2, 3, 2, 3, 2, 4], // ~18 pins/wk
         }
 
-        // Check daily pin count
-        const todayStart = new Date()
-        todayStart.setHours(0, 0, 0, 0)
+        const powerMatrices: Record<number, number[]> = {
+          0: [1, 3, 2, 4, 3, 6, 5], // A: Heavy Weekend
+          1: [4, 5, 2, 6, 1, 3, 2], // B: Mid-Week Spike
+          2: [3, 2, 4, 3, 4, 2, 5], // C: Consistent Wave
+          3: [2, 1, 1, 7, 5, 4, 5], // D: Viral Push
+        }
 
+        let isWarmedUp = brandCheck.is_account_warmed_up
+        if (!isWarmedUp && brandCheck.account_age_type === 'established') isWarmedUp = true
+        if (!isWarmedUp && daysSinceSignup >= 30) isWarmedUp = true
+
+        const targetToday = isWarmedUp ? powerMatrices[powIdx][dow] : warmupMatrices[wrmIdx][dow]
+
+        if (targetToday === 0) {
+          logger.info(`User ${user_id}: Human Entropy matrix targeted 0 pins today. Resting.`)
+          continue
+        }
+
+        // Count pins already published today
+        const todayStart = new Date()
+        todayStart.setUTCHours(0, 0, 0, 0)
+        
         const { count: pinsToday } = await supabase
           .from("pins")
           .select("id", { count: "exact", head: true })
@@ -80,14 +105,30 @@ export const publishPins = schedules.task({
           .gte("published_at", todayStart.toISOString())
           .eq("status", "published")
 
-        const dailyLimit = warmup_phase === "full" ? 15 : 2
-        if ((pinsToday || 0) >= dailyLimit) {
-          logger.info(`User ${user_id}: daily limit reached (${pinsToday}/${dailyLimit})`)
+        const published = pinsToday || 0
+
+        if (published >= targetToday) {
+          logger.info(`User ${user_id}: daily matrix limit reached (${published}/${targetToday})`)
           continue
         }
 
-        const remainingToday = dailyLimit - (pinsToday || 0)
-        const batchSize = Math.min(maxPinsPerBatch, remainingToday)
+        // Intra-Day Jitter (Clock Slicing)
+        // Divide 24 hours into 'targetToday' equal chunks.
+        // We only publish the NEXT pin if the current hour is inside or past its chunk.
+        const chunkDurationHours = 24 / targetToday
+        const currentHour = new Date().getUTCHours()
+        const requiredHour = published * chunkDurationHours
+        
+        if (currentHour < requiredHour) {
+          logger.info(`User ${user_id}: Jitter chunk not reached (hour ${currentHour} < ${requiredHour.toFixed(1)})`)
+          continue
+        }
+
+        // -------------------------------------------------------------
+
+        const remainingToday = targetToday - published
+        // We only ever publish 1 per Cron execution to enforce the natural jitter gaps
+        const batchSize = 1
 
         // Get valid access token (auto-refreshes if needed)
         const accessToken = await getValidAccessToken(user_id)

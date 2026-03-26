@@ -108,7 +108,19 @@ export const generatePinBatch = schedules.task({
           continue
         }
 
-        // Get products that need pins (active products with fewer than 5 pins)
+        // Check pending approval cap (> 50 pins waiting = skip generation)
+        const { count: pendingCount } = await supabase
+          .from("pins")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", brand.user_id)
+          .eq("status", "pending_approval")
+
+        if ((pendingCount || 0) >= 50) {
+          logger.info(`User ${brand.user_id} has >= 50 pins pending approval. Skipping generation to save API costs.`)
+          continue
+        }
+
+        // Get products that need pins (active products with fewer than 10 pins)
         const { data: products } = await supabase
           .from("products")
           .select("id, title, image_r2_key")
