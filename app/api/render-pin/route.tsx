@@ -18,22 +18,53 @@ const FONT_URLS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { imageUrl, title, templateId, fontChoice, storeUrl, pinId } = body;
+    const { imageUrl, title, templateId, fontChoice, storeUrl, pinId, layoutMode } = body;
 
     if (!imageUrl) {
       return new Response('Missing imageUrl in request body', { status: 400 });
     }
 
     const displayTitle = title || 'Aesthetic Collection';
-    const activeTemplate = templateId || 'template-1';
+    // If brand is in 'organic' layout mode, always force template-5 regardless of AI choice
+    const activeTemplate = layoutMode === 'organic' ? 'template-5' : (templateId || 'template-1');
     const fontName = fontChoice || 'Playfair Display';
-    const displayStoreUrl = storeUrl ? new URL(storeUrl).hostname.replace('www.', '') : 'shop.link';
+    const displayStoreUrl = storeUrl ? new URL(storeUrl).hostname.replace('www.', '') : '';
 
-    // Load the requested font
+    // ─────────────────────────────────────────────────
+    // Template 5: Pure Aesthetic (Zero-Text Mode)
+    // Raw lifestyle image. No gradient. No title. No CTA badge.
+    // Only a barely-visible watermark for brand safety.
+    // ─────────────────────────────────────────────────
+    if (activeTemplate === 'template-5') {
+      return new ImageResponse(
+        (
+          <div tw="flex w-full h-full relative">
+            <img
+              src={imageUrl}
+              tw="absolute inset-0 w-full h-full"
+              style={{ objectFit: 'cover' }}
+              alt="Lifestyle"
+            />
+            {/* Micro-watermark: barely visible, bottom-left. Copyright + brand safety only. */}
+            {displayStoreUrl && (
+              <div
+                tw="absolute bottom-8 left-8 text-white text-lg"
+                style={{ opacity: 0.3, letterSpacing: '0.08em', fontFamily: 'sans-serif' }}
+              >
+                {displayStoreUrl}
+              </div>
+            )}
+          </div>
+        ),
+        { width: 1000, height: 1500 }
+      );
+    }
+
+    // Load the requested font (only needed for templates with text)
     const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
     const fontData = await fetch(new URL(fontUrl)).then((res) => res.arrayBuffer());
 
-    const fontSize = 64; 
+    const fontSize = 64;
 
     let gradientOverlay;
     let textContainer;

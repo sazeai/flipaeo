@@ -40,6 +40,7 @@ interface BrandSettingsData {
   automation_paused: boolean
   autopilot_enabled: boolean
   account_age_type: 'brand_new' | 'established' | ''
+  pin_layout_mode: 'organic' | 'editorial'
 }
 
 export default function BrandSettingsPage() {
@@ -57,6 +58,7 @@ export default function BrandSettingsPage() {
     automation_paused: false,
     autopilot_enabled: false,
     account_age_type: '',
+    pin_layout_mode: 'organic',
   })
   const [approvedPinsCount, setApprovedPinsCount] = useState(0)
 
@@ -84,6 +86,7 @@ export default function BrandSettingsPage() {
           automation_paused: data.automation_paused || false,
           autopilot_enabled: data.autopilot_enabled || false,
           account_age_type: data.account_age_type || '',
+          pin_layout_mode: (data.pin_layout_mode as 'organic' | 'editorial') || 'organic',
         })
       }
 
@@ -130,6 +133,7 @@ export default function BrandSettingsPage() {
       automation_paused: form.automation_paused,
       autopilot_enabled: form.autopilot_enabled,
       account_age_type: form.account_age_type,
+      pin_layout_mode: form.pin_layout_mode,
     }
 
     if (settingsId) {
@@ -307,6 +311,50 @@ export default function BrandSettingsPage() {
           </button>
         </div>
       )}
+
+      {/* Pin Style Mode (Zero-Text Pivot) */}
+      <div className="space-y-3">
+        <div>
+          <h3 className="text-sm font-semibold">Pin Style</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">How your pins appear in the Pinterest feed.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setForm(p => ({ ...p, pin_layout_mode: 'organic' }))}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              form.pin_layout_mode === 'organic'
+                ? 'border-neutral-900 bg-neutral-50'
+                : 'border-neutral-200 bg-white hover:border-neutral-400'
+            }`}
+          >
+            <div className="font-semibold text-sm mb-1">🌿 Organic Lifestyle</div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Pure image. Zero text overlay. Blends into the feed like Target or Crate &amp; Barrel. <strong>Highest click-through rate.</strong>
+            </p>
+            {form.pin_layout_mode === 'organic' && (
+              <span className="mt-2 inline-block text-[10px] font-semibold text-neutral-900 bg-neutral-200 px-2 py-0.5 rounded-full">ACTIVE</span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setForm(p => ({ ...p, pin_layout_mode: 'editorial' }))}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              form.pin_layout_mode === 'editorial'
+                ? 'border-neutral-900 bg-neutral-50'
+                : 'border-neutral-200 bg-white hover:border-neutral-400'
+            }`}
+          >
+            <div className="font-semibold text-sm mb-1">✏️ Editorial / Campaign</div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              AI selects a magazine-style text layout. Best for promotions, seasonal campaigns, or infographic content.
+            </p>
+            {form.pin_layout_mode === 'editorial' && (
+              <span className="mt-2 inline-block text-[10px] font-semibold text-neutral-900 bg-neutral-200 px-2 py-0.5 rounded-full">ACTIVE</span>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* Form */}
       <div className="space-y-6">

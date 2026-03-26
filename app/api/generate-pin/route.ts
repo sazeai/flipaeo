@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         // Fetch brand aesthetic boundaries
         const { data: brand } = await supabase
           .from('brand_settings')
-          .select('aesthetic_boundaries')
+          .select('aesthetic_boundaries, pin_layout_mode')
           .eq('id', brandSettingsId)
           .single();
 
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
             },
             templateId: { 
               type: Type.STRING, 
-              description: "template-1 (Top text) if negative space is at the top. template-2 (Center text) if negative space is in the center. template-3 (Bottom text) if negative space is at the bottom. template-4 (Frame) if negative space is around the edges." 
+              description: "template-1 (Top text) if negative space is at the top. template-2 (Center text) if negative space is in the center. template-3 (Bottom text) if negative space is at the bottom. template-4 (Frame) if negative space is around the edges. template-5 (Pure Aesthetic) — select this when the product image is so visually compelling that no text overlay is needed; best for luxury items, furniture, or fashion where the scene alone drives the click." 
             }
           },
           required: ["imagePrompt", "title", "templateId"]

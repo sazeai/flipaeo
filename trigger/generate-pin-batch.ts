@@ -59,7 +59,7 @@ export const generatePinBatch = schedules.task({
     // Get all users with brand settings
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused, autopilot_enabled, audience_profile")
+      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused, autopilot_enabled, audience_profile, pin_layout_mode")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No users with brand settings found")
@@ -184,25 +184,47 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
-            // Step 2: Generate Pinterest SEO copy
+            // Step 2: Generate premium Pinterest SEO copy (title + description) — ALL modes
+            // The metadata is now the PRIMARY driver of discovery for organic pins.
             const copyRes = await ai.models.generateContent({
               model: "gemini-2.5-flash",
               contents: [{
-                text: `Write a Pinterest SEO description for this pin.
-                
+                text: `You are a Pinterest SEO expert. Your copy is the PRIMARY driver of discovery and click-through. Make it world-class.
+
 Product: "${product.title}"
-Pin Title: "${genResult.title}"
+Lifestyle Angle: "${targetAngle}"
+Trending Keywords this week: ${globalTrends.slice(0, 5).join(', ')}
 
-Write a 150-300 character description optimized for Pinterest SEO. Include relevant keywords naturally. Do NOT use hashtags. Write in an inviting, editorial tone.
+Generate:
 
-Return ONLY the description text, nothing else.`
+1. PIN TITLE (max 100 chars): Keyword-first. Hook the searcher. Make it sound desirable. No hashtags. No ALL CAPS. No generic "Buy Now" language.
+   Good example: "Sunlit Nursery Aesthetic — Handmade Terrazzo Kids Chair"
+   Bad example: "Kids Chair For Sale"
+
+2. PIN DESCRIPTION (150-300 chars): Evocative, editorial copy. Weave the trend keyword in naturally. Paint the lifestyle. End with a soft discovery word (Explore, Discover, Shop the look). No hashtags.
+
+Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               }],
-              config: { temperature: 0.6 }
+              config: {
+                temperature: 0.7,
+                responseMimeType: "application/json",
+              }
             })
 
-            const pinDescription = copyRes.text?.trim() || `Discover ${product.title}`
+            let pinTitle = genResult.title
+            let pinDescription = `Discover ${product.title}`
+            try {
+              const seoData = JSON.parse(copyRes.text?.trim() || '{}')
+              if (seoData.seo_title) pinTitle = seoData.seo_title.slice(0, 100)
+              if (seoData.seo_description) pinDescription = seoData.seo_description.slice(0, 500)
+            } catch {
+              logger.warn(`SEO copy parse failed for ${product.title}, using Art Director title`)
+            }
 
-            // Step 3: Call render-pin API (text overlay + CTA badge)
+            // Step 3: Call render-pin API
+            // In 'organic' mode: layoutMode forces template-5 (pure image, no text)
+            // In 'editorial' mode: uses AI-selected template (1-5)
+            const layoutMode = brand.pin_layout_mode || 'organic'
             const renderRes = await fetch(`${appUrl}/api/render-pin`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -213,6 +235,7 @@ Return ONLY the description text, nothing else.`
                 fontChoice: brand.font_choice || "Playfair Display",
                 storeUrl: brand.store_url || "",
                 pinId,
+                layoutMode,
               }),
             })
 
@@ -230,12 +253,13 @@ Return ONLY the description text, nothing else.`
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
             const renderedImageUrl = r2Domain ? `${r2Domain}/${renderedR2Key}` : renderedR2Key
 
-            // Step 5: Update pin record with rendered image + description
+            // Step 5: Update pin record with rendered image, SEO title, and description
             await supabase
               .from("pins")
               .update({
                 rendered_image_url: renderedImageUrl,
                 rendered_image_r2_key: renderedR2Key,
+                pin_title: pinTitle,          // Override Art Director title with SEO-optimized title
                 pin_description: pinDescription,
                 status: brand.autopilot_enabled ? "queued" : "pending_approval",
               })
