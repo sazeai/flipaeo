@@ -52,8 +52,12 @@ Examples: "Minimalist Work Bag for Autumn Streetwear", "Cozy Cottagecore Mug for
 
     // 2. Generate text embedding for semantic comparison
     const embeddingResponse = await ai.models.embedContent({
-      model: "text-embedding-004",
+      model: "gemini-embedding-2-preview",
       contents: proposedAngle,
+      config: {
+        taskType: "SEMANTIC_SIMILARITY",
+        outputDimensionality: 768,
+      }
     })
 
     const embedding = embeddingResponse.embeddings?.[0]?.values
@@ -87,8 +91,12 @@ Examples: "Minimalist Work Bag for Autumn Streetwear", "Cozy Cottagecore Mug for
   // Fallback if all 3 attempts hit duplicates (rare)
   const fallbackAngle = `Premium Lifestyle aesthetic for ${product.title}`
   const fallbackEmbedding = await ai.models.embedContent({
-    model: "text-embedding-004",
+    model: "gemini-embedding-2-preview",
     contents: fallbackAngle,
+    config: {
+      taskType: "SEMANTIC_SIMILARITY",
+      outputDimensionality: 768,
+    }
   })
   
   return { 

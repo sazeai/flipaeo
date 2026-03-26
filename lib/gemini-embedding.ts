@@ -8,13 +8,13 @@ export async function generateEmbedding(text: string, taskType?: string): Promis
     try {
         const genAI = getGeminiClient()
         const result = await genAI.models.embedContent({
-            model: "gemini-embedding-001",
+            model: "gemini-embedding-2-preview",
+            contents: text,
             config: {
+                taskType: taskType || "SEMANTIC_SIMILARITY",
                 outputDimensionality: 768,
-            },
-            contents: [{ parts: [{ text }] }],
-            taskType: taskType
-        } as any)
+            }
+        })
 
         const embedding = result.embeddings?.[0]?.values || []
 
