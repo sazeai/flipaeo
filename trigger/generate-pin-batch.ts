@@ -33,7 +33,7 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 export const generatePinBatch = schedules.task({
   id: "pinloop-generate-batch",
-  cron: "*/5 * * * *", // changed temporarily to 5 minutes for user testing
+  cron: "0 */6 * * *",
   run: async () => {
     logger.info("🎨 PinLoop batch generator started")
 
@@ -308,7 +308,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
 
             const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
             const layoutMode = brand.pin_layout_mode || 'organic'
-            
+
             const renderParams = new URLSearchParams({
               imageUrl: rawImageUrl,
               title: genTitle,
@@ -318,7 +318,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               pinId,
               layoutMode,
             })
-            
+
             const renderRes = await fetch(`${appUrl}/api/render-pin?${renderParams.toString()}`)
 
             if (!renderRes.ok) {
@@ -445,7 +445,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             pinId: mbPinId,
             layoutMode: brand.pin_layout_mode || 'organic',
           })
-          
+
           const mbRenderRes = await fetch(`${appUrl.replace(/\/$/, '')}/api/render-pin?${mbRenderParams.toString()}`)
 
           if (!mbRenderRes.ok) {
