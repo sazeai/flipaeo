@@ -53,7 +53,7 @@ export const generatePinBatch = schedules.task({
     } catch (e) {
       logger.warn("Could not fetch live trends, using fallbacks")
     }
-    
+
     if (globalTrends.length === 0) {
       globalTrends = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
     }
@@ -96,7 +96,7 @@ export const generatePinBatch = schedules.task({
         // 1. API Safeguards: Check 150-pin monthly generation limit
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-        
+
         const { count: cycleGenerations } = await supabase
           .from("pins")
           .select("id", { count: "exact", head: true })
@@ -174,12 +174,12 @@ export const generatePinBatch = schedules.task({
             // Step 1: Call Gemini Art Director & Fal.ai Inline
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
             const sourceImageUrl = product.image_url || (r2Domain && product.image_r2_key ? `${r2Domain}/${product.image_r2_key}` : "")
-            
+
             if (!sourceImageUrl) {
               logger.error(`Skipping product ${product.title} because no valid image URL could be resolved`)
               continue
             }
-            
+
             const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director.
 Product: "${product.title}"
 Angle: "${targetAngle}"
@@ -204,7 +204,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             const genTemplateId = plan.templateId || "template-5"
 
             logger.info(`Art Director Prompt: ${dynamicImagePrompt}`)
-            
+
             // Firing Fal.ai Native Polling
             logger.info(`Starting fal.ai generation for ${product.title}...`)
             const result: any = await fal.subscribe("fal-ai/nano-banana-2/edit", {
@@ -260,7 +260,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             const falImageBuffer = Buffer.from(await falImageRes.arrayBuffer())
             const rawR2Key = `pin-images/${brand.user_id}/${pinId}-raw.png`
             await putR2Object(rawR2Key, falImageBuffer, "image/png")
-            
+
             const rawImageUrl = r2Domain ? `${r2Domain}/${rawR2Key}` : rawR2Key
 
             // Step 2: Generate premium Pinterest SEO copy (title + description) — ALL modes
@@ -317,7 +317,8 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
             })
 
             if (!renderRes.ok) {
-              logger.error(`Render failed for pin ${pinId}`)
+              const errText = await renderRes.text().catch(() => "Unable to read error text")
+              logger.error(`Render failed for pin ${pinId}: STATUS ${renderRes.status} | MSG: ${errText} | Sent Image: ${rawImageUrl}`)
               await supabase.from("pins").update({ status: "failed", error_message: "Render failed" }).eq("id", pinId)
               continue
             }
