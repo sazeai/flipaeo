@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { putR2Object, getR2ObjectStream } from '@/lib/r2';
 import { selectWeightedPrompt, seedDefaultPrompts, recordPromptUsage } from '@/lib/prompt-weight-engine';
 
+export const maxDuration = 60; // Prevent Vercel 504 timeouts on long GenAI fetches
+
 // Initialize the SDK using the custom API key provided by the user
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY });
 
@@ -15,7 +17,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const contentType = req.headers.get('content-type') || '';
-    
+
     let base64ImageData: string;
     let mimeType: string;
     let productId: string | null = null;
@@ -52,7 +54,7 @@ export async function POST(req: NextRequest) {
           .eq('user_id', userId)
           .single();
         if (brand) brandSettingsId = brand.id;
-        
+
         base64ImageData = '';
         mimeType = '';
       } else {
@@ -137,7 +139,7 @@ export async function POST(req: NextRequest) {
       1. Write a photorealistic, 8k background prompt for an image generation model to create a stunning, atmospheric scene.${aestheticGuidance}
       2. Write an elegant, 4 to 6 word title for this mood board. Use nouns, not verbs.
       3. Select template-2 (Center text) as the text layout template.`;
-      
+
       aiContents = [{ text: artDirectorPrompt }];
     } else {
       const artDirectorPrompt = `Analyze this product image. You are an expert Pinterest Marketing Art Director.
@@ -146,7 +148,7 @@ export async function POST(req: NextRequest) {
       1. Write a photorealistic, 8k background prompt for an image generation model to place this product in a fitting, highly aesthetic lifestyle environment. You MUST explicitly state where to leave negative space (e.g., "Leave negative space at the top", "Leave negative space at the bottom", "Leave negative space in the center", or "Leave negative space around the edges").
       2. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs. (e.g., "The Minimalist Ceramic Watering Can", "Premium Leather Autumn Collection"). Do not use punctuation.
       3. Select the best text layout template based on where you left negative space in the image prompt.${aestheticGuidance}`;
-      
+
       aiContents = [
         { inlineData: { data: base64ImageData, mimeType: mimeType } },
         { text: artDirectorPrompt },
@@ -162,17 +164,17 @@ export async function POST(req: NextRequest) {
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            imagePrompt: { 
-              type: Type.STRING, 
-              description: "The image generation prompt. e.g., 'Product resting on a rustic wooden table, dappled sunlight, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the bottom.'" 
+            imagePrompt: {
+              type: Type.STRING,
+              description: "The image generation prompt. e.g., 'Product resting on a rustic wooden table, dappled sunlight, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the bottom.'"
             },
-            title: { 
-              type: Type.STRING, 
-              description: "Elegant 4-6 word title. Nouns only." 
+            title: {
+              type: Type.STRING,
+              description: "Elegant 4-6 word title. Nouns only."
             },
-            templateId: { 
-              type: Type.STRING, 
-              description: "template-1 (Top text) if negative space is at the top. template-2 (Center text) if negative space is in the center. template-3 (Bottom text) if negative space is at the bottom. template-4 (Frame) if negative space is around the edges. template-5 (Pure Aesthetic) — select this when the product image is so visually compelling that no text overlay is needed; best for luxury items, furniture, or fashion where the scene alone drives the click." 
+            templateId: {
+              type: Type.STRING,
+              description: "template-1 (Top text) if negative space is at the top. template-2 (Center text) if negative space is in the center. template-3 (Bottom text) if negative space is at the bottom. template-4 (Frame) if negative space is around the edges. template-5 (Pure Aesthetic) — select this when the product image is so visually compelling that no text overlay is needed; best for luxury items, furniture, or fashion where the scene alone drives the click."
             }
           },
           required: ["imagePrompt", "title", "templateId"]
@@ -182,7 +184,7 @@ export async function POST(req: NextRequest) {
 
     const planText = planResponse.text?.trim() || '{}';
     const plan = JSON.parse(planText);
-    
+
     const dynamicImagePrompt = plan.imagePrompt || 'Product resting on a clean marble countertop, morning sunlight, soft aesthetic shadows, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the top.';
     const generatedTitle = plan.title || 'The Aesthetic Product Collection';
     const templateId = plan.templateId || 'template-1';
@@ -212,7 +214,7 @@ export async function POST(req: NextRequest) {
 
     let generatedImageBase64 = '';
     let generatedImageMime = 'image/png';
-    
+
     if (imageResponse.candidates?.[0]?.content?.parts) {
       for (const part of imageResponse.candidates[0].content.parts) {
         if (part.inlineData) {
