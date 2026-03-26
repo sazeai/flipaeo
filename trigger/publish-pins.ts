@@ -1,6 +1,6 @@
 import { schedules, logger } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
-import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
+import { getValidAccessToken, createPin, getBoards, createBoard } from "@/lib/pinterest-api"
 
 /**
  * PinLoop — Drip Publisher Engine
@@ -140,37 +140,45 @@ export const publishPins = schedules.task({
               continue
             }
 
-            // Check for duplicate URL pin in last 24 hours (shadow ban prevention)
-            if (pin.products?.product_url) {
-              const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-              const { count: recentSameUrl } = await supabase
+            // Feature 16: Domain Velocity Capping (The Safety Brake)
+            // No two pins pointing to the same root domain can be published within 4 hours of each other.
+            if (!pin.is_mood_board && pin.products?.product_url) {
+              const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
+              const { count: recentDomainPin } = await supabase
                 .from("pins")
                 .select("id", { count: "exact", head: true })
                 .eq("user_id", user_id)
                 .eq("status", "published")
-                .gte("published_at", twentyFourHoursAgo)
-                .eq("product_id", pin.product_id)
+                .eq("is_mood_board", false)
+                .gte("published_at", fourHoursAgo)
 
-              if ((recentSameUrl || 0) > 0) {
-                logger.info(`Pin ${pin.id}: same product URL published in last 24h, deferring`)
+              if ((recentDomainPin || 0) > 0) {
+                logger.info(`Pin ${pin.id}: Domain Velocity Cap hit. A product pin was published in the last 4 hours. Deferring URL pin to next safe window.`)
                 continue
               }
             }
 
-            // Select a board (simple round-robin by keyword matching or first public board)
-            const targetBoard = selectBoard(boards, pin.pin_title || '')
+            // Feature 11: Select best board or auto-create a new SEO-optimized one
+            const targetBoard = await selectOrCreateBoard(boards, pin.pin_title || '', pin.target_angle || '', accessToken)
+            if (!targetBoard) {
+              logger.error(`No board available for pin ${pin.id}, skipping`)
+              continue
+            }
+
+            // Feature 15: Chronological Jitter (Mimicking Human Entropy)
+            // API pushes are randomly offset by up to 45 minutes to completely mask bot footprints.
+            const jitterMs = Math.floor(Math.random() * (45 * 60 * 1000))
+            logger.info(`🛡️ Anti-Ban: Applying chronological jitter of ${Math.round(jitterMs / 60000)} minutes...`)
+            await new Promise(resolve => setTimeout(resolve, jitterMs))
 
             // Publish to Pinterest
             const pinterestResult = await createPin(accessToken, {
               boardId: targetBoard.id,
               title: pin.pin_title || '',
               description: pin.pin_description || '',
-              link: pin.products?.product_url || '',
+              link: pin.is_mood_board ? '' : (pin.products?.product_url || ''),
               imageUrl: pin.rendered_image_url,
             })
-
-            // Add jitter delay (1-5 seconds) between publishes to appear organic
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 4000))
 
             // Update pin record
             await supabase
@@ -231,14 +239,25 @@ export const publishPins = schedules.task({
 })
 
 /**
- * Select the best board for a pin based on title keyword matching.
- * Falls back to the first public board.
+ * Feature 11: Select the best board or auto-create an SEO-optimized one.
+ * 
+ * 1. Score each existing board by keyword overlap with the pin title.
+ * 2. If a strong match is found (score >= 2), use that board.
+ * 3. If no match, auto-create a new board named after the pin's lifestyle angle.
+ * 4. Cache created boards in `boardCache` to avoid duplicate creation in a single batch.
  */
-function selectBoard(boards: any[], pinTitle: string): any {
+const boardCache = new Map<string, any>()
+
+async function selectOrCreateBoard(
+  boards: any[],
+  pinTitle: string,
+  targetAngle: string,
+  accessToken: string
+): Promise<any> {
   const titleWords = pinTitle.toLowerCase().split(/\s+/)
 
-  // Score each board by keyword overlap
-  let bestBoard = boards[0]
+  // Score each existing board by keyword overlap
+  let bestBoard = boards.find(b => b.privacy === 'PUBLIC') || boards[0]
   let bestScore = 0
 
   for (const board of boards) {
@@ -249,16 +268,46 @@ function selectBoard(boards: any[], pinTitle: string): any {
     let score = 0
 
     for (const word of titleWords) {
-      if (word.length < 3) continue // Skip short words
+      if (word.length < 3) continue
       if (boardName.includes(word)) score += 2
       if (boardDesc.includes(word)) score += 1
     }
 
-    if (score > bestScore || (score === 0 && bestScore === 0 && board.privacy === 'PUBLIC')) {
+    if (score > bestScore) {
       bestScore = score
       bestBoard = board
     }
   }
 
-  return bestBoard
+  // If we found a strong keyword match, use it
+  if (bestScore >= 2) {
+    return bestBoard
+  }
+
+  // No strong match — auto-create a new SEO-optimized board
+  // Derive a board name from the angle or pin title
+  const boardName = targetAngle
+    ? `${targetAngle.split(' ').slice(0, 5).join(' ')} Ideas`
+    : `${pinTitle.split(' ').slice(0, 4).join(' ')} Inspiration`
+
+  // Check cache first to avoid creating duplicates in the same batch
+  const cacheKey = boardName.toLowerCase().trim()
+  if (boardCache.has(cacheKey)) {
+    return boardCache.get(cacheKey)
+  }
+
+  try {
+    logger.info(`📌 Feature 11: Auto-creating SEO board: "${boardName}"`)
+    const newBoard = await createBoard(
+      accessToken,
+      boardName,
+      `Curated ${boardName.toLowerCase()} for your home, lifestyle, and aesthetic inspiration. Discover trending products and design ideas.`
+    )
+    boardCache.set(cacheKey, newBoard)
+    boards.push(newBoard) // Add to the live list for subsequent pins
+    return newBoard
+  } catch (err: any) {
+    logger.error(`Failed to create board "${boardName}": ${err.message}`)
+    return bestBoard // Fall back to best existing board
+  }
 }

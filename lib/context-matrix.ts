@@ -15,7 +15,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 export async function generateUniqueAngle(
   product: { id: string; title: string; description?: string },
   trends: string[],
-  brandBoundaries?: string[]
+  brandBoundaries?: string[],
+  audienceProfile?: Record<string, any> | null
 ): Promise<{ angle: string; embedding: number[] }> {
   const supabase = createAdminClient()
 
@@ -28,6 +29,7 @@ Product: "${product.title}" ${product.description ? `- ${product.description}` :
 
 Current Pinterest Trends this week: ${trends.slice(0, 10).join(", ")}
 ${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints: strictly stick to these vibes -> ${brandBoundaries.join(", ")}` : ""}
+${audienceProfile ? `\nAudience Intelligence (from Pinterest analytics): The account's engaged audience data is: ${JSON.stringify(audienceProfile).slice(0, 500)}. Bias your lifestyle angle to resonate with this demographic.` : ""}
 
 Generate ONE highly specific "Angle" that combines:
 1. A specific Aesthetic / Vibe

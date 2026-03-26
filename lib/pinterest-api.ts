@@ -165,10 +165,58 @@ export async function getBoards(accessToken: string): Promise<PinterestBoard[]> 
 }
 
 /**
+ * Create a new board on the authenticated user's Pinterest account.
+ * Used by Feature 11 (Programmatic Board Optimization) to auto-create
+ * SEO-optimized boards when no existing board matches a pin's keywords.
+ */
+export async function createBoard(
+  accessToken: string,
+  name: string,
+  description: string = ''
+): Promise<PinterestBoard> {
+  return pinterestFetch(accessToken, '/boards', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name.slice(0, 50),  // Pinterest board name max 50 chars
+      description: description.slice(0, 500),
+      privacy: 'PUBLIC',
+    }),
+  })
+}
+
+/**
  * Get account info for the authenticated user.
  */
 export async function getAccountInfo(accessToken: string): Promise<PinterestUserInfo> {
   return pinterestFetch(accessToken, '/user_account')
+}
+
+/**
+ * Feature 10: Fetch audience demographic insights for the authenticated user.
+ * Uses /v5/user_account/analytics — requires Pinterest Business Account (free).
+ * Returns aggregated engagement data for the last 30 days.
+ */
+export async function getAudienceInsights(accessToken: string): Promise<{
+  topPinMetrics: any
+  demographics: any
+} | null> {
+  try {
+    const endDate = new Date().toISOString().split('T')[0]
+    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+    const data = await pinterestFetch(
+      accessToken,
+      `/user_account/analytics?start_date=${startDate}&end_date=${endDate}&metric_types=IMPRESSION,SAVE,OUTBOUND_CLICK,PIN_CLICK&from_claimed_content=BOTH&pin_format=ALL&app_types=ALL&split_field=PIN_FORMAT`
+    )
+
+    return {
+      topPinMetrics: data,
+      demographics: data,
+    }
+  } catch (err) {
+    console.error('Failed to fetch audience insights:', err)
+    return null
+  }
 }
 
 /**

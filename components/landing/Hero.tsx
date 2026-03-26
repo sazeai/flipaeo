@@ -50,13 +50,13 @@ export default function Hero() {
 
       {/* Main Headline */}
       <h1 className="font-serif text-4xl md:text-7xl lg:text-7xl text-stone-900 leading-[1.1] mb-6 tracking-tight">
-        Stop Managing Software. <br />
-        <span className="italic font-light">Hire an Autonomous Pinterest Agent.</span>
+        We Do 99% of the Work. <br />
+        <span className="italic font-light">You Retain 100% Creative Control.</span>
       </h1>
 
       {/* Subheadline */}
       <p className="font-sans text-lg md:text-xl text-stone-500 max-w-2xl leading-snug mb-6 px-2">
-        The era of manual pin design and bulk scheduling is over. PinLoop AI automatically turns your plain product photos into photorealistic lifestyle scenes, formats them for Pinterest’s visual algorithm, and <strong className="text-black font-normal">optimizes for Outbound Clicks while you sleep.</strong>
+        PinLoop AI is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every week, we hand you a <strong className="text-black font-normal">silver platter of perfect, ready-to-publish pins.</strong> You just click &lsquo;Approve&rsquo; and get back to running your business.
       </p>
 
       {/* CTA Button Container */}

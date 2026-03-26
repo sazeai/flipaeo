@@ -10,14 +10,14 @@ import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
   title: 'Pricing — PinLoop AI',
-  description: 'Deploy an autonomous Pinterest marketing engine for $79/mo. Generate lifestyle pins, publish on autopilot, and drive traffic to your store.',
+  description: 'Your AI Art Director for Pinterest. We do 99% of the work, you retain 100% creative control. Generate lifestyle pins, approve with one click, and drive traffic to your store.',
   keywords: ['PinLoop pricing', 'Pinterest marketing pricing', 'automated Pinterest pins', 'Pinterest traffic tool'],
   canonical: '/pricing',
 })
 
 const planFeatures = [
   "Unlimited AI Lifestyle Pin Generation",
-  "Autonomous Drip Publishing to Pinterest",
+  "AI-Supervised Drip Publishing to Pinterest",
   "Self-Improving Prompt Engine (Closed-Loop AI)",
   "Account Warmup & Shadow Ban Prevention",
   "Pinterest SEO Title & Description Generation",
@@ -52,9 +52,9 @@ const faqs = [
 
 const comparisonData = {
   traditional: [
-    { aspect: "Cost", traditional: "$500–2000/mo (VA or agency)", flipaeo: "$79/month, fully autonomous" },
+    { aspect: "Cost", traditional: "$500–2000/mo (VA or agency)", flipaeo: "$79/month, AI-powered" },
     { aspect: "Pin Quality", traditional: "Generic Canva templates", flipaeo: "AI lifestyle photography with brand fonts" },
-    { aspect: "Publishing", traditional: "Manual daily pinning", flipaeo: "Autonomous drip publishing 24/7" },
+    { aspect: "Publishing", traditional: "Manual daily pinning", flipaeo: "AI-supervised drip publishing 24/7" },
     { aspect: "Strategy", traditional: "Guesswork or paid audits", flipaeo: "Self-optimizing based on click data" },
     { aspect: "Account Safety", traditional: "Risk of shadow ban from over-pinning", flipaeo: "3-phase warmup + auto-throttle" },
     { aspect: "Scaling", traditional: "Hire more VAs", flipaeo: "Add products, engine scales automatically" },
@@ -82,7 +82,7 @@ export default function PricingPage() {
               <span className="font-bold tracking-widest uppercase">Simple Pricing</span>
             </div>
             <h1 className="font-serif text-stone-900 text-4xl sm:text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6">
-              Stop Pinning Manually. <br className="hidden md:block " /> <span className="italic text-stone-500">Deploy an Autonomous Pin Engine.</span>
+              Stop Pinning Manually. <br className="hidden md:block " /> <span className="italic text-stone-500">Deploy Your AI Art Director.</span>
             </h1>
             <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-10">
               Get the output of a full-time Pinterest VA for the price of a dinner. PinLoop AI generates stunning lifestyle pins, publishes them on autopilot, and self-optimizes based on real click data.

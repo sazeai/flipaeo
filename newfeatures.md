@@ -111,14 +111,6 @@ Charge for **"Assets Generated"** not **"Assets Published."**
   > _"The current high-volume Pinterest search trends are: [indoor plant aesthetic, spring gardening, pink decor]. Choose ONE and design around it."_
 - **Result:** Pins are engineered to intercept documented, high-volume searches happening that week
 
-### Feature 9: Rich Product Pins (Catalogs API)
-
-Standard image pins just show a picture + link. **Product Pins** show real-time price, stock, and a native "Shop" button.
-
-- Use **`/v5/catalogs`** API to ingest the user's Shopify XML product feed into Pinterest
-- When publishing a lifestyle pin, bind it to the catalog `Item ID`
-- Result: Beautiful AI lifestyle image + hard-coded conversion metadata of a native Product Pin
-- Significantly higher conversion rate than standard pins
 
 ### Feature 10: Audience Insights (Demographic Shifting)
 
@@ -169,3 +161,44 @@ Updated landing page copy direction:
 | 🟢 P3 | Audience Insights (#10) | Personalization — Month 2+ | Medium |
 | 🟢 P3 | Board Optimization (#11) | SEO boost — partially built | Low |
 | 🟢 P3 | Landing Page Update (#12) | Messaging alignment | Low |
+
+---
+
+## 🛡️ The Anti-Ban Autopilot (P2 Extension)
+*A series of hardcoded algorithmic safeguards engineered to completely bypass Pinterest's spam filters without requiring user configuration.*
+
+### Feature 13: The Invisible Warm-Up Ramp (Auto-Pacing)
+**The Flaw in Competitors:** They make users configure 4-week calendar ramp-ups.
+**Our Fix:** During 2-minute onboarding, we ask one question: "Is your Pinterest account brand new, or established?"
+If "Brand New," the backend automatically applies an API drip-ramp (Week 1: 1 pin/day, Week 2: 2 pins/day, etc.). The UI simply shows: *🛡️ Account Protection: Active (Warm-Up Phase)*.
+
+### Feature 14: The "Trojan Horse" Trust Ratio (No-URL Pins)
+**The Flaw in Competitors:** They force every pin to carry a product URL, triggering Pinterest's "spammer" flag.
+**Our Fix:** Our engine natively generates pure aesthetic "Mood Board" pins with zero outbound links and mixes them into the publish queue. This feeds the algorithm "valuable native community content," drastically boosting the domain's Trust Score so that the actual Product Pins rank exponentially higher.
+
+### Feature 15: Chronological Jitter (Mimicking Human Entropy)
+**The Flaw in Competitors:** Precise cron jobs (e.g., exactly 14:00:00 every day) flag bot-detection. They fix it by asking the user to type in a "floating minute" variable.
+**Our Fix:** Hardcode a `Math.random()` offset into the database publisher. API pushes are randomly offset by ±45 minutes to perfectly mimic chaotic human behavior.
+
+### Feature 16: Domain Velocity Capping (The Safety Brake)
+**The Flaw in Competitors:** Blasting 10 pins pointing to the same Shopify domain within 3 hours results in a temporary domain blacklist.
+**Our Fix:** Hardcoded queue rule: No two pins pointing to the same root domain can be published within 4 hours. If scheduled too close, the queue automatically bumps it to the next safe window.
+
+### UI Implementation: The "System Health" Card
+Instead of a confusing "Settings" page with dials and levers, we use this engineering as Premium Marketing Copy. We simply show a "System Health" card inside the app:
+- **Status:** Autopilot Active
+- **Cadence:** Organic Entropy (Mimicking human behavior)
+- **Domain Trust:** Building (Mixing native content with product links)
+
+---
+
+## 📅 The Curated Queue (P3 Phase)
+*Solving user psychological fatigue and making the AI feel like a luxury Art Director.*
+
+### Feature 17: The Weekly Shuffle Algorithm
+**The Flaw in Bulk Generators:** They loop through a single product (e.g., Terrazzo Chair) and generate 10 identical pins with different backgrounds in a row. When the user opens their Approval Inbox, they feel "fatigue." It feels cheap and algorithmic.
+**Our Fix:** We shift the generation trigger to a "Weekly Plan" rather than a "Per-Product Batch."
+1. **The Shuffle:** When the cron job runs, it grabs the entire product catalog, shuffles the SKUs randomly, and slices a diverse batch.
+2. **The Memory Check:** Before generating an angle for the Terrazzo Chair, the Context Matrix checks the database to see what aesthetic was used last week. If it used "Minimalist Scandi", it actively selects "Sunlit Nursery" this time.
+3. **The UX Magic:** The user's Approval Inbox looks like a highly curated lifestyle magazine—a mixed grid of different products featuring rotating seasonal themes.
+4. **Publish Spacing:** When approved, the pins drop into the queue. Because of our 4-Hour Domain Jitter, the system organically spaces out the publishing so the board has maximum variety.

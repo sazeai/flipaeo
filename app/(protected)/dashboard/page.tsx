@@ -9,6 +9,7 @@ import {
   Activity,
   ArrowRight,
   Zap,
+  ShieldCheck,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -141,6 +142,44 @@ export default function DashboardPage() {
               Publishing rate is limited during warmup to protect your account.
             </p>
           )}
+        </div>
+      </div>
+
+      {/* System Health (Anti-Ban Autopilot) */}
+      <div className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 rounded-2xl p-6 text-white border border-neutral-800 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-5">
+          <Activity className="w-48 h-48" />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-emerald-500/20 rounded-lg">
+              <ShieldCheck className="w-6 h-6 text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">System Health: Protect &amp; Scale</h2>
+              <p className="text-neutral-400 text-sm">PinLoop AI automatically manages Pinterest's undocumented API limits to keep your store 100% safe.</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-semibold">Status</div>
+              <div className="text-sm font-medium text-emerald-400 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Autopilot Active
+              </div>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-semibold">Cadence Mode</div>
+              <div className="text-sm font-medium text-white">Organic Entropy</div>
+              <div className="text-xs text-neutral-500 mt-1">Mimicking human behavior</div>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-xs text-neutral-400 mb-1 uppercase tracking-wider font-semibold">Domain Trust</div>
+              <div className="text-sm font-medium text-white">Actively Building</div>
+              <div className="text-xs text-neutral-500 mt-1">Splicing native Mood Boards</div>
+            </div>
+          </div>
         </div>
       </div>
 

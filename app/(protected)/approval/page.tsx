@@ -147,6 +147,17 @@ export default function ApprovalPage() {
         )}
       </div>
 
+      {/* Month 1 Warmup Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
+        <Sparkles className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+        <div>
+          <h4 className="font-semibold text-blue-900 text-sm">Asset Vault & Publishing Rate</h4>
+          <p className="text-blue-800 text-xs mt-1 leading-relaxed">
+            To protect your Pinterest account from algorithmic spam filters during Month 1, publishing is throttled to a safe rate of ~2 pins per day. Your AI engine will still generate your full monthly quota into your Scheduled Vault here.
+          </p>
+        </div>
+      </div>
+
       {/* Empty State */}
       {pins.length === 0 ? (
         <div className="text-center py-20 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">

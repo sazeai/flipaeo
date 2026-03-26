@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Save, Loader2, PauseCircle, PlayCircle } from 'lucide-react'
+import { Save, Loader2, PauseCircle, PlayCircle, Rocket, ShieldAlert, Moon, Sun } from 'lucide-react'
 
 const FONT_OPTIONS = [
   'Playfair Display',
@@ -38,6 +38,8 @@ interface BrandSettingsData {
   font_choice: string
   aesthetic_boundaries: string[]
   automation_paused: boolean
+  autopilot_enabled: boolean
+  account_age_type: 'brand_new' | 'established' | ''
 }
 
 export default function BrandSettingsPage() {
@@ -53,7 +55,10 @@ export default function BrandSettingsPage() {
     font_choice: 'Playfair Display',
     aesthetic_boundaries: [],
     automation_paused: false,
+    autopilot_enabled: false,
+    account_age_type: '',
   })
+  const [approvedPinsCount, setApprovedPinsCount] = useState(0)
 
   useEffect(() => {
     async function load() {
@@ -77,8 +82,20 @@ export default function BrandSettingsPage() {
           font_choice: data.font_choice || 'Playfair Display',
           aesthetic_boundaries: (data.aesthetic_boundaries as string[]) || [],
           automation_paused: data.automation_paused || false,
+          autopilot_enabled: data.autopilot_enabled || false,
+          account_age_type: data.account_age_type || '',
         })
       }
+
+      // Check how many pins the user has approved (Trust Ladder)
+      const { count } = await supabase
+        .from('pins')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .in('status', ['queued', 'published'])
+      
+      setApprovedPinsCount(count || 0)
+      
       setLoading(false)
     }
     load()
@@ -111,6 +128,8 @@ export default function BrandSettingsPage() {
       font_choice: form.font_choice,
       aesthetic_boundaries: form.aesthetic_boundaries,
       automation_paused: form.automation_paused,
+      autopilot_enabled: form.autopilot_enabled,
+      account_age_type: form.account_age_type,
     }
 
     if (settingsId) {
@@ -118,6 +137,15 @@ export default function BrandSettingsPage() {
     } else {
       const { data } = await supabase.from('brand_settings').insert(payload).select('id').single()
       if (data) setSettingsId(data.id)
+    }
+
+    // Feature 13: Auto-configure warmup_phase based on account age
+    if (form.account_age_type) {
+      const warmupPhase = form.account_age_type === 'brand_new' ? 'warmup_partial' : 'full'
+      await supabase
+        .from('pinterest_connections')
+        .update({ warmup_phase: warmupPhase })
+        .eq('user_id', user.id)
     }
 
     setSaving(false)
@@ -144,43 +172,141 @@ export default function BrandSettingsPage() {
         </p>
       </div>
 
-      {/* Automation Control */}
-      <div className={`rounded-2xl border-2 p-5 transition-colors ${
-        form.automation_paused
-          ? 'border-amber-300 bg-amber-50/50'
-          : 'border-emerald-200 bg-emerald-50/30'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {form.automation_paused ? (
-              <PauseCircle className="w-6 h-6 text-amber-600" />
-            ) : (
-              <PlayCircle className="w-6 h-6 text-emerald-600" />
-            )}
-            <div>
-              <h3 className="font-semibold text-sm">
-                {form.automation_paused ? 'Automation Paused' : 'Automation Active'}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {form.automation_paused
-                  ? 'All AI generation and publishing is paused. Your account is in sleep mode.'
-                  : 'Your PinLoop engine is generating and queuing pins for approval.'}
-              </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Universal Pause — Sleep Mode */}
+        <div className={`rounded-2xl border-2 p-5 transition-colors ${
+          form.automation_paused
+            ? 'border-red-300 bg-red-50/50'
+            : 'border-emerald-200 bg-emerald-50/30'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {form.automation_paused ? (
+                <Moon className="w-6 h-6 text-red-500 shrink-0" />
+              ) : (
+                <Sun className="w-6 h-6 text-emerald-600 shrink-0" />
+              )}
+              <div>
+                <h3 className="font-semibold text-sm">
+                  {form.automation_paused ? '🛑 Sleep Mode' : '✅ Engine Active'}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 max-w-[200px]">
+                  {form.automation_paused
+                    ? 'ALL automation is paused. No generation, no publishing.'
+                    : 'AI is generating and scheduling pins normally.'}
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, automation_paused: !p.automation_paused }))}
+              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
+                form.automation_paused ? 'bg-red-400' : 'bg-emerald-500'
+              }`}
+            >
+              <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+                form.automation_paused ? 'translate-x-1' : 'translate-x-6'
+              }`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Full Autopilot Toggle */}
+        <div className={`rounded-2xl border-2 p-5 transition-colors ${
+          form.autopilot_enabled
+            ? 'border-indigo-300 bg-indigo-50/50'
+            : 'border-neutral-200 bg-neutral-50'
+        } ${approvedPinsCount < 50 ? 'opacity-70' : ''}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {approvedPinsCount < 50 ? (
+                <ShieldAlert className="w-6 h-6 text-neutral-400 shrink-0" />
+              ) : (
+                <Rocket className={`w-6 h-6 shrink-0 ${form.autopilot_enabled ? 'text-indigo-600' : 'text-neutral-500'}`} />
+              )}
+              <div>
+                <h3 className="font-semibold text-sm">Full Autopilot</h3>
+                <p className="text-xs text-muted-foreground mt-0.5 max-w-[200px]">
+                  {approvedPinsCount < 50
+                    ? `Unlock by approving 50 pins. (Current: ${approvedPinsCount}/50)`
+                    : form.autopilot_enabled 
+                      ? 'AI automatically publishes pins.' 
+                      : 'AI waits for your manual approval.'}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={approvedPinsCount < 50}
+              onClick={() => setForm(p => ({ ...p, autopilot_enabled: !p.autopilot_enabled }))}
+              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed ${
+                form.autopilot_enabled ? 'bg-indigo-500' : 'bg-neutral-300'
+              }`}
+            >
+              <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+                form.autopilot_enabled ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Feature 13: Account Age Question (Warm-Up Ramp) */}
+      {!form.account_age_type && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
+          <h3 className="font-semibold text-base mb-1">🛡️ Account Protection Setup</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            To protect your Pinterest account from spam filters, we need to know one thing:
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, account_age_type: 'brand_new' }))}
+              className="p-4 rounded-xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all text-left"
+            >
+              <div className="font-semibold text-sm">🌱 Brand New</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Created in the last 3 months. We&apos;ll ramp up slowly (1 pin/day → 5 pins/day over 4 weeks).
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, account_age_type: 'established' }))}
+              className="p-4 rounded-xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all text-left"
+            >
+              <div className="font-semibold text-sm">🏛️ Established</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Active for 3+ months with existing pins. We&apos;ll publish at full speed immediately.
+              </p>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {form.account_age_type && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200">
+          <span className="text-sm">
+            {form.account_age_type === 'brand_new' ? '🌱' : '🏛️'}
+          </span>
+          <div>
+            <span className="text-sm font-medium">
+              {form.account_age_type === 'brand_new' ? 'Warm-Up Mode Active' : 'Full Speed Mode'}
+            </span>
+            <p className="text-xs text-muted-foreground">
+              {form.account_age_type === 'brand_new'
+                ? 'Publishing is throttled for 4 weeks to protect your account.'
+                : 'Your account is publishing at maximum safe velocity.'}
+            </p>
           </div>
           <button
             type="button"
-            onClick={() => setForm(p => ({ ...p, automation_paused: !p.automation_paused }))}
-            className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-              form.automation_paused ? 'bg-amber-400' : 'bg-emerald-500'
-            }`}
+            onClick={() => setForm(p => ({ ...p, account_age_type: '' }))}
+            className="ml-auto text-xs text-muted-foreground hover:text-neutral-800 underline"
           >
-            <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-              form.automation_paused ? 'translate-x-1' : 'translate-x-6'
-            }`} />
+            Change
           </button>
         </div>
-      </div>
+      )}
 
       {/* Form */}
       <div className="space-y-6">
