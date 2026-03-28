@@ -53,18 +53,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: `Server Configuration Error: ${encErr.message}` }, { status: 500 })
     }
 
-    // Validation successful, save to profiles table securely
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
+    // Validation successful, save to shopify_connections table securely
+    const { error: connectionError } = await supabase
+      .from("shopify_connections")
+      .upsert({
+        user_id: user.id,
         shopify_client_id: clientId, // Public ID 
         shopify_client_secret: encryptedSecret, // Encrypted securely
-        shopify_store_url: cleanUrl
+        store_domain: cleanUrl,
+        is_default: true,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: "user_id,store_domain"
       })
-      .eq("id", user.id)
 
-    if (profileError) {
-      return NextResponse.json({ message: `Failed to save connection: ${profileError.message}` }, { status: 500 })
+    if (connectionError) {
+      return NextResponse.json({ message: `Failed to save connection: ${connectionError.message}` }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

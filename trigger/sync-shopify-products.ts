@@ -17,14 +17,15 @@ export const shopifyProductSync = schedules.task({
 
     const supabase = createAdminClient() as any
 
-    // Fetch all profiles with custom app client credentials
-    const { data: profiles, error: profErr } = await supabase
-      .from("profiles")
-      .select("id, shopify_store_url, shopify_client_id, shopify_client_secret")
+    // Fetch all connections with custom app client credentials
+    const { data: connections, error: connErr } = await supabase
+      .from("shopify_connections")
+      .select("user_id, store_domain, shopify_client_id, shopify_client_secret")
       .not("shopify_client_secret", "is", null)
-      .not("shopify_store_url", "is", null)
+      .not("store_domain", "is", null)
+      .eq("is_default", true)
 
-    if (profErr || !profiles || profiles.length === 0) {
+    if (connErr || !connections || connections.length === 0) {
       logger.info(`No users configured for Shopify auto-sync.`)
       return { result: "No users configured" }
     }
@@ -33,11 +34,8 @@ export const shopifyProductSync = schedules.task({
     let totalSyncedGlobal = 0
     let totalSkippedGlobal = 0
 
-    for (const profile of profiles) {
-      const userId = profile.id
-      const store_domain = profile.shopify_store_url
-      const client_id = profile.shopify_client_id
-      const encrypted_secret = profile.shopify_client_secret
+    for (const connection of connections) {
+      const { user_id: userId, store_domain, shopify_client_id: client_id, shopify_client_secret: encrypted_secret } = connection
       
       let access_token: string
       try {
