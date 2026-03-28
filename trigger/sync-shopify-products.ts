@@ -1,6 +1,7 @@
 import { schedules, logger } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { putR2Object } from "@/lib/r2"
+import { decrypt } from "@/utils/encryption"
 
 /**
  * PinLoop — Shopify Product Sync (No-OAuth)
@@ -16,11 +17,11 @@ export const shopifyProductSync = schedules.task({
 
     const supabase = createAdminClient() as any
 
-    // Fetch all profiles with custom app tokens
+    // Fetch all profiles with custom app client credentials
     const { data: profiles, error: profErr } = await supabase
       .from("profiles")
-      .select("id, shopify_store_url, shopify_custom_app_token")
-      .not("shopify_custom_app_token", "is", null)
+      .select("id, shopify_store_url, shopify_client_id, shopify_client_secret")
+      .not("shopify_client_secret", "is", null)
       .not("shopify_store_url", "is", null)
 
     if (profErr || !profiles || profiles.length === 0) {
@@ -35,7 +36,36 @@ export const shopifyProductSync = schedules.task({
     for (const profile of profiles) {
       const userId = profile.id
       const store_domain = profile.shopify_store_url
-      const access_token = profile.shopify_custom_app_token
+      const client_id = profile.shopify_client_id
+      const encrypted_secret = profile.shopify_client_secret
+      
+      let access_token: string
+      try {
+        const client_secret = decrypt(encrypted_secret)
+        
+        // Exchange Client Credentials for 24-hr access token
+        const tokenRes = await fetch(`https://${store_domain}/admin/oauth/access_token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id,
+            client_secret,
+            grant_type: 'client_credentials'
+          })
+        })
+        
+        if (!tokenRes.ok) {
+          logger.error(`Failed to generate 24hr access token for user ${userId}. Skipping...`)
+          continue
+        }
+        
+        const tokenData = await tokenRes.json()
+        access_token = tokenData.access_token
+      } catch (err: any) {
+        logger.error(`Encryption or Auth failure for user ${userId}: ${err.message}`)
+        continue
+      }
+      
       const shopifyBase = `https://${store_domain}/admin/api/2024-10`
 
       logger.info(`Syncing store: ${store_domain} for user ${userId}`)

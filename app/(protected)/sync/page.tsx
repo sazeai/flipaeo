@@ -14,7 +14,8 @@ export default function SyncPage() {
   const [syncReport, setSyncReport] = useState<{ updated: number; inserted: number; errors: number; errorDetails?: string[] } | null>(null)
 
   const [storeUrl, setStoreUrl] = useState("")
-  const [apiToken, setApiToken] = useState("")
+  const [clientId, setClientId] = useState("")
+  const [clientSecret, setClientSecret] = useState("")
   const [isSavingToken, setIsSavingToken] = useState(false)
 
   // -- Feature 1: CSV Upload --
@@ -66,8 +67,8 @@ export default function SyncPage() {
 
   // -- Feature 2: Custom App API Token --
   const handleSaveToken = async () => {
-    if (!storeUrl.trim() || !apiToken.trim()) {
-      toast.error("Please enter both the store URL and API token.")
+    if (!storeUrl.trim() || !clientId.trim() || !clientSecret.trim()) {
+      toast.error("Please enter the store URL, Client ID, and Client Secret.")
       return
     }
 
@@ -76,7 +77,7 @@ export default function SyncPage() {
       const res = await fetch("/api/sync/validate-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ storeUrl: storeUrl.trim(), apiToken: apiToken.trim() }),
+        body: JSON.stringify({ storeUrl: storeUrl.trim(), clientId: clientId.trim(), clientSecret: clientSecret.trim() }),
       })
 
       if (!res.ok) {
@@ -186,12 +187,12 @@ export default function SyncPage() {
             <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-xs text-amber-800 space-y-1.5 flex gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Setup Instructions:</p>
+                <p className="font-bold">2026 Authentication Setup:</p>
                 <ol className="list-decimal pl-4 space-y-1 mt-1">
                   <li>Go to Shopify Settings → Apps and sales channels → Develop apps.</li>
                   <li>Click "Create an app" (Name it PinLoop).</li>
-                  <li>Configure Admin API Scopes: Check <code className="bg-amber-100 px-1 rounded">read_products</code>.</li>
-                  <li>Install and paste the <code className="bg-amber-100 px-1 rounded">shpat_...</code> token below.</li>
+                  <li>Go to <b>Configuration</b> → Admin API Scopes: Check <code className="bg-amber-100 px-1 rounded">read_products</code> and Save.</li>
+                  <li>Go to <b>API Credentials</b>. Copy the <b>Client ID</b> and <b>Client Secret</b> and paste them below.</li>
                 </ol>
               </div>
             </div>
@@ -212,19 +213,36 @@ export default function SyncPage() {
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">
-                  Admin API Access Token
-                </label>
-                <div className="relative">
-                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-                  <input
-                    type="password"
-                    value={apiToken}
-                    onChange={(e) => setApiToken(e.target.value)}
-                    placeholder="shpat_..."
-                    className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Client ID
+                  </label>
+                  <div className="relative">
+                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                    <input
+                      type="text"
+                      value={clientId}
+                      onChange={(e) => setClientId(e.target.value)}
+                      placeholder="Client ID"
+                      className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                    Client Secret
+                  </label>
+                  <div className="relative">
+                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                    <input
+                      type="password"
+                      value={clientSecret}
+                      onChange={(e) => setClientSecret(e.target.value)}
+                      placeholder="Client Secret"
+                      className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -232,7 +250,7 @@ export default function SyncPage() {
             <div className="pt-2">
               <Button
                 onClick={handleSaveToken}
-                disabled={!storeUrl || !apiToken || isSavingToken}
+                disabled={!storeUrl || !clientId || !clientSecret || isSavingToken}
                 className="w-full bg-stone-900 text-white hover:bg-stone-800 h-10"
               >
                 {isSavingToken ? (

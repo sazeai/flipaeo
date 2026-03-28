@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
+import { encrypt } from "@/utils/encryption"
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -10,43 +11,60 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { storeUrl, apiToken } = await req.json()
-    if (!storeUrl || !apiToken) {
-      return NextResponse.json({ message: "Missing store URL or API Token" }, { status: 400 })
+    const { storeUrl, clientId, clientSecret } = await req.json()
+    if (!storeUrl || !clientId || !clientSecret) {
+      return NextResponse.json({ message: "Missing store URL, Client ID, or Client Secret" }, { status: 400 })
     }
 
     // Clean store URL
     const cleanUrl = storeUrl.replace(/^https?:\/\//, "").replace(/\/+$/, "")
-    const testUrl = `https://${cleanUrl}/admin/api/2024-01/products.json?limit=1`
+    const authUrl = `https://${cleanUrl}/admin/oauth/access_token`
 
-    // Validate token against Shopify Admin API per PRD
-    const res = await fetch(testUrl, {
-      method: "GET",
+    // Step 1: Validate credentials by exchanging them for an access token immediately
+    const res = await fetch(authUrl, {
+      method: "POST",
       headers: {
-        "X-Shopify-Access-Token": apiToken,
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: "client_credentials"
+      })
     })
 
     if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}))
       // Return 400 for validation failure
       return NextResponse.json(
-        { message: `Shopify API rejected the token (Status: ${res.status})` },
+        { message: `Shopify rejected credentials: ${errorData.error_description || 'Invalid Client Credentials'}` },
         { status: 400 }
       )
     }
 
-    // Validation successful, save to profiles table as per PRD
+    // We successfully got a 24-hr token (res.ok is true). We just drop the token; the background job will fetch a new one when needed.
+
+    // Step 2: Encrypt the secret using our secure AES-256-GCM utility.
+    let encryptedSecret: string
+    try {
+      encryptedSecret = encrypt(clientSecret)
+    } catch (encErr: any) {
+      console.error("Encryption failed:", encErr)
+      return NextResponse.json({ message: `Server Configuration Error: ${encErr.message}` }, { status: 500 })
+    }
+
+    // Validation successful, save to profiles table securely
     const { error: profileError } = await supabase
       .from("profiles")
       .update({
-        shopify_custom_app_token: apiToken,
+        shopify_client_id: clientId, // Public ID 
+        shopify_client_secret: encryptedSecret, // Encrypted securely
         shopify_store_url: cleanUrl
       })
       .eq("id", user.id)
 
     if (profileError) {
-      return NextResponse.json({ message: "Failed to save connection to database." }, { status: 500 })
+      return NextResponse.json({ message: `Failed to save connection: ${profileError.message}` }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
