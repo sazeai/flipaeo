@@ -396,17 +396,22 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
             const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
             const layoutMode = brand.pin_layout_mode || 'organic'
 
-            const renderParams = new URLSearchParams({
-              imageUrl: rawImageUrl,
-              title: genTitle,
-              templateId: genTemplateId,
-              fontChoice: brand.font_choice || "Playfair Display",
-              storeUrl: brand.store_url || "",
-              pinId,
-              layoutMode,
-            })
+            // Convert the raw Fal image buffer to a base64 data URI and POST it directly
+            // This is the PROVEN working pattern from the prototype — zero remote fetching inside Satori
+            const imageDataUri = `data:image/png;base64,${falImageBuffer.toString('base64')}`
 
-            const renderRes = await fetch(`${appUrl}/api/render-pin?${renderParams.toString()}`)
+            const renderRes = await fetch(`${appUrl}/api/render-pin`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                imageUrl: imageDataUri,
+                title: genTitle,
+                templateId: genTemplateId,
+                fontChoice: brand.font_choice || "Playfair Display",
+                storeUrl: brand.store_url || "",
+                layoutMode,
+              }),
+            })
 
             if (!renderRes.ok) {
               const errText = await renderRes.text().catch(() => "Unable to read error text")

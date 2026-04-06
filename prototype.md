@@ -1,80 +1,27 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-// Google Fonts CDN mapping for supported fonts
-const FONT_URLS: Record<string, string> = {
-  'Playfair Display': 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf',
-  'Inter': 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf',
-  'Roboto': 'https://fonts.gstatic.com/s/roboto/v47/KFOMCnqEu92Fr1MmYUtfBBc4AMP6lbBP.ttf',
-  'Outfit': 'https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NjuGObqx1XmO1I4e61C4S-Ys25Zh0.ttf',
-  'Poppins': 'https://fonts.gstatic.com/s/poppins/v22/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.ttf',
-  'Montserrat': 'https://fonts.gstatic.com/s/montserrat/v29/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw9aXp-p7K4KLg.ttf',
-  'Lora': 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuyJGmKxemMeZ.ttf',
-  'Merriweather': 'https://fonts.gstatic.com/s/merriweather/v30/u-440qOEagQyNhF5d-FsKilJyeC_wXvsF25UBJQFKg.ttf',
-  'Raleway': 'https://fonts.gstatic.com/s/raleway/v34/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrE.ttf',
-  'DM Sans': 'https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAkpFhR0i2Gw.ttf',
-};
-
-/**
- * Render Pin — Text Overlay Engine
- * 
- * Uses POST to receive the base64 image directly in the body.
- * This is the PROVEN pattern from the working prototype.
- * No remote image fetching happens inside this route — zero network calls for the image.
- */
 export async function POST(req: NextRequest) {
   try {
+    // We use POST instead of GET because the base64 image URL can be very large 
+    // and would exceed the maximum URL length limits if passed as a query parameter.
     const body = await req.json();
-    const { imageUrl, title, templateId, fontChoice, storeUrl, layoutMode } = body;
+    const { imageUrl, title, templateId } = body;
 
     if (!imageUrl) {
       return new Response('Missing imageUrl in request body', { status: 400 });
     }
 
     const displayTitle = title || 'Aesthetic Collection';
-    // If brand is in 'organic' layout mode, always force template-5
-    const activeTemplate = layoutMode === 'organic' ? 'template-5' : (templateId || 'template-1');
-    const fontName = fontChoice || 'Playfair Display';
+    const activeTemplate = templateId || 'template-1';
 
-    let displayStoreUrl = '';
-    try {
-      if (storeUrl) displayStoreUrl = new URL(storeUrl).hostname.replace('www.', '');
-    } catch {
-      displayStoreUrl = storeUrl || '';
-    }
+    // Load custom font (Playfair Display)
+    const fontData = await fetch(
+      new URL('https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf')
+    ).then((res) => res.arrayBuffer());
 
-    // ─────────────────────────────────────────────────
-    // Template 5: Pure Aesthetic (Zero-Text Mode)
-    // ─────────────────────────────────────────────────
-    if (activeTemplate === 'template-5') {
-      return new ImageResponse(
-        (
-          <div tw="flex w-full h-full relative" style={{ backgroundColor: '#ffffff' }}>
-            <img
-              src={imageUrl}
-              tw="absolute inset-0 w-full h-full"
-              style={{ objectFit: 'cover' }}
-              alt="Lifestyle"
-            />
-            {displayStoreUrl && (
-              <div
-                tw="absolute bottom-8 left-8 text-white text-lg"
-                style={{ opacity: 0.3, letterSpacing: '0.08em', fontFamily: 'sans-serif' }}
-              >
-                {displayStoreUrl}
-              </div>
-            )}
-          </div>
-        ),
-        { width: 1000, height: 1500 }
-      );
-    }
-
-    // Load the requested font (only needed for templates with text)
-    const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
-    const fontData = await fetch(new URL(fontUrl)).then((res) => res.arrayBuffer());
-
-    const fontSize = 64;
+    // Decreased font size for better fit with 4-6 words
+    const fontSize = 64; 
 
     let gradientOverlay;
     let textContainer;
@@ -92,7 +39,7 @@ export async function POST(req: NextRequest) {
               fontSize,
               fontWeight: 'bold',
               letterSpacing: '0.05em',
-              fontFamily: `"${fontName}"`,
+              fontFamily: '"Playfair Display"',
               textShadow: '0 4px 16px rgba(0,0,0,0.6)',
             }}
           >
@@ -118,7 +65,7 @@ export async function POST(req: NextRequest) {
               fontSize,
               fontWeight: 'bold',
               letterSpacing: '0.05em',
-              fontFamily: `"${fontName}"`,
+              fontFamily: '"Playfair Display"',
               textShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}
           >
@@ -147,7 +94,7 @@ export async function POST(req: NextRequest) {
               fontSize,
               fontWeight: 'bold',
               letterSpacing: '0.05em',
-              fontFamily: `"${fontName}"`,
+              fontFamily: '"Playfair Display"',
               textShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}
           >
@@ -173,7 +120,7 @@ export async function POST(req: NextRequest) {
               fontSize,
               fontWeight: 'bold',
               letterSpacing: '0.05em',
-              fontFamily: `"${fontName}"`,
+              fontFamily: '"Playfair Display"',
               textShadow: '0 4px 12px rgba(0,0,0,0.5)',
             }}
           >
@@ -198,17 +145,15 @@ export async function POST(req: NextRequest) {
           {textContainer}
           
           {/* The Trust Badge (Bottom CTA) */}
-          {displayStoreUrl && (
-            <div
-              tw="absolute bottom-12 left-1/2 flex text-black px-8 py-4 rounded-full text-3xl font-semibold shadow-xl"
-              style={{ 
-                transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)'
-              }}
-            >
-              {displayStoreUrl} ↗
-            </div>
-          )}
+          <div
+            tw="absolute bottom-12 left-1/2 flex text-black px-8 py-4 rounded-full text-3xl font-semibold shadow-xl"
+            style={{ 
+              transform: 'translateX(-50%)',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)'
+            }}
+          >
+            shopname.com ↗
+          </div>
         </div>
       ),
       {
@@ -216,7 +161,7 @@ export async function POST(req: NextRequest) {
         height: 1500,
         fonts: [
           {
-            name: fontName,
+            name: 'Playfair Display',
             data: fontData,
             style: 'normal',
             weight: 700,
@@ -225,7 +170,7 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error: any) {
-    console.error('Render-pin FATAL error:', error);
+    console.error('Error rendering image:', error);
     return new Response(`Failed to generate image: ${error.message}`, {
       status: 500,
     });
