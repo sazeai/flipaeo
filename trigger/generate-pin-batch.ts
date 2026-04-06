@@ -393,7 +393,11 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               logger.warn(`SEO copy parse failed for ${product.title}, using Art Director title`)
             }
 
-            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
+            let appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
+            if (!appUrl.startsWith('http')) {
+              // Vercel deployment URLs (e.g. flipaeo.vercel.app) come without protocol
+              appUrl = `https://${appUrl}`
+            }
             const layoutMode = brand.pin_layout_mode || 'organic'
 
             // Convert the raw Fal image buffer to a base64 data URI and POST it directly
