@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     let angleEmbedding: number[] | null = null;
     let isMoodBoard = false;
 
+
     if (contentType.includes('application/json')) {
       // --- Autonomous mode: product_id from background task ---
       const body = await req.json();
