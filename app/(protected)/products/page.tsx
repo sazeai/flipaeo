@@ -70,12 +70,24 @@ export default function ProductsPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // If we have a file, we'd upload to R2 here. For now, just create the record.
     let imageUrl = null
     if (uploadFile) {
-      // TODO: Upload to R2 via API route, get back URL
-      // For now, create a local object URL placeholder
-      imageUrl = URL.createObjectURL(uploadFile)
+      const formData = new FormData()
+      formData.append("file", uploadFile)
+
+      try {
+        const upRes = await fetch("/api/images/upload", {
+          method: "POST",
+          body: formData
+        })
+        if (!upRes.ok) throw new Error("Image upload failed")
+        const upData = await upRes.json()
+        imageUrl = upData.url
+      } catch (err: any) {
+        toast.error(`Failed to upload image: ${err.message}`)
+        setUploading(false)
+        return
+      }
     }
 
     await supabase.from('products').insert({

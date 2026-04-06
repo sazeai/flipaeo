@@ -29,74 +29,77 @@ export async function POST(req: NextRequest) {
     let errors = 0
     let errorDetails: string[] = []
 
-    // Deduplication Engine
-    // Query all existing handles for this user
+    // Dedup engine
     const { data: existingProducts } = await supabase
       .from("products")
-      .select("handle")
+      .select("id, handle")
       .eq("user_id", user.id)
       .not("handle", "is", null)
 
-    const existingHandles = new Set(existingProducts?.map(p => p.handle) || [])
+    const handleToId = new Map(existingProducts?.map(p => [p.handle, p.id]) || [])
+    const processedHandles = new Set()
+
+    const upsertPayload = []
 
     for (const row of rows) {
-      if (!row.Handle || !row.Title) continue // Skip invalid rows
-
+      if (!row.Handle || !row.Title) continue
+      
       const handle = row.Handle
+      if (processedHandles.has(handle)) continue // Dedup within the CSV itself
+      processedHandles.add(handle)
+
       const title = row.Title
       const price = parseFloat(row["Variant Price"]) || null
-      // Map Image Src to image_url per PRD
       const imageUrl = row["Image Src"] || null
-      
       const tags = row.Tags ? row.Tags.split(",").map((t: string) => t.trim()) : []
+      const description = row["Body (HTML)"]?.replace(/<[^>]*>/g, "").substring(0, 1000) || null
 
-      if (existingHandles.has(handle)) {
-        // Condition: Handle already in database, UPDATE product
-        const { error } = await supabase
-          .from("products")
-          .update({
-            title,
-            price,
-            image_url: imageUrl,
-            updated_at: new Date().toISOString()
-          })
-          .eq("user_id", user.id)
-          .eq("handle", handle)
+      const existingId = handleToId.get(handle)
 
-        if (error) {
-          console.error(`CSV Update Error for ${handle}:`, error)
-          errors++
-          errorDetails.push(`Update failed for ${handle}: ${error.message}`)
-        } else {
-          updated++
-        }
+      if (existingId) {
+        // It's an update (preserve other fields by just passing id)
+        upsertPayload.push({
+          id: existingId,
+          user_id: user.id,
+          handle,
+          title,
+          price,
+          image_url: imageUrl,
+          updated_at: new Date().toISOString()
+        })
+        updated++
       } else {
-        // Condition: Handle does not exist, INSERT new product
-        const { error } = await supabase
-          .from("products")
-          .insert({
-            user_id: user.id,
-            brand_settings_id: brandSettingsId,
-            source: "shopify",
-            source_product_id: handle, // Use handle as source_product_id for CSV to avoid null errors
-            handle: handle,
-            title,
-            description: row["Body (HTML)"]?.replace(/<[^>]*>/g, "").substring(0, 1000) || null,
-            price,
-            product_url: row["SEO Item URL"] || null, // Or try to build from storefront if known
-            image_url: imageUrl,
-            tags,
-            is_active: row.Published !== "false",
-          })
+        // It's an insert
+        upsertPayload.push({
+          user_id: user.id,
+          brand_settings_id: brandSettingsId,
+          source: "shopify",
+          source_product_id: handle,
+          handle,
+          title,
+          description,
+          price,
+          product_url: row["SEO Item URL"] || null,
+          image_url: imageUrl,
+          tags,
+          is_active: row.Published !== "false",
+        })
+        inserted++
+      }
+    }
 
-        if (error) {
-          console.error(`CSV Insert Error for ${handle}:`, error)
-          errors++
-          errorDetails.push(`Insert failed for ${handle}: ${error.message}`)
-        } else {
-          inserted++
-          existingHandles.add(handle) // Prevent duplicate inserts for later rows of same handle
-        }
+    // Process in chunks of 100 to respect Supabase payload limits
+    const chunkSize = 100;
+    for (let i = 0; i < upsertPayload.length; i += chunkSize) {
+      const chunk = upsertPayload.slice(i, i + chunkSize);
+      const { error } = await supabase.from("products").upsert(chunk);
+      if (error) {
+        console.error("Bulk upsert error chunk:", error);
+        errors += chunk.length;
+        errorDetails.push(`Bulk chunk failed: ${error.message}`);
+        // Readjust metrics
+        inserted -= chunk.filter(c => !c.id).length;
+        updated -= chunk.filter(c => c.id).length;
       }
     }
 
