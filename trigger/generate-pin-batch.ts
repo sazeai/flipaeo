@@ -133,11 +133,19 @@ export const generatePinBatch = schedules.task({
           continue
         }
 
-        // 2. Filter Eligible Products (limit to 10 pending pins per product max)
+        // 2. Filter Eligible Products
+        // Dynamic per-product cap: distribute 100-pin quota evenly across catalog.
+        // With 2 products → max 15 each. With 40 products → max 3 each. Hard ceiling of 15.
+        const perProductCap = Math.min(15, Math.ceil(100 / products.length))
+        
         const eligibleProducts = products.filter((prod: any) => {
           const prodPins = (userPins || []).filter((p: any) => p.product_id === prod.id)
+          // Check pending approval queue limit (max 10 sitting unapproved)
           const pendingCount = prodPins.filter((p: any) => !['published', 'failed'].includes(p.status)).length
           if (pendingCount >= 10) return false
+          // Check monthly per-product cap
+          const monthlyProdPins = prodPins.filter((p: any) => new Date(p.created_at) >= pastThirtyDays)
+          if (monthlyProdPins.length >= perProductCap) return false
           return true
         })
 
