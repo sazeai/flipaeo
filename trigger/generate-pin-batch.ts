@@ -39,29 +39,12 @@ export const generatePinBatch = schedules.task({
 
     const supabase = createAdminClient() as any
 
-    // Fetch global trends from Pinterest once per batch to avoid rate limits
-    let globalTrends: string[] = []
-    try {
-      const { data: anyConn } = await supabase.from("pinterest_connections").select("user_id").limit(1).maybeSingle()
-      if (anyConn) {
-        const token = await getValidAccessToken(anyConn.user_id)
-        if (token) {
-          globalTrends = await getTrendingKeywords(token, 'US', 'growing')
-          logger.info(`Fetched Pinterest Trends: ${globalTrends.slice(0, 5).join(", ")}...`)
-        }
-      }
-    } catch (e) {
-      logger.warn("Could not fetch live trends, using fallbacks")
-    }
 
-    if (globalTrends.length === 0) {
-      globalTrends = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
-    }
 
     // Get all users with brand settings
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused, autopilot_enabled, audience_profile, pin_layout_mode")
+      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused, audience_profile, pin_layout_mode")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No users with brand settings found")
@@ -154,6 +137,21 @@ export const generatePinBatch = schedules.task({
           continue
         }
 
+        // Fetch trends isolated per-user to comply with Pinterest API guidelines
+        let brandTrends: string[] = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
+        try {
+          const token = await getValidAccessToken(brand.user_id)
+          if (token) {
+            const fetchedTrends = await getTrendingKeywords(token, 'US', 'growing')
+            if (fetchedTrends && fetchedTrends.length > 0) {
+              brandTrends = fetchedTrends
+              logger.info(`Fetched isolated Pinterest Trends for ${brand.user_id}: ${brandTrends.slice(0, 5).join(", ")}...`)
+            }
+          }
+        } catch (e) {
+          logger.warn(`Could not fetch live trends for user ${brand.user_id}, using fallbacks`)
+        }
+
         // Weekly Shuffle: Randomize product selection so the Approval Inbox has maximum variety
         const shuffledProducts = shuffleArray(eligibleProducts)
         const batchProducts = shuffledProducts.slice(0, 3)
@@ -165,7 +163,7 @@ export const generatePinBatch = schedules.task({
             // Generate unique Context Matrix angle (Semantic De-Duplication)
             const { angle: targetAngle, embedding: angleEmbedding } = await generateUniqueAngle(
               { id: product.id, title: product.title },
-              globalTrends,
+              brandTrends,
               brand.aesthetic_boundaries,
               brand.audience_profile
             )
@@ -278,7 +276,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
 Product: "${product.title}"
 Lifestyle Angle: "${targetAngle}"
-Trending Keywords this week: ${globalTrends.slice(0, 5).join(', ')}
+Trending Keywords this week: ${brandTrends.slice(0, 5).join(', ')}
 
 Generate:
 
@@ -343,14 +341,14 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
                 rendered_image_r2_key: renderedR2Key,
                 pin_title: pinTitle,          // Override Art Director title with SEO-optimized title
                 pin_description: pinDescription,
-                status: brand.autopilot_enabled ? "queued" : "pending_approval",
+                status: "pending_approval",
               })
               .eq("id", pinId)
 
-            // Pin now waits for user approval before entering publish queue (unless Autopilot is enabled)
+            // Pin now waits for user approval before entering publish queue
 
             totalGenerated++
-            logger.info(`✅ Pin generated → ${brand.autopilot_enabled ? 'queued (Autopilot)' : 'pending approval'}: ${pinId} for "${product.title}"`)
+            logger.info(`✅ Pin generated → pending approval: ${pinId} for "${product.title}"`)
 
           } catch (productError: any) {
             logger.error(`Error generating pin for ${product.title}: ${productError.message}`)
@@ -463,11 +461,11 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             rendered_image_url: renderedImageUrl,
             rendered_image_r2_key: renderedR2Key,
             pin_description: mbDescription,
-            status: brand.autopilot_enabled ? "queued" : "pending_approval",
+            status: "pending_approval",
           }).eq("id", mbPinId)
 
           totalGenerated++
-          logger.info(`✅ Mood Board generated → ${brand.autopilot_enabled ? 'queued' : 'pending approval'}: ${mbPinId}`)
+          logger.info(`✅ Mood Board generated → pending approval: ${mbPinId}`)
 
         } catch (moodBoardError: any) {
           logger.error(`Error generating Mood Board for ${brand.brand_name}: ${moodBoardError.message}`)

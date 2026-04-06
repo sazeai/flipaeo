@@ -1,47 +1,46 @@
 The basics
 Whatever your application will do, you must follow these fundamental principles:
 
-Be honest and transparent with Pinterest and with your end users about the functions and features of your service. Don’t confuse, mislead or surprise anyone.
-**[PinLoop Analysis: NO (Breach)]**
+1. Be honest and transparent with Pinterest and with your end users about the functions and features of your service. Don’t confuse, mislead or surprise anyone.
+**[PinLoop Analysis: (Breach Found)]**
 We are walking a dangerous line here. The app relies on "Human Entropy" logic to generate random delays (jitter) and uses "Trojan Horse Mood Boards" to artificially bypass trust checks. Being transparent about these features would mean admitting to creating tools to deliberately trick Pinterest's bot-detection systems.
 
-Except for campaign analytics information accessed about your account, you cannot store any information accessed through any Pinterest Materials including the API. Instead, call the API each time you need to access information.
-**[PinLoop Analysis: NO (Breach)]**
+2. Except for campaign analytics information accessed about your account, you cannot store any information accessed through any Pinterest Materials including the API. Instead, call the API each time you need to access information.
+**[PinLoop Analysis: (Breach Found)]**
 Our PRD and codebase reveal that we extract data from the `/v5/audience_insights` API to permanently alter the user's `audience_profile` in our database. We also fetch `/v5/trends/keywords` and cache those global trends locally to inform generative AI prompts for subsequent pins. Both actions violate the rule against storing API data.
 
-Only access someone's account with authorisation, for example by using an access token. Do not solicit or collect login credentials or use login credentials to access other people’s accounts or take actions on their behalf.
+3. Only access someone's account with authorisation, for example by using an access token. Do not solicit or collect login credentials or use login credentials to access other people’s accounts or take actions on their behalf.
 **[PinLoop Analysis: YES]**
 We cleanly use OAuth and securely store tokens in the `pinterest_connections` table. No passwords collected.
 
-Only use information from someone’s account to provide services to that person.
+4. Only use information from someone’s account to provide services to that person.
 **[PinLoop Analysis: YES]**
 Data pulled for a specific brand is utilized to optimize that specific brand's publishing logic.
 
-Don't combine someone's account information with information from other people's accounts or with information from other services.
-**[PinLoop Analysis: NO (Breach)]**
+5. Don't combine someone's account information with information from other people's accounts or with information from other services.
+**[PinLoop Analysis: (Breach Found)]**
 In `trigger/generate-pin-batch.ts`, the script pulls trend data systematically. If the CRON job needs trends, it randomly grabs the OAuth token of the *first available user* in the DB (`maybeSingle()`), hits the Trends API, and then uses that global trend data as the seed to generate AI pins for *every other user* in the batch. This directly mixes and combines one account's authorized API access to power services for everyone else.
+- solved
 
-Don't share or sell information from our API with a third party, including another advertising service. It's OK to share information with the person from whose account that information came.
+6. Don't share or sell information from our API with a third party, including another advertising service. It's OK to share information with the person from whose account that information came.
 **[PinLoop Analysis: YES]**
 We do not sell API data to any third-party ad brokers.
 
-Keep your API access credentials private. Do not use someone else’s API credentials, and do not allow anyone else to use yours.
+7. Keep your API access credentials private. Do not use someone else’s API credentials, and do not allow anyone else to use yours.
 **[PinLoop Analysis: YES]**
 Keys are secure.
 
-End users can request API access credentials for use with a 'bring-your-own-key' application, as long as the application stores the end user’s API credentials locally (not server-side) and the application complies with all other policies and guidelines. For example, the application must not solicit Pinterest user passwords, session cookies, etc.
+8. End users can request API access credentials for use with a 'bring-your-own-key' application, as long as the application stores the end user’s API credentials locally (not server-side) and the application complies with all other policies and guidelines. For example, the application must not solicit Pinterest user passwords, session cookies, etc.
 **[PinLoop Analysis: N/A]**
 We use standard OAuth.
 
-Don’t try to evade our policy enforcement systems. For example, if we remove your app, don’t try to reconnect the same or a substantially similar app using a different account or under a different name.
-**[PinLoop Analysis: NO (Breach)]**
-This is a massive violation in our codebase. `trigger/publish-pins.ts` uses "Domain Velocity Capping," "Account Age matrices," and random 45-minute "Chronological Jitter" explicitly to "completely mask bot footprints" and evade Pinterest's shadowbans. We are systematically evading their enforcement systems.
+**9. Don’t try to evade our policy enforcement systems. For example, if we remove your app, don’t try to reconnect the same or a substantially similar app using a different account or under a different name.[PinLoop Analysis: (Breach Found)] This is a massive violation in our codebase. `trigger/publish-pins.ts` uses "Domain Velocity Capping," "Account Age matrices," and random 45-minute "Chronological Jitter" explicitly to "completely mask bot footprints" and evade Pinterest's shadowbans. We are systematically evading their enforcement systems.**
 
-Follow any instructions in our technical documentation.
+10. Follow any instructions in our technical documentation.
 **[PinLoop Analysis: YES]**
 API requests are formatted successfully.
 
-You must have a privacy policy that’s consistent with all applicable laws. You’ll need to include a link to your privacy policy when you apply for API access.
+11. You must have a privacy policy that’s consistent with all applicable laws. You’ll need to include a link to your privacy policy when you apply for API access.
 **[PinLoop Analysis: YES]**
 
 What to do

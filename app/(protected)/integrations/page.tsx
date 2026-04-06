@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { Link2, CheckCircle2, Loader2, Store } from "lucide-react"
+import { Link2, CheckCircle2, Loader2, Store, Key, Link as LinkIcon, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GlobalCard } from "@/components/ui/global-card"
 import { CustomSpinner } from "@/components/CustomSpinner"
@@ -21,6 +21,13 @@ export default function IntegrationsPage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [connections, setConnections] = useState<Connection[]>([])
+
+  // Shopify inline form state
+  const [showShopifyForm, setShowShopifyForm] = useState(false)
+  const [storeUrl, setStoreUrl] = useState("")
+  const [clientId, setClientId] = useState("")
+  const [clientSecret, setClientSecret] = useState("")
+  const [isSavingToken, setIsSavingToken] = useState(false)
 
   useEffect(() => {
     loadConnections()
@@ -121,7 +128,36 @@ export default function IntegrationsPage() {
     } else if (platform === "etsy") {
       window.location.href = "/api/auth/etsy"
     } else if (platform === "shopify") {
-      window.location.href = "/sync"
+      setShowShopifyForm(prev => !prev)
+    }
+  }
+
+  const handleSaveShopifyToken = async () => {
+    if (!storeUrl.trim() || !clientId.trim() || !clientSecret.trim()) {
+      toast.error("Please enter the store URL, Client ID, and Client Secret.")
+      return
+    }
+
+    setIsSavingToken(true)
+    try {
+      const res = await fetch("/api/sync/validate-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeUrl: storeUrl.trim(), clientId: clientId.trim(), clientSecret: clientSecret.trim() }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.message || "Failed to validate or save token")
+      }
+
+      toast.success("Shopify connected! Auto-sync is now active.")
+      setShowShopifyForm(false)
+      loadConnections() // reload connection list to show it as connected
+    } catch (error: any) {
+      toast.error(`Validation error: ${error.message}`)
+    } finally {
+      setIsSavingToken(false)
     }
   }
 
@@ -140,6 +176,12 @@ export default function IntegrationsPage() {
     } else {
       toast.success(`${platform} disconnected`)
       setConnections(prev => prev.filter(c => c.id !== id))
+      if (platform === "shopify") {
+        setShowShopifyForm(false)
+        setStoreUrl("")
+        setClientId("")
+        setClientSecret("")
+      }
     }
   }
 
@@ -268,6 +310,97 @@ export default function IntegrationsPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Inline Shopify Form */}
+                {platform.id === "shopify" && showShopifyForm && !isConnected && (
+                  <div className="border-t border-stone-200 bg-stone-50/50 p-5 p-r space-y-4">
+                    <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-xs text-amber-800 space-y-1.5 flex gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold">Shopify Authentication Setup:</p>
+                        <ol className="list-decimal pl-4 space-y-1 mt-1">
+                          <li>Go to Shopify Settings → Apps and sales channels → Develop apps.</li>
+                          <li>Click "Create an app" (Name it PinLoop).</li>
+                          <li>Go to <b>Configuration</b> → Admin API Scopes: Check <code className="bg-amber-100 px-1 rounded">read_products</code> and Save.</li>
+                          <li>Go to <b>API Credentials</b>. Copy the <b>Client ID</b> and <b>Client Secret</b> and paste them below.</li>
+                        </ol>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-stone-700 mb-1 uppercase tracking-wider">
+                          Shopify Store URL
+                        </label>
+                        <div className="relative">
+                          <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                          <input
+                            type="text"
+                            value={storeUrl}
+                            onChange={(e) => setStoreUrl(e.target.value)}
+                            placeholder="your-store.myshopify.com"
+                            className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-stone-700 mb-1 uppercase tracking-wider">
+                            Client ID
+                          </label>
+                          <div className="relative">
+                            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                            <input
+                              type="text"
+                              value={clientId}
+                              onChange={(e) => setClientId(e.target.value)}
+                              placeholder="Client ID"
+                              className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-stone-700 mb-1 uppercase tracking-wider">
+                            Client Secret
+                          </label>
+                          <div className="relative">
+                            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                            <input
+                              type="password"
+                              value={clientSecret}
+                              onChange={(e) => setClientSecret(e.target.value)}
+                              placeholder="Client Secret"
+                              className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowShopifyForm(false)}
+                        className="text-stone-600"
+                        size="sm"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleSaveShopifyToken}
+                        disabled={!storeUrl || !clientId || !clientSecret || isSavingToken}
+                        className="bg-stone-900 text-white hover:bg-stone-800"
+                        size="sm"
+                      >
+                        {isSavingToken ? (
+                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Verifying...</>
+                        ) : (
+                          "Save & Connect"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}

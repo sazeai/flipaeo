@@ -38,7 +38,7 @@ interface BrandSettingsData {
   font_choice: string
   aesthetic_boundaries: string[]
   automation_paused: boolean
-  autopilot_enabled: boolean
+  default_board_id: string
   account_age_type: 'brand_new' | 'established' | ''
   pin_layout_mode: 'organic' | 'editorial'
 }
@@ -56,11 +56,13 @@ export default function BrandSettingsPage() {
     font_choice: 'Playfair Display',
     aesthetic_boundaries: [],
     automation_paused: false,
-    autopilot_enabled: false,
+    default_board_id: '',
     account_age_type: '',
     pin_layout_mode: 'organic',
   })
   const [approvedPinsCount, setApprovedPinsCount] = useState(0)
+  const [boards, setBoards] = useState<{ id: string; name: string }[]>([])
+  const [loadingBoards, setLoadingBoards] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -84,10 +86,24 @@ export default function BrandSettingsPage() {
           font_choice: data.font_choice || 'Playfair Display',
           aesthetic_boundaries: (data.aesthetic_boundaries as string[]) || [],
           automation_paused: data.automation_paused || false,
-          autopilot_enabled: data.autopilot_enabled || false,
+          default_board_id: data.default_board_id || '',
           account_age_type: data.account_age_type || '',
           pin_layout_mode: (data.pin_layout_mode as 'organic' | 'editorial') || 'organic',
         })
+      }
+
+      // Fetch user's Pinterest boards
+      try {
+        setLoadingBoards(true)
+        const res = await fetch('/api/pinterest/boards')
+        if (res.ok) {
+          const bData = await res.json()
+          setBoards(bData.boards || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch boards', err)
+      } finally {
+        setLoadingBoards(false)
       }
 
       // Check how many pins the user has approved (Trust Ladder)
@@ -131,7 +147,7 @@ export default function BrandSettingsPage() {
       font_choice: form.font_choice,
       aesthetic_boundaries: form.aesthetic_boundaries,
       automation_paused: form.automation_paused,
-      autopilot_enabled: form.autopilot_enabled,
+      default_board_id: form.default_board_id,
       account_age_type: form.account_age_type,
       pin_layout_mode: form.pin_layout_mode,
     }
@@ -222,49 +238,31 @@ export default function BrandSettingsPage() {
           </div>
         </div>
 
-        {/* Full Autopilot Toggle */}
-        <div className={`rounded-2xl border-2 p-5 transition-colors ${
-          form.autopilot_enabled
-            ? 'border-indigo-300 bg-indigo-50/50'
-            : 'border-neutral-200 bg-neutral-50'
-        } ${approvedPinsCount < 50 ? 'opacity-70' : ''}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {approvedPinsCount < 50 ? (
-                <ShieldAlert className="w-6 h-6 text-neutral-400 shrink-0" />
+        {/* Default Pinterest Board Selector */}
+        <div className="rounded-2xl border-2 border-neutral-200 bg-neutral-50 p-5 transition-colors">
+          <div className="flex items-start justify-between">
+            <div className="w-full">
+              <h3 className="font-semibold text-sm mb-2">📌 Default Pinterest Board</h3>
+              <p className="text-xs text-muted-foreground mb-3 max-w-[280px]">
+                Pre-select where your manually approved pins should be saved on Pinterest.
+              </p>
+              {loadingBoards ? (
+                <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Fetching your boards...
+                </div>
               ) : (
-                <Rocket className={`w-6 h-6 shrink-0 ${form.autopilot_enabled ? 'text-indigo-600' : 'text-neutral-500'}`} />
+                <select
+                  value={form.default_board_id}
+                  onChange={e => setForm(p => ({ ...p, default_board_id: e.target.value }))}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                >
+                  <option value="">-- Select a Board (Required) --</option>
+                  {boards.map(b => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
               )}
-              <div>
-                <h3 className="font-semibold text-sm">Full Autopilot</h3>
-                <p className="text-xs text-muted-foreground mt-0.5 max-w-[200px]">
-                  {approvedPinsCount < 50
-                    ? `Unlock by approving 50 pins. (Current: ${approvedPinsCount}/50)`
-                    : form.autopilot_enabled 
-                      ? 'AI automatically publishes pins.' 
-                      : 'AI waits for your manual approval.'}
-                </p>
-              </div>
             </div>
-            <button
-              type="button"
-              disabled={approvedPinsCount < 50}
-              onClick={async () => {
-                const newValue = !form.autopilot_enabled
-                setForm(p => ({ ...p, autopilot_enabled: newValue }))
-                if (settingsId) {
-                  const supabase = createClient()
-                  await supabase.from('brand_settings').update({ autopilot_enabled: newValue }).eq('id', settingsId)
-                }
-              }}
-              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed ${
-                form.autopilot_enabled ? 'bg-indigo-500' : 'bg-neutral-300'
-              }`}
-            >
-              <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                form.autopilot_enabled ? 'translate-x-6' : 'translate-x-1'
-              }`} />
-            </button>
           </div>
         </div>
       </div>

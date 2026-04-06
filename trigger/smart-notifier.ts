@@ -23,7 +23,7 @@ export const smartNotifier = schedules.task({
     // 1. Fetch active brands
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, automation_paused, autopilot_enabled, last_notified_at")
+      .select("id, user_id, brand_name, automation_paused, last_notified_at")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No active brands found")
@@ -33,8 +33,8 @@ export const smartNotifier = schedules.task({
     let usersNotified = 0
 
     for (const brand of brands) {
-      // Skip if completely paused or on full autopilot (autopilot skips the inbox)
-      if (brand.automation_paused || brand.autopilot_enabled) continue
+      // Skip if completely paused
+      if (brand.automation_paused) continue;
 
       // 2. Count Approved Pins (The Queue)
       const { count: queuedCount } = await supabase

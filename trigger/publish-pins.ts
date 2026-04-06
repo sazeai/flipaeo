@@ -1,6 +1,6 @@
 import { schedules, logger } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
-import { getValidAccessToken, createPin, getBoards, createBoard } from "@/lib/pinterest-api"
+import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
 
 /**
  * PinLoop — Drip Publisher Engine
@@ -44,7 +44,7 @@ export const publishPins = schedules.task({
         // Check brand settings and account age for Entropy calculations
         const { data: brandCheck } = await supabase
           .from("brand_settings")
-          .select("automation_paused, created_at, account_age_type, is_account_warmed_up")
+          .select("automation_paused, created_at, account_age_type, is_account_warmed_up, default_board_id")
           .eq("user_id", user_id)
           .maybeSingle()
 
@@ -199,10 +199,13 @@ export const publishPins = schedules.task({
               }
             }
 
-            // Feature 11: Select best board or auto-create a new SEO-optimized one
-            const targetBoard = await selectOrCreateBoard(boards, pin.pin_title || '', pin.target_angle || '', accessToken)
+            // Route to explicitly defined default board, or fallback to the best existing board
+            let targetBoard = boards.find(b => b.id === brandCheck?.default_board_id)
             if (!targetBoard) {
-              logger.error(`No board available for pin ${pin.id}, skipping`)
+              targetBoard = selectBestBoard(boards, pin.pin_title || '')
+            }
+            if (!targetBoard) {
+              logger.error(`No default board or public board available for pin ${pin.id}, skipping`)
               continue
             }
 
@@ -280,24 +283,19 @@ export const publishPins = schedules.task({
 })
 
 /**
- * Feature 11: Select the best board or auto-create an SEO-optimized one.
+ * Feature 11 (Modified for API Compliance): Select the best existing board.
  * 
  * 1. Score each existing board by keyword overlap with the pin title.
  * 2. If a strong match is found (score >= 2), use that board.
- * 3. If no match, auto-create a new board named after the pin's lifestyle angle.
- * 4. Cache created boards in `boardCache` to avoid duplicate creation in a single batch.
+ * 3. Never auto-create boards. Just use the best matching public board, or standard fallback.
  */
-const boardCache = new Map<string, any>()
-
-async function selectOrCreateBoard(
+function selectBestBoard(
   boards: any[],
-  pinTitle: string,
-  targetAngle: string,
-  accessToken: string
-): Promise<any> {
+  pinTitle: string
+): any {
   const titleWords = pinTitle.toLowerCase().split(/\s+/)
 
-  // Score each existing board by keyword overlap
+  // Fallback to first available public board
   let bestBoard = boards.find(b => b.privacy === 'PUBLIC') || boards[0]
   let bestScore = 0
 
@@ -320,35 +318,5 @@ async function selectOrCreateBoard(
     }
   }
 
-  // If we found a strong keyword match, use it
-  if (bestScore >= 2) {
-    return bestBoard
-  }
-
-  // No strong match — auto-create a new SEO-optimized board
-  // Derive a board name from the angle or pin title
-  const boardName = targetAngle
-    ? `${targetAngle.split(' ').slice(0, 5).join(' ')} Ideas`
-    : `${pinTitle.split(' ').slice(0, 4).join(' ')} Inspiration`
-
-  // Check cache first to avoid creating duplicates in the same batch
-  const cacheKey = boardName.toLowerCase().trim()
-  if (boardCache.has(cacheKey)) {
-    return boardCache.get(cacheKey)
-  }
-
-  try {
-    logger.info(`📌 Feature 11: Auto-creating SEO board: "${boardName}"`)
-    const newBoard = await createBoard(
-      accessToken,
-      boardName,
-      `Curated ${boardName.toLowerCase()} for your home, lifestyle, and aesthetic inspiration. Discover trending products and design ideas.`
-    )
-    boardCache.set(cacheKey, newBoard)
-    boards.push(newBoard) // Add to the live list for subsequent pins
-    return newBoard
-  } catch (err: any) {
-    logger.error(`Failed to create board "${boardName}": ${err.message}`)
-    return bestBoard // Fall back to best existing board
-  }
+  return bestBoard
 }
