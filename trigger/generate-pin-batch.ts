@@ -250,12 +250,15 @@ Product: "${product.title}"
 Habitat & Aesthetic Vibe: "${targetAngle}"
 
 1. Look closely at the attached image of the product.
-2. Write a photorealistic, 8k background prompt for an image generation model to place this EXACT product in its natural habitat based on the Vibe above.
-3. CRITICAL CONSTRAINT: Do NOT describe the product itself changing shape, size, text, or structure. The product must remain structurally identical to its real-world form in the image. Focus ONLY on building the environment around it, matching its physics.
-4. You MUST format the prompt utilizing this exact Camera Angle: [${randomCamera}]
-5. You MUST format the prompt utilizing this exact Lighting Style: [${randomLighting}]
-6. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs.
-7. Select the best text layout template (template-1, template-2, template-3, template-4, or template-5). template-5 is pure aesthetic (no text) which is usually best.
+2. Write a photorealistic, 8k image generation prompt. The prompt MUST:
+   a. Start by describing the product ("${product.title}") in its exact real-world form — its shape, color, size, label, packaging.
+   b. Then describe the environment/habitat around it based on the Vibe above.
+   c. Use Camera Angle: [${randomCamera}]
+   d. Use Lighting Style: [${randomLighting}]
+3. CRITICAL: The product "${product.title}" MUST be the hero subject in the center of the scene. Do NOT write a prompt that only describes a background or room.
+4. Do NOT alter the product's shape, text, or structure. Keep it structurally faithful to the real product.
+5. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs.
+6. Select the best text layout template (template-1, template-2, template-3, template-4, or template-5). template-5 is pure aesthetic (no text) which is usually best.
 
 Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
 
@@ -412,8 +415,14 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               continue
             }
 
-            // Step 4: Upload rendered image to R2
+            // Step 4: Validate rendered image is not blank/broken (a real 1000x1500 PNG is >50KB)
             const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
+            if (renderedBuffer.length < 10000) {
+              logger.error(`Render returned suspiciously small image (${renderedBuffer.length} bytes) for pin ${pinId}. Likely a blank/black render. Marking as failed.`)
+              await supabase.from("pins").update({ status: "failed", error_message: `Render produced blank image (${renderedBuffer.length} bytes)` }).eq("id", pinId)
+              continue
+            }
+
             const renderedR2Key = `pin-images/${brand.user_id}/${pinId}-final.png`
             await putR2Object(renderedR2Key, renderedBuffer, "image/png")
 

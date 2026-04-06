@@ -15,6 +15,28 @@ const FONT_URLS: Record<string, string> = {
   'DM Sans': 'https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAkpFhR0i2Gw.ttf',
 };
 
+/**
+ * Converts a raw image buffer to a JPEG base64 data URI using a canvas-based
+ * re-encoding approach that also compresses the image to prevent Satori from
+ * choking on oversized (5-10MB) PNG data URIs.
+ * 
+ * Fallback: if sharp is not available, we just pass the raw base64 through.
+ */
+async function toCompressedDataUri(buffer: Buffer, originalMime: string): Promise<string> {
+  try {
+    // Use sharp to re-encode as JPEG at 80% quality, capped at 1000px wide
+    const sharp = (await import('sharp')).default
+    const jpegBuffer = await sharp(buffer)
+      .resize(1000, 1500, { fit: 'cover' })
+      .jpeg({ quality: 85 })
+      .toBuffer()
+    return `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`
+  } catch {
+    // Fallback: use raw buffer as-is (may be large)
+    return `data:${originalMime};base64,${buffer.toString('base64')}`
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -34,17 +56,28 @@ export async function GET(req: NextRequest) {
     // If brand is in 'organic' layout mode, always force template-5 regardless of AI choice
     const activeTemplate = layoutMode === 'organic' ? 'template-5' : (templateId || 'template-1');
     const fontName = fontChoice || 'Playfair Display';
-    const displayStoreUrl = storeUrl ? new URL(storeUrl).hostname.replace('www.', '') : '';
+    
+    let displayStoreUrl = '';
+    try {
+      if (storeUrl) displayStoreUrl = new URL(storeUrl).hostname.replace('www.', '');
+    } catch {
+      displayStoreUrl = storeUrl || '';
+    }
 
-    // Fetch the raw image manually to prevent Satori from silently failing (which causes black screens)
+    // Fetch and compress the raw image to prevent Satori buffer overflow on large PNGs
     const bgResponse = await fetch(imageUrl);
     if (!bgResponse.ok) {
-      throw new Error(`Background image failed to load with status: ${bgResponse.status}`);
+      return new Response(`Background image failed to load: ${bgResponse.status} from ${imageUrl}`, { status: 500 });
     }
     const bgArrayBuffer = await bgResponse.arrayBuffer();
-    /* Convert ArrayBuffer to explicit Base64 data URI to force Satori to explicitly render without making parallel cross-origin fetches */
-    const base64Str = Buffer.from(bgArrayBuffer).toString('base64');
-    const bgDataUri = `data:${bgResponse.headers.get('content-type') || 'image/png'};base64,${base64Str}`;
+    const bgBuffer = Buffer.from(bgArrayBuffer);
+    
+    if (bgBuffer.length < 1000) {
+      return new Response(`Background image is suspiciously small (${bgBuffer.length} bytes), likely broken`, { status: 500 });
+    }
+    
+    const originalMime = bgResponse.headers.get('content-type') || 'image/png';
+    const bgDataUri = await toCompressedDataUri(bgBuffer, originalMime);
 
     // ─────────────────────────────────────────────────
     // Template 5: Pure Aesthetic (Zero-Text Mode)
@@ -76,7 +109,17 @@ export async function GET(req: NextRequest) {
 
     // Load the requested font (only needed for templates with text)
     const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
-    const fontData = await fetch(new URL(fontUrl)).then((res) => res.arrayBuffer());
+    let fontData: ArrayBuffer;
+    try {
+      const fontRes = await fetch(new URL(fontUrl));
+      if (!fontRes.ok) throw new Error(`Font fetch failed: ${fontRes.status}`);
+      fontData = await fontRes.arrayBuffer();
+    } catch (fontErr: any) {
+      console.error(`Font load failed for ${fontName}, falling back to system font:`, fontErr.message);
+      // Fallback: render without custom font (Satori will use system default)
+      const fallbackFontRes = await fetch(new URL(FONT_URLS['Inter']));
+      fontData = await fallbackFontRes.arrayBuffer();
+    }
 
     const fontSize = 64;
 
@@ -202,15 +245,17 @@ export async function GET(req: NextRequest) {
           {textContainer}
           
           {/* The Trust Badge (Bottom CTA) */}
-          <div
-            tw="absolute bottom-12 left-1/2 flex text-black px-8 py-4 rounded-full text-3xl font-semibold shadow-xl"
-            style={{ 
-              transform: 'translateX(-50%)',
-              backgroundColor: 'rgba(255, 255, 255, 0.9)'
-            }}
-          >
-            {displayStoreUrl} ↗
-          </div>
+          {displayStoreUrl && (
+            <div
+              tw="absolute bottom-12 left-1/2 flex text-black px-8 py-4 rounded-full text-3xl font-semibold shadow-xl"
+              style={{ 
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)'
+              }}
+            >
+              {displayStoreUrl} ↗
+            </div>
+          )}
         </div>
       ),
       {
@@ -227,10 +272,9 @@ export async function GET(req: NextRequest) {
       }
     );
   } catch (error: any) {
-    console.error('Error rendering image:', error);
-    return new Response(`Failed to generate image: ${error.message}`, {
+    console.error('Render-pin FATAL error:', error);
+    return new Response(`Render failed: ${error.message}`, {
       status: 500,
     });
   }
 }
-
