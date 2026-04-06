@@ -33,7 +33,7 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 export const generatePinBatch = schedules.task({
   id: "pinloop-generate-batch",
-  cron: "0 */6 * * *",
+  cron: "*/5 * * * *",
   run: async () => {
     logger.info("🎨 PinLoop batch generator started")
 
