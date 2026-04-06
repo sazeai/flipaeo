@@ -36,17 +36,25 @@ export async function GET(req: NextRequest) {
     const fontName = fontChoice || 'Playfair Display';
     const displayStoreUrl = storeUrl ? new URL(storeUrl).hostname.replace('www.', '') : '';
 
+    // Fetch the raw image manually to prevent Satori from silently failing (which causes black screens)
+    const bgResponse = await fetch(imageUrl);
+    if (!bgResponse.ok) {
+      throw new Error(`Background image failed to load with status: ${bgResponse.status}`);
+    }
+    const bgArrayBuffer = await bgResponse.arrayBuffer();
+    /* Convert ArrayBuffer to explicit Base64 data URI to force Satori to explicitly render without making parallel cross-origin fetches */
+    const base64Str = Buffer.from(bgArrayBuffer).toString('base64');
+    const bgDataUri = `data:${bgResponse.headers.get('content-type') || 'image/png'};base64,${base64Str}`;
+
     // ─────────────────────────────────────────────────
     // Template 5: Pure Aesthetic (Zero-Text Mode)
-    // Raw lifestyle image. No gradient. No title. No CTA badge.
-    // Only a barely-visible watermark for brand safety.
     // ─────────────────────────────────────────────────
     if (activeTemplate === 'template-5') {
       return new ImageResponse(
         (
-          <div tw="flex w-full h-full relative">
+          <div tw="flex w-full h-full relative" style={{ backgroundColor: '#ffffff' }}>
             <img
-              src={imageUrl}
+              src={bgDataUri}
               tw="absolute inset-0 w-full h-full"
               style={{ objectFit: 'cover' }}
               alt="Lifestyle"
@@ -184,7 +192,7 @@ export async function GET(req: NextRequest) {
         <div tw="flex flex-col w-full h-full relative bg-white">
           {/* Background Image */}
           <img
-            src={imageUrl}
+            src={bgDataUri}
             tw="absolute inset-0 w-full h-full"
             style={{ objectFit: 'cover' }}
             alt="Background"

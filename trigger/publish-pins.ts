@@ -199,13 +199,22 @@ export const publishPins = schedules.task({
               }
             }
 
-            // Route to explicitly defined default board, or fallback to the best existing board
-            let targetBoard = boards.find(b => b.id === brandCheck?.default_board_id)
-            if (!targetBoard) {
-              targetBoard = selectBestBoard(boards, pin.pin_title || '')
+            // Route to board: Mood boards always go to default board.
+            // Normal pins use the board selected in the Approval UI (pinterest_board_id),
+            // falling back to the default board or best-match board.
+            let targetBoard: any
+            if (pin.is_mood_board) {
+              targetBoard = boards.find(b => b.id === brandCheck?.default_board_id)
+              if (!targetBoard) targetBoard = boards[0] // absolute fallback
+            } else if (pin.pinterest_board_id) {
+              targetBoard = boards.find(b => b.id === pin.pinterest_board_id)
+              if (!targetBoard) targetBoard = selectBestBoard(boards, pin.pin_title || '')
+            } else {
+              targetBoard = boards.find(b => b.id === brandCheck?.default_board_id)
+              if (!targetBoard) targetBoard = selectBestBoard(boards, pin.pin_title || '')
             }
             if (!targetBoard) {
-              logger.error(`No default board or public board available for pin ${pin.id}, skipping`)
+              logger.error(`No board available for pin ${pin.id}, skipping`)
               continue
             }
 
@@ -215,7 +224,7 @@ export const publishPins = schedules.task({
             logger.info(`🛡️ Anti-Ban: Applying chronological jitter of ${Math.round(jitterMs / 60000)} minutes...`)
             await new Promise(resolve => setTimeout(resolve, jitterMs))
 
-            // Publish to Pinterest
+            // Publish to Pinterest — mood boards have NO outbound link
             const pinterestResult = await createPin(accessToken, {
               boardId: targetBoard.id,
               title: pin.pin_title || '',

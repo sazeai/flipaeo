@@ -4,9 +4,10 @@ import { createClient } from "@/utils/supabase/server"
 /**
  * Batch Approve Pins
  * POST /api/pins/approve
- * Body: { pinIds: string[] }
+ * Body: { pinIds: string[], boardMap?: Record<string, string> }
  * 
  * Moves pins from "pending_approval" → "queued" and inserts into pin_queue.
+ * If boardMap is provided, assigns each pin to its selected Pinterest board.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { pinIds } = await req.json()
+    const { pinIds, boardMap } = await req.json()
 
     if (!pinIds || !Array.isArray(pinIds) || pinIds.length === 0) {
       return NextResponse.json({ error: "pinIds array required" }, { status: 400 })
@@ -41,11 +42,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ approved: 0 })
     }
 
-    // Update pins status to "queued"
-    await supabase
-      .from("pins")
-      .update({ status: "queued", updated_at: new Date().toISOString() })
-      .in("id", validPinIds)
+    // Update each pin: set status to "queued" and assign board if provided
+    for (const pinId of validPinIds) {
+      const updatePayload: Record<string, any> = {
+        status: "queued",
+        updated_at: new Date().toISOString(),
+      }
+
+      // Assign the selected board if a boardMap was provided
+      if (boardMap && boardMap[pinId]) {
+        updatePayload.pinterest_board_id = boardMap[pinId]
+      }
+
+      await supabase
+        .from("pins")
+        .update(updatePayload)
+        .eq("id", pinId)
+    }
 
     // Insert into pin_queue for the publisher to pick up
     const queueEntries = validPinIds.map((pinId: string) => ({

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { createClient } from '@supabase/supabase-js';
 import { putR2Object, getR2ObjectStream } from '@/lib/r2';
-import { selectWeightedPrompt, seedDefaultPrompts, recordPromptUsage } from '@/lib/prompt-weight-engine';
+
 
 export const maxDuration = 60; // Prevent Vercel 504 timeouts on long GenAI fetches
 
@@ -24,8 +24,7 @@ export async function POST(req: NextRequest) {
     let userId: string | null = null;
     let brandSettingsId: string | null = null;
     let productContext = '';
-    let weightedPromptId: string | null = null;
-    let aestheticBasePrompt: string | null = null;
+
     let targetAngle: string | null = null;
     let angleEmbedding: number[] | null = null;
     let isMoodBoard = false;
@@ -87,26 +86,7 @@ export async function POST(req: NextRequest) {
         if (product.price) productContext += ` Price: $${product.price}.`;
       }
 
-      // Select weighted prompt template
-      if (brandSettingsId) {
-        // Fetch brand aesthetic boundaries
-        const { data: brand } = await supabase
-          .from('brand_settings')
-          .select('aesthetic_boundaries, pin_layout_mode')
-          .eq('id', brandSettingsId)
-          .single();
 
-        await seedDefaultPrompts(userId, brandSettingsId);
-        const selectedPrompt = await selectWeightedPrompt(
-          userId,
-          brandSettingsId,
-          (brand?.aesthetic_boundaries as string[]) || undefined
-        );
-        if (selectedPrompt) {
-          aestheticBasePrompt = selectedPrompt.prompt_template;
-          weightedPromptId = selectedPrompt.id;
-        }
-      }
     } else {
       // --- Manual mode: raw file upload (existing behavior) ---
       const formData = await req.formData();
@@ -126,8 +106,6 @@ export async function POST(req: NextRequest) {
     let aestheticGuidance = '';
     if (targetAngle) {
       aestheticGuidance = `\n\nCRITICAL CONTEXT: The specific lifestyle angle you MUST use for this image is: "${targetAngle}". You MUST design the entire environment, lighting, and aesthetic strictly around this angle.`;
-    } else if (aestheticBasePrompt) {
-      aestheticGuidance = `\n\nUse this as aesthetic inspiration for the environment: "${aestheticBasePrompt}"`;
     }
 
     // 1. Call Gemini 2.5 Flash to act as the "Art Director"
@@ -242,7 +220,7 @@ export async function POST(req: NextRequest) {
           product_id: productId,
           brand_settings_id: brandSettingsId,
           art_director_prompt: dynamicImagePrompt,
-          image_prompt_used: aestheticBasePrompt || null,
+
           target_angle: targetAngle,
           angle_embedding: angleEmbedding ? `[${angleEmbedding.join(",")}]` : null, // Postgres vector representation
           template_id: templateId,
@@ -272,10 +250,7 @@ export async function POST(req: NextRequest) {
           })
           .eq('id', pin.id);
 
-        // Record prompt weight usage
-        if (weightedPromptId) {
-          await recordPromptUsage(weightedPromptId);
-        }
+
 
         return NextResponse.json({
           pinId: pin.id,

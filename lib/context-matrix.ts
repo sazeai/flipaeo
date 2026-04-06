@@ -16,34 +16,41 @@ export async function generateUniqueAngle(
   product: { id: string; title: string; description?: string },
   trends: string[],
   brandBoundaries?: string[],
-  audienceProfile?: Record<string, any> | null
+  audienceProfile?: Record<string, any> | null,
+  pastAngles?: string[]
 ): Promise<{ angle: string; embedding: number[] }> {
   const supabase = createAdminClient()
 
   // Try up to 3 times to find a unique angle
   for (let attempt = 1; attempt <= 3; attempt++) {
-    // 1. Ask Gemini to generate an angle
+    // 1. Ask Gemini to generate a Micro-Environment Habitat
     const generationPrompt = `
-You are an expert Pinterest Strategist. We need a unique, highly-converting lifestyle angle for a product.
+You are an expert Pinterest Strategist configuring the "Micro-Environment" visual engine.
+We need a highly specific, natural lifestyle habitat for this product.
 Product: "${product.title}" ${product.description ? `- ${product.description}` : ""}
 
-Current Pinterest Trends this week: ${trends.slice(0, 10).join(", ")}
-${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints: strictly stick to these vibes -> ${brandBoundaries.join(", ")}` : ""}
-${audienceProfile ? `\nAudience Intelligence (from Pinterest analytics): The account's engaged audience data is: ${JSON.stringify(audienceProfile).slice(0, 500)}. Bias your lifestyle angle to resonate with this demographic.` : ""}
+Current Pinterest Trends this week (use for lighting/color-grading ideas only): ${trends.slice(0, 10).join(", ")}
+${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints (strictly stick to these vibes): ${brandBoundaries.join(", ")}` : ""}
+${audienceProfile ? `\nAudience Intelligence: ${JSON.stringify(audienceProfile).slice(0, 500)}.` : ""}
 
-Generate ONE highly specific "Angle" that combines:
-1. A specific Aesthetic / Vibe
-2. A Season, Event, or Buyer Persona
-3. One of the trending keywords (if it makes sense for the product, otherwise invent a high-volume search term)
+CRITICAL INSTRUCTION: Do NOT force this product into a generic "cozy room". Consider the product's NATURAL, real-world habitat. 
 
-Output MUST be a single, short string (max 12 words).
-Examples: "Minimalist Work Bag for Autumn Streetwear", "Cozy Cottagecore Mug for Holiday Gifting", "Dark Academia Desk Setup Aesthetic".
+${pastAngles && pastAngles.length > 0 ? `CRITICAL RULE: You have already generated these exact habitats for this product in the past. You MUST INVENT SOMETHING COMPLETELY DIFFERENT. DO NOT REUSE THESE:
+- ${pastAngles.slice(0, 20).join("\n- ")}` : ""}
+
+Generate ONE highly specific "Habitat Vibe" that combines:
+1. The Product's distinct Natural Habitat (physical surface/location)
+2. A specific Aesthetic / Lighting style
+3. An optional season or trend (for color grading)
+
+Output MUST be a single, short string (max 15 words).
+Examples: "Marble vanity with warm glowing sunset light", "Rustic wooden picnic table in autumn breeze", "Sleek workout bench under neon gym lighting", "Morning kitchen counter with scattered coffee beans".
     `
 
     const angleResponse = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{ text: generationPrompt }],
-      config: { temperature: 0.8 + (attempt * 0.1) }, // increase creativity if retrying
+      config: { temperature: 1.1 + (attempt * 0.1) }, // Start high (1.2) for maximum brainstorming variance
     })
 
     const proposedAngle = angleResponse.text?.trim()
@@ -98,9 +105,9 @@ Examples: "Minimalist Work Bag for Autumn Streetwear", "Cozy Cottagecore Mug for
       outputDimensionality: 768,
     }
   })
-  
-  return { 
-    angle: fallbackAngle, 
-    embedding: fallbackEmbedding.embeddings?.[0]?.values || Array(768).fill(0) 
+
+  return {
+    angle: fallbackAngle,
+    embedding: fallbackEmbedding.embeddings?.[0]?.values || Array(768).fill(0)
   }
 }

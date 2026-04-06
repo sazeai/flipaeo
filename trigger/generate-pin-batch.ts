@@ -118,24 +118,46 @@ export const generatePinBatch = schedules.task({
           continue
         }
 
-        // For each product, check how many pins already exist
-        const eligibleProducts = []
-        for (const product of products) {
-          const { count } = await supabase
-            .from("pins")
-            .select("id", { count: "exact", head: true })
-            .eq("product_id", product.id)
-            .neq("status", "failed")
+        // 1. Calculate Monthly Quota (100-Pin Hard Cap)
+        const pastThirtyDays = new Date()
+        pastThirtyDays.setDate(pastThirtyDays.getDate() - 30)
 
-          if ((count || 0) < 10) {
-            eligibleProducts.push(product)
-          }
-        }
+        const { data: userPins } = await supabase
+          .from("pins")
+          .select("id, product_id, created_at, status, target_angle")
+          .eq("user_id", brand.user_id)
 
-        if (eligibleProducts.length === 0) {
-          logger.info(`All products for user ${brand.user_id} have sufficient pins`)
+        const monthlyPins = (userPins || []).filter((p: any) => new Date(p.created_at) >= pastThirtyDays)
+        if (monthlyPins.length >= 100) {
+          logger.info(`User ${brand.user_id} hit the 100-pin monthly quota limit. Skipping generation.`)
           continue
         }
+
+        // 2. Filter Eligible Products (limit to 10 pending pins per product max)
+        const eligibleProducts = products.filter((prod: any) => {
+          const prodPins = (userPins || []).filter((p: any) => p.product_id === prod.id)
+          const pendingCount = prodPins.filter((p: any) => !['published', 'failed'].includes(p.status)).length
+          if (pendingCount >= 10) return false
+          return true
+        })
+
+        if (eligibleProducts.length === 0) {
+          logger.info(`All products for user ${brand.user_id} have sufficient pins or hit limit`)
+          continue
+        }
+
+        // 3. Round-Robin Array: Sort products by oldest `last_generated_at`
+        const productsWithLastGen = eligibleProducts.map((prod: any) => {
+          const prodPins = (userPins || []).filter((p: any) => p.product_id === prod.id)
+          let lastGenTime = 0
+          if (prodPins.length > 0) {
+            const dates = prodPins.map((p: any) => new Date(p.created_at).getTime())
+            lastGenTime = Math.max(...dates)
+          }
+          return { ...prod, last_generated_at: lastGenTime }
+        })
+
+        productsWithLastGen.sort((a: any, b: any) => a.last_generated_at - b.last_generated_at)
 
         // Fetch trends isolated per-user to comply with Pinterest API guidelines
         let brandTrends: string[] = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
@@ -152,20 +174,23 @@ export const generatePinBatch = schedules.task({
           logger.warn(`Could not fetch live trends for user ${brand.user_id}, using fallbacks`)
         }
 
-        // Weekly Shuffle: Randomize product selection so the Approval Inbox has maximum variety
-        const shuffledProducts = shuffleArray(eligibleProducts)
-        const batchProducts = shuffledProducts.slice(0, 3)
+        // Grab exactly 1 product to generate (4 pins generated a day on 6hr cron interval)
+        const batchProducts = productsWithLastGen.slice(0, 1)
 
         for (const product of batchProducts) {
           try {
             logger.info(`Generating pin for product: ${product.title}`)
 
             // Generate unique Context Matrix angle (Semantic De-Duplication)
+            const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
+            const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
+
             const { angle: targetAngle, embedding: angleEmbedding } = await generateUniqueAngle(
-              { id: product.id, title: product.title },
+              { id: product.id, title: product.title, description: product.description },
               brandTrends,
               brand.aesthetic_boundaries,
-              brand.audience_profile
+              brand.audience_profile,
+              pastAngles
             )
             logger.info(`Selected semantic angle: "${targetAngle}"`)
 
@@ -178,21 +203,74 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
+            const cameraAngles = [
+              "Macro close-up shot",
+              "Overhead flat-lay shot",
+              "Dynamic low-angle shot",
+              "Eye-level straight on shot",
+              "Wide environmental shot",
+              "Symmetrical Wes Anderson style shot",
+              "Dutch angle, dramatic tilt",
+              "Ultra-wide establishing shot",
+              "Shallow depth of field with heavy bokeh",
+              "First-person POV perspective",
+              "Intimate over-the-shoulder perspective",
+              "Isometric 3D perspective style",
+              "Telephoto compressed background shot"
+            ]
+            const lightingStyles = [
+              "Golden hour sunlight streaming through a window",
+              "Moody cinematic shadows with soft diffused light",
+              "Bright, high-key studio lighting",
+              "Harsh sunlight with strong, defined shadows",
+              "Soft, glowing evening ambient light",
+              "Neon cyberpunk glow with pink and blue hues",
+              "Warm, flickering candlelit ambiance",
+              "Dappled sunlight filtering through tree leaves",
+              "Harsh direct flash, paparazzi style",
+              "Overcast, flat diffused daylight",
+              "Cinematic rim lighting separating subject from background",
+              "Ethereal, misty morning light",
+              "Dramatic chiaroscuro Renaissance lighting"
+            ]
+            
+            const randomCamera = cameraAngles[Math.floor(Math.random() * cameraAngles.length)]
+            const randomLighting = lightingStyles[Math.floor(Math.random() * lightingStyles.length)]
+
             const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director.
 Product: "${product.title}"
-Angle: "${targetAngle}"
+Habitat & Aesthetic Vibe: "${targetAngle}"
 
-1. Write a photorealistic, 8k background prompt for an image generation model to place this product in a fitting, highly aesthetic lifestyle environment.
-2. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs.
-3. Select the best text layout template (template-1, template-2, template-3, template-4, or template-5). template-5 is pure aesthetic (no text) which is usually best.
-
-CRITICAL CONTEXT: The specific lifestyle angle you MUST use for this image is: "${targetAngle}". You MUST design the entire environment, lighting, and aesthetic strictly around this angle.
+1. Look closely at the attached image of the product.
+2. Write a photorealistic, 8k background prompt for an image generation model to place this EXACT product in its natural habitat based on the Vibe above.
+3. CRITICAL CONSTRAINT: Do NOT describe the product itself changing shape, size, text, or structure. The product must remain structurally identical to its real-world form in the image. Focus ONLY on building the environment around it, matching its physics.
+4. You MUST format the prompt utilizing this exact Camera Angle: [${randomCamera}]
+5. You MUST format the prompt utilizing this exact Lighting Style: [${randomLighting}]
+6. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs.
+7. Select the best text layout template (template-1, template-2, template-3, template-4, or template-5). template-5 is pure aesthetic (no text) which is usually best.
 
 Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
 
+            // Fetch product image to give Gemini visual context
+            let imagePart: any = null
+            try {
+              const imgRes = await fetch(sourceImageUrl)
+              if (imgRes.ok) {
+                const imgBuffer = await imgRes.arrayBuffer()
+                const imgBase64 = Buffer.from(imgBuffer).toString('base64')
+                const mimeType = imgRes.headers.get('content-type') || 'image/jpeg'
+                imagePart = { inlineData: { data: imgBase64, mimeType } }
+              }
+            } catch (err) {
+              logger.warn(`Failed to fetch product image for Gemini context`)
+            }
+
+            const promptParts: any[] = [{ text: artDirectorPrompt }]
+            if (imagePart) promptParts.push(imagePart)
+
             const planResponse = await ai.models.generateContent({
               model: 'gemini-2.5-flash',
-              contents: [{ text: artDirectorPrompt }],
+              contents: promptParts,
               config: { temperature: 0.7, responseMimeType: "application/json" }
             })
 
@@ -243,7 +321,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
               template_id: genTemplateId,
               pin_title: genTitle,
               status: 'generating',
-              is_mood_board: false
+              is_mood_board: Math.random() < 0.1
             }).select('id').single()
 
             const pinId = pin?.id
@@ -355,121 +433,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
           }
         }
 
-        // Feature 14: Generate Trojan Horse "Mood Board" Pin to actively build domain trust
-        try {
-          logger.info(`Generating Trojan Horse Mood Board pin for brand: ${brand.brand_name}`)
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000'
-          const r2DomainMb = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
 
-          // Step 1: Gemini Art Director for Mood Board
-          const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director. Generate a beautiful, purely aesthetic "Mood Board" lifestyle photo concept.
-          
-1. Write a photorealistic, 8k background prompt for an image generation model to create a stunning, atmospheric scene based on the brand: "${brand.brand_name}".
-2. Write an elegant, 4 to 6 word title for this mood board. Use nouns, not verbs.
-3. Select template-2 (Center text) as the text layout template.
-
-Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
-
-          const mbPlanResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: [{ text: artDirectorPrompt }],
-            config: { temperature: 0.7, responseMimeType: "application/json" }
-          })
-
-          const mbPlan = JSON.parse(mbPlanResponse.text?.trim() || '{}')
-          const mbPrompt = mbPlan.imagePrompt || `Aesthetic lifestyle mood board for ${brand.brand_name}`
-          const mbTitle = mbPlan.title || `${brand.brand_name} Mood Board`
-          const mbTemplateId = mbPlan.templateId || "template-2"
-
-          // Step 2: Fal.ai Generation
-          logger.info(`Starting fal.ai Mood Board generation for ${brand.brand_name}...`)
-          const mbResult: any = await fal.subscribe("fal-ai/flux/dev", {
-            input: {
-              prompt: mbPrompt,
-              num_images: 1,
-              image_size: { width: 1000, height: 1500 },
-              output_format: "png",
-            },
-          })
-
-          const mbFalImageUrl = mbResult.data?.images?.[0]?.url
-          if (!mbFalImageUrl) {
-            logger.error("Fal.ai returned no Mood Board image URL. Full Result:", mbResult)
-            throw new Error("Fal.ai returned no Mood Board image URL")
-          }
-          logger.info(`✅ Fal.ai successfully generated Mood Board image: ${mbFalImageUrl}`)
-
-          // Save pin to DB for ID
-          const { data: mbPin } = await supabase.from('pins').insert({
-            user_id: brand.user_id,
-            brand_settings_id: brand.id,
-            art_director_prompt: mbPrompt,
-            template_id: mbTemplateId,
-            pin_title: mbTitle,
-            status: 'generating',
-            is_mood_board: true
-          }).select('id').single()
-
-          const mbPinId = mbPin?.id
-          if (!mbPinId) throw new Error("No pinId returned from DB for Mood Board")
-
-          // Download & Save raw to R2
-          const mbFalRes = await fetch(mbFalImageUrl)
-          const mbFalBuffer = Buffer.from(await mbFalRes.arrayBuffer())
-          const mbRawR2Key = `pin-images/${brand.user_id}/${mbPinId}-raw.png`
-          await putR2Object(mbRawR2Key, mbFalBuffer, "image/png")
-          const mbRawImageUrl = r2DomainMb ? `${r2DomainMb}/${mbRawR2Key}` : mbRawR2Key
-
-          // Step 3: SEO Copy
-          const copyRes = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [{
-              text: `Write a Pinterest SEO description for this aesthetic mood board image.
-              Pin Title: "${mbTitle}"
-              Write a 150-300 character description optimized for Pinterest SEO. Include relevant aesthetic keywords naturally. Do NOT use hashtags. Write in an inviting, editorial tone.
-              Return ONLY the description text, nothing else.`
-            }],
-            config: { temperature: 0.6 }
-          })
-          const mbDescription = copyRes.text?.trim() || `Discover ${mbTitle}`
-
-          // Step 4: Render Mood Board with Template
-          const mbRenderParams = new URLSearchParams({
-            imageUrl: mbRawImageUrl,
-            title: mbTitle,
-            templateId: mbTemplateId,
-            fontChoice: brand.font_choice || "Playfair Display",
-            storeUrl: brand.store_url || "",
-            pinId: mbPinId,
-            layoutMode: brand.pin_layout_mode || 'organic',
-          })
-
-          const mbRenderRes = await fetch(`${appUrl.replace(/\/$/, '')}/api/render-pin?${mbRenderParams.toString()}`)
-
-          if (!mbRenderRes.ok) {
-            await supabase.from("pins").update({ status: "failed", error_message: "Render failed" }).eq("id", mbPinId)
-            throw new Error(`Render failed for mb pin ${mbPinId}`)
-          }
-
-          // Step 5: Save Rendered to R2 & Update DB
-          const renderedBuffer = Buffer.from(await mbRenderRes.arrayBuffer())
-          const renderedR2Key = `pin-images/${brand.user_id}/${mbPinId}-final.png`
-          await putR2Object(renderedR2Key, renderedBuffer, "image/png")
-          const renderedImageUrl = r2DomainMb ? `${r2DomainMb}/${renderedR2Key}` : renderedR2Key
-
-          await supabase.from("pins").update({
-            rendered_image_url: renderedImageUrl,
-            rendered_image_r2_key: renderedR2Key,
-            pin_description: mbDescription,
-            status: "pending_approval",
-          }).eq("id", mbPinId)
-
-          totalGenerated++
-          logger.info(`✅ Mood Board generated → pending approval: ${mbPinId}`)
-
-        } catch (moodBoardError: any) {
-          logger.error(`Error generating Mood Board for ${brand.brand_name}: ${moodBoardError.message}`)
-        }
       } catch (brandError: any) {
         logger.error(`Error processing brand ${brand.brand_name}: ${brandError.message}`)
       }
