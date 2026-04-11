@@ -13,6 +13,9 @@ import {
   CheckCircle,
   X,
   Check,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 import { PinEditModal } from '@/components/pin-edit-modal'
 
@@ -84,6 +87,13 @@ export default function PinsPage() {
   // Bulk selection
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkLoading, setBulkLoading] = useState(false)
+
+  // Quick-reject reason picker
+  const [rejectingPinId, setRejectingPinId] = useState<string | null>(null)
+
+  // Image viewer
+  const [viewingImage, setViewingImage] = useState<{ url: string; title: string } | null>(null)
+  const [zoomLevel, setZoomLevel] = useState(1)
 
   // Board state (fetched once, shared with modal)
   const [boards, setBoards] = useState<PinterestBoard[]>([])
@@ -316,7 +326,7 @@ export default function PinsPage() {
         <div className="flex gap-2">
           {[...Array(5)].map((_, i) => <div key={i} className="h-8 w-20 bg-muted rounded-full" />)}
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="rounded-2xl bg-white border border-neutral-200/70 overflow-hidden">
               <div className="mx-3 mt-3 rounded-xl bg-muted aspect-[3/4]" />
@@ -431,7 +441,7 @@ export default function PinsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
           {pins.map(pin => {
             const imageUrl = pin.rendered_image_url || pin.generated_image_url
             const isSelected = selected.has(pin.id)
@@ -447,7 +457,7 @@ export default function PinsPage() {
                 }`}
               >
                 {/* Image container — fixed height, padded, light bg */}
-                <div className="relative mx-3 mt-3 rounded-xl bg-neutral-100 overflow-hidden">
+                <div className="relative mx-2 mt-2 sm:mx-3 sm:mt-3 rounded-xl bg-neutral-100 overflow-hidden">
                   <div className="aspect-[3/4] flex items-center justify-center">
                     {imageUrl ? (
                       <img
@@ -468,21 +478,32 @@ export default function PinsPage() {
                     {STATUS_LABELS[pin.status] || pin.status}
                   </span>
 
-                  {/* Checkbox */}
+                  {/* Checkbox — always visible on mobile */}
                   <button
                     onClick={e => { e.stopPropagation(); toggleSelect(pin.id) }}
                     className={`cursor-pointer absolute top-2 right-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-neutral-900 border-neutral-900 text-white'
-                        : 'bg-white/90 border-white/70 backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                        : 'bg-white/90 border-white/70 backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                   </button>
+
+                  {/* Expand image — always visible on mobile */}
+                  {imageUrl && (
+                    <button
+                      onClick={e => { e.stopPropagation(); setViewingImage({ url: imageUrl, title: pin.pin_title || 'Pin' }); setZoomLevel(1) }}
+                      className="cursor-pointer absolute bottom-2 right-2 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-sm text-white/80 hover:text-white flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                      title="View full image"
+                    >
+                      <Maximize2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Content section */}
-                <div className="px-3.5 pt-3 pb-3.5">
+                <div className="px-2 pt-3 pb-3.5 sm:px-3.5 space-y-1">
                   {pin.products?.title && (
                     <p className="text-[11px] font-medium text-emerald-600 truncate">{pin.products.title}</p>
                   )}
@@ -506,13 +527,63 @@ export default function PinsPage() {
                       </span>
                     </div>
                   )}
-                  {/* Edit button */}
-                  <button
-                    onClick={() => setEditingPin(pin)}
-                    className="cursor-pointer w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 bg-neutral-900 text-white rounded-lg text-xs font-semibold hover:bg-neutral-800 transition-colors"
-                  >
-                    <Pencil className="w-3 h-3" /> Edit Pin
-                  </button>
+                  {/* Quick actions */}
+                  {pin.status === 'pending_approval' ? (
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            const board = defaultBoardId || boards[0]?.id
+                            if (board) handleApprove(pin.id, board)
+                          }}
+                          className="cursor-pointer flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-2 sm:py-2 bg-emerald-600 text-white rounded-lg text-[11px] sm:text-xs font-semibold hover:bg-emerald-700 transition-colors min-w-0"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5 shrink-0 hidden md:block" /> <span className="truncate">Approve</span>
+                        </button>
+                        <button
+                          onClick={() => setRejectingPinId(rejectingPinId === pin.id ? null : pin.id)}
+                          className={`cursor-pointer flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-2 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-colors min-w-0 ${
+                            rejectingPinId === pin.id
+                              ? 'bg-red-600 text-white'
+                              : 'bg-red-500 text-white hover:bg-red-600'
+                          }`}
+                        >
+                          <X className="w-3.5 h-3.5 shrink-0 hidden md:block" /> <span className="truncate">Reject</span>
+                        </button>
+                        <button
+                          onClick={() => setEditingPin(pin)}
+                          className="cursor-pointer flex items-center justify-center w-8 h-8 shrink-0 rounded-lg border border-neutral-200 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-colors"
+                          title="Edit Pin"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {rejectingPinId === pin.id && (
+                        <div className="flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                          {[
+                            { reason: 'bad_image' as RejectReason, label: 'Image', fullLabel: 'Bad Image' },
+                            { reason: 'bad_text' as RejectReason, label: 'Text', fullLabel: 'Bad Text' },
+                            { reason: 'wrong_vibe' as RejectReason, label: 'Vibe', fullLabel: 'Wrong Vibe' },
+                          ].map(({ reason, label, fullLabel }) => (
+                            <button
+                              key={reason}
+                              onClick={() => { handleReject(pin.id, reason); setRejectingPinId(null) }}
+                              className="cursor-pointer flex-1 px-1 py-1.5 text-[10px] sm:text-[11px] font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-md transition-colors text-center"
+                            >
+                              <span className="sm:hidden">{label}</span><span className="hidden sm:inline">{fullLabel}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setEditingPin(pin)}
+                      className="cursor-pointer w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 bg-neutral-900 text-white rounded-lg text-xs font-semibold hover:bg-neutral-800 transition-colors"
+                    >
+                      <Pencil className="w-3 h-3" /> Edit Pin
+                    </button>
+                  )}
                 </div>
               </div>
             )
@@ -532,6 +603,56 @@ export default function PinsPage() {
         onRejected={(pinId, reason) => { handleReject(pinId, reason); setEditingPin(null) }}
         onDeleted={(pinId) => { handleDelete(pinId); setEditingPin(null) }}
       />
+
+      {/* Fullscreen Image Viewer */}
+      {viewingImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center"
+          onClick={() => setViewingImage(null)}
+        >
+          {/* Top bar */}
+          <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-3 z-10">
+            <p className="text-white/70 text-sm font-medium truncate max-w-[60%]">{viewingImage.title}</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={e => { e.stopPropagation(); setZoomLevel(z => Math.max(0.5, z - 0.5)) }}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <span className="text-white/60 text-xs font-mono min-w-[3rem] text-center">{Math.round(zoomLevel * 100)}%</span>
+              <button
+                onClick={e => { e.stopPropagation(); setZoomLevel(z => Math.min(5, z + 0.5)) }}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewingImage(null)}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors ml-2"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Image */}
+          <div
+            className="overflow-auto max-w-full max-h-full flex items-center justify-center p-4"
+            onClick={e => e.stopPropagation()}
+            style={{ touchAction: 'pinch-zoom' }}
+          >
+            <img
+              src={viewingImage.url}
+              alt={viewingImage.title}
+              className="transition-transform duration-200 ease-out rounded-lg select-none"
+              style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center center', maxHeight: '85vh', maxWidth: '90vw', objectFit: 'contain' }}
+              draggable={false}
+              onDoubleClick={() => setZoomLevel(z => z === 1 ? 2.5 : 1)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

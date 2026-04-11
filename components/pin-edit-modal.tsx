@@ -262,7 +262,7 @@ export function PinEditModal({
               </div>
 
               {/* Footer Actions */}
-              <div className="px-6 py-4 border-t border-neutral-100 shrink-0 space-y-3">
+              <div className="px-4 py-4 border-t border-neutral-100 shrink-0 space-y-3">
                 {/* Primary actions */}
                 <div className="flex items-center gap-2.5">
                   {isPending ? (
@@ -270,7 +270,7 @@ export function PinEditModal({
                       <button
                         onClick={handleSave}
                         disabled={saving || approving}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-700 text-sm font-semibold hover:bg-neutral-50 transition-all disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-2 px-2 py-2 rounded-lg border border-neutral-200 bg-white text-neutral-700 text-sm font-semibold hover:bg-neutral-50 transition-all disabled:opacity-50"
                       >
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                         Save Draft
@@ -278,7 +278,7 @@ export function PinEditModal({
                       <button
                         onClick={handleSaveAndApprove}
                         disabled={saving || approving}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 text-white text-sm font-semibold hover:bg-neutral-800 transition-all disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-2 px-2 py-2 rounded-lg bg-neutral-900 text-white text-sm font-semibold hover:bg-neutral-800 transition-all disabled:opacity-50"
                       >
                         {approving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
                         Save & Approve
