@@ -23,28 +23,37 @@ export async function generateUniqueAngle(
 
   // Try up to 3 times to find a unique angle
   for (let attempt = 1; attempt <= 3; attempt++) {
-    // 1. Ask Gemini to generate a Micro-Environment Habitat
+    // 1. Ask Gemini to generate a creative Scene Concept
     const generationPrompt = `
-You are an expert Pinterest Strategist configuring the "Micro-Environment" visual engine.
-We need a highly specific, natural lifestyle habitat for this product.
-Product: "${product.title}" ${product.description ? `- ${product.description}` : ""}
+You are an elite Pinterest Creative Director who creates viral, aspirational product photography concepts.
+Your scenes get 10x more saves than generic "product on counter" shots.
 
-Current Pinterest Trends this week (use for lighting/color-grading ideas only): ${trends.slice(0, 10).join(", ")}
-${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints (strictly stick to these vibes): ${brandBoundaries.join(", ")}` : ""}
-${audienceProfile ? `\nAudience Intelligence: ${JSON.stringify(audienceProfile).slice(0, 500)}.` : ""}
+Product: "${product.title}" ${product.description ? `— ${product.description}` : ""}
 
-CRITICAL INSTRUCTION: Do NOT force this product into a generic "cozy room". Consider the product's NATURAL, real-world habitat. 
+Current Pinterest Trends this week: ${trends.slice(0, 10).join(", ")}
+${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints (strictly follow): ${brandBoundaries.join(", ")}` : ""}
+${audienceProfile ? `\nTarget Audience: ${JSON.stringify(audienceProfile).slice(0, 500)}.` : ""}
 
-${pastAngles && pastAngles.length > 0 ? `CRITICAL RULE: You have already generated these exact habitats for this product in the past. You MUST INVENT SOMETHING COMPLETELY DIFFERENT. DO NOT REUSE THESE:
-- ${pastAngles.slice(0, 20).join("\n- ")}` : ""}
+STEP 1 — Understand the product category. Is this a FOOD item, BEAUTY product, HOME DECOR, FASHION, FITNESS, KIDS, TECH, or something else? Your scene MUST feel natural for this specific category.
 
-Generate ONE highly specific "Habitat Vibe" that combines:
-1. The Product's distinct Natural Habitat (physical surface/location)
-2. A specific Aesthetic / Lighting style
-3. An optional season or trend (for color grading)
+STEP 2 — Choose ONE creative direction from these diverse approaches (rotate, don't repeat):
+• LIFESTYLE MOMENT: Show the product being used in an aspirational real-life scene (e.g. someone's breakfast spread, a morning skincare ritual, a cozy reading nook setup)
+• INGREDIENT STORY: Surround the product with its raw ingredients or complementary items spilling naturally around it (e.g. peanuts, cocoa beans, fresh herbs, fabric swatches)
+• SEASONAL TABLESCAPE: Place the product in a seasonally-styled scene — spring florals, summer citrus, autumn leaves, winter textures
+• FLAT-LAY COMPOSITION: Artful overhead arrangement with complementary props, textures, and negative space
+• ASPIRATIONAL CONTEXT: The product in an aspirational setting that tells a story about who uses it (fitness prep station, artisan workshop, nursery shelf, travel essentials layout)
+• CULTURAL MOMENT: tie to a celebration, festival, gifting occasion, or ritual (Diwali gift hamper, Christmas morning, birthday brunch, self-care Sunday)
+• TEXTURE CONTRAST: Place product against unexpected but beautiful contrasting textures (smooth product on rough linen, glossy packaging on raw wood, colorful label against matte concrete)
+• PROCESS SHOT: The product mid-use — being poured, spread, applied, unwrapped, or styled — capturing motion and anticipation
 
-Output MUST be a single, short string (max 15 words).
-Examples: "Marble vanity with warm glowing sunset light", "Rustic wooden picnic table in autumn breeze", "Sleek workout bench under neon gym lighting", "Morning kitchen counter with scattered coffee beans".
+STEP 3 — Write the scene as a vivid, specific concept. Include a concrete physical setting, 2-3 specific props or contextual details, and an overall mood/emotion.
+
+${pastAngles && pastAngles.length > 0 ? `IMPORTANT — These scenes were ALREADY created for this product. You MUST create something COMPLETELY DIFFERENT in both concept and mood. DO NOT produce anything similar:
+${pastAngles.slice(0, 20).map(a => `• ${a}`).join("\n")}` : ""}
+
+Output ONLY a single descriptive scene concept (max 20 words). Be specific and vivid, not generic.
+BAD examples (too generic): "Kitchen counter with warm light", "Cozy room with soft lighting", "Shelf with natural light"
+GOOD examples: "Overflowing breakfast spread with fresh toast, fruit, and morning newspaper on sunlit farmhouse table", "Autumn picnic blanket with scattered maple leaves, thermos, and knit scarf in golden hour", "Gym bag flat-lay with protein shake, earbuds, and chalk-dusted hands on rubber mat", "Diwali gift hamper with diyas, marigolds, and silk wrapping on brass tray"
     `
 
     const angleResponse = await ai.models.generateContent({
@@ -75,7 +84,7 @@ Examples: "Marble vanity with warm glowing sunset light", "Rustic wooden picnic 
     const { data: matchesData, error } = await supabase.rpc("match_pin_angles" as any, {
       query_product_id: product.id,
       query_embedding: embedding,
-      match_threshold: 0.85, // 85% similarity is considered a duplicate
+      match_threshold: 0.75, // 75% similarity = genuinely different creative concepts required
       match_count: 1
     })
 

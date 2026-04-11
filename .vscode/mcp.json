@@ -14,7 +14,6 @@
 			"args": [
 				"--project-ref",
 				"${input:project-ref}",
-				"${input:project-ref = 'toftajqocetadulwyvvy'} ? '--project-ref ' + input : ''}",
 				"--read-only",
 				"${input:read-only}",
 				"--features",

@@ -211,54 +211,25 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
-            const cameraAngles = [
-              "Macro close-up shot",
-              "Overhead flat-lay shot",
-              "Dynamic low-angle shot",
-              "Eye-level straight on shot",
-              "Wide environmental shot",
-              "Symmetrical Wes Anderson style shot",
-              "Dutch angle, dramatic tilt",
-              "Ultra-wide establishing shot",
-              "Shallow depth of field with heavy bokeh",
-              "First-person POV perspective",
-              "Intimate over-the-shoulder perspective",
-              "Isometric 3D perspective style",
-              "Telephoto compressed background shot"
-            ]
-            const lightingStyles = [
-              "Golden hour sunlight streaming through a window",
-              "Moody cinematic shadows with soft diffused light",
-              "Bright, high-key studio lighting",
-              "Harsh sunlight with strong, defined shadows",
-              "Soft, glowing evening ambient light",
-              "Neon cyberpunk glow with pink and blue hues",
-              "Warm, flickering candlelit ambiance",
-              "Dappled sunlight filtering through tree leaves",
-              "Harsh direct flash, paparazzi style",
-              "Overcast, flat diffused daylight",
-              "Cinematic rim lighting separating subject from background",
-              "Ethereal, misty morning light",
-              "Dramatic chiaroscuro Renaissance lighting"
-            ]
-            
-            const randomCamera = cameraAngles[Math.floor(Math.random() * cameraAngles.length)]
-            const randomLighting = lightingStyles[Math.floor(Math.random() * lightingStyles.length)]
+            const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
 
-            const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director.
-Product: "${product.title}"
-Habitat & Aesthetic Vibe: "${targetAngle}"
+PRODUCT: "${product.title}"
+SCENE CONCEPT: "${targetAngle}"
 
-1. Look closely at the attached image of the product.
-2. Write a photorealistic, 8k image generation prompt. The prompt MUST:
-   a. Start by describing the product ("${product.title}") in its exact real-world form — its shape, color, size, label, packaging.
-   b. Then describe the environment/habitat around it based on the Vibe above.
-   c. Use Camera Angle: [${randomCamera}]
-   d. Use Lighting Style: [${randomLighting}]
-3. CRITICAL: The product "${product.title}" MUST be the hero subject in the center of the scene. Do NOT write a prompt that only describes a background or room.
-4. Do NOT alter the product's shape, text, or structure. Keep it structurally faithful to the real product.
-5. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs.
-6. Select the best text layout template (template-1, template-2, template-3, template-4, or template-5). template-5 is pure aesthetic (no text) which is usually best.
+Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
+
+YOUR JOB: Write an image editing prompt that describes ONLY the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will preserve the product from the source image — you are designing the world around it.
+
+RULES:
+1. Do NOT describe the product itself (no labels, colors, shapes, packaging text). The source image handles that.
+2. DO describe: the surface/setting it sits on, background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props), color palette of the environment.
+3. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
+4. Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.
+5. End with a short style tag like: "editorial product photography, soft natural light, 8k"
+
+Also generate:
+- A 4-6 word aspirational title (nouns, not verbs) for the pin
+- A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text — usually best for lifestyle shots)
 
 Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
 
@@ -297,15 +268,15 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             const result: any = await fal.subscribe("fal-ai/flux-2/flash/edit", {
               input: {
                 prompt: dynamicImagePrompt,
-                guidance_scale: 4,
-    image_size: {
-      width: 1000,
-      height: 1500
-    },
-    num_images: 1,
-    enable_safety_checker: true,
-    output_format: "png",
-    image_urls: [sourceImageUrl],
+                guidance_scale: 3.5,
+                image_size: {
+                  width: 1000,
+                  height: 1500
+                },
+                num_images: 1,
+                enable_safety_checker: true,
+                output_format: "png",
+                image_urls: [sourceImageUrl],
               },
               logs: true,
               onQueueUpdate: (update) => {
