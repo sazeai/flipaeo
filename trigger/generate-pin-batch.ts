@@ -297,14 +297,15 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
             const result: any = await fal.subscribe("fal-ai/nano-banana-2/edit", {
               input: {
                 prompt: dynamicImagePrompt,
-                num_images: 1,
-                aspect_ratio: "2:3",
-                output_format: "png",
-                safety_tolerance: "4",
-                image_urls: [sourceImageUrl],
-                resolution: "1K",
-                limit_generations: true,
-                thinking_level: "minimal"
+                guidance_scale: 4,
+    image_size: {
+      width: 1000,
+      height: 1500
+    },
+    num_images: 2,
+    enable_safety_checker: true,
+    output_format: "png",
+    image_urls: [sourceImageUrl],
               },
               logs: true,
               onQueueUpdate: (update) => {
@@ -400,15 +401,13 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
             }
             const layoutMode = brand.pin_layout_mode || 'organic'
 
-            // Convert the raw Fal image buffer to a base64 data URI and POST it directly
-            // This is the PROVEN working pattern from the prototype — zero remote fetching inside Satori
-            const imageDataUri = `data:image/png;base64,${falImageBuffer.toString('base64')}`
-
+            // Use the public R2 URL instead of base64 to avoid exceeding
+            // Vercel Edge Function's 4 MB request-body limit (which returns 405).
             const renderRes = await fetch(`${appUrl}/api/render-pin`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                imageUrl: imageDataUri,
+                imageUrl: rawImageUrl,
                 title: genTitle,
                 templateId: genTemplateId,
                 fontChoice: brand.font_choice || "Playfair Display",
