@@ -302,7 +302,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
       width: 1000,
       height: 1500
     },
-    num_images: 2,
+    num_images: 1,
     enable_safety_checker: true,
     output_format: "png",
     image_urls: [sourceImageUrl],
