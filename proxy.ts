@@ -85,9 +85,16 @@ export async function proxy(request: NextRequest) {
   }
 
   // Check if the user is authenticated (only for routes that need it)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data, error } = await supabase.auth.getUser()
+    if (!error) {
+      user = data.user
+    }
+  } catch {
+    // Auth call failed (rate limit, network error, etc.) — skip redirects to avoid loops
+    return response
+  }
 
   // If accessing protected routes and not authenticated, redirect to login
   if (isProtectedRoute && !user) {

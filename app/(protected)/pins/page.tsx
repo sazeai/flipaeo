@@ -1,15 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import {
   ImageIcon,
   MousePointerClick,
   Eye,
   Bookmark,
-  Trash2,
-  ExternalLink,
+  Loader2,
+  Sparkles,
+  Pencil,
+  CheckCircle,
+  X,
+  Check,
 } from 'lucide-react'
+import { PinEditModal } from '@/components/pin-edit-modal'
 
 interface Pin {
   id: string
@@ -24,162 +29,485 @@ interface Pin {
   published_at: string | null
   pin_url: string | null
   created_at: string
-  products?: { title: string } | null
+  is_mood_board?: boolean
+  pinterest_board_id?: string | null
+  products?: { title: string; image_url?: string | null; product_url?: string | null } | null
+}
+
+interface PinterestBoard {
+  id: string
+  name: string
+}
+
+type RejectReason = 'bad_image' | 'bad_text' | 'wrong_vibe'
+
+const STATUS_FILTERS = [
+  { key: 'all', label: 'All' },
+  { key: 'pending_approval', label: 'Needs Review' },
+  { key: 'queued', label: 'Queued' },
+  { key: 'published', label: 'Published' },
+  { key: 'generating', label: 'Generating' },
+  { key: 'rendered', label: 'Rendered' },
+  { key: 'rejected', label: 'Rejected' },
+  { key: 'failed', label: 'Failed' },
+] as const
+
+const STATUS_LABELS: Record<string, string> = {
+  pending_approval: 'Needs Review',
+  generating: 'Generating',
+  rendered: 'Rendered',
+  queued: 'Queued',
+  published: 'Published',
+  rejected: 'Rejected',
+  failed: 'Failed',
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  generating: 'bg-amber-100/90 text-amber-800',
+  rendered: 'bg-sky-100/90 text-sky-800',
+  pending_approval: 'bg-orange-100/90 text-orange-800',
+  queued: 'bg-violet-100/90 text-violet-800',
+  published: 'bg-emerald-100/90 text-emerald-800',
+  rejected: 'bg-red-100/90 text-red-700',
+  failed: 'bg-red-100/90 text-red-700',
 }
 
 export default function PinsPage() {
   const [pins, setPins] = useState<Pin[]>([])
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
 
-  useEffect(() => {
-    async function fetchPins() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+  // Modal
+  const [editingPin, setEditingPin] = useState<Pin | null>(null)
 
-      let query = supabase
-        .from('pins')
-        .select('*, products(title)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+  // Bulk selection
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bulkLoading, setBulkLoading] = useState(false)
 
-      if (filter !== 'all') {
-        query = query.eq('status', filter)
+  // Board state (fetched once, shared with modal)
+  const [boards, setBoards] = useState<PinterestBoard[]>([])
+  const [loadingBoards, setLoadingBoards] = useState(true)
+  const [defaultBoardId, setDefaultBoardId] = useState<string>('')
+
+  const fetchPins = useCallback(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    // Fetch counts
+    const { data: allPins } = await supabase
+      .from('pins')
+      .select('status')
+      .eq('user_id', user.id)
+
+    if (allPins) {
+      const counts: Record<string, number> = {}
+      for (const p of allPins) {
+        counts[p.status] = (counts[p.status] || 0) + 1
       }
-
-      const { data } = await query
-      setPins((data as Pin[]) || [])
-      setLoading(false)
+      setStatusCounts(counts)
     }
-    fetchPins()
+
+    // Fetch filtered pins
+    let query = supabase
+      .from('pins')
+      .select('*, products(title, image_url, product_url)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (filter !== 'all') {
+      query = query.eq('status', filter)
+    }
+
+    const { data } = await query
+    setPins((data as Pin[]) || [])
+    setLoading(false)
   }, [filter])
 
+  const fetchBoards = useCallback(async () => {
+    setLoadingBoards(true)
+    try {
+      const res = await fetch('/api/pinterest/boards')
+      if (res.ok) {
+        const data = await res.json()
+        setBoards(data.boards || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch boards:', err)
+    }
+    setLoadingBoards(false)
+  }, [])
+
+  const fetchDefaultBoard = useCallback(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: brand } = await supabase
+      .from('brand_settings')
+      .select('default_board_id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (brand?.default_board_id) {
+      setDefaultBoardId(brand.default_board_id)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchPins()
+    fetchBoards()
+    fetchDefaultBoard()
+  }, [fetchPins, fetchBoards, fetchDefaultBoard])
+
+  // Clear selection when filter changes
+  useEffect(() => {
+    setSelected(new Set())
+  }, [filter])
+
+  // ─── Actions ───────────────────────────────────────────────
+
+  async function handleApprove(pinId: string, boardId: string) {
+    try {
+      const res = await fetch('/api/pins/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinIds: [pinId], boardMap: { [pinId]: boardId } }),
+      })
+      if (res.ok) {
+        setPins(prev => prev.map(p => p.id === pinId ? { ...p, status: 'queued' } : p))
+        setStatusCounts(prev => ({
+          ...prev,
+          pending_approval: Math.max(0, (prev.pending_approval || 0) - 1),
+          queued: (prev.queued || 0) + 1,
+        }))
+      }
+    } catch (err) {
+      console.error('Approve failed:', err)
+    }
+  }
+
+  async function handleReject(pinId: string, reason: RejectReason) {
+    try {
+      const res = await fetch('/api/pins/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinId, reason }),
+      })
+      if (res.ok) {
+        setPins(prev => prev.map(p => p.id === pinId ? { ...p, status: 'rejected' } : p))
+        setStatusCounts(prev => ({
+          ...prev,
+          pending_approval: Math.max(0, (prev.pending_approval || 0) - 1),
+          rejected: (prev.rejected || 0) + 1,
+        }))
+      }
+    } catch (err) {
+      console.error('Reject failed:', err)
+    }
+  }
+
   async function handleDelete(pinId: string) {
+    const pin = pins.find(p => p.id === pinId)
     const supabase = createClient()
     await supabase.from('pins').delete().eq('id', pinId)
     setPins(prev => prev.filter(p => p.id !== pinId))
+    setSelected(prev => { const n = new Set(prev); n.delete(pinId); return n })
+    if (pin) {
+      setStatusCounts(prev => ({
+        ...prev,
+        [pin.status]: Math.max(0, (prev[pin.status] || 0) - 1),
+      }))
+    }
   }
 
-  const statusStyles: Record<string, string> = {
-    generating: 'bg-amber-100 text-amber-700',
-    rendered: 'bg-blue-100 text-blue-700',
-    pending_approval: 'bg-orange-100 text-orange-700',
-    queued: 'bg-brand-100 text-brand-700',
-    published: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-red-100/60 text-red-600',
-    failed: 'bg-red-100 text-red-700',
+  function handleSaved(updates: { id: string; pin_title: string; pin_description: string; pinterest_board_id?: string }) {
+    setPins(prev => prev.map(p => p.id === updates.id ? { ...p, ...updates } : p))
+    setEditingPin(null)
   }
+
+  // ─── Bulk actions ──────────────────────────────────────────
+
+  function toggleSelect(pinId: string) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(pinId)) next.delete(pinId)
+      else next.add(pinId)
+      return next
+    })
+  }
+
+  function selectAllVisible() {
+    setSelected(new Set(pins.map(p => p.id)))
+  }
+
+  async function bulkApprove() {
+    setBulkLoading(true)
+    const ids = [...selected].filter(id => pins.find(p => p.id === id)?.status === 'pending_approval')
+    if (ids.length === 0) { setBulkLoading(false); return }
+
+    const boardMap: Record<string, string> = {}
+    const fallbackBoard = defaultBoardId || boards[0]?.id || ''
+    for (const id of ids) {
+      const pin = pins.find(p => p.id === id)
+      boardMap[id] = pin?.pinterest_board_id || fallbackBoard
+    }
+
+    try {
+      const res = await fetch('/api/pins/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinIds: ids, boardMap }),
+      })
+      if (res.ok) {
+        setPins(prev => prev.map(p => ids.includes(p.id) ? { ...p, status: 'queued' } : p))
+        setStatusCounts(prev => ({
+          ...prev,
+          pending_approval: Math.max(0, (prev.pending_approval || 0) - ids.length),
+          queued: (prev.queued || 0) + ids.length,
+        }))
+        setSelected(new Set())
+      }
+    } catch (err) {
+      console.error('Bulk approve failed:', err)
+    }
+    setBulkLoading(false)
+  }
+
+  async function bulkReject(reason: RejectReason) {
+    setBulkLoading(true)
+    const ids = [...selected].filter(id => pins.find(p => p.id === id)?.status === 'pending_approval')
+
+    for (const id of ids) {
+      try {
+        await fetch('/api/pins/reject', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pinId: id, reason }),
+        })
+      } catch {}
+    }
+
+    setPins(prev => prev.map(p => ids.includes(p.id) ? { ...p, status: 'rejected' } : p))
+    setStatusCounts(prev => ({
+      ...prev,
+      pending_approval: Math.max(0, (prev.pending_approval || 0) - ids.length),
+      rejected: (prev.rejected || 0) + ids.length,
+    }))
+    setSelected(new Set())
+    setBulkLoading(false)
+  }
+
+  // ─── Derived state ────────────────────────────────────────
+
+  const pendingCount = statusCounts['pending_approval'] || 0
+  const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0)
+  const selectedCount = selected.size
+  const selectedPendingCount = [...selected].filter(id => pins.find(p => p.id === id)?.status === 'pending_approval').length
+  const anySelected = selectedCount > 0
+
+  // ─── Render ────────────────────────────────────────────────
 
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-10 bg-muted rounded w-48" />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="aspect-[2/3] bg-muted rounded-2xl" />)}
+        <div className="h-10 bg-muted rounded-xl w-48" />
+        <div className="flex gap-2">
+          {[...Array(5)].map((_, i) => <div key={i} className="h-8 w-20 bg-muted rounded-full" />)}
+        </div>
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
+          {[...Array(8)].map((_, i) => <div key={i} className="mb-4 aspect-[2/3] bg-muted rounded-2xl" />)}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Pins</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {pins.length} pin{pins.length !== 1 ? 's' : ''} generated
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">My Pins</h1>
+        <p className="text-neutral-500 text-sm mt-1">
+          Review, approve, and track all your generated pins.
+        </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 flex-wrap">
-        {['all', 'pending_approval', 'generating', 'rendered', 'queued', 'published', 'rejected', 'failed'].map(f => (
-          <button
-            key={f}
-            onClick={() => { setLoading(true); setFilter(f) }}
-            className={`px-3 py-1.5 rounded-full text-sm border transition-all capitalize ${
-              filter === f
-                ? 'bg-neutral-900 text-white border-neutral-900'
-                : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-400'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
+      {/* Filter tabs */}
+      <div className="flex gap-1.5 flex-wrap">
+        {STATUS_FILTERS.map(({ key, label }) => {
+          const count = key === 'all' ? totalCount : (statusCounts[key] || 0)
+          const isActive = filter === key
+          return (
+            <button
+              key={key}
+              onClick={() => { setLoading(true); setFilter(key) }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                isActive
+                  ? 'bg-neutral-900 text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
+              }`}
+            >
+              {label}
+              {count > 0 && (
+                <span className={`text-[10px] font-bold min-w-[18px] text-center px-1 py-px rounded-md ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-neutral-200/60 text-neutral-500'
+                }`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
+
+      {/* Bulk selection bar */}
+      {anySelected && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-neutral-900 text-white rounded-xl">
+          <span className="text-sm font-medium">{selectedCount} selected</span>
+          <div className="w-px h-4 bg-white/20" />
+          <button onClick={() => setSelected(new Set())} className="text-xs font-medium text-white/70 hover:text-white transition-colors">
+            Deselect all
+          </button>
+          <button onClick={selectAllVisible} className="text-xs font-medium text-white/70 hover:text-white transition-colors">
+            Select all
+          </button>
+          <div className="flex-1" />
+          {selectedPendingCount > 0 && (
+            <>
+              <button
+                onClick={bulkApprove}
+                disabled={bulkLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+              >
+                {bulkLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
+                Approve {selectedPendingCount}
+              </button>
+              <button
+                onClick={() => bulkReject('wrong_vibe')}
+                disabled={bulkLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+              >
+                <X className="w-3 h-3" /> Reject {selectedPendingCount}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Month 1 warmup banner */}
+      {filter === 'pending_approval' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
+          <Sparkles className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-semibold text-blue-900 text-sm">Asset Vault & Publishing Rate</h4>
+            <p className="text-blue-800 text-xs mt-1 leading-relaxed">
+              To protect your Pinterest account from algorithmic spam filters during Month 1, publishing is throttled to a safe rate of ~2 pins per day. Your AI engine will still generate your full monthly quota into your Scheduled Vault here.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Pin Gallery */}
       {pins.length === 0 ? (
-        <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
+        <div className="text-center py-20 bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200">
           <ImageIcon className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-          <h3 className="font-medium text-neutral-600 mb-1">No pins yet</h3>
-          <p className="text-sm text-muted-foreground">
-            Pins will appear here as the engine generates them from your products.
+          <h3 className="font-semibold text-neutral-600 mb-1">
+            {filter === 'pending_approval' ? 'All caught up!' : 'No pins yet'}
+          </h3>
+          <p className="text-sm text-neutral-400 max-w-sm mx-auto">
+            {filter === 'pending_approval'
+              ? "When your PinLoop engine generates new pins, they'll appear here for review."
+              : 'Pins will appear here as the engine generates them from your products.'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-3.5">
           {pins.map(pin => {
             const imageUrl = pin.rendered_image_url || pin.generated_image_url
+            const isSelected = selected.has(pin.id)
+            const isPublished = pin.status === 'published'
+
             return (
-              <div key={pin.id} className="group relative bg-white border rounded-2xl overflow-hidden hover:shadow-md transition-all">
+              <div
+                key={pin.id}
+                style={{ breakInside: 'avoid' }}
+                className={`mb-3.5 rounded-2xl overflow-hidden group relative transition-all duration-200 ${
+                  isSelected
+                    ? 'ring-2 ring-neutral-900 ring-offset-2'
+                    : 'hover:shadow-lg hover:shadow-neutral-200/60'
+                }`}
+              >
                 {/* Image */}
-                <div className="aspect-[2/3] bg-neutral-100 relative">
+                <div className="relative bg-neutral-100">
                   {imageUrl ? (
-                    <img src={imageUrl} alt={pin.pin_title || 'Pin'} className="w-full h-full object-cover" />
+                    <img
+                      src={imageUrl}
+                      alt={pin.pin_title || 'Pin'}
+                      className="w-full h-auto block"
+                      loading="lazy"
+                      style={{ minHeight: '140px' }}
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full flex items-center justify-center py-24 bg-neutral-100">
                       <ImageIcon className="w-10 h-10 text-neutral-300" />
                     </div>
                   )}
+
                   {/* Status badge */}
-                  <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusStyles[pin.status] || 'bg-neutral-100'}`}>
-                    {pin.status}
+                  <span className={`absolute top-2.5 left-2.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm ${
+                    STATUS_STYLES[pin.status] || 'bg-neutral-100/90 text-neutral-600'
+                  }`}>
+                    {STATUS_LABELS[pin.status] || pin.status}
                   </span>
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <div className="flex gap-2">
-                      {pin.pin_url && (
-                        <a
-                          href={pin.pin_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 bg-white rounded-full shadow-lg hover:bg-neutral-100 transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                      <button
-                        onClick={() => handleDelete(pin.id)}
-                        className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+
+                  {/* Checkbox */}
+                  <button
+                    onClick={e => { e.stopPropagation(); toggleSelect(pin.id) }}
+                    className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                      isSelected
+                        ? 'bg-neutral-900 border-neutral-900 text-white'
+                        : 'bg-white/80 border-white/60 backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                    }`}
+                  >
+                    {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+                  </button>
+
+                  {/* Hover overlay with Edit button */}
+                  <div
+                    onClick={() => setEditingPin(pin)}
+                    className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer flex items-center justify-center"
+                  >
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-xl text-sm font-semibold text-neutral-900 hover:bg-neutral-50 transition-colors transform translate-y-1 group-hover:translate-y-0">
+                      <Pencil className="w-3.5 h-3.5" /> Edit Pin
                     </div>
                   </div>
                 </div>
+
                 {/* Info */}
-                <div className="p-3">
-                  <p className="text-sm font-medium truncate">{pin.pin_title || 'Untitled Pin'}</p>
-                  {(pin as any).products?.title && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      {(pin as any).products.title}
-                    </p>
-                  )}
-                  {/* Stats (only for published) */}
-                  {pin.status === 'published' && (
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                <div className="px-3 py-2.5 bg-white border border-t-0 border-neutral-200/60 rounded-b-2xl">
+                  <p className="text-sm font-semibold text-neutral-900 line-clamp-1 leading-snug">
+                    {pin.pin_title || 'Untitled Pin'}
+                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    {pin.products?.title && (
+                      <p className="text-[11px] text-neutral-400 truncate flex-1 mr-2">{pin.products.title}</p>
+                    )}
+                    <time className="text-[10px] text-neutral-300 shrink-0 tabular-nums">
+                      {new Date(pin.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </time>
+                  </div>
+                  {/* Published analytics row */}
+                  {isPublished && (pin.impressions > 0 || pin.outbound_clicks > 0 || pin.saves > 0) && (
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-neutral-100 text-[11px] text-neutral-400">
                       <span className="flex items-center gap-1">
-                        <MousePointerClick className="w-3 h-3" /> {pin.outbound_clicks}
+                        <Eye className="w-3 h-3" /> {pin.impressions.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" /> {pin.impressions}
+                        <MousePointerClick className="w-3 h-3" /> {pin.outbound_clicks.toLocaleString()}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Bookmark className="w-3 h-3" /> {pin.saves}
+                        <Bookmark className="w-3 h-3" /> {pin.saves.toLocaleString()}
                       </span>
                     </div>
                   )}
@@ -189,6 +517,19 @@ export default function PinsPage() {
           })}
         </div>
       )}
+
+      {/* Edit Pin Modal */}
+      <PinEditModal
+        pin={editingPin}
+        boards={boards}
+        loadingBoards={loadingBoards}
+        defaultBoardId={defaultBoardId}
+        onClose={() => setEditingPin(null)}
+        onSaved={handleSaved}
+        onApproved={(pinId, boardId) => { handleApprove(pinId, boardId); setEditingPin(null) }}
+        onRejected={(pinId, reason) => { handleReject(pinId, reason); setEditingPin(null) }}
+        onDeleted={(pinId) => { handleDelete(pinId); setEditingPin(null) }}
+      />
     </div>
   )
 }
