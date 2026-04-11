@@ -64,6 +64,7 @@ export async function proxy(request: NextRequest) {
     '/api/auth',
     '/api/dodopayments/webhook',
     '/api/images',
+    '/api/render-pin',
   ]
   const isPublicApiRoute = publicApiRoutes.some(route =>
     request.nextUrl.pathname.startsWith(route)
