@@ -316,8 +316,17 @@ export default function PinsPage() {
         <div className="flex gap-2">
           {[...Array(5)].map((_, i) => <div key={i} className="h-8 w-20 bg-muted rounded-full" />)}
         </div>
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
-          {[...Array(8)].map((_, i) => <div key={i} className="mb-4 aspect-[2/3] bg-muted rounded-2xl" />)}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="rounded-2xl bg-white border border-neutral-200/70 overflow-hidden">
+              <div className="mx-3 mt-3 rounded-xl bg-muted aspect-[3/4]" />
+              <div className="px-3.5 pt-3 pb-3.5 space-y-2">
+                <div className="h-3 bg-muted rounded w-16" />
+                <div className="h-4 bg-muted rounded w-full" />
+                <div className="h-3 bg-muted rounded w-20" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     )
@@ -342,7 +351,7 @@ export default function PinsPage() {
             <button
               key={key}
               onClick={() => { setLoading(true); setFilter(key) }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+              className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
                 isActive
                   ? 'bg-neutral-900 text-white shadow-sm'
                   : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
@@ -366,10 +375,10 @@ export default function PinsPage() {
         <div className="flex items-center gap-3 px-4 py-3 bg-neutral-900 text-white rounded-xl">
           <span className="text-sm font-medium">{selectedCount} selected</span>
           <div className="w-px h-4 bg-white/20" />
-          <button onClick={() => setSelected(new Set())} className="text-xs font-medium text-white/70 hover:text-white transition-colors">
+          <button onClick={() => setSelected(new Set())} className="cursor-pointer text-xs font-medium text-white/70 hover:text-white transition-colors">
             Deselect all
           </button>
-          <button onClick={selectAllVisible} className="text-xs font-medium text-white/70 hover:text-white transition-colors">
+          <button onClick={selectAllVisible} className="cursor-pointer text-xs font-medium text-white/70 hover:text-white transition-colors">
             Select all
           </button>
           <div className="flex-1" />
@@ -378,7 +387,7 @@ export default function PinsPage() {
               <button
                 onClick={bulkApprove}
                 disabled={bulkLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 {bulkLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
                 Approve {selectedPendingCount}
@@ -386,7 +395,7 @@ export default function PinsPage() {
               <button
                 onClick={() => bulkReject('wrong_vibe')}
                 disabled={bulkLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
+                className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
               >
                 <X className="w-3 h-3" /> Reject {selectedPendingCount}
               </button>
@@ -422,7 +431,7 @@ export default function PinsPage() {
           </p>
         </div>
       ) : (
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-3.5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {pins.map(pin => {
             const imageUrl = pin.rendered_image_url || pin.generated_image_url
             const isSelected = selected.has(pin.id)
@@ -431,31 +440,29 @@ export default function PinsPage() {
             return (
               <div
                 key={pin.id}
-                style={{ breakInside: 'avoid' }}
-                className={`mb-3.5 rounded-2xl overflow-hidden group relative transition-all duration-200 ${
+                className={`group relative bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
                   isSelected
-                    ? 'ring-2 ring-neutral-900 ring-offset-2'
-                    : 'hover:shadow-lg hover:shadow-neutral-200/60'
+                    ? 'ring-2 ring-neutral-900 ring-offset-2 border-neutral-300'
+                    : 'border-neutral-200/70 hover:border-neutral-300 hover:shadow-lg hover:shadow-neutral-200/50'
                 }`}
               >
-                {/* Image */}
-                <div className="relative bg-neutral-100">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={pin.pin_title || 'Pin'}
-                      className="w-full h-auto block"
-                      loading="lazy"
-                      style={{ minHeight: '140px' }}
-                    />
-                  ) : (
-                    <div className="w-full flex items-center justify-center py-24 bg-neutral-100">
+                {/* Image container — fixed height, padded, light bg */}
+                <div className="relative mx-3 mt-3 rounded-xl bg-neutral-100 overflow-hidden">
+                  <div className="aspect-[3/4] flex items-center justify-center">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={pin.pin_title || 'Pin'}
+                        className="w-full h-full object-cover rounded-xl"
+                        loading="lazy"
+                      />
+                    ) : (
                       <ImageIcon className="w-10 h-10 text-neutral-300" />
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Status badge */}
-                  <span className={`absolute top-2.5 left-2.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm ${
+                  <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm ${
                     STATUS_STYLES[pin.status] || 'bg-neutral-100/90 text-neutral-600'
                   }`}>
                     {STATUS_LABELS[pin.status] || pin.status}
@@ -464,42 +471,30 @@ export default function PinsPage() {
                   {/* Checkbox */}
                   <button
                     onClick={e => { e.stopPropagation(); toggleSelect(pin.id) }}
-                    className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                    className={`cursor-pointer absolute top-2 right-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-neutral-900 border-neutral-900 text-white'
-                        : 'bg-white/80 border-white/60 backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                        : 'bg-white/90 border-white/70 backdrop-blur-sm opacity-0 group-hover:opacity-100'
                     }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                   </button>
-
-                  {/* Hover overlay with Edit button */}
-                  <div
-                    onClick={() => setEditingPin(pin)}
-                    className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer flex items-center justify-center"
-                  >
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-xl text-sm font-semibold text-neutral-900 hover:bg-neutral-50 transition-colors transform translate-y-1 group-hover:translate-y-0">
-                      <Pencil className="w-3.5 h-3.5" /> Edit Pin
-                    </div>
-                  </div>
                 </div>
 
-                {/* Info */}
-                <div className="px-3 py-2.5 bg-white border border-t-0 border-neutral-200/60 rounded-b-2xl">
-                  <p className="text-sm font-semibold text-neutral-900 line-clamp-1 leading-snug">
+                {/* Content section */}
+                <div className="px-3.5 pt-3 pb-3.5">
+                  {pin.products?.title && (
+                    <p className="text-[11px] font-medium text-emerald-600 truncate">{pin.products.title}</p>
+                  )}
+                  <p className="text-[13px] font-semibold text-neutral-900 line-clamp-2 leading-snug mt-0.5">
                     {pin.pin_title || 'Untitled Pin'}
                   </p>
-                  <div className="flex items-center justify-between mt-1">
-                    {pin.products?.title && (
-                      <p className="text-[11px] text-neutral-400 truncate flex-1 mr-2">{pin.products.title}</p>
-                    )}
-                    <time className="text-[10px] text-neutral-300 shrink-0 tabular-nums">
-                      {new Date(pin.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </time>
-                  </div>
-                  {/* Published analytics row */}
+                  <time className="text-[10px] text-neutral-400 mt-1.5 block tabular-nums">
+                    {new Date(pin.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </time>
+                  {/* Published analytics */}
                   {isPublished && (pin.impressions > 0 || pin.outbound_clicks > 0 || pin.saves > 0) && (
-                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-neutral-100 text-[11px] text-neutral-400">
+                    <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-neutral-100 text-[11px] text-neutral-400">
                       <span className="flex items-center gap-1">
                         <Eye className="w-3 h-3" /> {pin.impressions.toLocaleString()}
                       </span>
@@ -511,6 +506,13 @@ export default function PinsPage() {
                       </span>
                     </div>
                   )}
+                  {/* Edit button */}
+                  <button
+                    onClick={() => setEditingPin(pin)}
+                    className="cursor-pointer w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 bg-neutral-900 text-white rounded-lg text-xs font-semibold hover:bg-neutral-800 transition-colors"
+                  >
+                    <Pencil className="w-3 h-3" /> Edit Pin
+                  </button>
                 </div>
               </div>
             )
