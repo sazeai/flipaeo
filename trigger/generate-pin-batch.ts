@@ -168,7 +168,7 @@ export const generatePinBatch = schedules.task({
         productsWithLastGen.sort((a: any, b: any) => a.last_generated_at - b.last_generated_at)
 
         // Fetch trends isolated per-user to comply with Pinterest API guidelines
-        let brandTrends: string[] = ['home decor', 'aesthetic lifestyle', 'minimalist style', 'gift ideas', 'seasonal trends']
+        let brandTrends: string[] = []
         try {
           const token = await getValidAccessToken(brand.user_id)
           if (token) {
@@ -228,7 +228,9 @@ RULES:
 5. End with a short style tag like: "editorial product photography, soft natural light, 8k"
 
 Also generate:
-- A 4-6 word aspirational title (nouns, not verbs) for the pin
+- A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product. Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor".
+  Good: "Clear Skin Starts Here", "The Protein Snack You Need", "Nursery Chair, Handmade with Love"
+  Bad: "Aesthetic Lifestyle Collection", "Minimalist Home Decor Finds"
 - A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text — usually best for lifestyle shots)
 
 Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
@@ -330,27 +332,51 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
             // Step 2: Generate premium Pinterest SEO copy (title + description) — ALL modes
             // The metadata is now the PRIMARY driver of discovery for organic pins.
+            const trendLine = brandTrends.length > 0 
+              ? `\nTrending search terms on Pinterest right now: ${brandTrends.slice(0, 5).join(', ')}` 
+              : ''
+
             const copyRes = await ai.models.generateContent({
               model: "gemini-2.5-flash",
               contents: [{
-                text: `You are a Pinterest SEO expert. Your copy is the PRIMARY driver of discovery and click-through. Make it world-class.
+                text: `You write Pinterest pin titles and descriptions that rank in Pinterest search and drive clicks to product pages.
 
-Product: "${product.title}"
-Lifestyle Angle: "${targetAngle}"
-Trending Keywords this week: ${brandTrends.slice(0, 5).join(', ')}
+Product name: "${product.title}"
+${product.description ? `Product details: "${product.description}"` : ''}
+Creative angle for this pin: "${targetAngle}"${trendLine}
+
+Pinterest SEO rules you MUST follow:
+- Pinterest extracts "annotations" (1-6 word keyword phrases) from pin titles and descriptions, then scores relevance
+- Titles with specific, searchable terms outperform generic aesthetic language
+- Users search Pinterest like Google: "peanut butter jar gift set", "face serum for acne", "wooden kids chair"
+- The title must sound like something a real person would type into Pinterest search
 
 Generate:
 
-1. PIN TITLE (max 100 chars): Keyword-first. Hook the searcher. Make it sound desirable. No hashtags. No ALL CAPS. No generic "Buy Now" language.
-   Good example: "Sunlit Nursery Aesthetic — Handmade Terrazzo Kids Chair"
-   Bad example: "Kids Chair For Sale"
+1. PIN TITLE (max 100 chars):
+   - Lead with the most specific, searchable product term
+   - Include 1-2 descriptive modifiers real shoppers would search for (material, use-case, benefit, occasion)
+   - Make it read naturally — not keyword-stuffed
+   - NEVER use generic filler like "Aesthetic", "Lifestyle", "Home Decor Finds", "Essential", "Collection"
+   - NEVER use em-dashes (—) or en-dashes (–) to bolt on generic suffixes
+   - Good: "Pintola Peanut Butter Jar — Perfect Protein-Packed Snack for Gym Days"
+   - Good: "Lashika Anti-Acne Face Serum with Niacinamide for Clear Skin"
+   - Good: "Handmade Terrazzo Kids Chair for Sunlit Nursery Rooms"
+   - Bad: "Aesthetic Lifestyle: Pintola Stone Garden — Minimalist Home Decor" (generic filler)
+   - Bad: "Sun-Dappled Aesthetic: Pintola Jar & Roasted Peanuts" (describes the photo, not the product)
 
-2. PIN DESCRIPTION (150-300 chars): Evocative, editorial copy. Weave the trend keyword in naturally. Paint the lifestyle. End with a soft discovery word (Explore, Discover, Shop the look). No hashtags.
+2. PIN DESCRIPTION (150-300 chars):
+   - Open with what the product IS and who it's for
+   - Include 2-3 natural long-tail keyword phrases shoppers would search
+   - Mention a specific benefit, ingredient, material, or use-case
+   - End with a single call-to-action phrase: "Shop now", "Get yours", "See more", "Save for later"
+   - NEVER use hashtags
+   - Write like a product copywriter, not a poet
 
 Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               }],
               config: {
-                temperature: 0.7,
+                temperature: 0.6,
                 responseMimeType: "application/json",
               }
             })

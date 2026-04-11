@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     let targetAngle: string | null = null;
     let angleEmbedding: number[] | null = null;
     let isMoodBoard = false;
+    let productTitle: string | null = null;
 
 
     if (contentType.includes('application/json')) {
@@ -81,6 +82,8 @@ export async function POST(req: NextRequest) {
         base64ImageData = imageBuffer.toString('base64');
         mimeType = imgContentType || 'image/webp';
 
+        productTitle = product.title;
+
         // Build product context for the Art Director
         productContext = `Product: "${product.title}".`;
         if (product.description) productContext += ` Description: ${product.description}.`;
@@ -116,7 +119,7 @@ export async function POST(req: NextRequest) {
       const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director. Generate a beautiful, purely aesthetic "Mood Board" lifestyle photo concept.
       
       1. Write a photorealistic, 8k background prompt for an image generation model to create a stunning, atmospheric scene.${aestheticGuidance}
-      2. Write an elegant, 4 to 6 word title for this mood board. Use nouns, not verbs.
+      2. Write an elegant, 4 to 6 word title for this mood board. Make it catchy and specific, like a magazine headline.
       3. Select template-2 (Center text) as the text layout template.`;
 
       aiContents = [{ text: artDirectorPrompt }];
@@ -125,7 +128,7 @@ export async function POST(req: NextRequest) {
       ${productContext}
       
       1. Write a photorealistic, 8k background prompt for an image generation model to place this product in a fitting, highly aesthetic lifestyle environment. You MUST explicitly state where to leave negative space (e.g., "Leave negative space at the top", "Leave negative space at the bottom", "Leave negative space in the center", or "Leave negative space around the edges").
-      2. Write an elegant, 4 to 6 word title for the product. Use nouns, not verbs. (e.g., "The Minimalist Ceramic Watering Can", "Premium Leather Autumn Collection"). Do not use punctuation.
+      2. Write a punchy 3-7 word image overlay title for the product. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product. Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor". Good examples: "Clear Skin Starts Here", "The Protein Snack You Need". Do not use punctuation.
       3. Select the best text layout template based on where you left negative space in the image prompt.${aestheticGuidance}`;
 
       aiContents = [
@@ -149,7 +152,7 @@ export async function POST(req: NextRequest) {
             },
             title: {
               type: Type.STRING,
-              description: "Elegant 4-6 word title. Nouns only."
+              description: "Punchy 3-7 word image overlay title. Like a magazine headline — catchy and product-specific."
             },
             templateId: {
               type: Type.STRING,
@@ -165,7 +168,7 @@ export async function POST(req: NextRequest) {
     const plan = JSON.parse(planText);
 
     const dynamicImagePrompt = plan.imagePrompt || 'Product resting on a clean marble countertop, morning sunlight, soft aesthetic shadows, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the top.';
-    const generatedTitle = plan.title || 'The Aesthetic Product Collection';
+    const generatedTitle = plan.title || productTitle || 'Shop Now';
     const templateId = plan.templateId || 'template-1';
 
     // 2. Call Gemini image model to generate lifestyle background
