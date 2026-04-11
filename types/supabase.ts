@@ -321,36 +321,51 @@ export type Database = {
       brand_settings: {
         Row: {
           aesthetic_boundaries: Json | null
+          account_age_type: string | null
+          automation_paused: boolean
+          audience_profile: Json | null
           brand_description: string | null
           brand_name: string
           created_at: string
+          default_board_id: string | null
           font_choice: string
           id: string
           logo_url: string | null
+          pin_layout_mode: string
           store_url: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           aesthetic_boundaries?: Json | null
+          account_age_type?: string | null
+          automation_paused?: boolean
+          audience_profile?: Json | null
           brand_description?: string | null
           brand_name: string
           created_at?: string
+          default_board_id?: string | null
           font_choice?: string
           id?: string
           logo_url?: string | null
+          pin_layout_mode?: string
           store_url?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           aesthetic_boundaries?: Json | null
+          account_age_type?: string | null
+          automation_paused?: boolean
+          audience_profile?: Json | null
           brand_description?: string | null
           brand_name?: string
           created_at?: string
+          default_board_id?: string | null
           font_choice?: string
           id?: string
           logo_url?: string | null
+          pin_layout_mode?: string
           store_url?: string | null
           updated_at?: string
           user_id?: string

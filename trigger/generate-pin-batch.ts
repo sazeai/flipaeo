@@ -3,7 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
 import { fal } from "@fal-ai/client"
-import { getValidAccessToken, getTrendingKeywords } from "@/lib/pinterest-api"
+import { getValidAccessToken } from "@/lib/pinterest-api"
 import { generateUniqueAngle } from "@/lib/context-matrix"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
@@ -167,21 +167,6 @@ export const generatePinBatch = schedules.task({
 
         productsWithLastGen.sort((a: any, b: any) => a.last_generated_at - b.last_generated_at)
 
-        // Fetch trends isolated per-user to comply with Pinterest API guidelines
-        let brandTrends: string[] = []
-        try {
-          const token = await getValidAccessToken(brand.user_id)
-          if (token) {
-            const fetchedTrends = await getTrendingKeywords(token, 'US', 'growing')
-            if (fetchedTrends && fetchedTrends.length > 0) {
-              brandTrends = fetchedTrends
-              logger.info(`Fetched isolated Pinterest Trends for ${brand.user_id}: ${brandTrends.slice(0, 5).join(", ")}...`)
-            }
-          }
-        } catch (e) {
-          logger.warn(`Could not fetch live trends for user ${brand.user_id}, using fallbacks`)
-        }
-
         // Grab exactly 1 product to generate (4 pins generated a day on 6hr cron interval)
         const batchProducts = productsWithLastGen.slice(0, 1)
 
@@ -195,7 +180,6 @@ export const generatePinBatch = schedules.task({
 
             const { angle: targetAngle, embedding: angleEmbedding } = await generateUniqueAngle(
               { id: product.id, title: product.title, description: product.description },
-              brandTrends,
               brand.aesthetic_boundaries,
               brand.audience_profile,
               pastAngles
@@ -332,10 +316,6 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
             // Step 2: Generate premium Pinterest SEO copy (title + description) — ALL modes
             // The metadata is now the PRIMARY driver of discovery for organic pins.
-            const trendLine = brandTrends.length > 0 
-              ? `\nTrending search terms on Pinterest right now: ${brandTrends.slice(0, 5).join(', ')}` 
-              : ''
-
             const copyRes = await ai.models.generateContent({
               model: "gemini-2.5-flash",
               contents: [{
@@ -343,7 +323,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
 Product name: "${product.title}"
 ${product.description ? `Product details: "${product.description}"` : ''}
-Creative angle for this pin: "${targetAngle}"${trendLine}
+Creative angle for this pin: "${targetAngle}"
 
 Pinterest SEO rules you MUST follow:
 - Pinterest extracts "annotations" (1-6 word keyword phrases) from pin titles and descriptions, then scores relevance

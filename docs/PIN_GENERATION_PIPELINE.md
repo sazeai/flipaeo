@@ -24,29 +24,14 @@ PinLoop generates Pinterest pins automatically through a 9-step pipeline. This d
 
 ---
 
-### Step 2: Live Pinterest Trends Fetch
-
-**File:** `trigger/generate-pin-batch.ts` (lines ~170-185)  
-**API:** `GET /v5/trends/keywords/US/top/growing` via `getTrendingKeywords()`
-
-Fetches the top 15 growing search terms on Pinterest for the US market. These trends are injected into:
-1. The **Context Matrix** angle generation (Step 3)
-2. The **SEO Copy** generation (Step 5)
-
-**Fallback:** If the Pinterest API call fails (expired token, rate limit), `brandTrends` defaults to an empty array — no generic keywords are injected.
-
-**Why this matters:** Pinterest's algorithm weights topic relevance heavily. Pins that reference currently trending search terms get boosted in distribution. By fetching live trends, generated pins align with what users are actively searching for.
-
----
-
-### Step 3: Semantic Angle Generation (Context Matrix)
+### Step 2: Semantic Angle Generation (Context Matrix)
 
 **File:** `lib/context-matrix.ts`
 
 Generates a unique "Scene Concept" for each pin — the creative direction that makes every pin for the same product visually distinct.
 
 **How it works:**
-1. Gemini generates a lifestyle scene concept incorporating the product, brand aesthetic boundaries, audience profile, and live Pinterest trends
+1. Gemini generates a lifestyle scene concept incorporating the product, brand aesthetic boundaries, and audience profile
 2. The concept is embedded into a 768-dimension vector using `gemini-embedding-2-preview`
 3. The vector is compared against all past angles for this product using pgvector cosine similarity
 4. If similarity > 0.75 with any past angle, it's rejected and regenerated (up to 3 retries with increasing temperature)
@@ -212,10 +197,8 @@ For every published pin, fetches 30-day analytics from Pinterest:
 ```
 [Cron: generate-pin-batch]
   │
-  ├─ Pinterest Trends API ──→ brandTrends[]
-  │
   ├─ generateUniqueAngle() ──→ targetAngle + embedding
-  │   └─ uses: product, brandTrends, aesthetic_boundaries, audience_profile
+  │   └─ uses: product, aesthetic_boundaries, audience_profile
   │   └─ dedup: pgvector cosine similarity vs past angles
   │
   ├─ Gemini Art Director ──→ imagePrompt, overlayTitle, templateId
@@ -225,7 +208,7 @@ For every published pin, fetches 30-day analytics from Pinterest:
   │   └─ input: product image + imagePrompt
   │
   ├─ Gemini SEO Copy ──→ pin_title, pin_description
-  │   └─ input: product name/desc + targetAngle + brandTrends
+  │   └─ input: product name/desc + targetAngle
   │
   └─ POST /api/render-pin ──→ rendered image with text overlay → R2
       └─ status: pending_approval
@@ -249,19 +232,17 @@ For every published pin, fetches 30-day analytics from Pinterest:
 
 ---
 
-## How Pinterest Trends Feed Into Generation
+## Removed: Pinterest Trends API Integration
 
-Pinterest's search algorithm uses 4 ranking signals: **domain quality**, **pin quality**, **pinner quality**, and **topic relevance**. The trends integration directly targets **topic relevance**.
+The Pinterest Trends API (`/v5/trends/keywords/US/top/growing`) was previously used to fetch platform-wide trending search terms and inject them into pin generation. **This was removed** because:
 
-**Forward flow (Trends → Pins):**
-1. `getTrendingKeywords()` hits Pinterest's `/v5/trends/keywords/US/top/growing` endpoint
-2. Returns top 15 growing search terms (e.g., "summer skincare routine", "protein snacks for gym")
-3. These are passed to `generateUniqueAngle()` → Gemini incorporates them into the scene concept
-4. These are passed to the SEO copy prompt → Gemini weaves them into title/description as natural long-tail keywords
-5. Result: Generated pins contain terms that Pinterest users are actively searching for → higher relevance score → more distribution
+1. **Irrelevant data:** The API returns global trending topics across ALL of Pinterest (e.g. "wedding hairstyles", "keto recipes"). For an ecom product like peanut butter or face serum, these random trends added noise, not signal.
+2. **Actively harmful:** Injecting unrelated trending keywords into titles/descriptions hurts Pinterest's topic relevance scoring — the algorithm expects pin metadata to match the pin's actual content.
+3. **Gemini already knows search behavior:** The LLM understands what people search for when looking for specific products. It doesn't need a trends API to know "protein snacks for gym" is a real search term for peanut butter. Product-specific keyword generation comes from understanding the product itself.
 
-**Feedback loop (Analytics → Future Pins):**
-Currently one-way. Analytics are displayed in the UI for user review but not used to influence future generation decisions.
+The `getTrendingKeywords()` function still exists in `lib/pinterest-api.ts` (dead code) in case a future niche-filtered implementation makes sense.
+
+**Future consideration:** Pinterest's API may eventually support category-filtered trends (e.g. "trending in Food & Drink"). If that happens, re-integrating trends scoped to the user's product niche could add value. Until then, Gemini's product-aware keyword generation is the better approach.
 
 ---
 

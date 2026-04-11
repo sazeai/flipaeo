@@ -14,7 +14,6 @@ const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
  */
 export async function generateUniqueAngle(
   product: { id: string; title: string; description?: string },
-  trends: string[],
   brandBoundaries?: string[],
   audienceProfile?: Record<string, any> | null,
   pastAngles?: string[]
@@ -30,7 +29,6 @@ Your scenes get 10x more saves than generic "product on counter" shots.
 
 Product: "${product.title}" ${product.description ? `— ${product.description}` : ""}
 
-Current Pinterest Trends this week: ${trends.slice(0, 10).join(", ")}
 ${brandBoundaries && brandBoundaries.length > 0 ? `Brand Aesthetic Constraints (strictly follow): ${brandBoundaries.join(", ")}` : ""}
 ${audienceProfile ? `\nTarget Audience: ${JSON.stringify(audienceProfile).slice(0, 500)}.` : ""}
 
