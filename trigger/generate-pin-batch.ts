@@ -294,7 +294,7 @@ Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": ".
 
             // Firing Fal.ai Native Polling
             logger.info(`Starting fal.ai generation for ${product.title}...`)
-            const result: any = await fal.subscribe("fal-ai/nano-banana-2/edit", {
+            const result: any = await fal.subscribe("fal-ai/flux-2/flash/edit", {
               input: {
                 prompt: dynamicImagePrompt,
                 guidance_scale: 4,
