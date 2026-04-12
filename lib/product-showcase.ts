@@ -25,78 +25,100 @@ export interface ShowcaseStrategy {
   productAppearance: string
 }
 
-const SHOWCASE_PROMPT = `You are a product photography strategist. Your ONLY job is to decide HOW a product should be presented in a photo — the most compelling, buyer-converting way to showcase it.
+/**
+ * Full showcase analysis returned by Gemini — contains ALL viable modes
+ * so we can rotate across pins for the same product.
+ */
+export interface ShowcaseAnalysis {
+  productType: string
+  productAppearance: string
+  /** Ranked list of viable presentation modes with details for each */
+  viableModes: {
+    presentationMode: PresentationMode
+    cameraAngle: string
+    heroAction: string
+    naturalEnvironment: string
+  }[]
+}
+
+const SHOWCASE_PROMPT = `You are a product photography strategist. Your ONLY job is to decide HOW a product should be presented in photos — the most compelling, buyer-converting ways to showcase it.
 
 You know NOTHING about aesthetics, mood, color palettes, or lighting. Those are someone else's job. You ONLY decide:
 1. What type of product this is
-2. How it should be physically presented
-3. Where it naturally belongs
-4. What the camera should focus on
+2. Multiple different ways it could be physically presented (we need VARIETY across pins)
+3. Where it naturally belongs in each scenario
+4. What the camera should focus on in each scenario
 
 PRODUCT TITLE: "{title}"
 {descriptionLine}
 
-PRESENTATION MODE — pick exactly ONE:
-- "worn-on-model": clothing, jewelry, accessories, wearables → show on a person
+PRESENTATION MODES — rank ALL modes that make sense for this product (minimum 2, maximum 4):
+- "worn-on-model": clothing, jewelry, accessories, wearables → show on a person/animal
 - "held-in-hand": small items, beverages, skincare, tools → show being held naturally
-- "styled-on-surface": home decor, candles, stationery, boxes, jars → arrange on an appropriate surface
-- "in-use-action": food being eaten, serum being applied, chair being sat in, tool being used → show mid-use
-- "flat-lay-arrangement": collections, kits, gift sets, multi-piece items → overhead curated layout
+- "styled-on-surface": home decor, candles, stationery, boxes, jars, accessories → arrange on an appropriate surface
+- "in-use-action": food being eaten, serum being applied, chair being sat in, tool being used, collar on a dog → show mid-use
+- "flat-lay-arrangement": collections, kits, gift sets, multi-piece items, accessories with their parts → overhead curated layout
 
 RULES:
-- Pick the mode that a professional product photographer would choose for THIS specific product
-- A hoodie → worn-on-model (on a person, styled casually)
-- A ring → worn-on-model (on a hand, close-up)
-- A face serum → held-in-hand OR in-use-action (being applied)
-- A kids chair → in-use-action (child sitting) OR styled-on-surface (in a room)
-- A candle → styled-on-surface (on a shelf or table)
-- A peanut butter jar → in-use-action (spread on toast) OR styled-on-surface (kitchen counter)
-- Jewelry box → styled-on-surface (on vanity) OR in-use-action (being opened)
+- Return MULTIPLE viable modes ranked by how compelling they are for a buyer
+- Each mode MUST have a DIFFERENT heroAction and naturalEnvironment — variety is the whole point
+- A dog collar → in-use-action (dog wearing it), styled-on-surface (on marble/wood), flat-lay-arrangement (collar + leash + tag spread out)
+- A hoodie → worn-on-model (person wearing), styled-on-surface (folded on chair), flat-lay-arrangement (outfit spread)
+- A ring → worn-on-model (on hand close-up), styled-on-surface (on ring dish), in-use-action (being put on)
+- A face serum → held-in-hand (holding bottle), in-use-action (applying to face), styled-on-surface (on vanity shelf)
+- A candle → styled-on-surface (on shelf), in-use-action (being lit/burning), flat-lay-arrangement (with match + tray)
 
-For cameraAngle pick ONE: "eye-level front", "eye-level three-quarter", "close-up detail", "overhead flat-lay", "low-angle hero", "over-the-shoulder"
+For cameraAngle pick ONE per mode: "eye-level front", "eye-level three-quarter", "close-up detail", "overhead flat-lay", "low-angle hero", "over-the-shoulder"
 
-For heroAction describe the SPECIFIC physical action/pose (max 12 words). Be concrete:
-- Good: "woman wearing hoodie unzipped over a white tee"
-- Good: "ring on a woman's ring finger, hand resting on collarbone"
-- Good: "child sitting cross-legged on the chair reading a book"
+For heroAction describe the SPECIFIC physical action/pose per mode (max 12 words). Be concrete:
+- Good: "large dog wearing collar, head slightly turned, looking forward"
+- Good: "collar coiled on aged marble slab beside brass leash clip"
+- Good: "collar and leash set spread in flat-lay with dog tags"
 - Bad: "product displayed beautifully" (too vague)
-- Bad: "aesthetic arrangement" (meaningless)
 
-For naturalEnvironment name 1-2 SPECIFIC real-world locations where a buyer would use this product (max 10 words):
-- Good: "bathroom vanity with mirror"
-- Good: "urban sidewalk cafe"
+For naturalEnvironment name 1-2 SPECIFIC real-world locations per mode (max 10 words):
+- Good: "sunny park path with grass edge"
+- Good: "rustic wooden entryway bench"
 - Bad: "beautiful setting" (not a place)
 
 For productAppearance describe the product's ACTUAL visual identity as seen in the image or inferred from the title (max 15 words). This is critical — an AI image editor will use this to know WHAT to preserve.
 - Include: dominant colors, material/fabric, key design elements, distinctive features
+- Good: "brown leather collar with turquoise padding, gold buckle, silver conchos"
 - Good: "gray cotton hoodie with dark cross and chain graphics, fur-trimmed hood"
-- Good: "matte black ceramic mug with gold rim and speckled glaze"
-- Good: "turquoise sterling silver ring with oval cabochon stone"
 - Bad: "nice product" (useless)
-- Bad: "hoodie" (no visual details)
 
 Return ONLY valid JSON:
 {
   "productType": "...",
-  "presentationMode": "worn-on-model|held-in-hand|styled-on-surface|in-use-action|flat-lay-arrangement",
-  "cameraAngle": "...",
-  "heroAction": "...",
-  "naturalEnvironment": "...",
-  "productAppearance": "..."
+  "productAppearance": "...",
+  "viableModes": [
+    {
+      "presentationMode": "in-use-action",
+      "cameraAngle": "...",
+      "heroAction": "...",
+      "naturalEnvironment": "..."
+    },
+    {
+      "presentationMode": "styled-on-surface",
+      "cameraAngle": "...",
+      "heroAction": "...",
+      "naturalEnvironment": "..."
+    }
+  ]
 }`
 
 /**
  * Stage 1: Product Showcase Resolver
  *
- * Decides HOW a product should be physically presented in photography,
- * BEFORE any aesthetic/mood is applied. Uses multimodal Gemini to see
- * the actual product image.
+ * Analyzes the product and returns ALL viable presentation modes ranked.
+ * Uses multimodal Gemini to see the actual product image.
+ * Call pickShowcaseForPin() after to select one mode by rotation.
  */
 export async function resolveProductShowcase(
   product: { title: string; description?: string },
   productImageBase64?: string | null,
   productImageMimeType?: string | null,
-): Promise<ShowcaseStrategy> {
+): Promise<ShowcaseAnalysis> {
   const descriptionLine = product.description
     ? `PRODUCT DESCRIPTION: "${product.description}"`
     : ""
@@ -125,29 +147,65 @@ export async function resolveProductShowcase(
 
     const parsed = JSON.parse(response.text?.trim() || "{}")
 
-    // Validate presentationMode is in our finite taxonomy
-    const mode = PRESENTATION_MODES.includes(parsed.presentationMode)
-      ? parsed.presentationMode
-      : "styled-on-surface"
+    // Validate and filter viable modes
+    const viableModes = (parsed.viableModes || [])
+      .filter((m: any) => PRESENTATION_MODES.includes(m.presentationMode))
+      .map((m: any) => ({
+        presentationMode: m.presentationMode as PresentationMode,
+        cameraAngle: m.cameraAngle || "eye-level three-quarter",
+        heroAction: m.heroAction || `${product.title} displayed naturally`,
+        naturalEnvironment: m.naturalEnvironment || "clean neutral surface",
+      }))
+
+    // Ensure at least one mode
+    if (viableModes.length === 0) {
+      viableModes.push({
+        presentationMode: "styled-on-surface" as PresentationMode,
+        cameraAngle: "eye-level three-quarter",
+        heroAction: `${product.title} displayed naturally`,
+        naturalEnvironment: "clean neutral surface",
+      })
+    }
 
     return {
       productType: parsed.productType || product.title,
-      presentationMode: mode,
-      cameraAngle: parsed.cameraAngle || "eye-level three-quarter",
-      heroAction: parsed.heroAction || `${product.title} displayed naturally`,
-      naturalEnvironment: parsed.naturalEnvironment || "clean neutral surface",
       productAppearance: parsed.productAppearance || product.title,
+      viableModes,
     }
   } catch (err) {
     // Graceful fallback — never block generation
     console.error("Product Showcase Resolver failed, using fallback:", err)
     return {
       productType: product.title,
-      presentationMode: "styled-on-surface",
-      cameraAngle: "eye-level three-quarter",
-      heroAction: `${product.title} displayed naturally`,
-      naturalEnvironment: "clean neutral surface",
       productAppearance: product.title,
+      viableModes: [{
+        presentationMode: "styled-on-surface",
+        cameraAngle: "eye-level three-quarter",
+        heroAction: `${product.title} displayed naturally`,
+        naturalEnvironment: "clean neutral surface",
+      }],
     }
+  }
+}
+
+/**
+ * Pick ONE showcase mode by rotating through the product's viable modes.
+ * Uses per-product pin count so each new pin gets a different presentation.
+ *
+ * Pin 0 → viableModes[0] (best mode)
+ * Pin 1 → viableModes[1] (second-best)
+ * Pin 2 → viableModes[2] (third option)
+ * Pin 3 → viableModes[0] (wraps around with fresh scene from Stage 2)
+ */
+export function pickShowcaseForPin(
+  analysis: ShowcaseAnalysis,
+  productPinCount: number,
+): ShowcaseStrategy {
+  const idx = productPinCount % analysis.viableModes.length
+  const picked = analysis.viableModes[idx]
+  return {
+    productType: analysis.productType,
+    productAppearance: analysis.productAppearance,
+    ...picked,
   }
 }

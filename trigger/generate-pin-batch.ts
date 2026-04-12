@@ -4,7 +4,7 @@ import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
 import { fal } from "@fal-ai/client"
 import { generateUniqueAngle } from "@/lib/context-matrix"
-import { resolveProductShowcase } from "@/lib/product-showcase"
+import { resolveProductShowcase, pickShowcaseForPin } from "@/lib/product-showcase"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
@@ -199,18 +199,23 @@ export const generatePinBatch = schedules.task({
               logger.warn(`Failed to fetch product image for multimodal context`)
             }
 
-            // Stage 1: Product Showcase Resolver — decides HOW to present the product (before aesthetic)
+            // Stage 1: Product Showcase Resolver — returns ALL viable presentation modes
             logger.info(`Resolving showcase strategy for: ${product.title}`)
-            const showcase = await resolveProductShowcase(
+            const showcaseAnalysis = await resolveProductShowcase(
               { title: product.title, description: product.description },
               productImageBase64,
               productImageMimeType,
             )
-            logger.info(`Showcase: ${showcase.presentationMode} | ${showcase.heroAction} | ${showcase.cameraAngle}`)
+            logger.info(`Showcase analysis: ${showcaseAnalysis.viableModes.length} viable modes for "${showcaseAnalysis.productType}"`)
+
+            // Pick one mode by rotating through viable modes using per-product pin count
+            // Pin 0 → mode[0], Pin 1 → mode[1], Pin 2 → mode[2], Pin 3 → wraps to mode[0] with fresh scene
+            const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
+            const showcase = pickShowcaseForPin(showcaseAnalysis, prodPins.length)
+            logger.info(`Picked showcase: ${showcase.presentationMode} | ${showcase.heroAction} | ${showcase.cameraAngle}`)
 
             // Stage 2: Generate unique Context Matrix angle (Semantic De-Duplication)
             // Showcase strategy is passed as locked constraints
-            const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
             const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
 
             const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
