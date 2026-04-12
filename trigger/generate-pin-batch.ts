@@ -3,8 +3,8 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
 import { fal } from "@fal-ai/client"
-import { getValidAccessToken } from "@/lib/pinterest-api"
 import { generateUniqueAngle } from "@/lib/context-matrix"
+import { resolveProductShowcase } from "@/lib/product-showcase"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
@@ -176,19 +176,7 @@ export const generatePinBatch = schedules.task({
           try {
             logger.info(`Generating pin for product: ${product.title}`)
 
-            // Generate unique Context Matrix angle (Semantic De-Duplication)
-            const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
-            const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
-
-            const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
-              { id: product.id, title: product.title, description: product.description },
-              brand.aesthetic_boundaries,
-              brand.audience_profile,
-              pastAngles
-            )
-            logger.info(`Selected semantic angle: "${targetAngle}" | Aesthetic: "${pickedAesthetic.tag}"`)
-
-            // Step 1: Call Gemini Art Director & Fal.ai Inline
+            // Resolve source image URL first — needed for both Showcase Resolver and Art Director
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
             const sourceImageUrl = product.image_url || (r2Domain && product.image_r2_key ? `${r2Domain}/${product.image_r2_key}` : "")
 
@@ -197,62 +185,98 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
-            const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
-
-            const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
-
-PRODUCT: "${product.title}"
-${product.description ? `PRODUCT DETAILS: "${product.description}"` : ''}
-SCENE CONCEPT: "${targetAngle}"
-
-VISUAL AESTHETIC FOR THIS PIN: "${pickedAesthetic.tag}"
-${pickedAesthetic.definition}
-
-CRITICAL RULE — PRODUCT CONTEXT COMES FIRST:
-The PRODUCT determines WHERE the scene takes place. The AESTHETIC determines HOW it looks and feels.
-First, identify what this product is and where it naturally lives (a kid's chair → nursery/playroom, a face serum → bathroom vanity, a dog collar → entryway/park, a keycap → desk setup).
-Then apply the aesthetic's mood, lighting, and color palette TO that natural environment.
-NEVER force the product into an environment that doesn't match its real-world use.
-Example: "Luxury & Premium" on a kid's chair = a rich, editorial nursery with jewel-tone accents — NOT a dark library with brass globes and velvet drapes.
-
-Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
-
-YOUR JOB: Write an image editing prompt that describes the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will place the product from the source image into this scene — you are designing the world around it.
-
-RULES:
-1. START the prompt by naming the product type (e.g. "A men's hoodie", "A jar of peanut butter", "A gold necklace") so the image editor knows WHAT object from the source image to preserve. This is critical — without it the editor doesn't know what to keep.
-2. Set the scene in the product's NATURAL environment — where a buyer would actually use or display this product. Then style that environment according to the aesthetic's mood, lighting, and color palette.
-3. After naming the product and setting, describe: background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props from the product's world), color palette of the environment.
-4. Do NOT describe the product's visual details (labels, colors, patterns, packaging text) — the source image handles that.
-5. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
-6. ${authenticHandmadeMode ? 'Keep it grounded and believable. Prefer Etsy-seller realism, modest props, and slight imperfections over polished campaign styling.' : 'Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.'}
-7. End with a short style tag like: "${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
-
-Also generate:
-- A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product.
-  RULES for the overlay title:
-  - MUST reference or name the actual product (e.g. "hoodie", "serum", "chair", "peanut butter")
-  - Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor", "Comfort", "Style"
-  - Never use vague "mood" phrases — the title must tell the viewer WHAT the product is
-  Good: "Clear Skin Starts Here", "The Protein Snack You Need", "Nursery Chair, Handmade with Love", "Your New Everyday Hoodie"
-  Bad: "Aesthetic Lifestyle Collection", "Minimalist Home Decor Finds", "Morning Comfort, Modern Style"
-- A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text — usually best for lifestyle shots)
-
-Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
-
-            // Fetch product image to give Gemini visual context
-            let imagePart: any = null
+            // Fetch product image once — reused by Showcase Resolver, Art Director, and fal.ai
+            let productImageBase64: string | null = null
+            let productImageMimeType: string | null = null
             try {
               const imgRes = await fetch(sourceImageUrl)
               if (imgRes.ok) {
                 const imgBuffer = await imgRes.arrayBuffer()
-                const imgBase64 = Buffer.from(imgBuffer).toString('base64')
-                const mimeType = imgRes.headers.get('content-type') || 'image/jpeg'
-                imagePart = { inlineData: { data: imgBase64, mimeType } }
+                productImageBase64 = Buffer.from(imgBuffer).toString('base64')
+                productImageMimeType = imgRes.headers.get('content-type') || 'image/jpeg'
               }
             } catch (err) {
-              logger.warn(`Failed to fetch product image for Gemini context`)
+              logger.warn(`Failed to fetch product image for multimodal context`)
             }
+
+            // Stage 1: Product Showcase Resolver — decides HOW to present the product (before aesthetic)
+            logger.info(`Resolving showcase strategy for: ${product.title}`)
+            const showcase = await resolveProductShowcase(
+              { title: product.title, description: product.description },
+              productImageBase64,
+              productImageMimeType,
+            )
+            logger.info(`Showcase: ${showcase.presentationMode} | ${showcase.heroAction} | ${showcase.cameraAngle}`)
+
+            // Stage 2: Generate unique Context Matrix angle (Semantic De-Duplication)
+            // Showcase strategy is passed as locked constraints
+            const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
+            const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
+
+            const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
+              { id: product.id, title: product.title, description: product.description },
+              brand.aesthetic_boundaries,
+              brand.audience_profile,
+              pastAngles,
+              showcase,
+            )
+            logger.info(`Selected semantic angle: "${targetAngle}" | Aesthetic: "${pickedAesthetic.tag}"`)
+
+            const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
+
+            // Stage 3: Art Director — writes fal.ai prompt with 3 locked sections
+
+            const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
+
+=== SECTION 1: PRODUCT SHOWCASE (LOCKED — do NOT modify) ===
+Product: "${product.title}"
+${product.description ? `Product Details: "${product.description}"` : ''}
+Product Type: ${showcase.productType}
+Presentation: ${showcase.presentationMode} — ${showcase.heroAction}
+Camera Angle: ${showcase.cameraAngle}
+Natural Setting: ${showcase.naturalEnvironment}
+
+These showcase decisions are FINAL. The product MUST be shown exactly as described above. Do not change the presentation mode, camera angle, hero action, or setting type.
+
+=== SECTION 2: ENVIRONMENT SCENE ===
+Scene Concept: "${targetAngle}"
+
+This is the creative scene designed around the product. It describes the props, background, and atmosphere. Your prompt must bring this scene to life while keeping the product showcase from Section 1 intact.
+
+=== SECTION 3: VISUAL STYLE (mood/lighting/color only) ===
+Aesthetic: "${pickedAesthetic.tag}"
+${pickedAesthetic.definition}
+
+This style controls ONLY the lighting quality, color palette, shadow character, and emotional tone of the image. It does NOT control what objects appear, how the product is presented, or the camera angle.
+
+Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
+
+YOUR JOB: Write an image editing prompt that describes the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will place the product from the source image into this scene.
+
+RULES:
+1. START the prompt with: "${showcase.productType}, ${showcase.presentationMode}, ${showcase.heroAction}" — this tells the image editor what to preserve and how to position it.
+2. Then describe the environment from the Scene Concept (Section 2) with props and background details.
+3. Apply the Visual Style (Section 3) as lighting and color grading over the entire scene.
+4. Do NOT describe the product's visual details (labels, colors, patterns) — the source image handles that.
+5. Do NOT add props from the aesthetic that don't belong in the product's world. A ring gets a jewelry tray, not gummy bears. A hoodie gets sneakers, not confetti.
+6. ${authenticHandmadeMode ? 'Keep it grounded and believable — Etsy-seller realism, modest props, slight imperfections.' : 'Keep it editorial and aspirational — professional lifestyle photoshoot quality.'}
+7. End with: "${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
+
+Also generate:
+- A short, punchy overlay title (3-7 words) for the pin image. Write it like a magazine headline — catchy, benefit-driven, specific to the product.
+  RULES for the overlay title:
+  - MUST reference the actual product (e.g. "hoodie", "serum", "chair", "ring")
+  - Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential"
+  - Good: "Clear Skin Starts Here", "Your New Everyday Hoodie", "Handmade Nursery Chair"
+  - Bad: "Aesthetic Lifestyle Collection", "Morning Comfort, Modern Style"
+- A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text)
+
+Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
+
+            // Reuse product image fetched earlier for Gemini Art Director multimodal context
+            const imagePart = productImageBase64 && productImageMimeType
+              ? { inlineData: { data: productImageBase64, mimeType: productImageMimeType } }
+              : null
 
             const promptParts: any[] = [{ text: artDirectorPrompt }]
             if (imagePart) promptParts.push(imagePart)
