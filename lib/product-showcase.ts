@@ -38,7 +38,6 @@ type ShowcaseMode = {
   cameraAngle: string
   heroAction: string
   naturalEnvironment: string
-  suggestedProps: string
 }
 
 type FamilyRules = {
@@ -52,22 +51,16 @@ type FamilyRules = {
 
 const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
   "jewelry-small": {
-    sceneScope: "macro jewelry shot only; no full-room background story",
-    scaleGuidance: "keep jewelry at believable wearable scale using macro framing, a hand, ring dish, tray, or velvet box",
-    forbiddenElements: "dressers, dreamcatchers, wall decor, full furniture scenes, oversized props",
-    defaultProps: {
-      "worn-on-model": "mirror, jewelry tray",
-      "held-in-hand": "soft linen, jewelry tray",
-      "styled-on-surface": "ring dish, soft linen",
-      "in-use-action": "mirror, velvet box",
-      "flat-lay-arrangement": "jewelry tray, soft linen",
-    },
+    sceneScope: "macro jewelry close-up only; no full-room background story",
+    scaleGuidance: "keep jewelry at macro wearable scale. Frame tightly on the jewelry piece itself",
+    forbiddenElements: "dressers, dreamcatchers, wall decor, full furniture scenes, oversized props, full room scenes, outdoor wide shots",
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "hand close-up near vanity mirror",
+      "worn-on-model": "finger close-up near vanity mirror",
       "held-in-hand": "soft linen beside vanity tray",
-      "styled-on-surface": "jewelry tray on stone slab close-up",
+      "styled-on-surface": "stone slab close-up",
       "in-use-action": "close vanity mirror setup",
-      "flat-lay-arrangement": "soft linen with jewelry tray",
+      "flat-lay-arrangement": "soft linen flat-lay",
     },
     defaultCameras: {
       "worn-on-model": "close-up detail",
@@ -78,16 +71,10 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "box-case-small": {
-    sceneScope: "tight tabletop or hand close-up only",
-    scaleGuidance: "keep the box at believable hand scale and anchor it with a hand, ring, or tabletop close-up",
+    sceneScope: "tight tabletop close-up only",
+    scaleGuidance: "keep the box at believable palm scale anchored on a tabletop close-up",
     forbiddenElements: "journals, pens, coffee cups, full sofa scenes, room decor",
-    defaultProps: {
-      "held-in-hand": "ring, soft linen",
-      "styled-on-surface": "ring, tissue paper",
-      "in-use-action": "ring, ribbon",
-      "flat-lay-arrangement": "ring, ribbon",
-      "worn-on-model": "ring, ribbon",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "held-in-hand": "soft window-lit interior close-up",
       "styled-on-surface": "linen tabletop close-up",
@@ -104,22 +91,16 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   apparel: {
-    sceneScope: "full garment shot or believable outfit layout only",
-    scaleGuidance: "garment must clearly rest on a real horizontal surface or be worn on a body; no floating or wall-floor ambiguity",
-    forbiddenElements: "floating layouts, vertical-wall ambiguity, vinyl records, skateboards, random decor props",
-    defaultProps: {
-      "worn-on-model": "sneakers, crossbody bag",
-      "held-in-hand": "phone, tote bag",
-      "styled-on-surface": "folded jeans, sneakers",
-      "in-use-action": "backpack, headphones",
-      "flat-lay-arrangement": "jeans, sneakers",
-    },
+    sceneScope: "full garment laid flat on a real horizontal surface",
+    scaleGuidance: "garment must clearly rest flat on a real horizontal surface; no floating, no wall-floor ambiguity",
+    forbiddenElements: "floating layouts, vertical-wall ambiguity, vinyl records, skateboards, random decor props, additional clothing items, shoes, other garments",
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "streetwear sidewalk or studio backdrop",
+      "worn-on-model": "studio backdrop with clean floor",
       "held-in-hand": "boutique fitting room",
-      "styled-on-surface": "studio paper backdrop or wooden bench",
-      "in-use-action": "city sidewalk or casual indoor hallway",
-      "flat-lay-arrangement": "studio paper backdrop or bedspread",
+      "styled-on-surface": "studio paper backdrop",
+      "in-use-action": "city sidewalk",
+      "flat-lay-arrangement": "studio paper backdrop",
     },
     defaultCameras: {
       "worn-on-model": "eye-level three-quarter",
@@ -130,21 +111,15 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "pet-accessory": {
-    sceneScope: "close product scene or dog-wear shot only",
-    scaleGuidance: "show believable pet-accessory scale using a dog neck, leash hardware, hand, or dog tag as context",
-    forbiddenElements: "watches, journals, pens, coffee cups, unrelated decor",
-    defaultProps: {
-      "worn-on-model": "leash, dog tag",
-      "held-in-hand": "leash, dog tag",
-      "styled-on-surface": "leash, dog tag",
-      "in-use-action": "leash, tennis ball",
-      "flat-lay-arrangement": "leash, dog tag",
-    },
+    sceneScope: "close product scene on a flat surface",
+    scaleGuidance: "show believable pet-accessory scale using a leash clip as size reference",
+    forbiddenElements: "watches, journals, pens, coffee cups, unrelated decor, chew toys, treat pouches, additional pet accessories",
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "park path near grass edge",
       "held-in-hand": "entryway bench close-up",
-      "styled-on-surface": "wood bench or stone slab close-up",
-      "in-use-action": "park path or porch step",
+      "styled-on-surface": "wood bench close-up",
+      "in-use-action": "park path close-up",
       "flat-lay-arrangement": "entryway bench flat-lay",
     },
     defaultCameras: {
@@ -156,16 +131,10 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "beauty-small": {
-    sceneScope: "close vanity or hand-held beauty shot only",
-    scaleGuidance: "keep the item at believable hand or countertop scale with close framing",
+    sceneScope: "close vanity countertop shot only",
+    scaleGuidance: "keep the item at believable countertop scale with tight framing",
     forbiddenElements: "room decor stories, oversized props, unrelated objects",
-    defaultProps: {
-      "worn-on-model": "mirror, folded towel",
-      "held-in-hand": "mirror, folded towel",
-      "styled-on-surface": "tray, folded towel",
-      "in-use-action": "mirror, cotton pad",
-      "flat-lay-arrangement": "tray, cotton pad",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "bathroom mirror close-up",
       "held-in-hand": "bathroom vanity close-up",
@@ -183,20 +152,14 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
   },
   "furniture-large": {
     sceneScope: "room-scale scene is allowed",
-    scaleGuidance: "show the product at believable furniture scale with enough surrounding context to read size",
+    scaleGuidance: "show the product at believable furniture scale with enough surrounding room context to read size",
     forbiddenElements: "miniature staging that shrinks the product unrealistically",
-    defaultProps: {
-      "worn-on-model": "throw pillow, blanket",
-      "held-in-hand": "book, blanket",
-      "styled-on-surface": "throw pillow, blanket",
-      "in-use-action": "book, throw pillow",
-      "flat-lay-arrangement": "blanket, throw pillow",
-    },
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "living room or nursery",
+      "worn-on-model": "living room corner",
       "held-in-hand": "living room corner",
-      "styled-on-surface": "living room or nursery",
-      "in-use-action": "living room or nursery",
+      "styled-on-surface": "living room corner",
+      "in-use-action": "living room corner",
       "flat-lay-arrangement": "styled room corner",
     },
     defaultCameras: {
@@ -208,20 +171,14 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "home-decor": {
-    sceneScope: "tabletop or shelf vignette only",
-    scaleGuidance: "show the item at believable home-decor scale using a table, shelf, or hand for context",
-    forbiddenElements: "random props unrelated to the item’s home use",
-    defaultProps: {
-      "worn-on-model": "tray, folded linen",
-      "held-in-hand": "tray, folded linen",
-      "styled-on-surface": "tray, folded linen",
-      "in-use-action": "tray, folded linen",
-      "flat-lay-arrangement": "tray, folded linen",
-    },
+    sceneScope: "tabletop vignette only",
+    scaleGuidance: "show the item at believable home-decor scale on a table surface",
+    forbiddenElements: "random props unrelated to the item's home use",
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "tabletop vignette",
       "held-in-hand": "tabletop vignette",
-      "styled-on-surface": "tabletop or shelf vignette",
+      "styled-on-surface": "tabletop vignette",
       "in-use-action": "tabletop vignette",
       "flat-lay-arrangement": "tabletop flat-lay",
     },
@@ -234,21 +191,15 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "food-drink": {
-    sceneScope: "close kitchen or dining scene only",
-    scaleGuidance: "show believable serving scale with plate, hand, or tabletop context",
+    sceneScope: "close dining table scene only",
+    scaleGuidance: "show believable serving scale on a table setting",
     forbiddenElements: "random decor props unrelated to eating or serving",
-    defaultProps: {
-      "worn-on-model": "plate, napkin",
-      "held-in-hand": "napkin, spoon",
-      "styled-on-surface": "plate, napkin",
-      "in-use-action": "spoon, napkin",
-      "flat-lay-arrangement": "plate, napkin",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "kitchen table",
       "held-in-hand": "kitchen counter close-up",
-      "styled-on-surface": "kitchen counter or dining table",
-      "in-use-action": "kitchen table or counter",
+      "styled-on-surface": "dining table close-up",
+      "in-use-action": "kitchen table close-up",
       "flat-lay-arrangement": "tabletop flat-lay",
     },
     defaultCameras: {
@@ -260,20 +211,14 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "tech-desk": {
-    sceneScope: "desk or workspace close-up only; no full-room shots",
-    scaleGuidance: "keep the item at believable desk-accessory scale using a keyboard, monitor edge, or hand for context",
+    sceneScope: "desk close-up only; no full-room shots",
+    scaleGuidance: "keep the item at believable desk-accessory scale beside a keyboard",
     forbiddenElements: "kitchen props, food, pet items, jewelry, candles, plants unrelated to desk setup",
-    defaultProps: {
-      "worn-on-model": "keyboard, monitor",
-      "held-in-hand": "keyboard, cable",
-      "styled-on-surface": "keyboard, desk mat",
-      "in-use-action": "keyboard, monitor",
-      "flat-lay-arrangement": "keyboard, cable",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "desk setup close-up",
       "held-in-hand": "desk setup close-up",
-      "styled-on-surface": "desk mat or wooden desk close-up",
+      "styled-on-surface": "wooden desk close-up",
       "in-use-action": "workspace with monitor glow",
       "flat-lay-arrangement": "desk mat flat-lay",
     },
@@ -286,20 +231,14 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   stationery: {
-    sceneScope: "desk vignette or hand-writing close-up only",
-    scaleGuidance: "keep the item at believable hand or desk scale with close framing",
+    sceneScope: "desk vignette close-up only",
+    scaleGuidance: "keep the item at believable desk scale with close framing on the writing surface",
     forbiddenElements: "kitchen props, pet items, jewelry, full room scenes, tech monitors",
-    defaultProps: {
-      "worn-on-model": "ink bottle, wax seal",
-      "held-in-hand": "ink bottle, desk blotter",
-      "styled-on-surface": "ink bottle, brass paperweight",
-      "in-use-action": "ink bottle, letter paper",
-      "flat-lay-arrangement": "ink bottle, wax seal",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "dark wood desk close-up",
       "held-in-hand": "leather desk pad close-up",
-      "styled-on-surface": "dark wood desk or leather pad close-up",
+      "styled-on-surface": "dark wood desk close-up",
       "in-use-action": "writing desk with warm lamp glow",
       "flat-lay-arrangement": "dark wood desk flat-lay",
     },
@@ -312,20 +251,14 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "ceramics-tableware": {
-    sceneScope: "tabletop or hand-held pottery close-up only",
-    scaleGuidance: "keep the item at believable tableware scale using a hand, table setting, or shelf for context",
+    sceneScope: "tabletop pottery close-up only",
+    scaleGuidance: "keep the item at believable tableware scale on a table surface",
     forbiddenElements: "pet items, tech accessories, jewelry, full room scenes, wall decor",
-    defaultProps: {
-      "worn-on-model": "linen napkin, wooden spoon",
-      "held-in-hand": "linen napkin, tea towel",
-      "styled-on-surface": "linen napkin, dried flowers",
-      "in-use-action": "wooden spoon, linen napkin",
-      "flat-lay-arrangement": "linen napkin, dried flowers",
-    },
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "kitchen shelf or dining table close-up",
+      "worn-on-model": "dining table close-up",
       "held-in-hand": "kitchen counter close-up with natural light",
-      "styled-on-surface": "linen tablecloth or wooden shelf close-up",
+      "styled-on-surface": "linen tablecloth close-up",
       "in-use-action": "kitchen table with morning light",
       "flat-lay-arrangement": "linen tablecloth flat-lay",
     },
@@ -338,22 +271,16 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "kids-baby": {
-    sceneScope: "nursery vignette, play mat, or parent-child close-up only",
-    scaleGuidance: "show believable child or baby scale using a small hand, play mat, crib rail, or nursery shelf for context",
+    sceneScope: "nursery vignette close-up only",
+    scaleGuidance: "show believable child-scale item on a play mat or nursery shelf",
     forbiddenElements: "alcohol, sharp objects, candles, adult-only props, dark moody lighting, industrial scenes",
-    defaultProps: {
-      "worn-on-model": "stuffed animal, wooden rattle",
-      "held-in-hand": "stuffed animal, wooden rattle",
-      "styled-on-surface": "stuffed animal, soft blanket",
-      "in-use-action": "stuffed animal, play mat",
-      "flat-lay-arrangement": "stuffed animal, soft blanket",
-    },
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "sunlit nursery corner",
-      "held-in-hand": "parent holding near nursery shelf",
-      "styled-on-surface": "nursery shelf or crib ledge close-up",
+      "held-in-hand": "nursery shelf close-up",
+      "styled-on-surface": "nursery shelf close-up",
       "in-use-action": "play mat in bright nursery",
-      "flat-lay-arrangement": "soft blanket or play mat flat-lay",
+      "flat-lay-arrangement": "soft blanket flat-lay",
     },
     defaultCameras: {
       "worn-on-model": "eye-level three-quarter",
@@ -364,21 +291,15 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "wedding-event": {
-    sceneScope: "elegant tabletop vignette or hand close-up only; no full venue shots",
-    scaleGuidance: "keep the item at believable gift or table-setting scale using a hand, invitation, or small tray for context",
+    sceneScope: "elegant tabletop vignette only; no full venue shots",
+    scaleGuidance: "keep the item at believable gift scale on a linen surface",
     forbiddenElements: "pet items, tech accessories, kitchen appliances, full room scenes, casual streetwear",
-    defaultProps: {
-      "worn-on-model": "ribbon, dried flowers",
-      "held-in-hand": "ribbon, envelope",
-      "styled-on-surface": "ribbon, dried flowers",
-      "in-use-action": "envelope, wax seal stamp",
-      "flat-lay-arrangement": "ribbon, dried flowers",
-    },
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "elegant vanity or linen table close-up",
+      "worn-on-model": "elegant linen table close-up",
       "held-in-hand": "soft window-lit interior close-up",
-      "styled-on-surface": "linen or marble tabletop close-up",
-      "in-use-action": "candlelit table or writing desk close-up",
+      "styled-on-surface": "marble tabletop close-up",
+      "in-use-action": "candlelit writing desk close-up",
       "flat-lay-arrangement": "linen tabletop flat-lay with soft light",
     },
     defaultCameras: {
@@ -390,22 +311,16 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "wall-art": {
-    sceneScope: "wall-mounted or framed display only; art must be on or against a wall",
-    scaleGuidance: "show the art at believable print scale on a real wall, leaning on a shelf, or in a frame held by a hand",
+    sceneScope: "wall-mounted display only; art must be on a wall",
+    scaleGuidance: "show the art at believable print scale mounted on a real wall",
     forbiddenElements: "random tabletop props, kitchen items, pet items, tech accessories",
-    defaultProps: {
-      "worn-on-model": "frame, picture hook",
-      "held-in-hand": "frame, wrapping paper",
-      "styled-on-surface": "frame, small plant",
-      "in-use-action": "frame, picture hook",
-      "flat-lay-arrangement": "frame, tissue paper",
-    },
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "gallery wall or living room wall close-up",
+      "worn-on-model": "gallery wall close-up",
       "held-in-hand": "bright room with clean wall behind",
       "styled-on-surface": "leaning on shelf against clean wall",
       "in-use-action": "being hung on gallery wall",
-      "flat-lay-arrangement": "wrapping paper flat-lay with frame",
+      "flat-lay-arrangement": "wrapping paper flat-lay",
     },
     defaultCameras: {
       "worn-on-model": "eye-level front",
@@ -416,22 +331,16 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
     },
   },
   "carried-accessory": {
-    sceneScope: "outfit pairing or styled surface shot only; no full room backgrounds",
-    scaleGuidance: "show the accessory at believable carry scale — on a shoulder, in a hand, or beside an outfit",
+    sceneScope: "styled surface shot only; no full room backgrounds",
+    scaleGuidance: "show the accessory at believable carry scale resting on a styled surface",
     forbiddenElements: "kitchen props, pet items, jewelry trays, candles, full furniture scenes",
-    defaultProps: {
-      "worn-on-model": "sunglasses, phone",
-      "held-in-hand": "sunglasses, coffee cup",
-      "styled-on-surface": "sunglasses, keys",
-      "in-use-action": "phone, sunglasses",
-      "flat-lay-arrangement": "sunglasses, keys",
-    },
+    defaultProps: {},
     defaultEnvironments: {
-      "worn-on-model": "city sidewalk or café entrance",
-      "held-in-hand": "café table or boutique doorway",
-      "styled-on-surface": "wooden bench or studio backdrop",
-      "in-use-action": "city street or transit station",
-      "flat-lay-arrangement": "studio or bedspread flat-lay",
+      "worn-on-model": "city sidewalk close-up",
+      "held-in-hand": "café table close-up",
+      "styled-on-surface": "wooden bench close-up",
+      "in-use-action": "city street close-up",
+      "flat-lay-arrangement": "studio flat-lay",
     },
     defaultCameras: {
       "worn-on-model": "eye-level three-quarter",
@@ -443,15 +352,9 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
   },
   general: {
     sceneScope: "product-world scene only",
-    scaleGuidance: "keep size believable using a natural surface, hand, or nearby product-world object",
-    forbiddenElements: "random unrelated props and room-scale distractions",
-    defaultProps: {
-      "worn-on-model": "none",
-      "held-in-hand": "none",
-      "styled-on-surface": "none",
-      "in-use-action": "none",
-      "flat-lay-arrangement": "none",
-    },
+    scaleGuidance: "keep size believable on a natural surface",
+    forbiddenElements: "random unrelated props, room-scale distractions",
+    defaultProps: {},
     defaultEnvironments: {
       "worn-on-model": "natural use setting",
       "held-in-hand": "clean close-up setting",
@@ -576,39 +479,6 @@ function containsAny(value: string, terms: string[]) {
   return terms.some(term => lower.includes(term))
 }
 
-function sanitizeSuggestedProps(rawProps: string, family: ProductFamily, mode: PresentationMode) {
-  const normalized = normalizeWhitespace(rawProps)
-  const rules = FAMILY_RULES[family]
-  const defaultProps = rules.defaultProps[mode] || "none"
-
-  if (!normalized || normalized === "none") return defaultProps
-
-  const blacklist = [
-    "watch",
-    "journal",
-    "notebook",
-    "pen",
-    "coffee cup",
-    "mug",
-    "dreamcatcher",
-    "record",
-    "vinyl",
-    "dvd",
-    "skateboard",
-    "candle",
-    "wine glass",
-    "cocktail",
-    "alcohol",
-    "cigarette",
-    "ashtray",
-    "knife",
-    "weapon",
-  ]
-
-  if (containsAny(normalized, blacklist)) return defaultProps
-  return normalized
-}
-
 function sanitizeEnvironment(rawEnvironment: string, family: ProductFamily, mode: PresentationMode) {
   const normalized = normalizeWhitespace(rawEnvironment)
   const rules = FAMILY_RULES[family]
@@ -650,7 +520,6 @@ function normalizeModeForFamily(
     cameraAngle: rules.defaultCameras[presentationMode] || mode.cameraAngle || "eye-level three-quarter",
     heroAction: normalizeWhitespace(mode.heroAction) || `${productTitle} displayed naturally`,
     naturalEnvironment: sanitizeEnvironment(mode.naturalEnvironment, family, presentationMode),
-    suggestedProps: sanitizeSuggestedProps(mode.suggestedProps, family, presentationMode),
   }
 }
 
@@ -671,7 +540,6 @@ export interface ShowcaseStrategy {
   heroAction: string
   naturalEnvironment: string
   productAppearance: string
-  suggestedProps: string
   sceneScope: string
   scaleGuidance: string
   forbiddenElements: string
@@ -693,7 +561,6 @@ export interface ShowcaseAnalysis {
     cameraAngle: string
     heroAction: string
     naturalEnvironment: string
-    suggestedProps: string
   }[]
 }
 
@@ -717,10 +584,7 @@ heroAction: specific pose/action in max 12 words (e.g. "dog wearing collar on mo
 
 naturalEnvironment: 1-2 specific locations in max 10 words (e.g. "sunny park path with grass edge")
 
-suggestedProps: exactly 2 props that a BUYER of this product would own or use alongside it. Props must come from the product's world — not generic lifestyle items.
-- Dog collar → "water bowl, tennis ball" or "leash hook, paw-print bandana" — NOT "watch, journal, vase"
-- Ring box → "ring, dried flowers" or "ribbon, tissue paper" — NOT "pen, notebook, coffee cup"
-- Hoodie → "sneakers, backpack" or "beanie, phone" — NOT "candle, book, plant"
+Do NOT suggest any props, accessories, or additional objects. The scene should contain ONLY the product on the described surface/environment.
 
 productAppearance: the product's actual colors, materials, and key design details in max 15 words. Critical for preservation.
 - Good: "brown leather collar with turquoise padding, gold buckle, silver conchos"
@@ -728,7 +592,8 @@ productAppearance: the product's actual colors, materials, and key design detail
 
 Keep size and support physically believable:
 - small jewelry or boxes should stay in macro or hand-level setups, not become room decor
-- apparel on a surface must clearly rest on a real horizontal surface, not float between wall and floor
+- apparel on a surface must clearly rest flat on a real horizontal surface, never floating
+- never mention "hand", "finger", or body parts in environments unless the mode is "worn-on-model" or "held-in-hand"
 
 Return ONLY valid JSON:
 {
@@ -747,8 +612,7 @@ Return ONLY valid JSON:
       "presentationMode": "...",
       "cameraAngle": "...",
       "heroAction": "...",
-      "naturalEnvironment": "...",
-      "suggestedProps": "..."
+      "naturalEnvironment": "..."
     }
   ]
 }`
@@ -803,7 +667,6 @@ export async function resolveProductShowcase(
         cameraAngle: m.cameraAngle || "eye-level three-quarter",
         heroAction: m.heroAction || `${product.title} displayed naturally`,
         naturalEnvironment: m.naturalEnvironment || "clean product setting",
-        suggestedProps: m.suggestedProps || "",
       }, productFamily, product.title))
 
     // Ensure at least one mode
@@ -813,7 +676,6 @@ export async function resolveProductShowcase(
         cameraAngle: "eye-level three-quarter",
         heroAction: `${product.title} displayed naturally`,
         naturalEnvironment: "clean product setting",
-        suggestedProps: "",
       }, productFamily, product.title))
     }
 
@@ -841,7 +703,6 @@ export async function resolveProductShowcase(
         cameraAngle: "eye-level three-quarter",
         heroAction: `${product.title} displayed naturally`,
         naturalEnvironment: "clean product setting",
-        suggestedProps: "",
       }, fallbackFamily, product.title)],
     }
   }
@@ -892,6 +753,10 @@ export function pickShowcaseForPin(
       forbiddenElements = `${rules.forbiddenElements}, ${c.forbiddenContexts.join(", ")}`
     }
   }
+
+  // Sanitize any remaining "or" ambiguity from AI-injected constraints
+  scaleGuidance = scaleGuidance.replace(/ or /gi, "; ")
+  sceneScope = sceneScope.replace(/ or /gi, "; ")
 
   return {
     productFamily: analysis.productFamily,

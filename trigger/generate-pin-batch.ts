@@ -247,7 +247,6 @@ FAMILY: ${showcase.productFamily}
 SHOT: ${showcase.presentationMode}, ${showcase.heroAction}
 CAMERA: ${showcase.cameraAngle}
 SETTING: ${showcase.naturalEnvironment}
-PROPS (only these): ${showcase.suggestedProps || "none"}
 SCENE SCOPE: ${showcase.sceneScope}
 SCALE RULE: ${showcase.scaleGuidance}
 NEVER INCLUDE: ${showcase.forbiddenElements}
@@ -257,9 +256,9 @@ STYLE: ${pickedAesthetic.tag} — ${pickedAesthetic.definition}
 Write the fal.ai prompt following this exact structure:
 1. "A ${showcase.productAppearance}, ${showcase.presentationMode}, ${showcase.heroAction}."
 2. "The product keeps its exact original colors, materials, and design from the source image."
-3. "Keep the product at natural real-world size and keep the scene within this scope: ${showcase.sceneScope}. ${showcase.scaleGuidance}."
+3. "Keep the product at natural real-world size and keep the scene within this scope: ${showcase.sceneScope}. ${showcase.scaleGuidance}. Do not render any human hands, fingers, or body parts unless the presentation mode is worn-on-model or held-in-hand."
 4. Describe the environment: surface material, background, and the scene concept above.
-5. Place ONLY the listed props — no other objects.
+5. Do NOT add any props, accessories, or additional objects to the scene. Show ONLY the product on the described surface/environment.
 6. Explicitly avoid these elements: ${showcase.forbiddenElements}.
 7. Apply the style's lighting and color palette to the environment only, not the product.
 8. End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
