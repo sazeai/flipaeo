@@ -1,262 +1,534 @@
-# Pin Generation Pipeline — Architecture Reference
+# Pin Generation Pipeline
 
-> Last updated: April 11, 2026
+> Last updated: April 12, 2026
 
-## Overview
+## What This Covers
 
-PinLoop generates Pinterest pins automatically through a 9-step pipeline. This document covers every step, every file, and how Pinterest data feeds back into generation.
+This is the current automatic pin pipeline used by PinLoop.
 
----
-
-## Pipeline Steps
-
-### Step 1: Batch Scheduler
-
-**File:** `trigger/generate-pin-batch.ts`  
-**Schedule:** Cron (`*/5 * * * *`) — processes 1 product per run  
-
-**Quotas enforced before generation starts:**
-- 150 pins/month hard cap per user
-- 100-pin monthly quota distributed evenly across products
-- Max 10 pending-approval pins per product (prevents backlog)
-
-**Product selection:** Products sorted by `last_generated_at` (oldest first), so every product gets rotated through fairly.
+It explains:
+- which file owns each stage
+- what data moves between stages
+- how showcase rotation works
+- how aesthetic rotation works
+- what gets stored in the database
+- what happens after generation
 
 ---
 
-### Step 2: Semantic Angle Generation (Context Matrix)
+## End-To-End Flow
+
+### 1. Batch Scheduler And Guard Rails
+
+**File:** `trigger/generate-pin-batch.ts`
+
+Runs on cron: `*/5 * * * *`
+
+What happens first:
+- load all users with `brand_settings`
+- skip users with `automation_paused = true`
+- skip users without an active `dodo_subscriptions` record
+- enforce `150` pins per 30 days safeguard
+- skip users with `>= 50` pins in `pending_approval`
+- load active products that have an image
+- enforce `100` monthly pin cap across the user
+- enforce per-product cap: `min(15, ceil(100 / productCount))`
+- skip products with `>= 10` non-final pins already sitting in the queue
+
+Product selection rule:
+- eligible products are sorted by oldest `last_generated_at`
+- one product is processed per run
+
+---
+
+### 2. Source Product Image Resolution
+
+**File:** `trigger/generate-pin-batch.ts`
+
+For the selected product:
+- resolve `sourceImageUrl` from `products.image_url`
+- fallback to `R2_PUBLIC_DOMAIN + image_r2_key` if needed
+- fetch the image once
+- convert it to base64 + mime type
+
+That same fetched image is reused by:
+- Showcase Resolver
+- Art Director
+- fal.ai image edit model
+
+If no valid image URL exists, the product is skipped.
+
+---
+
+### 3. Product Showcase Analysis
+
+**File:** `lib/product-showcase.ts`
+
+This is the first AI stage.
+
+Model:
+- Gemini 2.5 Flash multimodal
+
+Input:
+- product title
+- product description
+- actual product image
+
+Purpose:
+- decide how the product should be shown
+- decide what props are allowed
+- decide what visual identity must be preserved
+
+Output:
+- `productType`
+- `productAppearance`
+- `viableModes[]`
+
+Each entry in `viableModes[]` contains:
+- `presentationMode`
+- `cameraAngle`
+- `heroAction`
+- `naturalEnvironment`
+- `suggestedProps`
+
+Important:
+- this stage is product-aware
+- this is where product-specific props are chosen
+- later stages are not supposed to invent props
+
+Current presentation mode taxonomy:
+- `worn-on-model`
+- `held-in-hand`
+- `styled-on-surface`
+- `in-use-action`
+- `flat-lay-arrangement`
+
+Example:
+- a dog collar can produce modes like dog wearing it, collar on a surface, or flat-lay with leash
+- a ring box can produce held-in-hand, styled-on-surface, or opening action
+- a hoodie can produce worn-on-model, folded on surface, or outfit flat-lay
+
+---
+
+### 4. Showcase Mode Rotation
+
+**File:** `lib/product-showcase.ts`
+
+Function:
+- `pickShowcaseForPin()`
+
+Purpose:
+- rotate through the product's viable showcase modes over time
+
+Rotation input:
+- per-product pin count (`prodPins.length`)
+
+Rule:
+- `productPinCount % viableModes.length`
+
+What this means:
+- pin 0 uses mode 0
+- pin 1 uses mode 1
+- pin 2 uses mode 2
+- then it wraps
+
+Important:
+- showcase rotation is per product
+- this is separate from aesthetic rotation
+
+---
+
+### 5. Scene Concept Generation
 
 **File:** `lib/context-matrix.ts`
 
-Generates a unique "Scene Concept" for each pin — the creative direction that makes every pin for the same product visually distinct.
+Function:
+- `generateUniqueAngle()`
 
-**How it works:**
-1. Gemini generates a lifestyle scene concept incorporating the product, brand aesthetic boundaries, and audience profile
-2. The concept is embedded into a 768-dimension vector using `gemini-embedding-2-preview`
-3. The vector is compared against all past angles for this product using pgvector cosine similarity
-4. If similarity > 0.75 with any past angle, it's rejected and regenerated (up to 3 retries with increasing temperature)
-5. Both the angle text and embedding are stored on the `pins` record for future dedup
+This is the second AI stage.
 
-**Example output:** `"Autumn picnic blanket with scattered maple leaves, thermos, and knit scarf in golden hour"`
+Inputs:
+- product id, title, description
+- brand aesthetic boundaries
+- audience profile
+- past angles for this product
+- locked showcase chosen in step 4
+- global user pin count
 
-**DB fields:** `pins.target_angle` (text), `pins.angle_embedding` (vector(768))
+What this stage does:
+- picks one aesthetic from the user's selected boundaries
+- writes a short scene concept
+- keeps showcase data locked
+- only adds surface, background, lighting, and atmosphere
+- cannot invent new props outside `showcase.suggestedProps`
 
----
+What this stage does **not** decide anymore:
+- how the product is posed
+- which props belong with the product
+- what the product looks like
 
-### Step 4: Art Director (Image Concept Plan)
+Output:
+- `angle` text
+- `embedding` vector
+- `pickedAesthetic`
 
-**File:** `trigger/generate-pin-batch.ts` (lines ~214-270)  
-**Model:** Gemini 2.5 Flash (multimodal — sees the actual product image)
+Dedup logic:
+- embeds the scene text using `gemini-embedding-2-preview`
+- compares against past pin angles using pgvector RPC `match_pin_angles`
+- similarity threshold: `0.75`
+- retries up to 3 times
 
-The Art Director receives:
-- The product image (base64)
-- The product title
-- The scene concept from Step 3
-
-It generates:
-| Output | Purpose |
-|--------|---------|
-| `imagePrompt` | Scene description for fal.ai (environment, lighting, props — NOT the product itself) |
-| `title` | 3-7 word overlay text for the pin image (magazine headline style) |
-| `templateId` | Which text layout template to use (template-1 through template-5) |
-
-**Key rule:** The Art Director must NOT describe the product (labels, colors, packaging). The source image handles that — the AI only designs the world around it.
-
----
-
-### Step 5: AI Image Generation
-
-**File:** `trigger/generate-pin-batch.ts` (lines ~275-315)  
-**Model:** `fal-ai/flux-2/flash/edit`  
-**Parameters:** `guidance_scale: 3.5`, output size `1000x1500`
-
-Takes the product image + Art Director's scene prompt → generates a lifestyle photograph with the product placed in the scene. The product itself is preserved from the source image.
-
-**Output:** PNG uploaded to R2 at `pin-images/{userId}/{pinId}-raw.png`  
-**Validation:** Generated image must be >10KB (rejects blank/failed images)
+Fallback if all attempts fail:
+- `Premium Lifestyle aesthetic for {product.title}`
 
 ---
 
-### Step 6: SEO Copy Generation (Title + Description)
+### 6. Aesthetic Rotation
 
-**File:** `trigger/generate-pin-batch.ts` (lines ~326-370)  
-**Model:** Gemini 2.5 Flash, temperature 0.6
+**File:** `lib/context-matrix.ts`
 
-This is where the pin's **searchable title** and **description** are generated — the primary metadata that Pinterest's algorithm indexes.
+Function:
+- `pickAestheticForPin()`
 
-**Inputs:**
-- Product name and description
-- Creative angle from Step 3
-- Live Pinterest trends (if available)
+Purpose:
+- rotate across the user's selected aesthetics
 
-**Pinterest SEO principles enforced in the prompt:**
-- Pinterest extracts "annotations" (1-6 word keyword phrases) from titles/descriptions and scores relevance
-- Titles must contain specific, searchable terms that real users type into Pinterest search
-- Generic filler words ("Aesthetic", "Lifestyle", "Home Decor Finds", "Essential", "Collection") are explicitly banned
-- Descriptions must include 2-3 long-tail keyword phrases + a call-to-action
+Rotation input:
+- global user pin count across all products
 
-**Limits:** Title max 100 chars, description max 500 chars
+Rule:
+- `globalPinCount % selectedAesthetics.length`
 
-**Fallback:** If Gemini's response can't be parsed, falls back to the Art Director's overlay title (Step 4).
+Important:
+- this was changed from per-product rotation to global rotation
+- this prevents everything from defaulting to the first selected aesthetic
 
----
-
-### Step 7: Text Overlay Rendering
-
-**File:** `app/api/render-pin/route.tsx`  
-**Runtime:** Vercel Edge (uses `ImageResponse` / Satori — no Sharp dependency)
-
-Composites the overlay title text onto the generated image using one of 5 templates:
-
-| Template | Layout |
-|----------|--------|
-| template-1 | Top gradient + white text |
-| template-2 | Center overlay (dark background) |
-| template-3 | Bottom gradient + bottom text |
-| template-4 | White border frame + top text |
-| template-5 | Pure aesthetic (no text overlay) |
-
-Also adds a CTA badge at the bottom with the store domain + arrow icon.
-
-**Output:** Final rendered image uploaded to R2 at `pin-images/{userId}/{pinId}-rendered.png`  
-**DB update:** `pins.rendered_image_url`, `pins.status = 'pending_approval'`
+Current aesthetic behavior:
+- aesthetics control mood, lighting, color palette, and shadow style
+- aesthetics do not control product pose
+- aesthetics do not choose props
+- aesthetics do not recolor the product
 
 ---
 
-### Step 8: User Approval → Queue
+### 7. Art Director Prompt Generation
 
-**Files:**
-- `app/api/pins/approve/route.ts` — Approve individual pins
-- `app/api/pins/approve-all/route.ts` — Bulk approve all pending pins
-- `app/api/pins/reject/route.ts` — Reject with reason
+**File:** `trigger/generate-pin-batch.ts`
 
-**Approve flow:**
-1. Pin status changes: `pending_approval` → `queued`
-2. A record is inserted into `pin_queue` table with `status: 'pending'`
-3. Optionally assigns a Pinterest board via `boardMap`
+This is the third AI stage.
 
-**Reject reasons:** `bad_image`, `bad_text`, `wrong_vibe`
+Model:
+- Gemini 2.5 Flash multimodal
 
----
+Inputs:
+- product image
+- `showcase.productAppearance`
+- `showcase.presentationMode`
+- `showcase.heroAction`
+- `showcase.cameraAngle`
+- `showcase.naturalEnvironment`
+- `showcase.suggestedProps`
+- scene concept from step 5
+- picked aesthetic from step 6
 
-### Step 9: Drip Publisher (Anti-Ban)
+Purpose:
+- write the final fal.ai image editing prompt
+- generate overlay title
+- choose template id
 
-**File:** `trigger/publish-pins.ts`  
-**Schedule:** Every 6 hours
+Output JSON:
+- `imagePrompt`
+- `title`
+- `templateId`
 
-Uses a "Human Entropy" algorithm to mimic natural posting patterns and avoid Pinterest shadow bans:
+Hard rules in this stage:
+- preserve the product's original colors, materials, and design
+- use only the props listed in showcase
+- apply the aesthetic only to the environment
+- do not add extra objects
 
-- **Warmup matrices:** 7-day rotating patterns for accounts aged 0-30 days (starts slow, ramps up)
-- **Power matrices:** 4 rotation patterns for established accounts
-- **Daily target** calculated from: account age + day of week + rotation position
-- **Intra-day jitter:** Divides 24 hours into chunks, only publishes when the current hour falls within the right window
-- **Domain velocity cap:** No two product URLs published within 4 hours
-- **API jitter:** 0-45 minute random delay before each Pinterest API call
-
-**Publishing:**
-1. Calls Pinterest API `POST /v5/pins` with: image URL, title, description, link, board
-2. Updates `pins.pinterest_pin_id`, `pins.published_at`, `pins.status = 'published'`
-3. Updates `pin_queue.status = 'published'`
-
----
-
-### Step 10: Analytics Collection (Feedback Loop)
-
-**File:** `trigger/analytics-collector.ts`  
-**Schedule:** Daily at 3:30 AM UTC
-
-For every published pin, fetches 30-day analytics from Pinterest:
-- **API:** `GET /v5/pins/{pinId}/analytics?metric_types=IMPRESSION,SAVE,OUTBOUND_CLICK`
-- **Updates:** `pins.impressions`, `pins.saves`, `pins.outbound_clicks`
-
-**Current state:** Analytics are collected and displayed in the UI but are NOT yet fed back into the generation algorithm. This is a one-way integration.
-
-**Future opportunity:** Use analytics data to:
-- Weight trending keywords that correlate with high-performing pins
-- A/B test scene concepts (which angles get more saves?)
-- Auto-adjust template selection based on CTR data
-- Prioritize products whose pins perform best
+If Gemini parsing fails:
+- `imagePrompt` falls back to `Aesthetic lifestyle shot of {product.title}, photorealistic 8k`
+- title falls back to `product.title`
+- template falls back to `template-5`
 
 ---
 
-## Database Tables
+### 8. AI Image Generation And Raw Save
 
-| Table | Purpose | Key Fields |
-|-------|---------|-----------|
-| `pins` | Full pin lifecycle | `status`, `pin_title`, `pin_description`, `target_angle`, `angle_embedding` (vector 768), `generated_image_url`, `rendered_image_url`, `pinterest_pin_id`, `impressions`, `saves`, `outbound_clicks` |
-| `pin_queue` | Publishing queue | `pin_id`, `status` (pending/published/cancelled), `priority` |
-| `products` | Product catalog | `title`, `description`, `image_url`, `image_r2_key`, `is_active`, `product_url` |
-| `brand_settings` | User brand config | `aesthetic_boundaries`, `audience_profile`, `pin_layout_mode`, `default_board_id` |
-| `pinterest_connections` | OAuth tokens | `access_token`, `refresh_token`, `warmup_phase`, `account_age_days` |
-| `account_health_log` | Shadow ban tracking | `pins_today`, `shadow_ban_risk`, `warmup_phase` |
+**File:** `trigger/generate-pin-batch.ts`
 
----
+Model:
+- `fal-ai/flux-2/flash/edit`
 
-## Data Flow Diagram
+Input:
+- source product image URL
+- art director prompt
 
-```
-[Cron: generate-pin-batch]
-  │
-  ├─ generateUniqueAngle() ──→ targetAngle + embedding
-  │   └─ uses: product, aesthetic_boundaries, audience_profile
-  │   └─ dedup: pgvector cosine similarity vs past angles
-  │
-  ├─ Gemini Art Director ──→ imagePrompt, overlayTitle, templateId
-  │   └─ input: product image + targetAngle
-  │
-  ├─ fal.ai flux-2/flash/edit ──→ raw lifestyle image → R2
-  │   └─ input: product image + imagePrompt
-  │
-  ├─ Gemini SEO Copy ──→ pin_title, pin_description
-  │   └─ input: product name/desc + targetAngle
-  │
-  └─ POST /api/render-pin ──→ rendered image with text overlay → R2
-      └─ status: pending_approval
+Current params:
+- `guidance_scale: 3.5`
+- `width: 1000`
+- `height: 1500`
+- `num_images: 1`
+- `output_format: png`
 
-[User Action: Approve/Reject]
-  │
-  └─ Approve → pins.status = 'queued' + pin_queue INSERT
+Flow:
+1. call fal.ai
+2. receive generated image URL
+3. insert a `pins` record with `status = 'generating'`
+4. download the generated image
+5. upload it to R2 as raw image
+6. immediately save raw image URL and key back to the `pins` record
 
-[Cron: publish-pins]
-  │
-  ├─ Entropy matrix → daily target calculation
-  ├─ Domain velocity check
-  ├─ Anti-ban jitter delay
-  └─ Pinterest API POST /v5/pins → pins.status = 'published'
+Raw file path:
+- `pin-images/{userId}/{pinId}-raw.png`
 
-[Cron: analytics-collector — daily 3:30 AM UTC]
-  │
-  └─ Pinterest API GET /v5/pins/{id}/analytics
-      └─ updates: impressions, saves, outbound_clicks
-```
+Pin fields saved at this point:
+- `art_director_prompt`
+- `target_angle`
+- `angle_embedding`
+- `template_id`
+- `pin_title`
+- `status = generating`
+- `generated_image_url`
+- `generated_image_r2_key`
+
+Why raw image is saved before render:
+- if render fails later, the generated image is still preserved for inspection/debugging
 
 ---
 
-## Removed: Pinterest Trends API Integration
+### 9. SEO Copy Generation
 
-The Pinterest Trends API (`/v5/trends/keywords/US/top/growing`) was previously used to fetch platform-wide trending search terms and inject them into pin generation. **This was removed** because:
+**File:** `trigger/generate-pin-batch.ts`
 
-1. **Irrelevant data:** The API returns global trending topics across ALL of Pinterest (e.g. "wedding hairstyles", "keto recipes"). For an ecom product like peanut butter or face serum, these random trends added noise, not signal.
-2. **Actively harmful:** Injecting unrelated trending keywords into titles/descriptions hurts Pinterest's topic relevance scoring — the algorithm expects pin metadata to match the pin's actual content.
-3. **Gemini already knows search behavior:** The LLM understands what people search for when looking for specific products. It doesn't need a trends API to know "protein snacks for gym" is a real search term for peanut butter. Product-specific keyword generation comes from understanding the product itself.
+Model:
+- Gemini 2.5 Flash
 
-The `getTrendingKeywords()` function still exists in `lib/pinterest-api.ts` (dead code) in case a future niche-filtered implementation makes sense.
+Inputs:
+- product title
+- product description
+- creative angle text
 
-**Future consideration:** Pinterest's API may eventually support category-filtered trends (e.g. "trending in Food & Drink"). If that happens, re-integrating trends scoped to the user's product niche could add value. Until then, Gemini's product-aware keyword generation is the better approach.
+Outputs:
+- `seo_title`
+- `seo_description`
+
+Rules enforced in prompt:
+- title must use searchable product language
+- generic filler like `Aesthetic`, `Lifestyle`, `Collection`, `Home Decor Finds` is banned
+- description must include natural long-tail keyword phrases
+- description ends with a CTA
+- no hashtags
+
+Saved before render:
+- `pins.pin_title`
+- `pins.pin_description`
+
+If parsing fails:
+- title falls back to the art director title
+- description falls back to `Discover {product.title}`
 
 ---
 
-## Key Files Quick Reference
+### 10. Final Render With Text Overlay
 
-| File | What It Does |
-|------|-------------|
-| `trigger/generate-pin-batch.ts` | Main orchestrator — runs all generation steps |
-| `lib/context-matrix.ts` | Semantic angle generation + vector dedup |
-| `app/api/render-pin/route.tsx` | Edge function for text overlay rendering |
-| `app/api/generate-pin/route.ts` | Manual/API pin generation (used by UI) |
-| `app/api/pins/approve/route.ts` | Approve pins → queue |
-| `app/api/pins/reject/route.ts` | Reject pins with reason |
-| `trigger/publish-pins.ts` | Drip publisher with anti-ban entropy |
-| `trigger/analytics-collector.ts` | Daily Pinterest analytics sync |
-| `lib/pinterest-api.ts` | Pinterest API wrapper (trends, boards, analytics, create pin) |
-| `lib/r2.ts` | Cloudflare R2 storage (upload/download images) |
+**File:** `app/api/render-pin/route.tsx`
+
+Runtime:
+- `nodejs`
+
+Why Node.js runtime is used:
+- bundled local font files made the edge bundle too large
+- Node.js runtime avoids the edge size limit problem
+
+What this route does:
+- validates the raw image URL
+- only allows `https`, `*.r2.dev`, and the configured `R2_PUBLIC_DOMAIN`
+- fetches the raw generated image
+- validates content type and size
+- applies one of the text overlay templates
+- adds CTA badge with store domain if available
+- returns final `1000x1500` image
+
+Font source:
+- local bundled font files loaded with `readFile`
+
+Templates:
+- `template-1` top gradient text
+- `template-2` centered dark overlay text
+- `template-3` bottom gradient text
+- `template-4` framed top text
+- `template-5` pure image, no overlay text
+
+Template override rule:
+- if `layoutMode === 'organic'`, renderer forces `template-5`
+
+Final file path:
+- `pin-images/{userId}/{pinId}-final.png`
+
+Success DB update:
+- `pins.rendered_image_url`
+- `pins.rendered_image_r2_key`
+- `pins.status = 'pending_approval'`
+
+Failure handling:
+- if render request fails: mark pin `failed`
+- if final image is suspiciously small (`< 10000` bytes): mark pin `failed`
+
+---
+
+## What Happens After Generation
+
+### 11. User Approval
+
+Files:
+- `app/api/pins/approve/route.ts`
+- `app/api/pins/approve-all/route.ts`
+- `app/api/pins/reject/route.ts`
+
+Approve flow:
+- `pins.status` changes from `pending_approval` to `queued`
+- insert row into `pin_queue`
+
+Reject flow:
+- reject reason is stored
+
+---
+
+### 12. Publishing
+
+**File:** `trigger/publish-pins.ts`
+
+Purpose:
+- drip publish approved pins to Pinterest with anti-ban timing logic
+
+This happens after generation, not during generation.
+
+---
+
+### 13. Analytics Collection
+
+**File:** `trigger/analytics-collector.ts`
+
+Purpose:
+- fetch Pinterest analytics for published pins
+- update impressions, saves, and outbound clicks on `pins`
+
+Current state:
+- analytics are collected
+- analytics are not yet fed back into generation decisions
+
+---
+
+## Current Rotation Rules
+
+### Showcase Rotation
+
+Owned by:
+- `pickShowcaseForPin()` in `lib/product-showcase.ts`
+
+Based on:
+- per-product pin count
+
+Purpose:
+- rotate how the same product is shown over time
+
+---
+
+### Aesthetic Rotation
+
+Owned by:
+- `pickAestheticForPin()` in `lib/context-matrix.ts`
+
+Based on:
+- global user pin count
+
+Purpose:
+- rotate across the user's selected brand aesthetics across all products
+
+---
+
+### Scene Rotation
+
+Owned by:
+- `generateUniqueAngle()` in `lib/context-matrix.ts`
+
+Based on:
+- pgvector similarity against past angles for the same product
+
+Purpose:
+- prevent near-duplicate scene concepts
+
+---
+
+## Main Files
+
+| File | Responsibility |
+|------|----------------|
+| `trigger/generate-pin-batch.ts` | main orchestrator for automatic pin generation |
+| `lib/product-showcase.ts` | product-aware showcase analysis, viable modes, prop selection, showcase rotation |
+| `lib/context-matrix.ts` | aesthetic rotation, scene concept generation, semantic dedup |
+| `app/api/render-pin/route.tsx` | final text overlay renderer |
+| `app/api/pins/approve/route.ts` | approve pending pins |
+| `app/api/pins/reject/route.ts` | reject pending pins |
+| `trigger/publish-pins.ts` | drip publish approved pins to Pinterest |
+| `trigger/analytics-collector.ts` | collect Pinterest analytics |
+
+---
+
+## Main Database Fields Used In Generation
+
+### `products`
+- `id`
+- `title`
+- `description`
+- `image_url`
+- `image_r2_key`
+- `is_active`
+
+### `brand_settings`
+- `id`
+- `user_id`
+- `brand_name`
+- `font_choice`
+- `store_url`
+- `aesthetic_boundaries`
+- `automation_paused`
+- `audience_profile`
+- `pin_layout_mode`
+
+### `pins`
+- `id`
+- `user_id`
+- `product_id`
+- `brand_settings_id`
+- `status`
+- `art_director_prompt`
+- `target_angle`
+- `angle_embedding`
+- `template_id`
+- `pin_title`
+- `pin_description`
+- `generated_image_url`
+- `generated_image_r2_key`
+- `rendered_image_url`
+- `rendered_image_r2_key`
+- `pinterest_pin_id`
+- `impressions`
+- `saves`
+- `outbound_clicks`
+
+---
+
+## Important Current Rules
+
+- props are chosen in `product-showcase.ts`, not in later stages
+- scene generation is only allowed to add surface, lighting, and atmosphere
+- art director is only allowed to use locked props from showcase
+- the product's original appearance must be preserved from the source image
+- aesthetics style the environment, not the product
+- product showcase rotation is per product
+- aesthetic rotation is global across the user's account
+- render happens in Node.js runtime, not Edge runtime
+- Pinterest trends are not used in the current generation flow
