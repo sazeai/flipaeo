@@ -3,29 +3,40 @@ import { createAdminClient } from "@/utils/supabase/admin"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 
-const AUTHENTIC_HANDMADE_TAGS = ["Authentic & Handmade", "Indie DIY Setup"]
+const AUTHENTIC_HANDMADE_TAG = "Authentic & Handmade"
+const LEGACY_AESTHETIC_ALIASES: Record<string, string> = {
+  "Indie DIY Setup": AUTHENTIC_HANDMADE_TAG,
+}
 
-function hasAuthenticHandmadeAesthetic(brandBoundaries?: string[] | null) {
-  return (brandBoundaries || []).some((boundary) => AUTHENTIC_HANDMADE_TAGS.includes(boundary))
+function normalizeAestheticTag(tag?: string | null) {
+  if (!tag) return ""
+  return LEGACY_AESTHETIC_ALIASES[tag] || tag
 }
 
 /**
- * Aesthetic Definition Map — gives Gemini precise visual meaning for each tag.
- * Each entry describes: lighting, surfaces/textures, props, color palette, and camera feel.
- * When the system picks an aesthetic for a pin, it injects this full definition — not just the tag name.
+ * Aesthetic Definition Map — universal mood guides for Gemini.
+ *
+ * DESIGN PRINCIPLE: Each definition describes MOOD, LIGHTING, COLOR TEMPERATURE,
+ * CONTRAST, COMPOSITION, and CAMERA FEEL only — never specific props, surfaces,
+ * or environments. The product's own category determines WHERE the scene takes
+ * place; the aesthetic determines HOW it looks and feels.
+ *
+ * Must work equally well across all target categories: artisan food, tech accessories,
+ * wedding, stationery, spiritual/crystals, digital art, home decor, apparel,
+ * jewelry, bath/skincare, kids/baby, and pet accessories.
  */
 export const AESTHETIC_DEFINITIONS: Record<string, string> = {
-  'Modern & Minimalist': 'Clean white or light grey surfaces, negative space, geometric lines. Lighting: bright, even, diffused softbox feel. Props: single accent object (a plant sprig, a glass of water). Color palette: white, pale grey, black accents. Camera: perfectly centered, symmetrical, sharp focus.',
-  'Warm & Cozy': 'Warm wood tones, knit textures, candlelight glow. Lighting: golden hour warmth, soft shadows, amber tint. Props: knit blanket, ceramic mug, cinnamon sticks, dried flowers, worn leather book. Color palette: amber, cream, burnt orange, caramel. Camera: slightly shallow depth of field, inviting closeness.',
-  'Bold & Vibrant': 'Saturated pops of color, high contrast, energetic composition. Lighting: bright and punchy, hard shadows allowed. Props: colorful fruits, paint splashes, confetti, bold textiles. Color palette: fuchsia, electric blue, tangerine, lime. Camera: dynamic angles, tight crops, vivid saturation.',
-  'Earthy & Natural': 'Raw linen, terracotta, unfinished wood, green foliage. Lighting: soft natural daylight, dappled leaf shadows. Props: dried herbs, clay pots, woven baskets, raw cotton, stone surfaces. Color palette: sage, sand, warm brown, olive, cream. Camera: organic framing, slightly imperfect, natural tones.',
-  'Authentic & Handmade': 'Believable small-business DIY setup. Lighting: uneven natural window light, cheap ring-light catch, soft daylight falloff. Props: kraft paper, tape measure, scissors, stacked vintage books, half-burned candle, faux plant, tissue paper, fabric scraps. Surfaces: wrinkled linen on a table, wooden nightstand edge, cluttered craft desk, kitchen counter. Color palette: muted naturals, nothing too styled. Camera: amateur smartphone photography, slight grain, slightly off-center, natural crop.',
-  'Luxury & Premium': 'Dark moody backgrounds, marble, brass, velvet. Lighting: dramatic low-key, single directional light with deep shadows. Props: orchids, gold cutlery, crystal glassware, silk fabric, leather. Color palette: black, deep emerald, gold, burgundy, ivory. Camera: precise, editorial, rich contrast.',
-  'Playful & Fun': 'Soft pastels, rounded shapes, confetti energy. Lighting: bright, flat, cheerful with minimal shadows. Props: balloons, sprinkles, candy, colorful stationery, toys, ribbons. Color palette: baby pink, sky blue, lemon, lavender, mint. Camera: overhead flat-lays or slightly playful tilts.',
-  'Scandinavian': 'Light birch wood, white ceramics, grey wool, airy space. Lighting: cool, even northern daylight, clean and soft. Props: simple ceramic vase, single branch, wool throw, linen napkin. Color palette: white, pale grey, light wood, muted blue. Camera: clean, structured, lots of breathing room.',
-  'Industrial': 'Raw concrete, exposed brick, dark metals, grit. Lighting: harsh directional, tungsten warmth or cool fluorescent. Props: metal shelving, riveted surfaces, vintage tools, raw pipe, dark glass. Color palette: charcoal, rust, slate, gunmetal, dark brown. Camera: textural close-ups, moody shadows, raw angles.',
-  'Bohemian': 'Layered textiles, macramé, rattan, terracotta warmth. Lighting: warm golden hour, dappled sunlight through a curtain. Props: woven wall hanging, pampas grass, incense, floor cushions, beaded jewelry, terracotta pots. Color palette: burnt orange, rust, cream, olive, dusty rose. Camera: relaxed, slightly messy composition, warm color grading.',
-  'Coastal': 'Ocean blues, sandy neutrals, driftwood, sea glass. Lighting: bright overcast beach light, soft and airy. Props: shells, rope, linen, bleached wood, striped fabric, sea salt jar. Color palette: navy, sky blue, sandy beige, white, aqua. Camera: breezy, light-filled, slightly washed-out highlights.',
+  'Modern & Minimalist': 'Clean, bright, generous negative space. Cool-neutral palette (whites, pale greys, soft blacks). Even diffused lighting with almost no shadows. Symmetrical, centered composition with geometric precision. Sharp focus, editorial stillness. The product should feel like the only thing in the frame.',
+  'Warm & Cozy': 'Inviting golden-hour warmth. Amber, cream, caramel, and burnt-orange palette. Soft directional lighting with gentle, warm shadows. Slightly shallow depth of field — intimate and close. Layered textures feel touchable. The scene should make you want to reach in.',
+  'Bold & Vibrant': 'High-energy, saturated color pops against the product. Punchy lighting with strong contrast and hard shadows allowed. Dynamic angles — tilted, tight crops, unexpected framing. Vivid color grading pushed past neutral. The scene should feel alive and loud.',
+  'Earthy & Natural': 'Organic, grounded, tactile. Sage, sand, olive, warm-brown palette. Soft natural daylight — dappled if possible. Slightly imperfect framing, nothing too precise. Matte textures, warm muted tones. The scene should feel like it grew there naturally.',
+  'Authentic & Handmade': 'Believable small-business feel — shot-on-phone energy. Uneven natural window light or cheap ring-light catch. Slightly off-center amateur crop with mild grain. Muted naturals, nothing over-styled. The scene should look like a real seller photographed it on their kitchen table, not a studio.',
+  'Luxury & Premium': 'Elevated, aspirational, rich. Deep jewel-tone or dark neutral palette (emerald, burgundy, gold, ivory, black). Dramatic directional lighting with controlled shadows. Precise editorial composition — nothing accidental. Rich contrast, polished feel. The scene should whisper exclusivity without naming specific luxury objects.',
+  'Playful & Fun': 'Bright, cheerful, youthful energy. Pastel or candy-colored palette (pink, sky blue, lemon, lavender, mint). Flat even lighting with almost no shadows. Overhead flat-lays or slightly tilted angles. The scene should feel light, joyful, and smile-inducing.',
+  'Scandinavian': 'Airy, calm, breathing room. Pale neutral palette (white, light wood, soft grey, muted blue). Cool even northern daylight — clean and soft. Structured composition with deliberate empty space. The scene should feel serene and unhurried.',
+  'Industrial': 'Raw, textural, gritty character. Charcoal, rust, slate, gunmetal palette. Harsh directional lighting with strong moody shadows. Close-up angles that emphasize texture and material. The scene should feel like it has weight and history.',
+  'Bohemian': 'Layered, warm, effortlessly relaxed. Burnt orange, rust, dusty rose, olive, cream palette. Golden-hour warmth with dappled light. Relaxed composition — slightly busy but intentional. Warm color grading. The scene should feel collected and personal.',
+  'Coastal': 'Breezy, light-filled, airy calm. Ocean blue, sandy beige, white, aqua palette. Bright overcast lighting — soft, even, no harsh shadows. Slightly washed-out highlights. The scene should feel like a deep breath of sea air.',
 }
 
 /**
@@ -41,7 +52,7 @@ export function pickAestheticForPin(
   }
   // Round-robin through the user's selected aesthetics
   const idx = pastPinCount % boundaries.length
-  const tag = boundaries[idx]
+  const tag = normalizeAestheticTag(boundaries[idx])
   const definition = AESTHETIC_DEFINITIONS[tag] || tag
   return { tag, definition }
 }
@@ -62,10 +73,10 @@ export async function generateUniqueAngle(
   pastAngles?: string[]
 ): Promise<{ angle: string; embedding: number[]; pickedAesthetic: { tag: string; definition: string } }> {
   const supabase = createAdminClient()
-  const authenticHandmadeMode = hasAuthenticHandmadeAesthetic(brandBoundaries)
 
   // Pick ONE aesthetic from the user's selected set (round-robin by past pin count)
   const pickedAesthetic = pickAestheticForPin(brandBoundaries || [], (pastAngles || []).length)
+  const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
 
   // Try up to 3 times to find a unique angle
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -80,37 +91,41 @@ VISUAL AESTHETIC FOR THIS PIN: "${pickedAesthetic.tag}"
 ${pickedAesthetic.definition}
 
 ${audienceProfile ? `\nTarget Audience: ${JSON.stringify(audienceProfile).slice(0, 500)}.` : ""}
-${authenticHandmadeMode ? `
+${authenticHandmadeMode ? `\nAUTHENTICITY GUARDRAIL: Keep it believable, modest, slightly imperfect, and never polished like a luxury ad campaign.` : ""}
 
-AUTHENTIC & HANDMADE MODE:
-- The scene should feel like a real small-business seller shot it at home, in a tiny studio corner, or in a believable workspace.
-- Favor DIY setups: window-lit desk, wrinkled linen over a table, shelf corner, kitchen table, chair-back drape, bedspread flat-lay, peg rail, simple lightbox.
-- Allow human imperfections: slightly off-center framing, natural clutter, uneven fabric, casual crop, believable negative space.
-- Use props a normal seller could actually own: tape measure, scissors, kraft paper, folded tissue, stacked books, a ceramic mug, fake plant, candle stub, fabric swatches.
-- BAD: luxury hotel vibes, marble ad sets, impossible symmetry, hyper-polished studio campaigns, dramatic cinema lighting.
-` : ""}
+CRITICAL RULE — PRODUCT CONTEXT COMES FIRST:
+The PRODUCT determines WHERE the scene takes place. The AESTHETIC determines HOW it looks and feels.
+First, identify the product's real-world environment — where would a buyer actually use or display this?
+  - A kid's chair → nursery, playroom, child's bedroom
+  - A face serum → bathroom vanity, skincare shelf, morning routine
+  - A tarot deck → reading nook, cozy table, spiritual corner
+  - A dog collar → park scene, entryway, pet's bed area
+  - A mechanical keycap → desk setup, home office
+Then apply the aesthetic's mood, lighting, and color palette TO that natural environment.
+NEVER let the aesthetic override the product's context. "Luxury & Premium" on a kid's chair means a rich, editorial nursery — NOT a dark library with brass globes.
 
-STEP 1 — Understand the product category. Is this a FOOD item, BEAUTY product, HOME DECOR, FASHION, FITNESS, KIDS, TECH, or something else? Your scene MUST feel natural for this specific category.
+STEP 1 — Understand the product category and its NATURAL environment. Where does this product live in real life? Your scene MUST be set in a place that makes sense for this specific product.
 
 STEP 2 — Choose ONE creative direction from these diverse approaches (rotate, don't repeat):
-• LIFESTYLE MOMENT: Show the product being used in an aspirational real-life scene (e.g. someone's breakfast spread, a morning skincare ritual, a cozy reading nook setup)
-• INGREDIENT STORY: Surround the product with its raw ingredients or complementary items spilling naturally around it (e.g. peanuts, cocoa beans, fresh herbs, fabric swatches)
-• SEASONAL TABLESCAPE: Place the product in a seasonally-styled scene — spring florals, summer citrus, autumn leaves, winter textures
-• FLAT-LAY COMPOSITION: Artful overhead arrangement with complementary props, textures, and negative space
-• ASPIRATIONAL CONTEXT: The product in an aspirational setting that tells a story about who uses it (fitness prep station, artisan workshop, nursery shelf, travel essentials layout)
-• CULTURAL MOMENT: tie to a celebration, festival, gifting occasion, or ritual (Diwali gift hamper, Christmas morning, birthday brunch, self-care Sunday)
-• TEXTURE CONTRAST: Place product against unexpected but beautiful contrasting textures (smooth product on rough linen, glossy packaging on raw wood, colorful label against matte concrete)
-• PROCESS SHOT: The product mid-use — being poured, spread, applied, unwrapped, or styled — capturing motion and anticipation
-${authenticHandmadeMode ? `• DIY SELLER SNAPSHOT: A believable small-business setup shot on a phone with natural window light, modest props, and lived-in surfaces` : ""}
+• LIFESTYLE MOMENT: The product being used in an aspirational real-life scene within its natural environment
+• INGREDIENT STORY: Surround the product with its raw ingredients or complementary items spilling naturally around it
+• SEASONAL TABLESCAPE: Place the product in a seasonally-styled version of its natural setting
+• FLAT-LAY COMPOSITION: Artful overhead arrangement with category-appropriate complementary props
+• ASPIRATIONAL CONTEXT: The product in an aspirational version of where it naturally belongs, telling a story about its buyer
+• CULTURAL MOMENT: Tie to a celebration, festival, gifting occasion, or ritual that fits the product
+• TEXTURE CONTRAST: Place product against contrasting textures that still belong in its natural environment
+• PROCESS SHOT: The product mid-use — being poured, spread, applied, unwrapped, or styled
+${authenticHandmadeMode ? `• DIY SELLER SNAPSHOT: A believable small-business setup shot on a phone with natural window light and modest props` : ""}
 
-STEP 3 — Write the scene as a vivid, specific concept. Include a concrete physical setting, 2-3 specific props or contextual details, and an overall mood/emotion.
+STEP 3 — Write the scene as a vivid, specific concept. Include a concrete physical setting appropriate for the product, 2-3 specific props that naturally belong there, and the mood/lighting from the aesthetic.
 
 ${pastAngles && pastAngles.length > 0 ? `IMPORTANT — These scenes were ALREADY created for this product. You MUST create something COMPLETELY DIFFERENT in both concept and mood. DO NOT produce anything similar:
 ${pastAngles.slice(0, 20).map(a => `• ${a}`).join("\n")}` : ""}
 
 Output ONLY a single descriptive scene concept (max 20 words). Be specific and vivid, not generic.
 BAD examples (too generic): "Kitchen counter with warm light", "Cozy room with soft lighting", "Shelf with natural light"
-GOOD examples: "Overflowing breakfast spread with fresh toast, fruit, and morning newspaper on sunlit farmhouse table", "Autumn picnic blanket with scattered maple leaves, thermos, and knit scarf in golden hour", "Gym bag flat-lay with protein shake, earbuds, and chalk-dusted hands on rubber mat", "Diwali gift hamper with diyas, marigolds, and silk wrapping on brass tray"
+BAD examples (aesthetic overriding product): "Kid's chair in dark library with brass globe" (wrong environment for a children's product)
+GOOD examples: "Overflowing breakfast spread with fresh toast, fruit, and morning newspaper on sunlit farmhouse table", "Montessori playroom corner with soft rug, stacking rings, and morning sun through sheer curtains", "Gym bag flat-lay with protein shake, earbuds, and chalk-dusted hands on rubber mat"
     `
 
     const angleResponse = await ai.models.generateContent({

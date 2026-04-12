@@ -9,11 +9,7 @@ import { generateUniqueAngle } from "@/lib/context-matrix"
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
 
-const AUTHENTIC_HANDMADE_TAGS = ["Authentic & Handmade", "Indie DIY Setup"]
-
-function hasAuthenticHandmadeAesthetic(aestheticBoundaries?: string[] | null) {
-  return (aestheticBoundaries || []).some((boundary) => AUTHENTIC_HANDMADE_TAGS.includes(boundary))
-}
+const AUTHENTIC_HANDMADE_TAG = "Authentic & Handmade"
 
 // Fisher-Yates shuffle — ensures the Approval Inbox feels like a curated magazine, not a bulk generator
 function shuffleArray<T>(array: T[]): T[] {
@@ -201,18 +197,23 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
-            const authenticHandmadeMode = hasAuthenticHandmadeAesthetic(brand.aesthetic_boundaries)
+            const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
 
             const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
 
 PRODUCT: "${product.title}"
+${product.description ? `PRODUCT DETAILS: "${product.description}"` : ''}
 SCENE CONCEPT: "${targetAngle}"
 
 VISUAL AESTHETIC FOR THIS PIN: "${pickedAesthetic.tag}"
 ${pickedAesthetic.definition}
-${authenticHandmadeMode ? `\nBRAND SHOOT MODE: Authentic & Handmade
-This brand wants believable small-business photography that feels shot in a real home, studio corner, or maker workspace — not a glossy ad campaign.
-` : ''}
+
+CRITICAL RULE — PRODUCT CONTEXT COMES FIRST:
+The PRODUCT determines WHERE the scene takes place. The AESTHETIC determines HOW it looks and feels.
+First, identify what this product is and where it naturally lives (a kid's chair → nursery/playroom, a face serum → bathroom vanity, a dog collar → entryway/park, a keycap → desk setup).
+Then apply the aesthetic's mood, lighting, and color palette TO that natural environment.
+NEVER force the product into an environment that doesn't match its real-world use.
+Example: "Luxury & Premium" on a kid's chair = a rich, editorial nursery with jewel-tone accents — NOT a dark library with brass globes and velvet drapes.
 
 Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
 
@@ -220,19 +221,12 @@ YOUR JOB: Write an image editing prompt that describes the scene, environment, l
 
 RULES:
 1. START the prompt by naming the product type (e.g. "A men's hoodie", "A jar of peanut butter", "A gold necklace") so the image editor knows WHAT object from the source image to preserve. This is critical — without it the editor doesn't know what to keep.
-2. After naming the product, describe the scene: surface/setting, background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props), color palette of the environment.
-3. Do NOT describe the product's visual details (labels, colors, patterns, packaging text) — the source image handles that.
-4. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
-5. ${authenticHandmadeMode ? 'Keep it grounded and believable. Prefer Etsy-seller realism, DIY setup energy, and smartphone-native framing over polished campaign styling.' : 'Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.'}
-6. End with a short style tag like: "${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
-
-${authenticHandmadeMode ? `EXTRA AUTHENTICITY RULES:
-- Favor believable DIY setups: wrinkled linen draped over a table, edge of a wooden nightstand, shelf corner, kitchen table, craft desk, folded fabric on a bed, peg rail, small lightbox.
-- Use modest props only when natural for the category: stacked books, a half-burned candle, cheap faux plant, kraft paper, tape measure, scissors, ceramic mug, tissue paper, fabric scraps.
-- Lighting should feel real and imperfect: uneven natural window light, harsh afternoon shadow, soft daylight falloff, cheap ring-light reflection when appropriate.
-- Camera feel should be realistic: amateur smartphone photography, slight grain, slightly uncentered composition, natural crop, modest depth of field.
-- Avoid luxury sets, marble bathrooms, impossible symmetry, glossy catalog polish, dramatic studio rigs, or anything that looks like an ad agency made it.
-` : ''}
+2. Set the scene in the product's NATURAL environment — where a buyer would actually use or display this product. Then style that environment according to the aesthetic's mood, lighting, and color palette.
+3. After naming the product and setting, describe: background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props from the product's world), color palette of the environment.
+4. Do NOT describe the product's visual details (labels, colors, patterns, packaging text) — the source image handles that.
+5. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
+6. ${authenticHandmadeMode ? 'Keep it grounded and believable. Prefer Etsy-seller realism, modest props, and slight imperfections over polished campaign styling.' : 'Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.'}
+7. End with a short style tag like: "${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
 
 Also generate:
 - A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product.

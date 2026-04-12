@@ -79,6 +79,26 @@ async function handleRender(req: NextRequest) {
       return res.arrayBuffer();
     });
 
+    // Pre-fetch the background image and convert to base64 data URI.
+    // Satori silently produces 0-byte output when it can't reach a URL internally,
+    // so we fetch explicitly with a timeout to surface errors properly.
+    let imageSrc: string;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const imgRes = await fetch(imageUrl, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!imgRes.ok) throw new Error(`Image fetch returned ${imgRes.status}`);
+      const imgBuffer = await imgRes.arrayBuffer();
+      if (imgBuffer.byteLength < 1000) throw new Error(`Image too small (${imgBuffer.byteLength} bytes)`);
+      const mimeType = imgRes.headers.get('content-type') || 'image/png';
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
+      imageSrc = `data:${mimeType};base64,${base64}`;
+    } catch (imgErr: any) {
+      console.error('Render-pin: background image fetch failed:', imgErr.message, '| URL:', imageUrl);
+      return new Response(`Render failed: could not fetch background image — ${imgErr.message}`, { status: 500 });
+    }
+
     // ─────────────────────────────────────────────────
     // Template rendering (Unified Logic)
     // ─────────────────────────────────────────────────
@@ -88,9 +108,9 @@ async function handleRender(req: NextRequest) {
 
     const renderLayout = (
       <div tw="flex flex-col w-full h-full relative bg-white">
-        {/* Background Image: Satori handles base64 URIs and URLs equally well as long as they are accessible */}
+        {/* Background Image: pre-fetched as base64 data URI to avoid Satori silent fetch failures */}
         <img
-          src={imageUrl}
+          src={imageSrc}
           tw="absolute inset-0 w-full h-full"
           style={{ objectFit: 'cover' }}
           alt="Background"
