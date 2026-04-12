@@ -186,22 +186,22 @@ export function AutomationControl({
       aria-label={isActive ? "Pause automation" : "Resume automation"}
       aria-pressed={isActive}
       className={cn(
-        "cursor-pointer inline-flex h-8 items-center gap-2 rounded-full border border-neutral-200/80 bg-white py-1 pr-1 pl-2.5 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-70 sm:h-9 sm:pl-3",
+        "cursor-pointer inline-flex h-8 items-center gap-2 rounded-lg border border-neutral-200/80 bg-white pr-1 pl-2 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-70 sm:h-9 sm:pl-2",
         className
       )}
     >
       <span className="min-w-0 leading-none">
-        <span className="block text-[9px] font-medium uppercase tracking-[0.18em] text-neutral-500 sm:text-[10px]">
+        <span className="block text-[9px] font-medium uppercase tracking-none text-neutral-500">
           Automation
         </span>
-        <span className="mt-0.5 block text-[11px] font-medium text-neutral-900 sm:text-xs">
+        <span className="block text-[11px] font-medium text-neutral-900 sm:text-xs">
           {headerStatus}
         </span>
       </span>
 
       <span
         className={cn(
-          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors sm:h-7 sm:w-7",
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-7 sm:w-7",
           !hasSettings
             ? "bg-amber-50 text-amber-700"
             : isActive

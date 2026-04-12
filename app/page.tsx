@@ -15,6 +15,7 @@ import { FAQSection } from '@/components/landing/FAQSection';
 import CTASection from '@/components/landing/CTASection';
 import { Footer } from '@/components/landing/Footer';
 import { GridBackground } from "@/components/landing/GridBackground"
+import ProductCategoriesSection from '@/components/landing/ProductCategoriesSection';
 
 
 export const metadata: Metadata = commonPageMetadata.home()
@@ -34,6 +35,7 @@ export default function Home() {
         <Hero />
         <ProblemSection />
         <AhaSection />
+        <ProductCategoriesSection />
         <HowItWorksSection />
         <ComparisonSection />
         <FeaturesSection />
