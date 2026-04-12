@@ -3,18 +3,18 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
-// Google Fonts CDN mapping
-const FONT_URLS: Record<string, string> = {
-  'Playfair Display': 'https://fonts.gstatic.com/s/playfairdisplay/v40/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiukDQ.ttf',
-  'Inter': 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf',
-  'Roboto': 'https://fonts.gstatic.com/s/roboto/v47/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbGmT.ttf',
-  'Outfit': 'https://fonts.gstatic.com/s/outfit/v11/QGYyz_MVcBeNP4NjuGObqx1XmO1I4TC1C4G-EiAou6Y.ttf',
-  'Poppins': 'https://fonts.gstatic.com/s/poppins/v22/pxiByp8kv8JHgFVrLDD4Z1xlFQ.ttf',
-  'Montserrat': 'https://fonts.gstatic.com/s/montserrat/v29/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXo.ttf',
-  'Lora': 'https://fonts.gstatic.com/s/lora/v35/0QI6MX1D_JOuGQbT0gvTJPa787weuyJGmKxemMeZ.ttf',
-  'Merriweather': 'https://fonts.gstatic.com/s/merriweather/v30/u-440qOErmNTvRBTNXdSrpQ_5mB2fg.ttf',
-  'Raleway': 'https://fonts.gstatic.com/s/raleway/v34/1Ptxg8zYS_SKggPN4iEgvnHyvveLxVvaorCIPrE.ttf',
-  'DM Sans': 'https://fonts.gstatic.com/s/dmsans/v15/rP2tp2ywxg089UriI5-g4vlH9VoD8CmcqZG40F9JadbnoEwAopxRSW3z.ttf',
+// Local font files bundled with the Edge function (reliable, no CDN dependency)
+const FONT_FILES: Record<string, string> = {
+  'Playfair Display': 'PlayfairDisplay.ttf',
+  'Inter': 'Inter.ttf',
+  'Roboto': 'Roboto.ttf',
+  'Outfit': 'Outfit.ttf',
+  'Poppins': 'Poppins.ttf',
+  'Montserrat': 'Montserrat.ttf',
+  'Lora': 'Lora.ttf',
+  'Merriweather': 'Merriweather.ttf',
+  'Raleway': 'Raleway.ttf',
+  'DM Sans': 'DMSans.ttf',
 };
 
 /**
@@ -72,9 +72,12 @@ async function handleRender(req: NextRequest) {
       displayStoreUrl = storeUrl || '';
     }
 
-    // Load font
-    const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
-    const fontData = await fetch(new URL(fontUrl)).then((res) => res.arrayBuffer());
+    // Load font from local bundled files (no CDN dependency)
+    const fontFile = FONT_FILES[fontName] || FONT_FILES['Playfair Display'];
+    const fontData = await fetch(new URL(`./fonts/${fontFile}`, import.meta.url)).then((res) => {
+      if (!res.ok) throw new Error(`Font load failed: ${fontFile} (${res.status})`);
+      return res.arrayBuffer();
+    });
 
     // ─────────────────────────────────────────────────
     // Template rendering (Unified Logic)

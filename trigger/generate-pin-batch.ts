@@ -108,7 +108,7 @@ export const generatePinBatch = schedules.task({
         // Get products that need pins (active products that have an image)
         const { data: products } = await supabase
           .from("products")
-          .select("id, title, image_r2_key, image_url")
+          .select("id, title, description, image_r2_key, image_url")
           .eq("user_id", brand.user_id)
           .eq("is_active", true)
           .not("image_url", "is", null)
@@ -202,19 +202,24 @@ SCENE CONCEPT: "${targetAngle}"
 
 Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
 
-YOUR JOB: Write an image editing prompt that describes ONLY the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will preserve the product from the source image — you are designing the world around it.
+YOUR JOB: Write an image editing prompt that describes the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will place the product from the source image into this scene — you are designing the world around it.
 
 RULES:
-1. Do NOT describe the product itself (no labels, colors, shapes, packaging text). The source image handles that.
-2. DO describe: the surface/setting it sits on, background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props), color palette of the environment.
-3. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
-4. Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.
-5. End with a short style tag like: "editorial product photography, soft natural light, 8k"
+1. START the prompt by naming the product type (e.g. "A men's hoodie", "A jar of peanut butter", "A gold necklace") so the image editor knows WHAT object from the source image to preserve. This is critical — without it the editor doesn't know what to keep.
+2. After naming the product, describe the scene: surface/setting, background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props), color palette of the environment.
+3. Do NOT describe the product's visual details (labels, colors, patterns, packaging text) — the source image handles that.
+4. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
+5. Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.
+6. End with a short style tag like: "editorial product photography, soft natural light, 8k"
 
 Also generate:
-- A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product. Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor".
-  Good: "Clear Skin Starts Here", "The Protein Snack You Need", "Nursery Chair, Handmade with Love"
-  Bad: "Aesthetic Lifestyle Collection", "Minimalist Home Decor Finds"
+- A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product.
+  RULES for the overlay title:
+  - MUST reference or name the actual product (e.g. "hoodie", "serum", "chair", "peanut butter")
+  - Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor", "Comfort", "Style"
+  - Never use vague "mood" phrases — the title must tell the viewer WHAT the product is
+  Good: "Clear Skin Starts Here", "The Protein Snack You Need", "Nursery Chair, Handmade with Love", "Your New Everyday Hoodie"
+  Bad: "Aesthetic Lifestyle Collection", "Minimalist Home Decor Finds", "Morning Comfort, Modern Style"
 - A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text — usually best for lifestyle shots)
 
 Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
@@ -371,6 +376,13 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               logger.warn(`SEO copy parse failed for ${product.title}, using Art Director title`)
             }
 
+            // Save SEO title + description NOW, before render — so they survive render failures
+            await supabase.from("pins").update({
+              pin_title: pinTitle,
+              pin_description: pinDescription,
+            }).eq("id", pinId)
+            logger.info(`SEO data saved for pin ${pinId}: "${pinTitle}"`)
+
             let appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
             if (!appUrl.startsWith('http')) {
               // Vercel deployment URLs (e.g. flipaeo.vercel.app) come without protocol
@@ -413,14 +425,12 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
 
             const renderedImageUrl = r2Domain ? `${r2Domain}/${renderedR2Key}` : renderedR2Key
 
-            // Step 5: Update pin record with rendered image, SEO title, and description
+            // Step 5: Update pin record with rendered image (SEO title/desc already saved above)
             await supabase
               .from("pins")
               .update({
                 rendered_image_url: renderedImageUrl,
                 rendered_image_r2_key: renderedR2Key,
-                pin_title: pinTitle,          // Override Art Director title with SEO-optimized title
-                pin_description: pinDescription,
                 status: "pending_approval",
               })
               .eq("id", pinId)

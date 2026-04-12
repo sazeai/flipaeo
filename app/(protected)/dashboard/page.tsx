@@ -103,7 +103,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <Link
-            href={!stats?.hasBrandSettings ? '/settings/brand' : '/integrations'}
+            href={!stats?.hasBrandSettings ? '/settings' : '/integrations'}
             className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-100 transition-colors flex items-center gap-2"
           >
             Get Started <ArrowRight className="w-4 h-4" />
@@ -200,7 +200,7 @@ export default function DashboardPage() {
             description="Preview pin generation with a product image."
           />
           <QuickAction
-            href="/settings/brand"
+            href="/settings"
             icon={<Zap className="w-5 h-5" />}
             title="Brand Settings"
             description="Configure your brand's visual identity for pins."

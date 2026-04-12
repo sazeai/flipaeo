@@ -105,7 +105,7 @@ export function AppSidebar({
     },
     {
       title: "Brand Settings",
-      url: "/settings/brand",
+      url: "/settings",
       icon: Palette,
     },
     {
