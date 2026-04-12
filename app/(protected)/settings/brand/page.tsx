@@ -11,16 +11,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { AutomationControl } from '@/components/dashboard/automation-control'
 
 const FONT_OPTIONS: { name: string; google: string; sample: string }[] = [
-  { name: 'Playfair Display', google: 'Playfair+Display:wght@700', sample: 'Elegant Serif Style' },
-  { name: 'Inter', google: 'Inter:wght@600', sample: 'Clean Modern Sans' },
-  { name: 'Roboto', google: 'Roboto:wght@500', sample: 'Universal & Readable' },
-  { name: 'Outfit', google: 'Outfit:wght@600', sample: 'Geometric & Fresh' },
-  { name: 'Poppins', google: 'Poppins:wght@600', sample: 'Friendly Rounded Sans' },
-  { name: 'Montserrat', google: 'Montserrat:wght@600', sample: 'Bold & Confident' },
-  { name: 'Lora', google: 'Lora:wght@600', sample: 'Classic Book Serif' },
-  { name: 'Merriweather', google: 'Merriweather:wght@700', sample: 'Readable & Warm' },
+  { name: 'Playfair Display', google: 'Playfair+Display:wght@700', sample: 'Elegant Serif' },
+  { name: 'Inter', google: 'Inter:wght@600', sample: 'Modern Sans' },
+  { name: 'Roboto', google: 'Roboto:wght@500', sample: 'Readable Sans' },
+  { name: 'Outfit', google: 'Outfit:wght@600', sample: 'Geometric' },
+  { name: 'Poppins', google: 'Poppins:wght@600', sample: 'Rounded Sans' },
+  { name: 'Montserrat', google: 'Montserrat:wght@600', sample: 'Bold Sans' },
+  { name: 'Lora', google: 'Lora:wght@600', sample: 'Book Serif' },
+  { name: 'Merriweather', google: 'Merriweather:wght@700', sample: 'Warm Serif' },
   { name: 'Raleway', google: 'Raleway:wght@600', sample: 'Thin Elegance' },
-  { name: 'DM Sans', google: 'DM+Sans:wght@600', sample: 'Compact & Minimal' },
+  { name: 'DM Sans', google: 'DM+Sans:wght@600', sample: 'Minimal Sans' },
 ]
 
 const AESTHETIC_OPTIONS: { name: string; gradient: string; emoji: string; desc: string }[] = [
@@ -480,7 +480,7 @@ export default function BrandSettingsPage() {
                 <label className="text-sm font-medium text-neutral-900">Pin Font</label>
                 <p className="mt-1 text-xs text-neutral-500">Curated OCR-approved fonts that Pinterest's visual AI can read. Select one.</p>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {FONT_OPTIONS.map(f => {
                   const isSelected = form.font_choice === f.name
 
@@ -490,19 +490,26 @@ export default function BrandSettingsPage() {
                       type="button"
                       whileTap={{ scale: 0.985 }}
                       onClick={() => setForm(p => ({ ...p, font_choice: f.name }))}
-                      className={`cursor-pointer rounded-xl border p-4 text-left transition-all ${
+                      className={`cursor-pointer relative min-h-[94px] rounded-xl border p-3 text-left transition-all sm:min-h-[108px] sm:p-4 ${
                         isSelected
                           ? 'border-neutral-900 bg-neutral-50'
                           : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
                       }`}
                     >
+                      <span className={`absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
+                        isSelected
+                          ? 'border-neutral-900 bg-neutral-900 text-white'
+                          : 'border-neutral-200 bg-white text-transparent'
+                      }`}>
+                        <Check className="h-3 w-3" />
+                      </span>
                       <span
-                        className="block truncate text-[28px] leading-tight text-neutral-950"
+                        className="block truncate pr-6 text-[18px] leading-[1.05] text-neutral-950 sm:text-[24px]"
                         style={{ fontFamily: `'${f.name}', sans-serif` }}
                       >
                         {f.sample}
                       </span>
-                      <span className="mt-2 block text-xs text-neutral-500">{f.name}</span>
+                      <span className="mt-1.5 block truncate text-[11px] text-neutral-500 sm:mt-2 sm:text-xs">{f.name}</span>
                     </motion.button>
                   )
                 })}

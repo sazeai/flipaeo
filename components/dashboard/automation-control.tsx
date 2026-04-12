@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, Moon, Zap } from "lucide-react"
+import { Loader2, Pause, Play, Zap } from "lucide-react"
 import { toast } from "sonner"
 import { createClient } from "@/utils/supabase/client"
 import { cn } from "@/lib/utils"
@@ -112,8 +112,7 @@ export function AutomationControl({
   }
 
   const isActive = paused === false
-  const headerStatus = !hasSettings ? "Setup required" : isActive ? "Running" : "Paused"
-  const headerAction = !hasSettings ? "Setup" : isActive ? "Pause" : "Resume"
+  const headerStatus = !hasSettings ? "Setup" : isActive ? "Live" : "Paused"
 
   if (variant === "panel") {
     return (
@@ -187,55 +186,36 @@ export function AutomationControl({
       aria-label={isActive ? "Pause automation" : "Resume automation"}
       aria-pressed={isActive}
       className={cn(
-        "inline-flex h-9 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-white p-1 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-70",
+        "cursor-pointer inline-flex h-8 items-center gap-2 rounded-full border border-neutral-200/80 bg-white py-1 pr-1 pl-2.5 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-70 sm:h-9 sm:pl-3",
         className
       )}
     >
+      <span className="min-w-0 leading-none">
+        <span className="block text-[9px] font-medium uppercase tracking-[0.18em] text-neutral-500 sm:text-[10px]">
+          Automation
+        </span>
+        <span className="mt-0.5 block text-[11px] font-medium text-neutral-900 sm:text-xs">
+          {headerStatus}
+        </span>
+      </span>
+
       <span
         className={cn(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors",
-          isActive
-            ? "border-neutral-900 bg-neutral-900 text-white"
-            : "border-neutral-200 bg-neutral-50 text-neutral-600"
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors sm:h-7 sm:w-7",
+          !hasSettings
+            ? "bg-amber-50 text-amber-700"
+            : isActive
+              ? "bg-neutral-900 text-white"
+              : "bg-neutral-100 text-neutral-900"
         )}
       >
         {busy ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <Loader2 className="h-3 w-3 animate-spin sm:h-3.5 sm:w-3.5" />
         ) : isActive ? (
-          <Zap className="h-3.5 w-3.5" />
+          <Pause className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         ) : (
-          <Moon className="h-3.5 w-3.5" />
+          <Play className="h-3 w-3 translate-x-[0.5px] fill-current sm:h-3.5 sm:w-3.5" />
         )}
-      </span>
-
-      <span className="flex min-w-0 items-center gap-2 pr-1">
-        <span className="min-w-0 leading-none">
-          <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
-            Automation
-          </span>
-          <span className="mt-1 flex items-center gap-1.5 text-[11px] text-neutral-600">
-            <span
-              className={cn(
-                "inline-block h-1.5 w-1.5 rounded-full",
-                !hasSettings ? "bg-amber-500" : isActive ? "bg-emerald-500" : "bg-neutral-400"
-              )}
-            />
-            <span className="truncate">{headerStatus}</span>
-          </span>
-        </span>
-
-        <span
-          className={cn(
-            "inline-flex h-7 shrink-0 items-center rounded-full px-2.5 text-xs font-medium tracking-tight transition-colors",
-            !hasSettings
-              ? "bg-amber-50 text-amber-700"
-              : isActive
-                ? "bg-neutral-900 text-white"
-                : "bg-neutral-100 text-neutral-900"
-          )}
-        >
-          {busy ? "Saving" : headerAction}
-        </span>
       </span>
     </button>
   )
