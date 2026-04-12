@@ -9,6 +9,12 @@ import { generateUniqueAngle } from "@/lib/context-matrix"
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
 
+const AUTHENTIC_HANDMADE_TAGS = ["Authentic & Handmade", "Indie DIY Setup"]
+
+function hasAuthenticHandmadeAesthetic(aestheticBoundaries?: string[] | null) {
+  return (aestheticBoundaries || []).some((boundary) => AUTHENTIC_HANDMADE_TAGS.includes(boundary))
+}
+
 // Fisher-Yates shuffle — ensures the Approval Inbox feels like a curated magazine, not a bulk generator
 function shuffleArray<T>(array: T[]): T[] {
   const newArray = [...array]
@@ -178,13 +184,13 @@ export const generatePinBatch = schedules.task({
             const prodPins = (userPins || []).filter((p: any) => p.product_id === product.id)
             const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
 
-            const { angle: targetAngle, embedding: angleEmbedding } = await generateUniqueAngle(
+            const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
               { id: product.id, title: product.title, description: product.description },
               brand.aesthetic_boundaries,
               brand.audience_profile,
               pastAngles
             )
-            logger.info(`Selected semantic angle: "${targetAngle}"`)
+            logger.info(`Selected semantic angle: "${targetAngle}" | Aesthetic: "${pickedAesthetic.tag}"`)
 
             // Step 1: Call Gemini Art Director & Fal.ai Inline
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
@@ -195,10 +201,18 @@ export const generatePinBatch = schedules.task({
               continue
             }
 
+            const authenticHandmadeMode = hasAuthenticHandmadeAesthetic(brand.aesthetic_boundaries)
+
             const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
 
 PRODUCT: "${product.title}"
 SCENE CONCEPT: "${targetAngle}"
+
+VISUAL AESTHETIC FOR THIS PIN: "${pickedAesthetic.tag}"
+${pickedAesthetic.definition}
+${authenticHandmadeMode ? `\nBRAND SHOOT MODE: Authentic & Handmade
+This brand wants believable small-business photography that feels shot in a real home, studio corner, or maker workspace — not a glossy ad campaign.
+` : ''}
 
 Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
 
@@ -209,8 +223,16 @@ RULES:
 2. After naming the product, describe the scene: surface/setting, background elements, lighting direction and quality, atmospheric details (steam, bokeh, scattered props), color palette of the environment.
 3. Do NOT describe the product's visual details (labels, colors, patterns, packaging text) — the source image handles that.
 4. Choose a camera angle and lighting that serve the scene concept naturally — don't force dramatic angles on simple scenes.
-5. Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.
-6. End with a short style tag like: "editorial product photography, soft natural light, 8k"
+5. ${authenticHandmadeMode ? 'Keep it grounded and believable. Prefer Etsy-seller realism, DIY setup energy, and smartphone-native framing over polished campaign styling.' : 'Keep it painterly and editorial — this should look like a professional lifestyle photoshoot, not a product catalog.'}
+6. End with a short style tag like: "${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
+
+${authenticHandmadeMode ? `EXTRA AUTHENTICITY RULES:
+- Favor believable DIY setups: wrinkled linen draped over a table, edge of a wooden nightstand, shelf corner, kitchen table, craft desk, folded fabric on a bed, peg rail, small lightbox.
+- Use modest props only when natural for the category: stacked books, a half-burned candle, cheap faux plant, kraft paper, tape measure, scissors, ceramic mug, tissue paper, fabric scraps.
+- Lighting should feel real and imperfect: uneven natural window light, harsh afternoon shadow, soft daylight falloff, cheap ring-light reflection when appropriate.
+- Camera feel should be realistic: amateur smartphone photography, slight grain, slightly uncentered composition, natural crop, modest depth of field.
+- Avoid luxury sets, marble bathrooms, impossible symmetry, glossy catalog polish, dramatic studio rigs, or anything that looks like an ad agency made it.
+` : ''}
 
 Also generate:
 - A short, punchy overlay title (3-7 words) for the pin image. This is TEXT ON THE IMAGE, not SEO metadata. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product.
