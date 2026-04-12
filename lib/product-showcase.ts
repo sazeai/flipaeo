@@ -23,6 +23,7 @@ export interface ShowcaseStrategy {
   heroAction: string
   naturalEnvironment: string
   productAppearance: string
+  suggestedProps: string
 }
 
 /**
@@ -38,54 +39,38 @@ export interface ShowcaseAnalysis {
     cameraAngle: string
     heroAction: string
     naturalEnvironment: string
+    suggestedProps: string
   }[]
 }
 
-const SHOWCASE_PROMPT = `You are a product photography strategist. Your ONLY job is to decide HOW a product should be presented in photos — the most compelling, buyer-converting ways to showcase it.
+const SHOWCASE_PROMPT = `You are a product photographer planning shots. Decide HOW to present this product.
 
-You know NOTHING about aesthetics, mood, color palettes, or lighting. Those are someone else's job. You ONLY decide:
-1. What type of product this is
-2. Multiple different ways it could be physically presented (we need VARIETY across pins)
-3. Where it naturally belongs in each scenario
-4. What the camera should focus on in each scenario
-
-PRODUCT TITLE: "{title}"
+PRODUCT: "{title}"
 {descriptionLine}
 
-PRESENTATION MODES — rank ALL modes that make sense for this product (minimum 2, maximum 4):
-- "worn-on-model": clothing, jewelry, accessories, wearables → show on a person/animal
-- "held-in-hand": small items, beverages, skincare, tools → show being held naturally
-- "styled-on-surface": home decor, candles, stationery, boxes, jars, accessories → arrange on an appropriate surface
-- "in-use-action": food being eaten, serum being applied, chair being sat in, tool being used, collar on a dog → show mid-use
-- "flat-lay-arrangement": collections, kits, gift sets, multi-piece items, accessories with their parts → overhead curated layout
+Return 2-4 different shot options ranked by buyer appeal. For EACH shot:
 
-RULES:
-- Return MULTIPLE viable modes ranked by how compelling they are for a buyer
-- Each mode MUST have a DIFFERENT heroAction and naturalEnvironment — variety is the whole point
-- A dog collar → in-use-action (dog wearing it), styled-on-surface (on marble/wood), flat-lay-arrangement (collar + leash + tag spread out)
-- A hoodie → worn-on-model (person wearing), styled-on-surface (folded on chair), flat-lay-arrangement (outfit spread)
-- A ring → worn-on-model (on hand close-up), styled-on-surface (on ring dish), in-use-action (being put on)
-- A face serum → held-in-hand (holding bottle), in-use-action (applying to face), styled-on-surface (on vanity shelf)
-- A candle → styled-on-surface (on shelf), in-use-action (being lit/burning), flat-lay-arrangement (with match + tray)
+presentationMode (pick one):
+- "worn-on-model": show on person/animal (clothing, jewelry, accessories)
+- "held-in-hand": show being held (small items, skincare, beverages)
+- "styled-on-surface": arrange on surface (decor, boxes, jars, accessories)
+- "in-use-action": show being used (food eaten, serum applied, collar on dog)
+- "flat-lay-arrangement": overhead spread (kits, multi-piece sets)
 
-For cameraAngle pick ONE per mode: "eye-level front", "eye-level three-quarter", "close-up detail", "overhead flat-lay", "low-angle hero", "over-the-shoulder"
+cameraAngle: "eye-level front" | "eye-level three-quarter" | "close-up detail" | "overhead flat-lay" | "low-angle hero" | "over-the-shoulder"
 
-For heroAction describe the SPECIFIC physical action/pose per mode (max 12 words). Be concrete:
-- Good: "large dog wearing collar, head slightly turned, looking forward"
-- Good: "collar coiled on aged marble slab beside brass leash clip"
-- Good: "collar and leash set spread in flat-lay with dog tags"
-- Bad: "product displayed beautifully" (too vague)
+heroAction: specific pose/action in max 12 words (e.g. "dog wearing collar on morning walk, ears perked")
 
-For naturalEnvironment name 1-2 SPECIFIC real-world locations per mode (max 10 words):
-- Good: "sunny park path with grass edge"
-- Good: "rustic wooden entryway bench"
-- Bad: "beautiful setting" (not a place)
+naturalEnvironment: 1-2 specific locations in max 10 words (e.g. "sunny park path with grass edge")
 
-For productAppearance describe the product's ACTUAL visual identity as seen in the image or inferred from the title (max 15 words). This is critical — an AI image editor will use this to know WHAT to preserve.
-- Include: dominant colors, material/fabric, key design elements, distinctive features
+suggestedProps: exactly 2 props that a BUYER of this product would own or use alongside it. Props must come from the product's world — not generic lifestyle items.
+- Dog collar → "water bowl, tennis ball" or "leash hook, paw-print bandana" — NOT "watch, journal, vase"
+- Ring box → "ring, dried flowers" or "ribbon, tissue paper" — NOT "pen, notebook, coffee cup"
+- Hoodie → "sneakers, backpack" or "beanie, phone" — NOT "candle, book, plant"
+
+productAppearance: the product's actual colors, materials, and key design details in max 15 words. Critical for preservation.
 - Good: "brown leather collar with turquoise padding, gold buckle, silver conchos"
-- Good: "gray cotton hoodie with dark cross and chain graphics, fur-trimmed hood"
-- Bad: "nice product" (useless)
+- Bad: "collar" (no visual detail)
 
 Return ONLY valid JSON:
 {
@@ -93,16 +78,11 @@ Return ONLY valid JSON:
   "productAppearance": "...",
   "viableModes": [
     {
-      "presentationMode": "in-use-action",
+      "presentationMode": "...",
       "cameraAngle": "...",
       "heroAction": "...",
-      "naturalEnvironment": "..."
-    },
-    {
-      "presentationMode": "styled-on-surface",
-      "cameraAngle": "...",
-      "heroAction": "...",
-      "naturalEnvironment": "..."
+      "naturalEnvironment": "...",
+      "suggestedProps": "..."
     }
   ]
 }`
@@ -155,6 +135,7 @@ export async function resolveProductShowcase(
         cameraAngle: m.cameraAngle || "eye-level three-quarter",
         heroAction: m.heroAction || `${product.title} displayed naturally`,
         naturalEnvironment: m.naturalEnvironment || "clean neutral surface",
+        suggestedProps: m.suggestedProps || "",
       }))
 
     // Ensure at least one mode
@@ -164,6 +145,7 @@ export async function resolveProductShowcase(
         cameraAngle: "eye-level three-quarter",
         heroAction: `${product.title} displayed naturally`,
         naturalEnvironment: "clean neutral surface",
+        suggestedProps: "",
       })
     }
 
@@ -183,6 +165,7 @@ export async function resolveProductShowcase(
         cameraAngle: "eye-level three-quarter",
         heroAction: `${product.title} displayed naturally`,
         naturalEnvironment: "clean neutral surface",
+        suggestedProps: "",
       }],
     }
   }

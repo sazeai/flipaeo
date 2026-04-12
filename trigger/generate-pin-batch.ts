@@ -232,60 +232,29 @@ export const generatePinBatch = schedules.task({
 
             // Stage 3: Art Director — writes fal.ai prompt with 3 locked sections
 
-            const artDirectorPrompt = `You are an elite Pinterest Art Director creating scroll-stopping product photography.
+            const artDirectorPrompt = `Write an image editing prompt for fal.ai. The source product image will be composited into the scene you describe.
 
-=== SECTION 1: PRODUCT SHOWCASE (LOCKED — do NOT modify) ===
-Product: "${product.title}"
-${product.description ? `Product Details: "${product.description}"` : ''}
-Product Type: ${showcase.productType}
-Product Appearance: ${showcase.productAppearance}
-Presentation: ${showcase.presentationMode} — ${showcase.heroAction}
-Camera Angle: ${showcase.cameraAngle}
-Natural Setting: ${showcase.naturalEnvironment}
+PRODUCT: ${showcase.productAppearance}
+SHOT: ${showcase.presentationMode}, ${showcase.heroAction}
+CAMERA: ${showcase.cameraAngle}
+SETTING: ${showcase.naturalEnvironment}
+PROPS (only these): ${showcase.suggestedProps || "none"}
+SCENE: ${targetAngle}
+STYLE: ${pickedAesthetic.tag} — ${pickedAesthetic.definition}
 
-These showcase decisions are FINAL. The product MUST be shown exactly as described above. Do not change the presentation mode, camera angle, hero action, or setting type.
+Write the fal.ai prompt following this exact structure:
+1. "A ${showcase.productAppearance}, ${showcase.presentationMode}, ${showcase.heroAction}."
+2. "The product keeps its exact original colors, materials, and design from the source image."
+3. Describe the environment: surface material, background, and the scene concept above.
+4. Place ONLY the listed props — no other objects.
+5. Apply the style's lighting and color palette to the environment only, not the product.
+6. End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
 
-=== SECTION 2: ENVIRONMENT SCENE ===
-Scene Concept: "${targetAngle}"
+Also return:
+- title: catchy 3-7 word headline naming the product (not generic words like "Aesthetic" or "Collection")
+- templateId: template-1 (top text), template-2 (center), template-3 (bottom), template-4 (framed top), template-5 (no text)
 
-This is the creative scene designed around the product. It describes the props, background, and atmosphere. Your prompt must bring this scene to life while keeping the product showcase from Section 1 intact.
-
-=== SECTION 3: VISUAL STYLE (mood/lighting/color only) ===
-Aesthetic: "${pickedAesthetic.tag}"
-${pickedAesthetic.definition}
-
-This style controls ONLY the lighting quality, color palette, shadow character, and emotional tone of the ENVIRONMENT. It does NOT control the product's appearance, what objects appear, how the product is presented, or the camera angle. The aesthetic palette applies to walls, surfaces, backgrounds, and lighting — NEVER to the product itself.
-
-Look at the attached product image carefully. This EXACT product (untouched) will be placed into a scene by an AI image editor.
-
-YOUR JOB: Write an image editing prompt that describes the scene, environment, lighting, camera angle, and mood AROUND the product. The AI editor will composite the source product into this scene.
-
-PRODUCT PRESERVATION — MOST IMPORTANT RULE:
-The product in the source image MUST keep its EXACT original colors, materials, textures, and design details. You MUST explicitly state this in your prompt.
-- Product appearance to preserve: "${showcase.productAppearance}"
-- If the product is gray, it stays gray. If it has dark graphics, they stay dark. NEVER recolor the product to match the aesthetic's palette.
-- The aesthetic's color palette applies ONLY to the environment (walls, floor, props, lighting color temperature) — NOT the product.
-- Example: A gray streetwear hoodie with "Playful & Fun" aesthetic = gray hoodie on a model in a pastel-colored environment. The ENVIRONMENT is playful, the hoodie stays gray.
-
-RULES:
-1. START the prompt with: "A ${showcase.productAppearance}, ${showcase.presentationMode}, ${showcase.heroAction}" — this tells the image editor exactly what the product looks like and how to position it. Be specific about the product's original colors and materials.
-2. IMMEDIATELY after, add: "The product retains its original colors and design exactly as shown in the source image."
-3. Then describe the environment from the Scene Concept (Section 2) with props and background details.
-4. Apply the Visual Style (Section 3) as lighting and color grading over the ENVIRONMENT ONLY — not the product.
-5. Do NOT add props from the aesthetic that don't belong in the product's world. A ring gets a jewelry tray, not gummy bears. A hoodie gets sneakers, not confetti.
-6. ${authenticHandmadeMode ? 'Keep it grounded and believable — Etsy-seller realism, modest props, slight imperfections.' : 'Keep it editorial and aspirational — professional lifestyle photoshoot quality.'}
-7. End with: "The product preserves its original colors and details from the source image. ${authenticHandmadeMode ? 'authentic handmade product photography, natural window light, amateur smartphone camera, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
-
-Also generate:
-- A short, punchy overlay title (3-7 words) for the pin image. Write it like a magazine headline — catchy, benefit-driven, specific to the product.
-  RULES for the overlay title:
-  - MUST reference the actual product (e.g. "hoodie", "serum", "chair", "ring")
-  - Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential"
-  - Good: "Clear Skin Starts Here", "Your New Everyday Hoodie", "Handmade Nursery Chair"
-  - Bad: "Aesthetic Lifestyle Collection", "Morning Comfort, Modern Style"
-- A template choice: template-1 (top gradient text), template-2 (center overlay text), template-3 (bottom gradient text), template-4 (framed top text), or template-5 (pure aesthetic, no text)
-
-Return ONLY valid JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
+Return ONLY JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
 
             // Reuse product image fetched earlier for Gemini Art Director multimodal context
             const imagePart = productImageBase64 && productImageMimeType
