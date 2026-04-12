@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Loader2, Moon, Sun, Check, Store, Palette, Zap } from 'lucide-react'
+import { Loader2, Check, Store, Palette, ShieldCheck, Sparkles, Zap, type LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion } from 'motion/react'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { AutomationControl } from '@/components/dashboard/automation-control'
 
 const FONT_OPTIONS: { name: string; google: string; sample: string }[] = [
   { name: 'Playfair Display', google: 'Playfair+Display:wght@700', sample: 'Elegant Serif Style' },
@@ -34,6 +36,8 @@ const AESTHETIC_OPTIONS: { name: string; gradient: string; emoji: string; desc: 
   { name: 'Coastal', gradient: 'from-cyan-100 to-blue-200', emoji: '🌊', desc: 'Ocean blues, sandy neutrals' },
 ]
 
+const EMPTY_BOARD_VALUE = '__no_board__'
+
 interface BrandSettingsData {
   brand_name: string
   brand_description: string
@@ -41,10 +45,42 @@ interface BrandSettingsData {
   logo_url: string
   font_choice: string
   aesthetic_boundaries: string[]
-  automation_paused: boolean
   default_board_id: string
   account_age_type: 'brand_new' | 'established' | ''
   pin_layout_mode: 'organic' | 'editorial'
+}
+
+function SurfaceHeader({
+  icon: Icon,
+  eyebrow,
+  title,
+  description,
+  titleTag = 'h2',
+  titleClassName = 'text-[18px] font-semibold tracking-tight text-neutral-950',
+}: {
+  icon: LucideIcon
+  eyebrow: string
+  title: string
+  description: string
+  titleTag?: 'h2' | 'h3'
+  titleClassName?: string
+}) {
+  const TitleTag = titleTag
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900">
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+        <div>
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">{eyebrow}</span>
+          <TitleTag className={titleClassName}>{title}</TitleTag>
+        </div>
+      </div>
+      <p className="text-sm leading-6 text-neutral-600">{description}</p>
+    </div>
+  )
 }
 
 export default function BrandSettingsPage() {
@@ -57,7 +93,6 @@ export default function BrandSettingsPage() {
     logo_url: '',
     font_choice: 'Playfair Display',
     aesthetic_boundaries: [],
-    automation_paused: false,
     default_board_id: '',
     account_age_type: '',
     pin_layout_mode: 'organic',
@@ -95,7 +130,6 @@ export default function BrandSettingsPage() {
           logo_url: data.logo_url || '',
           font_choice: data.font_choice || 'Playfair Display',
           aesthetic_boundaries: (data.aesthetic_boundaries as string[]) || [],
-          automation_paused: data.automation_paused || false,
           default_board_id: data.default_board_id || '',
           account_age_type: data.account_age_type || '',
           pin_layout_mode: (data.pin_layout_mode as 'organic' | 'editorial') || 'organic',
@@ -151,7 +185,6 @@ export default function BrandSettingsPage() {
         logo_url: form.logo_url,
         font_choice: form.font_choice,
         aesthetic_boundaries: form.aesthetic_boundaries,
-        automation_paused: form.automation_paused,
         default_board_id: form.default_board_id,
         account_age_type: form.account_age_type,
         pin_layout_mode: form.pin_layout_mode,
@@ -186,346 +219,341 @@ export default function BrandSettingsPage() {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-10 bg-muted rounded w-64" />
-        <div className="h-96 bg-muted rounded-2xl" />
+        <div className="h-96 bg-muted rounded-xl" />
       </div>
     )
   }
 
+  const surfaceClass = 'rounded-xl border border-neutral-200/80 bg-white/95 p-4 sm:p-6'
+
   return (
-    <div className="max-w-2xl pb-16">
+    <div className="pb-16">
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link
         rel="stylesheet"
         href={`https://fonts.googleapis.com/css2?${FONT_OPTIONS.map(f => `family=${f.google}`).join('&')}&display=swap`}
       />
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Brand Settings</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Configure your brand identity. Changes save automatically.
-        </p>
+      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-950">Brand Settings</h1>
+          <p className="mt-1 text-sm text-neutral-600">
+            Refine how PinLoop looks, publishes, and behaves for your brand.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-500">
+          <Check className="h-3.5 w-3.5" />
+          Changes save automatically
+        </div>
       </div>
 
-      {/* ─── Section: Brand Identity ─── */}
-      <section className="mb-10">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center">
-            <Store className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold">Brand Identity</h2>
-            <p className="text-xs text-muted-foreground">Name, description, and store link</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] xl:gap-10">
+        <div className="space-y-6">
+          <AutomationControl variant="panel" />
 
-        <div className="space-y-5">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Brand Name *</label>
-            <Input
-              value={form.brand_name}
-              onChange={e => setForm(p => ({ ...p, brand_name: e.target.value }))}
-              placeholder="e.g., Artisan Home Co."
-              className="rounded-xl h-11"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Brand Description</label>
-            <Textarea
-              value={form.brand_description}
-              onChange={e => setForm(p => ({ ...p, brand_description: e.target.value }))}
-              placeholder="A brief description of your brand and what you sell..."
-              rows={3}
-              className="rounded-xl resize-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Store URL</label>
-            <Input
-              type="url"
-              value={form.store_url}
-              onChange={e => setForm(p => ({ ...p, store_url: e.target.value }))}
-              placeholder="https://yourstore.com"
-              className="rounded-xl h-11"
-            />
-            <p className="text-xs text-muted-foreground">This appears as the CTA badge on your pins.</p>
-          </div>
-        </div>
-      </section>
-
-      <hr className="border-neutral-100 mb-10" />
-
-      {/* ─── Section: Visual Style ─── */}
-      <section className="mb-10">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center">
-            <Palette className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold">Visual Style</h2>
-            <p className="text-xs text-muted-foreground">Control how your pins look in the feed</p>
-          </div>
-        </div>
-
-        <div className="space-y-7">
-          {/* Pin Style */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Pin Style</label>
-            <div className="grid grid-cols-2 gap-3">
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setForm(p => ({ ...p, pin_layout_mode: 'organic' }))}
-                className={`cursor-pointer p-4 rounded-xl border-2 text-left transition-all ${
-                  form.pin_layout_mode === 'organic'
-                    ? 'border-neutral-900 bg-neutral-50 shadow-sm'
-                    : 'border-neutral-200 bg-white hover:border-neutral-400'
-                }`}
-              >
-                <div className="font-semibold text-sm mb-1">🌿 Organic Lifestyle</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Pure image. Zero text overlay. Blends into the feed like Target or Crate &amp; Barrel. <strong>Highest click-through rate.</strong>
-                </p>
-                {form.pin_layout_mode === 'organic' && (
-                  <span className="mt-2 inline-block text-[10px] font-semibold text-neutral-900 bg-neutral-200 px-2 py-0.5 rounded-full">ACTIVE</span>
-                )}
-              </motion.button>
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setForm(p => ({ ...p, pin_layout_mode: 'editorial' }))}
-                className={`cursor-pointer p-4 rounded-xl border-2 text-left transition-all ${
-                  form.pin_layout_mode === 'editorial'
-                    ? 'border-neutral-900 bg-neutral-50 shadow-sm'
-                    : 'border-neutral-200 bg-white hover:border-neutral-400'
-                }`}
-              >
-                <div className="font-semibold text-sm mb-1">✏️ Editorial / Campaign</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  AI selects a magazine-style text layout. Best for promotions, seasonal campaigns, or infographic content.
-                </p>
-                {form.pin_layout_mode === 'editorial' && (
-                  <span className="mt-2 inline-block text-[10px] font-semibold text-neutral-900 bg-neutral-200 px-2 py-0.5 rounded-full">ACTIVE</span>
-                )}
-              </motion.button>
+          <section className={surfaceClass}>
+            <div className="mb-6">
+              <SurfaceHeader
+                icon={Zap}
+                eyebrow="Publishing"
+                title="Destination and safety"
+                description="Choose where approved pins go and how cautiously PinLoop should ramp up activity."
+              />
             </div>
-          </div>
 
-          {/* Font Choice */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Pin Font</label>
-            <p className="text-xs text-muted-foreground">
-              Curated OCR-approved fonts that Pinterest&apos;s visual AI can read. Select one.
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {FONT_OPTIONS.map(f => {
-                const isSelected = form.font_choice === f.name
-                return (
-                  <motion.button
-                    key={f.name}
-                    type="button"
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => setForm(p => ({ ...p, font_choice: f.name }))}
-                    className={`cursor-pointer text-left p-3.5 rounded-xl border-2 transition-all ${
-                      isSelected
-                        ? 'border-neutral-900 bg-neutral-50 shadow-sm'
-                        : 'border-neutral-200 bg-white hover:border-neutral-400'
-                    }`}
-                  >
-                    <span
-                      className="block text-lg leading-tight truncate"
-                      style={{ fontFamily: `'${f.name}', sans-serif` }}
-                    >
-                      {f.sample}
-                    </span>
-                    <span className="block text-[11px] text-muted-foreground mt-1">{f.name}</span>
-                  </motion.button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Aesthetic Boundaries */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Aesthetic Boundaries (pick up to 3)</label>
-            <p className="text-xs text-muted-foreground">
-              Tell the AI Art Director what visual styles to aim for. It will avoid anything outside these boundaries.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              {AESTHETIC_OPTIONS.map(opt => {
-                const selected = form.aesthetic_boundaries.includes(opt.name)
-                return (
-                  <motion.button
-                    key={opt.name}
-                    type="button"
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => toggleAesthetic(opt.name)}
-                    className={`cursor-pointer relative text-left rounded-xl border-2 overflow-hidden transition-all ${
-                      selected
-                        ? 'border-neutral-900 ring-1 ring-neutral-900 shadow-sm'
-                        : 'border-neutral-200 hover:border-neutral-400'
-                    }`}
-                  >
-                    <div className={`h-16 w-full bg-gradient-to-br ${opt.gradient} flex items-center justify-center text-2xl`}>
-                      {opt.emoji}
-                    </div>
-                    <div className="px-3 py-2.5">
-                      <span className="block text-xs font-semibold text-neutral-900 leading-tight">{opt.name}</span>
-                      <span className="block text-[10px] text-muted-foreground mt-0.5">{opt.desc}</span>
-                    </div>
-                    {selected && (
-                      <span className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-neutral-900 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
-                    )}
-                  </motion.button>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <hr className="border-neutral-100 mb-10" />
-
-      {/* ─── Section: Automation ─── */}
-      <section className="mb-10">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold">Automation</h2>
-            <p className="text-xs text-muted-foreground">Controls for scheduling, publishing, and safety</p>
-          </div>
-        </div>
-
-        <div className="space-y-5">
-          {/* Sleep Mode */}
-          <div className={`rounded-2xl border-2 p-5 transition-colors ${
-            form.automation_paused
-              ? 'border-red-300 bg-red-50/50'
-              : 'border-emerald-200 bg-emerald-50/30'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {form.automation_paused ? (
-                  <Moon className="w-6 h-6 text-red-500 shrink-0" />
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-900">Default Pinterest Board</label>
+                <p className="text-xs text-neutral-500">Where approved pins should publish by default.</p>
+                {loadingBoards ? (
+                  <div className="flex items-center gap-2 text-xs text-neutral-500">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Fetching your boards...
+                  </div>
                 ) : (
-                  <Sun className="w-6 h-6 text-emerald-600 shrink-0" />
+                  <Select
+                    value={form.default_board_id || EMPTY_BOARD_VALUE}
+                    onValueChange={value => setForm(p => ({
+                      ...p,
+                      default_board_id: value === EMPTY_BOARD_VALUE ? '' : value,
+                    }))}
+                    disabled={!boards.length}
+                  >
+                    <SelectTrigger className="h-12 w-full rounded-xl border-neutral-200 bg-white px-4 text-sm text-neutral-900 shadow-none focus:ring-2 focus:ring-neutral-900">
+                      <SelectValue placeholder="Select a board" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-neutral-200 bg-white shadow-lg">
+                      <SelectItem value={EMPTY_BOARD_VALUE} className="rounded-lg py-2.5 text-sm">
+                        No default board
+                      </SelectItem>
+                      {boards.map(b => (
+                        <SelectItem key={b.id} value={b.id} className="rounded-lg py-2.5 text-sm">
+                          {b.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
-                <div>
-                  <h3 className="font-semibold text-sm">
-                    {form.automation_paused ? '🛑 Sleep Mode' : '✅ Engine Active'}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 max-w-[200px]">
-                    {form.automation_paused
-                      ? 'ALL automation is paused. No generation, no publishing.'
-                      : 'AI is generating and scheduling pins normally.'}
-                  </p>
+              </div>
+
+              <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-5">
+                <SurfaceHeader
+                  icon={ShieldCheck}
+                  eyebrow="Account protection"
+                  title="Warm-up profile"
+                  titleTag="h3"
+                  titleClassName="text-sm font-semibold text-neutral-950"
+                  description="This sets how cautiously PinLoop increases publishing volume to keep your Pinterest account healthy."
+                />
+
+                <div className="mt-5 grid gap-3 md:grid-cols-2">
+                  {[
+                    {
+                      id: 'brand_new' as const,
+                      title: 'Brand new',
+                      subtitle: 'Created within the last 3 months',
+                      detail: 'Starts gently and ramps up over time to avoid early spam signals.',
+                      Icon: Sparkles,
+                    },
+                    {
+                      id: 'established' as const,
+                      title: 'Established',
+                      subtitle: 'Already has account history and activity',
+                      detail: 'Begins publishing at full safe velocity from day one.',
+                      Icon: Zap,
+                    },
+                  ].map(option => {
+                    const selected = form.account_age_type === option.id
+
+                    return (
+                      <motion.button
+                        key={option.id}
+                        type="button"
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setForm(p => ({ ...p, account_age_type: option.id }))}
+                        className={`cursor-pointer rounded-xl border p-4 text-left transition-all ${
+                          selected
+                            ? 'border-neutral-900 bg-white'
+                            : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/40'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <span className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-xl border ${
+                              selected ? 'border-neutral-300 bg-neutral-50 text-neutral-900' : 'border-neutral-200 bg-neutral-50 text-neutral-700'
+                            }`}>
+                              <option.Icon className="h-4.5 w-4.5" />
+                            </span>
+                            <div className="min-w-0">
+                              <div className="text-sm font-semibold text-neutral-950">{option.title}</div>
+                              <div className="mt-1 text-xs leading-5 text-neutral-500">{option.subtitle}</div>
+                            </div>
+                          </div>
+                          <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all ${
+                            selected
+                              ? 'border-neutral-900 bg-neutral-900 text-white'
+                              : 'border-neutral-200 bg-white text-transparent'
+                          }`}>
+                            <Check className="h-3.5 w-3.5" />
+                          </span>
+                        </div>
+                        <p className="mt-4 text-[13px] leading-6 text-neutral-600">{option.detail}</p>
+                      </motion.button>
+                    )
+                  })}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setForm(p => ({ ...p, automation_paused: !p.automation_paused }))}
-                className={`cursor-pointer relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
-                  form.automation_paused ? 'bg-red-400' : 'bg-emerald-500'
-                }`}
-              >
-                <span className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                  form.automation_paused ? 'translate-x-1' : 'translate-x-6'
-                }`} />
-              </button>
             </div>
-          </div>
+          </section>
 
-          {/* Default Board */}
-          <div className="rounded-2xl border-2 border-neutral-200 bg-neutral-50/50 p-5">
-            <h3 className="font-semibold text-sm mb-2">📌 Default Pinterest Board</h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              Pre-select where your manually approved pins should be saved on Pinterest.
-            </p>
-            {loadingBoards ? (
-              <div className="flex items-center gap-2 text-xs text-neutral-500">
-                <Loader2 className="w-4 h-4 animate-spin" /> Fetching your boards...
+          <section className={surfaceClass}>
+            <div className="mb-6">
+              <SurfaceHeader
+                icon={Store}
+                eyebrow="Brand identity"
+                title="Core brand profile"
+                description="Name your brand clearly so PinLoop can write, render, and label pins consistently."
+              />
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-900">Brand Name</label>
+                <Input
+                  value={form.brand_name}
+                  onChange={e => setForm(p => ({ ...p, brand_name: e.target.value }))}
+                  placeholder="e.g., Artisan Home Co."
+                  className="h-11 rounded-xl border-neutral-200 bg-white px-4"
+                />
               </div>
-            ) : (
-              <select
-                value={form.default_board_id}
-                onChange={e => setForm(p => ({ ...p, default_board_id: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
-              >
-                <option value="">-- Select a Board (Required) --</option>
-                {boards.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            )}
-          </div>
 
-          {/* Account Age */}
-          {!form.account_age_type && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
-              <h3 className="font-semibold text-base mb-1">🛡️ Account Protection Setup</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                To protect your Pinterest account from spam filters, we need to know one thing:
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setForm(p => ({ ...p, account_age_type: 'brand_new' }))}
-                  className="cursor-pointer p-4 rounded-xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all text-left"
-                >
-                  <div className="font-semibold text-sm">🌱 Brand New</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Created in the last 3 months. We&apos;ll ramp up slowly (1 pin/day → 5 pins/day over 4 weeks).
-                  </p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForm(p => ({ ...p, account_age_type: 'established' }))}
-                  className="cursor-pointer p-4 rounded-xl border-2 border-blue-200 bg-white hover:border-blue-400 transition-all text-left"
-                >
-                  <div className="font-semibold text-sm">🏛️ Established</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Active for 3+ months with existing pins. We&apos;ll publish at full speed immediately.
-                  </p>
-                </button>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-900">Brand Description</label>
+                <Textarea
+                  value={form.brand_description}
+                  onChange={e => setForm(p => ({ ...p, brand_description: e.target.value }))}
+                  placeholder="A concise description of your brand, products, and taste."
+                  rows={4}
+                  className="rounded-xl border-neutral-200 bg-white px-4 py-3 resize-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-900">Store URL</label>
+                <Input
+                  type="url"
+                  value={form.store_url}
+                  onChange={e => setForm(p => ({ ...p, store_url: e.target.value }))}
+                  placeholder="https://yourstore.com"
+                  className="h-11 rounded-xl border-neutral-200 bg-white px-4"
+                />
+                <p className="text-xs text-neutral-500">Used as the destination and CTA source across generated pins.</p>
               </div>
             </div>
-          )}
-
-          {form.account_age_type && (
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200">
-              <span className="text-sm">
-                {form.account_age_type === 'brand_new' ? '🌱' : '🏛️'}
-              </span>
-              <div>
-                <span className="text-sm font-medium">
-                  {form.account_age_type === 'brand_new' ? 'Warm-Up Mode Active' : 'Full Speed Mode'}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {form.account_age_type === 'brand_new'
-                    ? 'Publishing is throttled for 4 weeks to protect your account.'
-                    : 'Your account is publishing at maximum safe velocity.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setForm(p => ({ ...p, account_age_type: '' }))}
-                className="ml-auto text-xs text-muted-foreground hover:text-neutral-800 underline"
-              >
-                Change
-              </button>
-            </div>
-          )}
+          </section>
         </div>
-      </section>
 
-      {/* Auto-save indicator */}
-      <div className="flex items-center justify-center gap-1.5 pt-4 border-t border-neutral-100">
-        <Check className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-xs text-muted-foreground">All changes saved automatically</span>
+        <section className={surfaceClass}>
+          <div className="mb-6">
+            <SurfaceHeader
+              icon={Palette}
+              eyebrow="Visual style"
+              title="Creative direction"
+              description="Define the visual system PinLoop should follow when composing pins for your feed."
+            />
+          </div>
+
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-neutral-900">Pin Style</label>
+                <p className="mt-1 text-xs text-neutral-500">Choose the overall visual treatment for generated pins.</p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {[
+                  {
+                    id: 'organic' as const,
+                    title: 'Organic lifestyle',
+                    detail: 'Image-first and native to the feed. Best for high click-through and natural discovery.',
+                  },
+                  {
+                    id: 'editorial' as const,
+                    title: 'Editorial campaign',
+                    detail: 'Structured magazine-style layouts designed for promotions, launches, and campaign moments.',
+                  },
+                ].map(option => {
+                  const selected = form.pin_layout_mode === option.id
+
+                  return (
+                    <motion.button
+                      key={option.id}
+                      type="button"
+                      whileTap={{ scale: 0.985 }}
+                      onClick={() => setForm(p => ({ ...p, pin_layout_mode: option.id }))}
+                      className={`cursor-pointer rounded-xl border p-5 text-left transition-all ${
+                        selected
+                          ? 'border-neutral-900 bg-neutral-50'
+                          : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">
+                            {option.id === 'organic' ? 'Mode 01' : 'Mode 02'}
+                          </div>
+                          <div className="mt-2 text-base font-semibold tracking-tight text-neutral-950">{option.title}</div>
+                        </div>
+                        {selected && (
+                          <span className="rounded-full border border-neutral-300 bg-white px-2 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-neutral-700">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-4 text-sm leading-6 text-neutral-600">{option.detail}</p>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-neutral-900">Pin Font</label>
+                <p className="mt-1 text-xs text-neutral-500">Curated OCR-approved fonts that Pinterest's visual AI can read. Select one.</p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {FONT_OPTIONS.map(f => {
+                  const isSelected = form.font_choice === f.name
+
+                  return (
+                    <motion.button
+                      key={f.name}
+                      type="button"
+                      whileTap={{ scale: 0.985 }}
+                      onClick={() => setForm(p => ({ ...p, font_choice: f.name }))}
+                      className={`cursor-pointer rounded-xl border p-4 text-left transition-all ${
+                        isSelected
+                          ? 'border-neutral-900 bg-neutral-50'
+                          : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/50'
+                      }`}
+                    >
+                      <span
+                        className="block truncate text-[28px] leading-tight text-neutral-950"
+                        style={{ fontFamily: `'${f.name}', sans-serif` }}
+                      >
+                        {f.sample}
+                      </span>
+                      <span className="mt-2 block text-xs text-neutral-500">{f.name}</span>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <label className="text-sm font-medium text-neutral-900">Aesthetic Boundaries</label>
+                  <p className="mt-1 text-xs text-neutral-500">Tell the AI Art Director what visual styles to aim for. It will avoid anything outside these boundaries.</p>
+                </div>
+                <span className="text-[11px] uppercase tracking-[0.16em] text-neutral-400">Up to 3</span>
+              </div>
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {AESTHETIC_OPTIONS.map(opt => {
+                  const selected = form.aesthetic_boundaries.includes(opt.name)
+
+                  return (
+                    <motion.button
+                      key={opt.name}
+                      type="button"
+                      whileTap={{ scale: 0.985 }}
+                      onClick={() => toggleAesthetic(opt.name)}
+                      className={`cursor-pointer overflow-hidden rounded-xl border text-left transition-all ${
+                        selected
+                          ? 'border-neutral-900 bg-white'
+                          : 'border-neutral-200 bg-white hover:border-neutral-300'
+                      }`}
+                    >
+                      <div className={`h-16 w-full bg-gradient-to-br ${opt.gradient}`} />
+                      <div className="px-4 py-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <span className="block text-sm font-semibold text-neutral-950">{opt.name}</span>
+                            <span className="mt-1 block text-xs text-neutral-500">{opt.desc}</span>
+                          </div>
+                          {selected && (
+                            <span className="rounded-full bg-neutral-900 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   )

@@ -27,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useCreditManager } from "@/lib/credit-manager"
 import { FeatherIcon } from "@/components/icons/feathericon"
+import { AutomationControl } from "@/components/dashboard/automation-control"
 
 
 interface HeaderUserProps {
@@ -43,6 +44,8 @@ export function HeaderUser({ user, initialCreditBalance }: HeaderUserProps) {
   const { balance: creditBalance } = useCreditManager(user.id)
   return (
     <div className="flex items-center gap-3">
+      <AutomationControl variant="header" />
+
       {/* Credit Display */}
       <div className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md">
         <span className="flex items-center gap-2"><FeatherIcon size={12} /></span>

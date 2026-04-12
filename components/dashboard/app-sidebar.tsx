@@ -35,13 +35,13 @@ const navSecondary = [
   },
 ]
 
-// Pin Quota Card Component
+// Engine Status Card
 function PinQuotaCard({ isSubscribed }: { isSubscribed?: boolean }) {
   return (
     <Card className="py-2">
       <CardContent className="gap-1 flex flex-col px-3">
         <div className="text-sm font-medium mb-1">Engine Status</div>
-        <div className="text-xs text-muted-foreground mb-3 flex justify-between">
+        <div className="text-xs text-muted-foreground flex justify-between">
           <span className="flex items-center gap-2"><ImageIcon size={12} />Pins</span>
           <span className={isSubscribed ? "text-emerald-600" : "text-amber-600"}>
             {isSubscribed ? "Active" : "Inactive"}
