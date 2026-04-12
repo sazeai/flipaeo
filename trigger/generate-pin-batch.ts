@@ -4,7 +4,8 @@ import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
 import { fal } from "@fal-ai/client"
 import { generateUniqueAngle } from "@/lib/context-matrix"
-import { resolveProductShowcase, pickShowcaseForPin } from "@/lib/product-showcase"
+import { resolveProductShowcase, pickShowcaseForPin, isDigitalProduct } from "@/lib/product-showcase"
+import { validatePrompt } from "@/lib/prompt-critic"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
@@ -110,7 +111,7 @@ export const generatePinBatch = schedules.task({
         // Get products that need pins (active products that have an image)
         const { data: products } = await supabase
           .from("products")
-          .select("id, title, description, image_r2_key, image_url")
+          .select("id, title, description, image_r2_key, image_url, tags")
           .eq("user_id", brand.user_id)
           .eq("is_active", true)
           .not("image_url", "is", null)
@@ -176,6 +177,12 @@ export const generatePinBatch = schedules.task({
           try {
             logger.info(`Generating pin for product: ${product.title}`)
 
+            // Skip digital/downloadable products — no physical product to composite
+            if (isDigitalProduct({ title: product.title, description: product.description }, product.tags)) {
+              logger.info(`Skipping digital product: ${product.title} — flagged for manual pin creation`)
+              continue
+            }
+
             // Resolve source image URL first — needed for both Showcase Resolver and Art Director
             const r2Domain = process.env.R2_PUBLIC_DOMAIN?.replace(/\/$/, "")
             const sourceImageUrl = product.image_url || (r2Domain && product.image_r2_key ? `${r2Domain}/${product.image_r2_key}` : "")
@@ -205,6 +212,7 @@ export const generatePinBatch = schedules.task({
               { title: product.title, description: product.description },
               productImageBase64,
               productImageMimeType,
+              product.tags,
             )
             logger.info(`Showcase analysis: ${showcaseAnalysis.viableModes.length} viable modes for "${showcaseAnalysis.productType}"`)
 
@@ -235,20 +243,26 @@ export const generatePinBatch = schedules.task({
             const artDirectorPrompt = `Write an image editing prompt for fal.ai. The source product image will be composited into the scene you describe.
 
 PRODUCT: ${showcase.productAppearance}
+FAMILY: ${showcase.productFamily}
 SHOT: ${showcase.presentationMode}, ${showcase.heroAction}
 CAMERA: ${showcase.cameraAngle}
 SETTING: ${showcase.naturalEnvironment}
 PROPS (only these): ${showcase.suggestedProps || "none"}
+SCENE SCOPE: ${showcase.sceneScope}
+SCALE RULE: ${showcase.scaleGuidance}
+NEVER INCLUDE: ${showcase.forbiddenElements}
 SCENE: ${targetAngle}
 STYLE: ${pickedAesthetic.tag} — ${pickedAesthetic.definition}
 
 Write the fal.ai prompt following this exact structure:
 1. "A ${showcase.productAppearance}, ${showcase.presentationMode}, ${showcase.heroAction}."
 2. "The product keeps its exact original colors, materials, and design from the source image."
-3. Describe the environment: surface material, background, and the scene concept above.
-4. Place ONLY the listed props — no other objects.
-5. Apply the style's lighting and color palette to the environment only, not the product.
-6. End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
+3. "Keep the product at natural real-world size and keep the scene within this scope: ${showcase.sceneScope}. ${showcase.scaleGuidance}."
+4. Describe the environment: surface material, background, and the scene concept above.
+5. Place ONLY the listed props — no other objects.
+6. Explicitly avoid these elements: ${showcase.forbiddenElements}.
+7. Apply the style's lighting and color palette to the environment only, not the product.
+8. End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
 
 Also return:
 - title: catchy 3-7 word headline naming the product (not generic words like "Aesthetic" or "Collection")
@@ -271,9 +285,36 @@ Return ONLY JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
             })
 
             const plan = JSON.parse(planResponse.text?.trim() || '{}')
-            const dynamicImagePrompt = plan.imagePrompt || `Aesthetic lifestyle shot of ${product.title}, photorealistic 8k`
+            let dynamicImagePrompt = plan.imagePrompt || `Aesthetic lifestyle shot of ${product.title}, photorealistic 8k`
             const genTitle = plan.title || product.title
             const genTemplateId = plan.templateId || "template-5"
+
+            // Prompt Critic — validate before sending to fal.ai
+            const criticResult = validatePrompt(dynamicImagePrompt, showcase)
+            if (!criticResult.valid) {
+              logger.warn(`Prompt critic flagged issues: ${criticResult.issues.join("; ")}`)
+              // Retry Art Director with critic feedback (up to 2x)
+              for (let retry = 0; retry < 2; retry++) {
+                const retryPrompt = `${artDirectorPrompt}\n\nCRITICAL CORRECTIONS — your previous prompt had these issues:\n${criticResult.issues.map(i => `- ${i}`).join("\n")}\nFix these issues in the new prompt.`
+                const retryParts: any[] = [{ text: retryPrompt }]
+                if (imagePart) retryParts.push(imagePart)
+
+                const retryResponse = await ai.models.generateContent({
+                  model: 'gemini-2.5-flash',
+                  contents: retryParts,
+                  config: { temperature: 0.5, responseMimeType: "application/json" }
+                })
+                const retryPlan = JSON.parse(retryResponse.text?.trim() || '{}')
+                const retryPromptText = retryPlan.imagePrompt || dynamicImagePrompt
+                const retryCritic = validatePrompt(retryPromptText, showcase)
+                if (retryCritic.valid) {
+                  dynamicImagePrompt = retryPromptText
+                  logger.info(`Prompt critic passed on retry ${retry + 1}`)
+                  break
+                }
+                logger.warn(`Prompt critic retry ${retry + 1} still has issues: ${retryCritic.issues.join("; ")}`)
+              }
+            }
 
             logger.info(`Art Director Prompt: ${dynamicImagePrompt}`)
 

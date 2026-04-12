@@ -87,10 +87,14 @@ export async function generateUniqueAngle(
     ? `
 LOCKED SHOWCASE:
 - Product: ${showcase.productType}
+- Family: ${showcase.productFamily}
 - Shot: ${showcase.presentationMode} — ${showcase.heroAction}
 - Camera: ${showcase.cameraAngle}
 - Setting: ${showcase.naturalEnvironment}
 - Props (use ONLY these): ${showcase.suggestedProps || "none specified"}
+- Scene scope: ${showcase.sceneScope}
+- Scale rule: ${showcase.scaleGuidance}
+- Never include: ${showcase.forbiddenElements}
 Do NOT invent new props. Only use the props listed above.`
     : ""
 
@@ -110,6 +114,7 @@ Write a scene concept for this product photo. The showcase (shot type, props, se
 - Apply the aesthetic's color palette to the ENVIRONMENT only
 
 ONLY use the props listed in the showcase. Do NOT add unrelated objects like watches, books, pens, or coffee cups unless they are in the props list.
+Keep the scene inside the locked scene scope and scale rule. The product must read at natural real-world size.
 
 ${pastAngles && pastAngles.length > 0 ? `Already done — be DIFFERENT:\n${pastAngles.slice(0, 10).map(a => `• ${a}`).join("\n")}` : ""}
 

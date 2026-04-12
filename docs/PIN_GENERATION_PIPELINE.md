@@ -1,6 +1,6 @@
 # Pin Generation Pipeline
 
-> Last updated: April 12, 2026
+> Last updated: April 12, 2026 (v2 — expanded taxonomy, AI constraints, prompt critic)
 
 ## What This Covers
 
@@ -41,7 +41,23 @@ Product selection rule:
 
 ---
 
-### 2. Source Product Image Resolution
+### 2. Digital Product Detection
+
+**File:** `lib/product-showcase.ts`
+
+Function:
+- `isDigitalProduct()`
+
+Purpose:
+- detect digital/downloadable products that have no physical product to composite
+- these are skipped in auto-generation and should be handled via manual pin creation
+
+Detection pattern:
+- matches `downloadable`, `digital download`, `instant download`, `printable`, `pdf`, `digital file`, `digital print` in title, description, or tags
+
+---
+
+### 3. Source Product Image Resolution
 
 **File:** `trigger/generate-pin-batch.ts`
 
@@ -60,7 +76,7 @@ If no valid image URL exists, the product is skipped.
 
 ---
 
-### 3. Product Showcase Analysis
+### 4. Product Showcase Analysis
 
 **File:** `lib/product-showcase.ts`
 
@@ -73,15 +89,19 @@ Input:
 - product title
 - product description
 - actual product image
+- product tags (from Shopify/Etsy sync — `tags[0]` is product_type)
 
 Purpose:
 - decide how the product should be shown
 - decide what props are allowed
 - decide what visual identity must be preserved
+- classify into one of 16 product families
+- infer per-product physical constraints (size class, scale anchor, support rule, scene depth, prop world, forbidden contexts)
 
 Output:
 - `productType`
 - `productAppearance`
+- `constraints` (AI-inferred `ProductConstraints`)
 - `viableModes[]`
 
 Each entry in `viableModes[]` contains:
@@ -103,14 +123,42 @@ Current presentation mode taxonomy:
 - `in-use-action`
 - `flat-lay-arrangement`
 
+Current product family taxonomy (16 families):
+- `jewelry-small` — rings, earrings, bracelets, necklaces, watches
+- `box-case-small` — ring boxes, jewelry boxes, gift boxes
+- `apparel` — hoodies, t-shirts, jackets, dresses, sneakers
+- `pet-accessory` — collars, leashes, pet bowls, cat beds, pet tags
+- `beauty-small` — serums, creams, lotions, perfumes
+- `furniture-large` — chairs, tables, sofas, bookcases
+- `home-decor` — candles, vases, planters, throw pillows, rugs
+- `food-drink` — peanut butter, snacks, tea, coffee, honey
+- `tech-desk` — keycaps, laptop sleeves, mousepads, headphone stands
+- `stationery` — journals, planners, fountain pens, desk organizers
+- `ceramics-tableware` — artisan mugs, plates, matcha bowls, incense holders
+- `kids-baby` — wooden blocks, baby clothes, pacifier clips, nursery items
+- `wedding-event` — wax seal kits, acrylic signs, groomsmen flasks, bridesmaid gifts
+- `wall-art` — prints, posters, framed art, canvas pieces
+- `carried-accessory` — tote bags, wallets, backpacks, clutches
+- `general` — fallback for unclassified products
+
+AI-inferred ProductConstraints (returned alongside viableModes):
+- `sizeClass` — tiny, palm, handheld, tabletop, furniture, room
+- `scaleAnchor` — what object grounds the product's size
+- `supportRule` — how the product must be physically supported
+- `maxSceneDepth` — macro close-up, tabletop vignette, room corner, full room
+- `propWorld` — the product's natural prop universe
+- `forbiddenContexts` — contexts that would look wrong
+
 Example:
 - a dog collar can produce modes like dog wearing it, collar on a surface, or flat-lay with leash
 - a ring box can produce held-in-hand, styled-on-surface, or opening action
 - a hoodie can produce worn-on-model, folded on surface, or outfit flat-lay
+- an artisan mug can produce held-in-hand, styled-on-surface, or in-use-action pouring
+- a wax seal kit can produce styled-on-surface, in-use-action sealing, or flat-lay arrangement
 
 ---
 
-### 4. Showcase Mode Rotation
+### 5. Showcase Mode Rotation
 
 **File:** `lib/product-showcase.ts`
 
@@ -119,6 +167,7 @@ Function:
 
 Purpose:
 - rotate through the product's viable showcase modes over time
+- merge AI-inferred constraints with family rules (tighten-only, never loosen)
 
 Rotation input:
 - per-product pin count (`prodPins.length`)
@@ -132,13 +181,19 @@ What this means:
 - pin 2 uses mode 2
 - then it wraps
 
+Constraint merging:
+- family rules are the floor (minimum constraints always applied)
+- AI `maxSceneDepth` can tighten scene scope but not widen it
+- AI `scaleAnchor` and `supportRule` enrich scale guidance
+- AI `forbiddenContexts` are added to (never replace) family forbidden elements
+
 Important:
 - showcase rotation is per product
 - this is separate from aesthetic rotation
 
 ---
 
-### 5. Scene Concept Generation
+### 6. Scene Concept Generation
 
 **File:** `lib/context-matrix.ts`
 
@@ -183,7 +238,7 @@ Fallback if all attempts fail:
 
 ---
 
-### 6. Aesthetic Rotation
+### 7. Aesthetic Rotation
 
 **File:** `lib/context-matrix.ts`
 
@@ -211,7 +266,7 @@ Current aesthetic behavior:
 
 ---
 
-### 7. Art Director Prompt Generation
+### 8. Art Director Prompt Generation
 
 **File:** `trigger/generate-pin-batch.ts`
 
@@ -254,7 +309,33 @@ If Gemini parsing fails:
 
 ---
 
-### 8. AI Image Generation And Raw Save
+### 9. Prompt Critic (Validation Gate)
+
+**File:** `lib/prompt-critic.ts`
+
+Function:
+- `validatePrompt()`
+
+Purpose:
+- rule-based validation on the assembled art director prompt **before** sending to fal.ai
+- no LLM call — pure string/rule analysis
+
+Checks performed:
+- small product (`jewelry-small`, `box-case-small`, `beauty-small`, `ceramics-tableware`) placed in room-scale scene → REJECT
+- apparel/carried-accessory on surface without clear support surface mentioned → REJECT
+- forbidden elements from showcase leaked into the prompt → REJECT
+- wall art product without wall/frame/gallery context → REJECT
+- kids/baby product with adult-inappropriate context (alcohol, knife, etc.) → REJECT
+- wedding/event product with mismatched context (gym, garage, etc.) → REJECT
+
+On failure:
+- retry Art Director prompt generation up to 2 times with critic issues as feedback
+- lower temperature on retries (0.5) for more conservative output
+- if all retries fail, proceed with the best available prompt (logged as warning)
+
+---
+
+### 10. AI Image Generation And Raw Save
 
 **File:** `trigger/generate-pin-batch.ts`
 
@@ -298,7 +379,7 @@ Why raw image is saved before render:
 
 ---
 
-### 9. SEO Copy Generation
+### 11. SEO Copy Generation
 
 **File:** `trigger/generate-pin-batch.ts`
 
@@ -331,7 +412,7 @@ If parsing fails:
 
 ---
 
-### 10. Final Render With Text Overlay
+### 12. Final Render With Text Overlay
 
 **File:** `app/api/render-pin/route.tsx`
 
@@ -380,7 +461,7 @@ Failure handling:
 
 ## What Happens After Generation
 
-### 11. User Approval
+### 13. User Approval
 
 Files:
 - `app/api/pins/approve/route.ts`
@@ -396,7 +477,7 @@ Reject flow:
 
 ---
 
-### 12. Publishing
+### 14. Publishing
 
 **File:** `trigger/publish-pins.ts`
 
@@ -407,7 +488,7 @@ This happens after generation, not during generation.
 
 ---
 
-### 13. Analytics Collection
+### 15. Analytics Collection
 
 **File:** `trigger/analytics-collector.ts`
 
@@ -467,8 +548,9 @@ Purpose:
 | File | Responsibility |
 |------|----------------|
 | `trigger/generate-pin-batch.ts` | main orchestrator for automatic pin generation |
-| `lib/product-showcase.ts` | product-aware showcase analysis, viable modes, prop selection, showcase rotation |
+| `lib/product-showcase.ts` | product-aware showcase analysis, 16 product families, AI constraints, viable modes, prop selection, digital detection, showcase rotation |
 | `lib/context-matrix.ts` | aesthetic rotation, scene concept generation, semantic dedup |
+| `lib/prompt-critic.ts` | rule-based prompt validation gate (no LLM) |
 | `app/api/render-pin/route.tsx` | final text overlay renderer |
 | `app/api/pins/approve/route.ts` | approve pending pins |
 | `app/api/pins/reject/route.ts` | reject pending pins |
@@ -485,6 +567,7 @@ Purpose:
 - `description`
 - `image_url`
 - `image_r2_key`
+- `tags` (Shopify `product_type` + tags, Etsy `taxonomy_path` + tags — `tags[0]` is the primary category)
 - `is_active`
 
 ### `brand_settings`
@@ -532,3 +615,8 @@ Purpose:
 - aesthetic rotation is global across the user's account
 - render happens in Node.js runtime, not Edge runtime
 - Pinterest trends are not used in the current generation flow
+- digital/downloadable products are detected and skipped in auto-generation
+- product tags from Shopify/Etsy are fetched and used for family classification
+- AI-inferred constraints can tighten but never loosen family rules
+- prompt critic validates the art director prompt before fal.ai (rule-based, no LLM)
+- critic retries up to 2x with feedback before proceeding
