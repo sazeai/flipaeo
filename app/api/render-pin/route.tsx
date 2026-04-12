@@ -36,14 +36,22 @@ function isAllowedImageSource(imageUrl: string) {
 
   try {
     const url = new URL(imageUrl);
-    const r2Host = getHostnameFromUrlish(process.env.R2_PUBLIC_DOMAIN);
     const isLocalDevHost = ['localhost', '127.0.0.1'].includes(url.hostname);
 
     if (isLocalDevHost) {
       return process.env.NODE_ENV !== 'production' && url.protocol === 'http:';
     }
 
-    return url.protocol === 'https:' && !!r2Host && url.hostname === r2Host;
+    if (url.protocol !== 'https:') return false;
+
+    // Allow Cloudflare R2 public bucket URLs (*.r2.dev)
+    if (url.hostname.endsWith('.r2.dev')) return true;
+
+    // Also allow custom domain configured via R2_PUBLIC_DOMAIN env var
+    const r2Host = getHostnameFromUrlish(process.env.R2_PUBLIC_DOMAIN);
+    if (r2Host && url.hostname === r2Host) return true;
+
+    return false;
   } catch {
     return false;
   }
