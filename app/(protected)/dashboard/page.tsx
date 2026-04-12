@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import {
   ImageIcon,
@@ -25,6 +26,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -41,6 +43,12 @@ export default function DashboardPage() {
         supabase.from('brand_settings').select('id').eq('user_id', user.id).maybeSingle(),
         supabase.from('pinterest_connections').select('warmup_phase').eq('user_id', user.id).maybeSingle(),
       ])
+
+      // Redirect to onboarding if no brand_settings row exists
+      if (!brandRes.data) {
+        router.replace('/onboarding')
+        return
+      }
 
       const totalClicks = (publishedRes.data || []).reduce((sum: number, p: any) => sum + (p.outbound_clicks || 0), 0)
 
@@ -103,7 +111,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <Link
-            href={!stats?.hasBrandSettings ? '/settings' : '/integrations'}
+            href="/onboarding"
             className="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-100 transition-colors flex items-center gap-2"
           >
             Get Started <ArrowRight className="w-4 h-4" />

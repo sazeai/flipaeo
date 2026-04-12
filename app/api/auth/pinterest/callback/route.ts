@@ -44,6 +44,17 @@ export async function GET(req: NextRequest) {
     )
   }
 
+  // Parse redirect target from state
+  let redirectTo = "/integrations"
+  try {
+    const stateData = JSON.parse(Buffer.from(state, "base64").toString())
+    if (stateData.redirectTo && typeof stateData.redirectTo === "string" && stateData.redirectTo.startsWith("/")) {
+      redirectTo = stateData.redirectTo
+    }
+  } catch {
+    // fallback to /integrations
+  }
+
   try {
     const callbackUrl = new URL("/api/auth/pinterest/callback", req.url).toString()
 
@@ -106,9 +117,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Clear state cookie and redirect with success
-    const response = NextResponse.redirect(
-      new URL("/integrations?pinterest=connected", req.url)
-    )
+    const successUrl = new URL(redirectTo, req.url)
+    successUrl.searchParams.set("pinterest", "connected")
+    const response = NextResponse.redirect(successUrl)
     response.cookies.delete("pinterest_oauth_state")
 
     return response

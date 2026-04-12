@@ -22,11 +22,15 @@ export async function GET(req: NextRequest) {
 
   const callbackUrl = new URL("/api/auth/pinterest/callback", req.url).toString()
 
+  // Read optional redirect_to param (e.g., /onboarding?step=6)
+  const redirectTo = req.nextUrl.searchParams.get("redirect_to") || "/integrations"
+
   // Generate CSRF state token
   const state = Buffer.from(JSON.stringify({
     userId: user.id,
     timestamp: Date.now(),
     nonce: Math.random().toString(36).substring(7),
+    redirectTo,
   })).toString("base64")
 
   const authUrl = buildAuthUrl(callbackUrl, state)

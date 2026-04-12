@@ -2,87 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { Loader2, Check, Store, Palette, ShieldCheck, Sparkles, Zap, type LucideIcon } from 'lucide-react'
+import { Loader2, Check, Store, Palette, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion } from 'motion/react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { AutomationControl } from '@/components/dashboard/automation-control'
-
-const FONT_OPTIONS: { name: string; google: string; sample: string }[] = [
-  { name: 'Playfair Display', google: 'Playfair+Display:wght@700', sample: 'Elegant Serif' },
-  { name: 'Inter', google: 'Inter:wght@600', sample: 'Modern Sans' },
-  { name: 'Roboto', google: 'Roboto:wght@500', sample: 'Readable Sans' },
-  { name: 'Outfit', google: 'Outfit:wght@600', sample: 'Geometric' },
-  { name: 'Poppins', google: 'Poppins:wght@600', sample: 'Rounded Sans' },
-  { name: 'Montserrat', google: 'Montserrat:wght@600', sample: 'Bold Sans' },
-  { name: 'Lora', google: 'Lora:wght@600', sample: 'Book Serif' },
-  { name: 'Merriweather', google: 'Merriweather:wght@700', sample: 'Warm Serif' },
-  { name: 'Raleway', google: 'Raleway:wght@600', sample: 'Thin Elegance' },
-  { name: 'DM Sans', google: 'DM+Sans:wght@600', sample: 'Minimal Sans' },
-]
-
-const AESTHETIC_OPTIONS: { name: string; gradient: string; emoji: string; desc: string }[] = [
-  { name: 'Modern & Minimalist', gradient: 'from-neutral-100 to-neutral-300', emoji: '◻️', desc: 'White space, clean lines' },
-  { name: 'Warm & Cozy', gradient: 'from-amber-100 to-orange-200', emoji: '🕯️', desc: 'Soft tones, warm textures' },
-  { name: 'Bold & Vibrant', gradient: 'from-fuchsia-300 to-orange-300', emoji: '🎨', desc: 'Saturated, eye-catching' },
-  { name: 'Earthy & Natural', gradient: 'from-lime-100 to-emerald-200', emoji: '🌿', desc: 'Organic greens, linen, wood' },
-  { name: 'Authentic & Handmade', gradient: 'from-stone-100 via-amber-50 to-lime-100', emoji: '🧵', desc: 'Window light, lived-in props, DIY realism' },
-  { name: 'Luxury & Premium', gradient: 'from-amber-200 to-yellow-400', emoji: '✨', desc: 'Gold accents, dark moods' },
-  { name: 'Playful & Fun', gradient: 'from-pink-200 to-sky-200', emoji: '🎈', desc: 'Pastels, rounded, cheerful' },
-  { name: 'Scandinavian', gradient: 'from-slate-100 to-sky-100', emoji: '❄️', desc: 'Light wood, hygge, airy' },
-  { name: 'Industrial', gradient: 'from-zinc-300 to-stone-400', emoji: '⚙️', desc: 'Raw concrete, metal, dark' },
-  { name: 'Bohemian', gradient: 'from-orange-200 to-rose-200', emoji: '🪬', desc: 'Macramé, rattan, terracotta' },
-  { name: 'Coastal', gradient: 'from-cyan-100 to-blue-200', emoji: '🌊', desc: 'Ocean blues, sandy neutrals' },
-]
+import { SurfaceHeader } from '@/components/ui/surface-header'
+import { FONT_OPTIONS, AESTHETIC_OPTIONS, type BrandSettingsData } from '@/lib/constants/brand'
 
 const EMPTY_BOARD_VALUE = '__no_board__'
-
-interface BrandSettingsData {
-  brand_name: string
-  brand_description: string
-  store_url: string
-  logo_url: string
-  font_choice: string
-  aesthetic_boundaries: string[]
-  default_board_id: string
-  account_age_type: 'brand_new' | 'established' | ''
-  pin_layout_mode: 'organic' | 'editorial'
-}
-
-function SurfaceHeader({
-  icon: Icon,
-  eyebrow,
-  title,
-  description,
-  titleTag = 'h2',
-  titleClassName = 'text-[18px] font-semibold tracking-tight text-neutral-950',
-}: {
-  icon: LucideIcon
-  eyebrow: string
-  title: string
-  description: string
-  titleTag?: 'h2' | 'h3'
-  titleClassName?: string
-}) {
-  const TitleTag = titleTag
-
-  return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900">
-          <Icon className="h-4.5 w-4.5" />
-        </div>
-        <div>
-          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">{eyebrow}</span>
-          <TitleTag className={titleClassName}>{title}</TitleTag>
-        </div>
-      </div>
-      <p className="text-sm leading-6 text-neutral-600">{description}</p>
-    </div>
-  )
-}
 
 export default function BrandSettingsPage() {
   const [loading, setLoading] = useState(true)

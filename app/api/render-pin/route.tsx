@@ -1,31 +1,64 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { readFile } from 'node:fs/promises';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
-// Local font files bundled with the Edge function (reliable, no CDN dependency)
-const FONT_FILES: Record<string, string> = {
-  'Playfair Display': 'PlayfairDisplay.ttf',
-  'Inter': 'Inter.ttf',
-  'Roboto': 'Roboto.ttf',
-  'Outfit': 'Outfit.ttf',
-  'Poppins': 'Poppins.ttf',
-  'Montserrat': 'Montserrat.ttf',
-  'Lora': 'Lora.ttf',
-  'Merriweather': 'Merriweather.ttf',
-  'Raleway': 'Raleway.ttf',
-  'DM Sans': 'DMSans.ttf',
+// Static font URL declarations — each `new URL()` tells Next.js file tracing
+// to include the font in the serverless bundle. Must be literal strings, not dynamic.
+const FONT_URLS: Record<string, URL> = {
+  'Playfair Display': new URL('./fonts/PlayfairDisplay.ttf', import.meta.url),
+  'Inter': new URL('./fonts/Inter.ttf', import.meta.url),
+  'Roboto': new URL('./fonts/Roboto.ttf', import.meta.url),
+  'Outfit': new URL('./fonts/Outfit.ttf', import.meta.url),
+  'Poppins': new URL('./fonts/Poppins.ttf', import.meta.url),
+  'Montserrat': new URL('./fonts/Montserrat.ttf', import.meta.url),
+  'Lora': new URL('./fonts/Lora.ttf', import.meta.url),
+  'Merriweather': new URL('./fonts/Merriweather.ttf', import.meta.url),
+  'Raleway': new URL('./fonts/Raleway.ttf', import.meta.url),
+  'DM Sans': new URL('./fonts/DMSans.ttf', import.meta.url),
 };
+
+const MAX_REMOTE_IMAGE_BYTES = 10 * 1024 * 1024;
+
+function getHostnameFromUrlish(value?: string | null) {
+  if (!value) return null;
+  try {
+    const normalized = value.startsWith('http://') || value.startsWith('https://') ? value : `https://${value}`;
+    return new URL(normalized).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function isAllowedImageSource(imageUrl: string) {
+  if (imageUrl.startsWith('data:image/')) return true;
+
+  try {
+    const url = new URL(imageUrl);
+    const r2Host = getHostnameFromUrlish(process.env.R2_PUBLIC_DOMAIN);
+    const isLocalDevHost = ['localhost', '127.0.0.1'].includes(url.hostname);
+
+    if (isLocalDevHost) {
+      return process.env.NODE_ENV !== 'production' && url.protocol === 'http:';
+    }
+
+    return url.protocol === 'https:' && !!r2Host && url.hostname === r2Host;
+  } catch {
+    return false;
+  }
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  return Buffer.from(buffer).toString('base64');
+}
 
 /**
  * Render Pin — Text Overlay Engine
  * 
  * Supports both GET (for query-based renders) and POST (for base64 large payloads).
- * 
- * THE FIX:
- * 1. Removed 'sharp' entirely. Native binaries like sharp don't work on Vercel Edge.
- * 2. Added `runtime = 'edge'` to ensure ImageResponse behaves correctly with POST.
- * 3. Unified the render logic to be identical to the successful prototype.
+ * Uses Node.js runtime (250 MB limit) instead of Edge (1 MB limit) to accommodate
+ * bundled font files. Fonts are loaded via fs.readFile from files traced by Next.js.
  */
 export async function POST(req: NextRequest) {
   return handleRender(req);
@@ -61,6 +94,10 @@ async function handleRender(req: NextRequest) {
       return new Response('Missing imageUrl', { status: 400 });
     }
 
+    if (!isAllowedImageSource(imageUrl)) {
+      return new Response('Unsupported imageUrl source', { status: 400 });
+    }
+
     const displayTitle = title || 'Aesthetic Collection';
     const activeTemplate = layoutMode === 'organic' ? 'template-5' : (templateId || 'template-1');
     const fontName = fontChoice || 'Playfair Display';
@@ -73,30 +110,43 @@ async function handleRender(req: NextRequest) {
     }
 
     // Load font from local bundled files (no CDN dependency)
-    const fontFile = FONT_FILES[fontName] || FONT_FILES['Playfair Display'];
-    const fontData = await fetch(new URL(`./fonts/${fontFile}`, import.meta.url)).then((res) => {
-      if (!res.ok) throw new Error(`Font load failed: ${fontFile} (${res.status})`);
-      return res.arrayBuffer();
-    });
+    const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
+    const fontBuffer = await readFile(fontUrl);
+    const fontData = fontBuffer.buffer.slice(fontBuffer.byteOffset, fontBuffer.byteOffset + fontBuffer.byteLength);
 
     // Pre-fetch the background image and convert to base64 data URI.
     // Satori silently produces 0-byte output when it can't reach a URL internally,
     // so we fetch explicitly with a timeout to surface errors properly.
     let imageSrc: string;
-    try {
+    if (imageUrl.startsWith('data:image/')) {
+      imageSrc = imageUrl;
+    } else {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
-      const imgRes = await fetch(imageUrl, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (!imgRes.ok) throw new Error(`Image fetch returned ${imgRes.status}`);
-      const imgBuffer = await imgRes.arrayBuffer();
-      if (imgBuffer.byteLength < 1000) throw new Error(`Image too small (${imgBuffer.byteLength} bytes)`);
-      const mimeType = imgRes.headers.get('content-type') || 'image/png';
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
-      imageSrc = `data:${mimeType};base64,${base64}`;
-    } catch (imgErr: any) {
-      console.error('Render-pin: background image fetch failed:', imgErr.message, '| URL:', imageUrl);
-      return new Response(`Render failed: could not fetch background image — ${imgErr.message}`, { status: 500 });
+
+      try {
+        const imgRes = await fetch(imageUrl, { signal: controller.signal });
+        if (!imgRes.ok) throw new Error(`Image fetch returned ${imgRes.status}`);
+
+        const mimeType = imgRes.headers.get('content-type') || 'application/octet-stream';
+        if (!mimeType.startsWith('image/')) {
+          throw new Error(`Unexpected content type: ${mimeType}`);
+        }
+
+        const imgBuffer = await imgRes.arrayBuffer();
+        if (imgBuffer.byteLength < 1000) throw new Error(`Image too small (${imgBuffer.byteLength} bytes)`);
+        if (imgBuffer.byteLength > MAX_REMOTE_IMAGE_BYTES) {
+          throw new Error(`Image too large (${imgBuffer.byteLength} bytes)`);
+        }
+
+        const base64 = arrayBufferToBase64(imgBuffer);
+        imageSrc = `data:${mimeType};base64,${base64}`;
+      } catch (imgErr: any) {
+        console.error('Render-pin: background image fetch failed:', imgErr.message, '| URL:', imageUrl);
+        return new Response(`Render failed: could not fetch background image — ${imgErr.message}`, { status: 500 });
+      } finally {
+        clearTimeout(timeout);
+      }
     }
 
     // ─────────────────────────────────────────────────
