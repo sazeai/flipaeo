@@ -272,7 +272,7 @@ const FAMILY_RULES: Record<ProductFamily, FamilyRules> = {
   },
   "kids-baby": {
     sceneScope: "nursery vignette close-up only",
-    scaleGuidance: "show believable child-scale item on a play mat or nursery shelf",
+    scaleGuidance: "show believable child-scale item on a nursery shelf",
     forbiddenElements: "alcohol, sharp objects, candles, adult-only props, dark moody lighting, industrial scenes",
     defaultProps: {},
     defaultEnvironments: {
