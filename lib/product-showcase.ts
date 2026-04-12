@@ -22,6 +22,7 @@ export interface ShowcaseStrategy {
   cameraAngle: string
   heroAction: string
   naturalEnvironment: string
+  productAppearance: string
 }
 
 const SHOWCASE_PROMPT = `You are a product photography strategist. Your ONLY job is to decide HOW a product should be presented in a photo — the most compelling, buyer-converting way to showcase it.
@@ -66,13 +67,22 @@ For naturalEnvironment name 1-2 SPECIFIC real-world locations where a buyer woul
 - Good: "urban sidewalk cafe"
 - Bad: "beautiful setting" (not a place)
 
+For productAppearance describe the product's ACTUAL visual identity as seen in the image or inferred from the title (max 15 words). This is critical — an AI image editor will use this to know WHAT to preserve.
+- Include: dominant colors, material/fabric, key design elements, distinctive features
+- Good: "gray cotton hoodie with dark cross and chain graphics, fur-trimmed hood"
+- Good: "matte black ceramic mug with gold rim and speckled glaze"
+- Good: "turquoise sterling silver ring with oval cabochon stone"
+- Bad: "nice product" (useless)
+- Bad: "hoodie" (no visual details)
+
 Return ONLY valid JSON:
 {
   "productType": "...",
   "presentationMode": "worn-on-model|held-in-hand|styled-on-surface|in-use-action|flat-lay-arrangement",
   "cameraAngle": "...",
   "heroAction": "...",
-  "naturalEnvironment": "..."
+  "naturalEnvironment": "...",
+  "productAppearance": "..."
 }`
 
 /**
@@ -126,6 +136,7 @@ export async function resolveProductShowcase(
       cameraAngle: parsed.cameraAngle || "eye-level three-quarter",
       heroAction: parsed.heroAction || `${product.title} displayed naturally`,
       naturalEnvironment: parsed.naturalEnvironment || "clean neutral surface",
+      productAppearance: parsed.productAppearance || product.title,
     }
   } catch (err) {
     // Graceful fallback — never block generation
@@ -136,6 +147,7 @@ export async function resolveProductShowcase(
       cameraAngle: "eye-level three-quarter",
       heroAction: `${product.title} displayed naturally`,
       naturalEnvironment: "clean neutral surface",
+      productAppearance: product.title,
     }
   }
 }

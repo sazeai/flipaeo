@@ -42,17 +42,18 @@ export const AESTHETIC_DEFINITIONS: Record<string, string> = {
 
 /**
  * Pick ONE aesthetic from the user's selected boundaries for this specific pin.
- * Rotates based on the number of past pins to ensure visual variety across the feed.
+ * Rotates based on the GLOBAL user pin count (across all products) so that
+ * different products in the same batch get different aesthetics.
  */
 export function pickAestheticForPin(
   boundaries: string[],
-  pastPinCount: number,
+  globalPinCount: number,
 ): { tag: string; definition: string } {
   if (!boundaries || boundaries.length === 0) {
     return { tag: 'Modern & Minimalist', definition: AESTHETIC_DEFINITIONS['Modern & Minimalist'] }
   }
-  // Round-robin through the user's selected aesthetics
-  const idx = pastPinCount % boundaries.length
+  // Round-robin through the user's selected aesthetics using GLOBAL count
+  const idx = globalPinCount % boundaries.length
   const tag = normalizeAestheticTag(boundaries[idx])
   const definition = AESTHETIC_DEFINITIONS[tag] || tag
   return { tag, definition }
@@ -73,11 +74,12 @@ export async function generateUniqueAngle(
   audienceProfile?: Record<string, any> | null,
   pastAngles?: string[],
   showcase?: ShowcaseStrategy,
+  globalPinCount?: number,
 ): Promise<{ angle: string; embedding: number[]; pickedAesthetic: { tag: string; definition: string } }> {
   const supabase = createAdminClient()
 
-  // Pick ONE aesthetic from the user's selected set (round-robin by past pin count)
-  const pickedAesthetic = pickAestheticForPin(brandBoundaries || [], (pastAngles || []).length)
+  // Pick ONE aesthetic using GLOBAL user pin count (not per-product) so different products get different aesthetics
+  const pickedAesthetic = pickAestheticForPin(brandBoundaries || [], globalPinCount ?? (pastAngles || []).length)
   const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
 
   // Build showcase constraint block (from Stage 1 — Product Showcase Resolver)
