@@ -112,7 +112,7 @@ const HowItWorksSection: React.FC = () => {
           </div>
           <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
             <p className="font-sans text-stone-500 text-lg leading-relaxed">
-              Sync your catalog, let PinLoop create editorial lifestyle pins around each product, approve the ones you want, and let the system publish safely while it learns what actually drives clicks.
+              Sync your catalog, let EcomPin create editorial lifestyle pins around each product, approve the ones you want, and let the system publish safely while it learns what actually drives clicks.
             </p>
           </div>
         </div>
@@ -164,7 +164,7 @@ const HowItWorksSection: React.FC = () => {
                 Connect Your Store
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                Connect Shopify or Etsy, set your brand direction, and link Pinterest. PinLoop pulls in your product photos, titles, URLs, and publishing setup automatically.
+                Connect Shopify or Etsy, set your brand direction, and link Pinterest. EcomPin pulls in your product photos, titles, URLs, and publishing setup automatically.
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ const HowItWorksSection: React.FC = () => {
                 We Stage The Photoshoot
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                PinLoop turns each plain product image into multiple lifestyle scenes, writes Pinterest-ready titles and descriptions, and assembles finished pins around every SKU.
+                EcomPin turns each plain product image into multiple lifestyle scenes, writes Pinterest-ready titles and descriptions, and assembles finished pins around every SKU.
               </p>
             </div>
           </div>

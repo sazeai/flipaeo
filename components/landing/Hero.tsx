@@ -56,7 +56,7 @@ export default function Hero() {
 
       {/* Subheadline */}
       <p className="font-sans text-lg md:text-xl text-stone-500 max-w-2xl leading-snug mb-6 px-2">
-        PinLoop AI is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every week, we hand you a <strong className="text-black font-normal">silver platter of perfect, ready-to-publish pins.</strong> You just click &lsquo;Approve&rsquo; and get back to running your business.
+        EcomPin is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every week, we hand you a <strong className="text-black font-normal">silver platter of perfect, ready-to-publish pins.</strong> You just click &lsquo;Approve&rsquo; and get back to running your business.
       </p>
 
       {/* CTA Button Container */}

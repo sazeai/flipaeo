@@ -3,7 +3,7 @@ We will pivot the positioning to be sophisticated, authoritative, and focused en
 
 Here is the refined, high-end landing page blueprint.
 
-Landing Page Blueprint: PinLoop AI (Refined Positioning)
+Landing Page Blueprint: EcomPin (Refined Positioning)
 Section 1: The Hero (The Paradigm Shift)
 
 The goal is to instantly position your software as a new category: An Agent, not a Tool.
@@ -12,7 +12,7 @@ Pre-Headline (Eyebrow): BUILT FOR SHOPIFY & ETSY BRANDS
 
 Main Headline: Stop Managing Software. Hire an Autonomous Pinterest Agent.
 
-Sub-Headline: The era of manual pin design and bulk scheduling is over. PinLoop AI automatically turns your plain product photos into photorealistic lifestyle scenes, formats them for Pinterest’s visual algorithm, and optimizes for Outbound Clicks while you sleep.
+Sub-Headline: The era of manual pin design and bulk scheduling is over. EcomPin automatically turns your plain product photos into photorealistic lifestyle scenes, formats them for Pinterest’s visual algorithm, and optimizes for Outbound Clicks while you sleep.
 
 Primary CTA Button: Connect Your Store (Takes 2 Mins)
 
@@ -22,7 +22,7 @@ Visual: A clean, split-screen animation.
 
 Left side (The Old Way): A user dragging text boxes on a screen, downloading files, uploading them to a calendar grid, and getting flat traffic.
 
-Right side (The PinLoop Way): A raw shoe photo dropping into a funnel. The AI magically renders it on a cobblestone street (like your E-bike prototype), text applies itself, it publishes automatically, and the traffic graph climbs.
+Right side (The EcomPin Way): A raw shoe photo dropping into a funnel. The AI magically renders it on a cobblestone street (like your E-bike prototype), text applies itself, it publishes automatically, and the traffic graph climbs.
 
 Section 2: The Agitation (Why The "Old Way" is Failing)
 
@@ -56,7 +56,7 @@ Before: Your plain product on a pure white background.
 
 After: The beautiful, gradient-overlay lifestyle pin you generated (e.g., the E-bike or Terrazzo Chair).
 
-Body Copy: You don't need expensive lifestyle photoshoots. PinLoop's AI Art Director analyzes your physical product and places it in highly contextual, photorealistic environments. It preserves your exact product details while generating an aesthetic that Pinterest users actually want to click.
+Body Copy: You don't need expensive lifestyle photoshoots. EcomPin's AI Art Director analyzes your physical product and places it in highly contextual, photorealistic environments. It preserves your exact product details while generating an aesthetic that Pinterest users actually want to click.
 
 Section 4: How It Works (The "Zero-Touch" Workflow)
 
@@ -72,7 +72,7 @@ Step 2: The Generative Engine. Our AI systematically runs your products through 
 
 Step 3: The Drip Publisher. The system safely drip-publishes your new visual assets at algorithmically optimal times, ensuring every post looks like natural, organic human behavior to keep your account health pristine.
 
-Step 4: The Autonomous Optimizer. PinLoop continuously reads your Pinterest Analytics. If the "Dark Academia" aesthetic gets clicks, and "Minimalist" gets zero, the AI learns. It automatically shifts generation to the styles that drive actual sales.
+Step 4: The Autonomous Optimizer. EcomPin continuously reads your Pinterest Analytics. If the "Dark Academia" aesthetic gets clicks, and "Minimalist" gets zero, the AI learns. It automatically shifts generation to the styles that drive actual sales.
 
 Section 5: The "Moat" (The Objective Comparison)
 
@@ -86,25 +86,25 @@ Feature: Generates contextual lifestyle photography?
 
 Legacy Schedulers: ❌ No (You provide the assets)
 
-PinLoop AI: ✅ Yes (Fully programmatic)
+EcomPin: ✅ Yes (Fully programmatic)
 
 Feature: Applies OCR-Optimized Typography?
 
 Legacy Schedulers: ❌ No (Requires manual graphic design)
 
-PinLoop AI: ✅ Yes (Mathematically sized for AI readability)
+EcomPin: ✅ Yes (Mathematically sized for AI readability)
 
 Feature: Adjusts strategy based on live analytics?
 
 Legacy Schedulers: ❌ No (Relies on human interpretation)
 
-PinLoop AI: ✅ Yes (Self-correcting machine learning)
+EcomPin: ✅ Yes (Self-correcting machine learning)
 
 Feature: Active weekly management time?
 
 Legacy Schedulers: 5 to 10 Hours
 
-PinLoop AI: 0 Hours
+EcomPin: 0 Hours
 
 Section 6: Social Proof & ROI Focus
 
@@ -112,9 +112,9 @@ Frame the software as a revenue-generating employee, not a monthly expense.
 
 Headline: Compounding organic traffic that outlasts paid ads.
 
-Copy: "A standard social media ad dies the moment you stop paying. A highly-optimized Pinterest asset has a half-life of months, sometimes years. PinLoop AI builds a permanent library of visual entry-points to your store, driving high-intent buyers long after the pin is published."
+Copy: "A standard social media ad dies the moment you stop paying. A highly-optimized Pinterest asset has a half-life of months, sometimes years. EcomPin builds a permanent library of visual entry-points to your store, driving high-intent buyers long after the pin is published."
 
-Visual: A sleek mockup of the automated weekly report: "PinLoop generated 40 assets this week. Result: 112 Outbound Clicks. The 'Scandinavian' visual profile is currently yielding a 4% higher CTR. Adjusting next week's generation queue accordingly."
+Visual: A sleek mockup of the automated weekly report: "EcomPin generated 40 assets this week. Result: 112 Outbound Clicks. The 'Scandinavian' visual profile is currently yielding a 4% higher CTR. Adjusting next week's generation queue accordingly."
 
 Section 7: Value-Anchored Pricing
 
@@ -148,15 +148,15 @@ Section 8: FAQ (Overcoming Objections with Class)
 
 Q: Will the AI alter or distort my actual product?
 
-A: No. PinLoop utilizes advanced ControlNet architecture. We do not generate your product from scratch; we precisely extract your physical item and generate the environment around it. Your product's branding, shape, and details remain 100% accurate.
+A: No. EcomPin utilizes advanced ControlNet architecture. We do not generate your product from scratch; we precisely extract your physical item and generate the environment around it. Your product's branding, shape, and details remain 100% accurate.
 
 Q: Why don't I get a drag-and-drop editor to design my pins?
 
-A: PinLoop is designed for performance, not manual design. We enforce strict, algorithm-approved editorial layouts because they are mathematically proven to pass Pinterest's visual OCR scanners. We remove the guesswork so you can focus on your store.
+A: EcomPin is designed for performance, not manual design. We enforce strict, algorithm-approved editorial layouts because they are mathematically proven to pass Pinterest's visual OCR scanners. We remove the guesswork so you can focus on your store.
 
 Q: Will posting AI content hurt my account standing?
 
-A: No. In fact, repetitive manual scheduling of the exact same image often triggers spam filters. Because PinLoop generates 100% unique pixel arrangements and unique AI copywriting for every single post, it mimics high-quality, organic creation perfectly.
+A: No. In fact, repetitive manual scheduling of the exact same image often triggers spam filters. Because EcomPin generates 100% unique pixel arrangements and unique AI copywriting for every single post, it mimics high-quality, organic creation perfectly.
 
 Section 9: Final CTA
 

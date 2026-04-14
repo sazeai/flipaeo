@@ -21,7 +21,7 @@ export const publishPins = schedules.task({
   id: "pinloop-drip-publisher",
   cron: "15 */6 * * *", // Every 6 hours at :15 (offset from generator)
   run: async () => {
-    logger.info("📌 PinLoop publisher started")
+    logger.info("📌 EcomPin publisher started")
 
     const supabase = createAdminClient() as any
 
@@ -286,7 +286,7 @@ export const publishPins = schedules.task({
       }
     }
 
-    logger.info(`📌 PinLoop publisher complete: ${totalPublished} pins published`)
+    logger.info(`📌    EcomPin publisher complete: ${totalPublished} pins published`)
     return { result: "Complete", published: totalPublished }
   },
 })

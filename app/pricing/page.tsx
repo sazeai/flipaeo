@@ -9,9 +9,9 @@ import { FAQItem } from './FAQItem'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
-  title: 'Pricing — PinLoop AI',
+  title: 'Pricing — EcomPin',
   description: 'Your AI Art Director for Pinterest. We do 99% of the work, you retain 100% creative control. Generate lifestyle pins, approve with one click, and drive traffic to your store.',
-  keywords: ['PinLoop pricing', 'Pinterest marketing pricing', 'automated Pinterest pins', 'Pinterest traffic tool'],
+  keywords: ['EcomPin pricing', 'Pinterest marketing pricing', 'automated Pinterest pins', 'Pinterest traffic tool'],
   canonical: '/pricing',
 })
 
@@ -30,11 +30,11 @@ const planFeatures = [
 const faqs = [
   {
     question: "WHAT'S INCLUDED IN THE $79/MONTH?",
-    answer: "PinLoop AI generates unlimited lifestyle pins from your product catalog, publishes them to Pinterest on autopilot, and self-optimizes over time. You also get account warmup protection, weekly reports, and priority support."
+    answer: "EcomPin generates unlimited lifestyle pins from your product catalog, publishes them to Pinterest on autopilot, and self-optimizes over time. You also get account warmup protection, weekly reports, and priority support."
   },
   {
     question: "IS THIS A SUBSCRIPTION?",
-    answer: "Yes, PinLoop AI is a monthly subscription. You can cancel anytime from your dashboard, and you'll retain access until the end of your billing period."
+    answer: "Yes, EcomPin is a monthly subscription. You can cancel anytime from your dashboard, and you'll retain access until the end of your billing period."
   },
   {
     question: "WHAT'S YOUR REFUND POLICY?",
@@ -42,11 +42,11 @@ const faqs = [
   },
   {
     question: "WILL PINTEREST FLAG MY ACCOUNT?",
-    answer: "No. PinLoop AI includes a built-in 3-phase warmup protocol that mimics organic human behavior. Our shadow ban detection automatically throttles publishing if any risk is detected."
+    answer: "No. EcomPin includes a built-in 3-phase warmup protocol that mimics organic human behavior. Our shadow ban detection automatically throttles publishing if any risk is detected."
   },
   {
     question: "WHAT STORES ARE SUPPORTED?",
-    answer: "We support Shopify, Etsy, and manual product uploads. Connect your store and PinLoop will automatically sync your catalog and start generating pins."
+    answer: "We support Shopify, Etsy, and manual product uploads. Connect your store and EcomPin will automatically sync your catalog and start generating pins."
   }
 ]
 
@@ -85,7 +85,7 @@ export default function PricingPage() {
               Stop Pinning Manually. <br className="hidden md:block " /> <span className="italic text-stone-500">Deploy Your AI Art Director.</span>
             </h1>
             <p className="font-sans text-stone-500 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-10">
-              Get the output of a full-time Pinterest VA for the price of a dinner. PinLoop AI generates stunning lifestyle pins, publishes them on autopilot, and self-optimizes based on real click data.
+              Get the output of a full-time Pinterest VA for the price of a dinner. EcomPin generates stunning lifestyle pins, publishes them on autopilot, and self-optimizes based on real click data.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 md:gap-6">
@@ -138,7 +138,7 @@ export default function PricingPage() {
                     All In One
                   </span>
                   <h2 className="font-serif text-2xl text-stone-900">
-                    The PinLoop Engine Plan
+                    The EcomPin Engine Plan
                   </h2>
                 </div>
 
@@ -196,7 +196,7 @@ export default function PricingPage() {
 
               <h3 className="font-serif text-3xl md:text-4xl mb-4 text-stone-900">The Math is Simple</h3>
               <p className="font-sans text-stone-500 mb-10 max-w-lg mx-auto leading-relaxed">
-                Why PinLoop AI is the obvious choice for e-commerce brands.
+                Why EcomPin is the obvious choice for e-commerce brands.
               </p>
 
               <div className="space-y-4 font-sans text-left">
@@ -238,7 +238,7 @@ export default function PricingPage() {
                     <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold flex-shrink-0">C</div>
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-brand-600 uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                        PinLoop AI Engine <Check className="w-3 h-3" />
+                        EcomPin Engine <Check className="w-3 h-3" />
                       </span>
                       <span className="text-stone-900 font-bold text-lg">AI Pins + Auto-Publish + Self-Optimize</span>
                     </div>
@@ -251,7 +251,7 @@ export default function PricingPage() {
 
                 <div className="text-center mt-6">
                   <p className="text-sm text-stone-400 italic">
-                    "Even if PinLoop drives just 10 clicks/day to your store, that's 300 potential customers/month you weren't reaching before."
+                    "Even if EcomPin drives just 10 clicks/day to your store, that's 300 potential customers/month you weren't reaching before."
                   </p>
                 </div>
 
@@ -283,7 +283,7 @@ export default function PricingPage() {
                       <tr>
                         <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
                         <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Them</th>
-                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">PinLoop AI</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">EcomPin</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -314,7 +314,7 @@ export default function PricingPage() {
                       <tr>
                         <th className="p-4 pl-6 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Aspect</th>
                         <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-stone-400 border-b border-stone-100 w-1/3">Generic</th>
-                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">PinLoop AI</th>
+                        <th className="p-4 text-[10px] font-bold uppercase tracking-wider text-brand-600 border-b border-stone-100 bg-brand-50/30 w-1/3">EcomPin</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -342,7 +342,7 @@ export default function PricingPage() {
               Questions? Answered.
             </h2>
             <p className="font-sans text-stone-500 text-lg max-w-2xl mx-auto">
-              Everything you need to know about PinLoop AI.
+              Everything you need to know about EcomPin.
             </p>
           </div>
 
@@ -395,7 +395,7 @@ export default function PricingPage() {
             data: {
               "@context": "https://schema.org",
               "@type": "Product",
-              "name": "PinLoop AI Engine Plan",
+              "name": "EcomPin Engine Plan",
               "description": "Autonomous Pinterest Marketing Engine. Unlimited AI lifestyle pins, auto-publishing, self-optimizing prompt system, and account warmup protection.",
               "offers": {
                 "@type": "Offer",

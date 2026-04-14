@@ -10,7 +10,7 @@ const COMPARISON_DATA = [
         desc: '(You provide the assets)',
         isPro: false,
     },
-    pinloop: {
+    ecompin: {
         value: 'Yes',
         desc: '(Fully programmatic)',
         isPro: true,
@@ -23,7 +23,7 @@ const COMPARISON_DATA = [
         desc: '(Requires manual graphic design)',
         isPro: false,
     },
-    pinloop: {
+    ecompin: {
         value: 'Yes',
         desc: '(Mathematically sized for AI readability)',
         isPro: true,
@@ -36,7 +36,7 @@ const COMPARISON_DATA = [
         desc: '(Relies on human interpretation)',
         isPro: false,
     },
-    pinloop: {
+    ecompin: {
         value: 'Yes',
         desc: '(Self-correcting machine learning)',
         isPro: true,
@@ -49,7 +49,7 @@ const COMPARISON_DATA = [
         desc: '',
         isPro: false,
     },
-    pinloop: {
+    ecompin: {
         value: '0 Hours',
         desc: '',
         isPro: true,
@@ -98,7 +98,7 @@ const ComparisonSection: React.FC = () => {
                                     <th className="w-1/4 p-6 md:p-8 font-sans font-bold text-sm tracking-widest uppercase text-stone-400 border-b border-l border-stone-200 bg-stone-50/50 text-center">Legacy Schedulers</th>
                                     <th className="w-[35%] p-6 md:p-8 font-serif text-2xl md:text-3xl text-brand-600 border-b border-l border-stone-200 bg-brand-50/30 text-center relative overflow-hidden">
                                         <div className="absolute top-0 left-0 w-full h-1 bg-brand-400"></div>
-                                        PinLoop AI
+                                        EcomPin
                                     </th>
                                 </tr>
                             </thead>
@@ -123,13 +123,13 @@ const ComparisonSection: React.FC = () => {
                                         <td className="p-6 md:p-8 border-b border-l border-brand-100/50 bg-brand-50/10 text-center group-hover:bg-brand-50/30 transition-colors">
                                            <div className="flex flex-col items-center justify-center gap-1">
                                                 <div className="flex items-center gap-2">
-                                                    {row.pinloop.isPro ? 
+                                                    {row.ecompin.isPro ? 
                                                         <div className="w-5 h-5 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center border border-brand-200"><Check size={12} strokeWidth={3} /></div> : 
                                                         <X size={16} className="text-stone-400" strokeWidth={3} />
                                                     }
-                                                    <span className={`font-bold ${row.pinloop.isPro ? 'text-brand-700' : 'text-stone-500'}`}>{row.pinloop.value}</span>
+                                                    <span className={`font-bold ${row.ecompin.isPro ? 'text-brand-700' : 'text-stone-500'}`}>{row.ecompin.value}</span>
                                                 </div>
-                                                {row.pinloop.desc && <span className="text-[11px] text-brand-600/70 font-medium">{row.pinloop.desc}</span>}
+                                                {row.ecompin.desc && <span className="text-[11px] text-brand-600/70 font-medium">{row.ecompin.desc}</span>}
                                             </div>
                                         </td>
                                     </tr>

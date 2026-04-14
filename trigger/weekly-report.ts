@@ -3,7 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { resend, EMAIL_FROM, EMAIL_REPLY_TO } from "@/lib/emails/client"
 
 /**
- * PinLoop — Weekly Performance Report
+ * EcomPin — Weekly Performance Report
  * 
  * Runs every Monday at 9 AM UTC.
  * Sends each user a summary of their Pinterest performance:
@@ -17,7 +17,7 @@ export const weeklyReport = schedules.task({
   id: "pinloop-weekly-report",
   cron: "0 9 * * 1", // Every Monday 9 AM UTC
   run: async () => {
-    logger.info("📧 PinLoop weekly report starting")
+    logger.info("📧 EcomPin weekly report starting")
 
     const supabase = createAdminClient() as any
 
@@ -120,10 +120,10 @@ export const weeklyReport = schedules.task({
         })
 
         await resend.emails.send({
-          from: EMAIL_FROM.replace('FlipAEO', 'PinLoop AI'),
+          from: EMAIL_FROM.replace('FlipAEO', 'EcomPin'),
           replyTo: EMAIL_REPLY_TO,
           to: profile.email,
-          subject: `📊 Your PinLoop Weekly — ${totalClicks} clicks, ${pinsPublished || 0} pins published`,
+          subject: `📊 Your EcomPin Weekly — ${totalClicks} clicks, ${pinsPublished || 0} pins published`,
           html: emailHtml,
         })
 
@@ -171,7 +171,7 @@ function buildReportEmail(data: {
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
       <h1 style="font-size: 24px; font-weight: 800; color: #1c1917; margin: 0;">
-        📌 PinLoop AI
+        📌 EcomPin
       </h1>
       <p style="color: #78716c; font-size: 13px; margin: 4px 0 0;">
         Weekly Report — ${data.brandName}
@@ -183,7 +183,7 @@ function buildReportEmail(data: {
       Hey ${data.userName} 👋
     </p>
     <p style="color: #44403c; font-size: 15px; line-height: 1.6;">
-      Here's what your PinLoop engine accomplished this week:
+      Here's what your EcomPin engine accomplished this week:
     </p>
 
     <!-- Stats Grid -->
@@ -234,7 +234,7 @@ function buildReportEmail(data: {
 
     <!-- Footer -->
     <p style="color: #a8a29e; font-size: 12px; text-align: center; margin-top: 32px;">
-      Your PinLoop engine is working for you.${data.pendingApproval && data.pendingApproval > 0 ? `<br>You have <strong>${data.pendingApproval} pins</strong> awaiting your approval.` : ''}<br>
+      Your EcomPin engine is working for you.${data.pendingApproval && data.pendingApproval > 0 ? `<br>You have <strong>${data.pendingApproval} pins</strong> awaiting your approval.` : ''}<br>
       Log in to your dashboard anytime to fine-tune your settings.
     </p>
 

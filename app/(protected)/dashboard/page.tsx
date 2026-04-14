@@ -165,7 +165,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold">System Health: Protect &amp; Scale</h2>
-              <p className="text-neutral-400 text-sm">PinLoop AI automatically manages Pinterest's undocumented API limits to keep your store 100% safe.</p>
+              <p className="text-neutral-400 text-sm">EcomPin automatically manages Pinterest's undocumented API limits to keep your store 100% safe.</p>
             </div>
           </div>
           

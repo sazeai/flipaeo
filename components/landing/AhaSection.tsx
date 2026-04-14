@@ -26,7 +26,7 @@ const BeforeAfterVisual = () => (
         {/* AFTER */}
         <div className="flex-1 bg-stone-900 flex flex-col items-center justify-center p-8 relative overflow-hidden group">
             <div className="absolute top-4 right-4 bg-brand-500 text-white text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded shadow-md z-20">
-                After (PinLoop AI)
+                After (EcomPin)
             </div>
             
             {/* Abstract Lifestyle Render */}
@@ -80,7 +80,7 @@ const AhaSection: React.FC = () => {
                     </div>
                     <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
                         <p className="font-sans text-stone-500 text-lg leading-relaxed">
-                            You don't need expensive lifestyle photoshoots. PinLoop's AI Art Director analyzes your physical product and places it in highly contextual, photorealistic environments. It preserves your exact product details while generating an aesthetic that Pinterest users actually want to click.
+                            You don't need expensive lifestyle photoshoots. EcomPin's AI Art Director analyzes your physical product and places it in highly contextual, photorealistic environments. It preserves your exact product details while generating an aesthetic that Pinterest users actually want to click.
                         </p>
                     </div>
                 </div>

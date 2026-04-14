@@ -436,7 +436,7 @@ export default function PinsPage() {
           </h3>
           <p className="text-sm text-neutral-400 max-w-sm mx-auto">
             {filter === 'pending_approval'
-              ? "When your PinLoop engine generates new pins, they'll appear here for review."
+              ? "When your EcomPin engine generates new pins, they'll appear here for review."
               : 'Pins will appear here as the engine generates them from your products.'}
           </p>
         </div>

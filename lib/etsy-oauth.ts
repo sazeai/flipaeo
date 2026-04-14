@@ -1,5 +1,5 @@
 /**
- * Etsy OAuth 2.0 PKCE Client — PinLoop AI
+ * Etsy OAuth 2.0 PKCE Client — EcomPin
  *
  * Handles the full Etsy OAuth 2.0 + PKCE flow so any Etsy seller
  * can connect their shop:

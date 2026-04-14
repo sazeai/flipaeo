@@ -30,7 +30,7 @@ import { Card, CardContent } from "@/components/ui/card"
 const navSecondary = [
   {
     title: "Support",
-    url: "mailto:support@pinloop.ai",
+    url: "mailto:support@ecompin.com",
     icon: Send,
   },
 ]
@@ -122,9 +122,9 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/" prefetch={false}>
-                <Image src="/site-logo.png" alt="PinLoop AI" width={30} height={30} className="rounded-sm" />
+                <Image src="/site-logo.png" alt="EcomPin" width={30} height={30} className="rounded-sm" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">PinLoop</span>
+                  <span className="truncate font-semibold">EcomPin</span>
                   <span className="truncate text-xs">Pinterest AI Agent</span>
                 </div>
               </Link>

@@ -33,7 +33,7 @@ export function StepPinStyle({ value, onChange }: StepPinStyleProps) {
           Choose your pin style
         </h2>
         <p className="mt-2 text-sm text-neutral-600">
-          This controls the overall visual treatment PinLoop applies when composing pins for your feed.
+          This controls the overall visual treatment EcomPin applies when composing pins for your feed.
         </p>
       </div>
 

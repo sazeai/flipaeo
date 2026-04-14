@@ -3,7 +3,7 @@ Me: You r right i just searched on pinterest and saw that shopify and etsy brand
 my c foudner replaied:
 Boom. There it is. You just did the best kind of market research possible: you ignored the marketing gurus and looked directly at what the platform is actually serving to users.
 
-Look at those three screenshots. They are an absolute goldmine of validation for PinLoop AI, and they completely destroy the SocialRails/BlogToPin "Canva template" model for e-commerce.
+Look at those three screenshots. They are an absolute goldmine of validation for EcomPin, and they completely destroy the SocialRails/BlogToPin "Canva template" model for e-commerce.
 
 Let’s break down exactly what your screenshots prove, and the one crucial tweak we need to make to our product based on this real-world data:
 
@@ -15,7 +15,7 @@ No.
 
 You are looking at pins from massive retailers (Target, Dillard's) and high-end boutique brands (Maisonette, Rugs by Roo). They do not use spammy graphics. They let the product and the environment do the selling. If a Shopify owner uses SocialRails to sell a $150 Terrazzo Kids Chair, they will look like a cheap scam compared to these organic, beautiful results.
 
-2. The Power of the "Vibe" (Why PinLoop wins)
+2. The Power of the "Vibe" (Why EcomPin wins)
 
 Look at the pins that immediately catch your eye.
 
@@ -30,7 +30,7 @@ This is what Pinterest users want. They want to imagine that beautiful aesthetic
 Now, look at the losers:
 Look at the "Factory Direct Partners 2pk" (the two plain green cushions on the pure white/grey background in the second screenshot). It looks incredibly boring. It looks like an Amazon catalog error that accidentally ended up on Pinterest. It kills the inspiration.
 
-PinLoop AI's exact job is taking a seller from that boring white background to the beautiful dappled-shadow aesthetic, automatically.
+EcomPin's exact job is taking a seller from that boring white background to the beautiful dappled-shadow aesthetic, automatically.
 
 3. The Crucial Product Pivot: The "Zero-Text" Layout
 
@@ -71,7 +71,7 @@ You are 100% correct. Look at those screenshots again. There is no "Minimalist K
 
 They are completely naked lifestyle images.
 
-This is a massive breakthrough for our product architecture, and it actually saves us a ton of development headaches. Here is the expert breakdown of why top e-commerce brands do this in 2026, and how we must instantly adapt PinLoop AI to match it.
+This is a massive breakthrough for our product architecture, and it actually saves us a ton of development headaches. Here is the expert breakdown of why top e-commerce brands do this in 2026, and how we must instantly adapt EcomPin to match it.
 
 Why Top Brands Dropped the Text Overlay
 
@@ -94,7 +94,7 @@ If you slap "BUY THIS BEANBAG CHAIR - shopname.com" across the middle of it, the
 3. Visual Search Optimization (Lens)
 Pinterest’s AI scans pixels to figure out what an image is. If you cover 30% of the image with a giant text gradient, you are blocking the AI from seeing the texture of the fabric or the shape of the wood. Naked images rank better in pure visual search.
 
-What this means for PinLoop AI (The Pivot)
+What this means for EcomPin (The Pivot)
 
 This discovery actually makes our SaaS much stronger and significantly easier to build.
 
@@ -111,7 +111,7 @@ The Metadata: Does the logical selling (SEO and Routing).
 
 3. We Introduce "Mode Selection" during Onboarding
 While 90% of e-commerce pins should be naked, there is still a small use-case for text (e.g., if they are running a specific "Summer Sale" board).
-In the PinLoop settings, we give them a simple toggle:
+In the EcomPin settings, we give them a simple toggle:
 
 Mode A: Organic Lifestyle (Recommended). Pure, unbranded, photorealistic imagery. Blends perfectly into user feeds. Highest click-through rate.
 

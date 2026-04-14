@@ -25,7 +25,7 @@ export function StepProducts() {
           Import your products
         </h2>
         <p className="mt-2 text-sm text-neutral-600">
-          PinLoop generates pins from your product catalog. Upload a CSV or connect Shopify to get started.
+          EcomPin generates pins from your product catalog. Upload a CSV or connect Shopify to get started.
         </p>
       </div>
 

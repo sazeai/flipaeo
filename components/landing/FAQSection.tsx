@@ -6,15 +6,15 @@ import { Plus, X } from 'lucide-react';
 const FAQS = [
   {
     question: "Will the AI alter or distort my actual product?",
-    answer: "No. PinLoop utilizes advanced ControlNet architecture. We do not generate your product from scratch; we precisely extract your physical item and generate the environment around it. Your product's branding, shape, and details remain 100% accurate."
+    answer: "No. EcomPin utilizes advanced ControlNet architecture. We do not generate your product from scratch; we precisely extract your physical item and generate the environment around it. Your product's branding, shape, and details remain 100% accurate."
   },
   {
     question: "Why don't I get a drag-and-drop editor to design my pins?",
-    answer: "PinLoop is designed for performance, not manual design. We enforce strict, algorithm-approved editorial layouts because they are mathematically proven to pass Pinterest's visual OCR scanners. We remove the guesswork so you can focus on your store."
+    answer: "EcomPin is designed for performance, not manual design. We enforce strict, algorithm-approved editorial layouts because they are mathematically proven to pass Pinterest's visual OCR scanners. We remove the guesswork so you can focus on your store."
   },
   {
     question: "Will posting AI content hurt my account standing?",
-    answer: "No. In fact, repetitive manual scheduling of the exact same image often triggers spam filters. Because PinLoop generates 100% unique pixel arrangements and unique AI copywriting for every single post, it mimics high-quality, organic creation perfectly."
+    answer: "No. In fact, repetitive manual scheduling of the exact same image often triggers spam filters. Because EcomPin generates 100% unique pixel arrangements and unique AI copywriting for every single post, it mimics high-quality, organic creation perfectly."
   }
 ];
 
@@ -83,7 +83,7 @@ export const FAQSection: React.FC = () => {
                 Common Questions
               </span>
               <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-                Doubts about PinLoop AI?<br /><span className='italic text-stone-500'>Let's clear them.</span>
+                Doubts about EcomPin?<br /><span className='italic text-stone-500'>Let's clear them.</span>
               </h2>
             </div>
             <div className="flex-1 md:max-w-xl pb-0 md:pb-2">

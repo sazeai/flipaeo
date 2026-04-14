@@ -24,7 +24,7 @@ The Solution: The "Silver Platter" Inbox (Tinder for Pins)
 Your moat was never just the "auto-publish" trigger.dev job. Your moat is the fact that you are taking a white-background shoe and turning it into a $5,000 lifestyle editorial photoshoot with perfect typography and SEO copy.
 
 BlogToPin requires the user to cook the meal.
-PinLoop AI cooks the meal and serves it on a silver platter. You just need to ask the user to taste it before serving it to the guests.
+EcomPin cooks the meal and serves it on a silver platter. You just need to ask the user to taste it before serving it to the guests.
 
 Here is the exact UX shift you need to make:
 
@@ -34,7 +34,7 @@ The AI still does 99% of the heavy lifting in the background. It still pulls the
 
 But instead of pushing to Pinterest instantly, it drops them into a "Pending Approval" Inbox.
 
-Once a week, the Shopify owner gets an email: "PinLoop has generated 20 new editorial pins for next week. Click here to approve."
+Once a week, the Shopify owner gets an email: "EcomPin has generated 20 new editorial pins for next week. Click here to approve."
 
 2. The Frictionless UI (Do NOT build a complex dashboard)
 
@@ -78,7 +78,7 @@ Old Pitch: "Close your laptop. The AI does everything." (Scary).
 
 New Pitch: "We do 99% of the grunt work. You retain 100% of the creative control."
 
-The Landing Page Copy: "PinLoop AI is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every Monday, we hand you a silver platter of perfect, ready-to-publish pins. You just click 'Approve' and get back to running your business."
+The Landing Page Copy: "EcomPin is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every Monday, we hand you a silver platter of perfect, ready-to-publish pins. You just click 'Approve' and get back to running your business."
 
 The Verdict
 

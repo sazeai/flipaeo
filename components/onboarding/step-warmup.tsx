@@ -34,7 +34,7 @@ export function StepWarmup({ value, onChange }: StepWarmupProps) {
           Account protection
         </h2>
         <p className="mt-2 text-sm text-neutral-600">
-          Tell us about your Pinterest account age so PinLoop can publish at a safe velocity and protect your account health.
+          Tell us about your Pinterest account age so EcomPin can publish at a safe velocity and protect your account health.
         </p>
       </div>
 

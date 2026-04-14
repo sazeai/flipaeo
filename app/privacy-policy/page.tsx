@@ -7,7 +7,7 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Privacy Policy',
-  description: 'Learn how PinLoop AI collects, uses, and protects your personal data.',
+  description: 'Learn how EcomPin collects, uses, and protects your personal data.',
   canonical: '/privacy-policy',
 })
 
@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
               <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Privacy Policy</h1>
-            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how PinLoop AI collects, uses, and protects your personal data.</p>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Learn how EcomPin collects, uses, and protects your personal data.</p>
           </div>
         </section>
 
@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
           <div className="space-y-8 ">
             <div className="">
               <p>
-                At <strong>PinLoop AI</strong>, we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, how we process user data, and your rights under <strong>applicable privacy laws, including the General Data Protection Regulation (GDPR)</strong>. By using our services, you agree to the practices described in this Privacy Policy.
+                At <strong>EcomPin</strong>, we are committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, how we process user data, and your rights under <strong>applicable privacy laws, including the General Data Protection Regulation (GDPR)</strong>. By using our services, you agree to the practices described in this Privacy Policy.
               </p>
             </div>
 
@@ -116,7 +116,7 @@ export default function PrivacyPolicy() {
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. Google Services Integration</h2>
-              <p className="mb-4">PinLoop AI integrates with the following services to provide our core automated functionality:</p>
+              <p className="mb-4">EcomPin integrates with the following services to provide our core automated functionality:</p>
 
               <h3 className="text-lg font-semibold mb-2">6.1 Google Authentication (OAuth 2.0)</h3>
               <p className="mb-4">
@@ -133,7 +133,7 @@ export default function PrivacyPolicy() {
 
               <h3 className="text-lg font-semibold mb-2">6.2 Google API Services User Data Policy Compliance</h3>
               <p className="mb-4">
-                PinLoop AI's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
+                EcomPin's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
               </p>
             </div>
 
@@ -149,7 +149,7 @@ export default function PrivacyPolicy() {
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Cookies & Tracking Technologies</h2>
-              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on PinLoop AI.</p>
+              <p className="mb-4">We use cookies and similar tracking technologies to improve your experience on EcomPin.</p>
               <h3 className="text-lg font-semibold mb-2">8.1 What Cookies Do We Use?</h3>
               <ul className="list-disc list-inside pl-5 mb-4">
                 <li>🔐 <strong>Authentication Cookies:</strong> Used by Supabase to keep you logged in after signing in via email or Google login.</li>
@@ -177,7 +177,7 @@ export default function PrivacyPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Changes to This Privacy Policy</h2>
               <p className="mb-4">
-                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of PinLoop AI signifies your acceptance of the changes.
+                We may update this Privacy Policy to reflect <strong>legal, technical, or business changes</strong>. Any updates will be posted here with an <strong>effective date</strong>. Continued use of EcomPin signifies your acceptance of the changes.
               </p>
             </div>
 

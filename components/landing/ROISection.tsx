@@ -13,7 +13,7 @@ const ReportMockupVisual = () => (
             <div className="flex justify-between items-start border-b border-stone-100 pb-4">
                 <div className="flex flex-col">
                     <span className="text-[10px] font-bold tracking-widest uppercase text-stone-400 mb-1">Automated Weekly Report</span>
-                    <span className="font-serif text-lg text-stone-800 leading-tight">PinLoop AI Summary</span>
+                    <span className="font-serif text-lg text-stone-800 leading-tight">EcomPin Summary</span>
                 </div>
                 <div className="flex gap-1 items-center px-2 py-1 bg-green-50 text-green-700 rounded text-[10px] font-bold border border-green-100">
                     <TrendingUp size={12} strokeWidth={2.5} /> +24% Traffic
@@ -82,7 +82,7 @@ const ROISection: React.FC = () => {
                             </svg>
                         </div>
                         <p className="font-sans text-stone-500 text-lg leading-relaxed">
-                            A standard social media ad dies the moment you stop paying. A highly-optimized Pinterest asset has a half-life of months, sometimes years. <strong>PinLoop AI builds a permanent library of visual entry-points to your store,</strong> driving high-intent buyers long after the pin is published.
+                            A standard social media ad dies the moment you stop paying. A highly-optimized Pinterest asset has a half-life of months, sometimes years. <strong>EcomPin builds a permanent library of visual entry-points to your store,</strong> driving high-intent buyers long after the pin is published.
                         </p>
                     </div>
 

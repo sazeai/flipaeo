@@ -79,7 +79,7 @@ export default function ProductCategoriesSection() {
             Built for brands that sell <span className="text-brand-600 italic">physical</span> products.
           </h2>
           <p className="font-sans text-lg text-stone-500 leading-relaxed max-w-2xl mx-auto">
-            From handmade ceramics to premium pet gear, PinLoop understands the unique visual language and scale of your niche.
+            From handmade ceramics to premium pet gear, EcomPin understands the unique visual language and scale of your niche.
           </p>
         </div>
 

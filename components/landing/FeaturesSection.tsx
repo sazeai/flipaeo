@@ -377,7 +377,7 @@ const FEATURES = [
   {
     id: '04',
     title: 'Closed-Loop Analytic Brain',
-    description: 'This is the PinLoop moat. We pull your real 30-day Pinterest analytics to find out which visual styles drive actual outbound clicks to your store—then we automatically weight the prompt engine to generate more of what works.',
+    description: 'This is the EcomPin moat. We pull your real 30-day Pinterest analytics to find out which visual styles drive actual outbound clicks to your store—then we automatically weight the prompt engine to generate more of what works.',
     visual: CMSVisual,
     colSpan: 'col-span-1'
   }

@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
             <Link href="/" className="flex items-center gap-2">
               <Image src="/site-logo.png" alt="Logo" width={36} height={36} />
               <span className="font-bold text-2xl tracking-tight text-stone-900 leading-none pb-1">
-                PinLoop AI
+                EcomPin
               </span>
             </Link>
           </div>
@@ -69,7 +69,7 @@ export const Navbar: React.FC = () => {
             {/* Social/Tool Icons (Desktop only) */}
             <div className="hidden sm:flex items-center gap-2 pr-2 border-r border-stone-200/50 mr-1">
 
-              <Link href="https://x.com/pinloop" target="_blank">
+              <Link href="https://x.com/EcomPin" target="_blank">
                 <button className="
                           cursor-pointer group relative w-9 h-10 flex items-center justify-center 
                           bg-white border border-gray-300 rounded-lg text-stone-700

@@ -11,7 +11,7 @@ import { render } from "@react-email/components"
  * Checks for subscriptions renewing in 5 days and sends a reminder email.
  * 
  * Preserved from the legacy Watchman — this is payment infrastructure
- * that applies to both the old SEO product and the new PinLoop AI product.
+ * that applies to both the old SEO product and the new EcomPin product.
  */
 export const billingReminder = schedules.task({
     id: "billing-reminder",
@@ -53,7 +53,7 @@ export const billingReminder = schedules.task({
                             userName: user.user_metadata?.full_name || user.email.split('@')[0],
                             billingDate: new Date(sub.next_billing_date).toLocaleDateString(),
                             amount: plan ? `${plan.price} ${plan.currency}` : "Subscription Price",
-                            planName: plan?.name || "PinLoop AI Plan"
+                            planName: plan?.name || "EcomPin Plan"
                         }))
 
                         await resend.emails.send({

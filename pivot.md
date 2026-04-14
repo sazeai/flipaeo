@@ -12,7 +12,7 @@ This is your blueprint.
 
 Product Requirements Document (PRD)
 
-Product Name: PinLoop AI
+Product Name: EcomPin
 Concept: An Autonomous, Closed-Loop Pinterest Marketing Agent for E-Commerce.
 Target Audience: Shopify and Etsy store owners selling high-ticket physical products ($50+ AOV).
 Pricing Model: Value-based (e.g., $79/mo for 100 autonomous pins).
@@ -21,7 +21,7 @@ Pricing Model: Value-based (e.g., $79/mo for 100 autonomous pins).
 
 Legacy Pinterest tools (Tailwind, BlogToPin) are "dumb schedulers." They rely on the user to design the image, write the copy, and interpret the analytics. This results in high user churn (27%+) because users are bad at designing for Pinterest's visual AI, and managing the dashboard is a chore.
 
-PinLoop AI is not only a dashboard; it is an AI employee. It ingests a raw e-commerce catalog, programmatically generates hyper-realistic lifestyle photography using ai image generation models (preserving the physical product), formats them into editorial pins, publishes them, and most importantly: it autonomously reads the Pinterest Analytics API to see which visual aesthetics get Outbound Clicks, and alters its own future generation prompts to double-down on winners.
+EcomPin is not only a dashboard; it is an AI employee. It ingests a raw e-commerce catalog, programmatically generates hyper-realistic lifestyle photography using ai image generation models (preserving the physical product), formats them into editorial pins, publishes them, and most importantly: it autonomously reads the Pinterest Analytics API to see which visual aesthetics get Outbound Clicks, and alters its own future generation prompts to double-down on winners.
 
 2. Core Philosophy & "Anti-Features"
 
@@ -52,7 +52,7 @@ User selects their primary aesthetic boundaries (e.g., "Keep it modern, avoid gr
 
 The Engine Starts: The user closes the tab. The SaaS takes over completely.
 
-Weekly Report (Email): User receives an email: "PinLoop generated 25 pins this week, resulting in 42 Outbound Clicks to your Shopify store. The 'Minimalist Cafe' aesthetic is currently winning. We are re-allocating next week's generation budget to focus on that aesthetic."
+Weekly Report (Email): User receives an email: "EcomPin generated 25 pins this week, resulting in 42 Outbound Clicks to your Shopify store. The 'Minimalist Cafe' aesthetic is currently winning. We are re-allocating next week's generation budget to focus on that aesthetic."
 
 4. System Architecture (The 4-Node Autonomous Engine)
 

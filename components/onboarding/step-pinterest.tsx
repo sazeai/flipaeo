@@ -68,7 +68,7 @@ export function StepPinterest({ onConnected }: StepPinterestProps) {
             Connect Pinterest
           </h2>
           <p className="mt-2 text-sm text-neutral-600">
-            Link your Pinterest Business account so PinLoop can publish pins on your behalf.
+            Link your Pinterest Business account so EcomPin can publish pins on your behalf.
           </p>
         </div>
 
@@ -95,13 +95,13 @@ export function StepPinterest({ onConnected }: StepPinterestProps) {
           Connect Pinterest
         </h2>
         <p className="mt-2 text-sm text-neutral-600">
-          Link your Pinterest Business account so PinLoop can publish pins on your behalf.
+          Link your Pinterest Business account so EcomPin can publish pins on your behalf.
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
-          <h3 className="text-sm font-semibold text-neutral-950">What PinLoop gets access to</h3>
+          <h3 className="text-sm font-semibold text-neutral-950">What EcomPin gets access to</h3>
           <ul className="mt-3 space-y-2">
             {[
               'Read and create boards',
@@ -115,7 +115,7 @@ export function StepPinterest({ onConnected }: StepPinterestProps) {
             ))}
           </ul>
           <p className="mt-4 text-xs text-neutral-500">
-            PinLoop will never modify existing pins or boards. You can revoke access any time from Pinterest settings.
+            EcomPin will never modify existing pins or boards. You can revoke access any time from Pinterest settings.
           </p>
         </div>
 

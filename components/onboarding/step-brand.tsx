@@ -47,7 +47,7 @@ export function StepBrand({ data, onChange }: StepBrandProps) {
           Tell us about your brand
         </h2>
         <p className="mt-2 text-sm text-neutral-600">
-          This helps PinLoop write copy, label pins, and match your brand voice across every generated pin.
+          This helps EcomPin write copy, label pins, and match your brand voice across every generated pin.
         </p>
       </div>
 

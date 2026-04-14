@@ -38,7 +38,7 @@ export const generatePinBatch = schedules.task({
   id: "pinloop-generate-batch",
   cron: "*/5 * * * *",
   run: async () => {
-    logger.info("🎨 PinLoop batch generator started")
+    logger.info("🎨 EcomPin batch generator started")
 
     const supabase = createAdminClient() as any
 
@@ -448,7 +448,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
 
             let appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
             if (!appUrl.startsWith('http')) {
-              // Vercel deployment URLs (e.g. flipaeo.vercel.app) come without protocol
+              // Vercel deployment URLs (e.g. ecompin.com) come without protocol
               appUrl = `https://${appUrl}`
             }
 
@@ -523,7 +523,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
       }
     }
 
-    logger.info(`🎨 PinLoop batch complete: ${totalGenerated} pins generated`)
+    logger.info(`🎨 EcomPin batch complete: ${totalGenerated} pins generated`)
     return { result: "Batch complete", generated: totalGenerated }
   },
 })

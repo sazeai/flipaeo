@@ -1,4 +1,4 @@
-# PinLoop AI — New Features & Strategic Pivots
+# EcomPin — New Features & Strategic Pivots
 
 > Extracted from the co-founder discussion in `PRDUPDATE.md`. Each item is a concrete feature or architectural change that needs implementation.
 
@@ -12,7 +12,7 @@ The core product shifts from **100% autonomous publishing** to a **"Silver Platt
 
 Instead of auto-publishing to Pinterest, generated pins land in a **Pending Approval** queue.
 
-- Weekly email notification: _"PinLoop has generated 20 new pins for next week. Click here to approve."_
+- Weekly email notification: _"EcomPin has generated 20 new pins for next week. Click here to approve."_
 - Clean grid UI of finished pins — **no editor, no drag-and-drop**
 - Each pin has: ✅ **Approve** / ❌ **Reject** — that's it
 - Bulk actions: "Approve All" / "Send to Queue"
@@ -141,7 +141,7 @@ Pinterest SEO relies heavily on board titles. Dumping 100 pins into one "My Prod
 | _"Close your laptop. The AI does everything."_ | _"We do 99% of the grunt work. You retain 100% of the creative control."_ |
 
 Updated landing page copy direction:
-> _"PinLoop AI is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every Monday, we hand you a silver platter of perfect, ready-to-publish pins. You just click 'Approve' and get back to running your business."_
+> _"EcomPin is your tireless Art Director. We generate the lifestyle photos, write the SEO copy, and format the editorial layouts. Every Monday, we hand you a silver platter of perfect, ready-to-publish pins. You just click 'Approve' and get back to running your business."_
 
 ---
 

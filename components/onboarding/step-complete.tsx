@@ -63,7 +63,7 @@ export function StepComplete({ data, onFinish }: StepCompleteProps) {
           transition={{ delay: 0.4 }}
           className="mt-2 text-sm text-neutral-600"
         >
-          PinLoop is ready to start generating and publishing pins for your brand.
+          EcomPin is ready to start generating and publishing pins for your brand.
         </motion.p>
       </div>
 

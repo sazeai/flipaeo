@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
                 storeDomain: connection.store_domain,
                 accessToken: connection.access_token,
             },
-            "", // Legacy: blog_id removed in PinLoop pivot
+            "", // Legacy: blog_id removed in EcomPin pivot
             {
                 title: article.outline?.title || 'Untitled',
                 content: processedContent,

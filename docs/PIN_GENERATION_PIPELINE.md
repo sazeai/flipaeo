@@ -4,7 +4,7 @@
 
 ## What This Covers
 
-This is the current automatic pin pipeline used by PinLoop.
+This is the current automatic pin pipeline used by EcomPin.
 
 It explains:
 - which file owns each stage

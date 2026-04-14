@@ -3,7 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { getValidAccessToken, getBatchPinAnalytics } from "@/lib/pinterest-api"
 
 /**
- * PinLoop — Analytics Collector
+ * EcomPin — Analytics Collector
  * 
  * Runs every 24 hours. For each user with a Pinterest connection:
  * 1. Fetches analytics for all published pins (last 30 days)
@@ -13,7 +13,7 @@ export const analyticsCollector = schedules.task({
   id: "pinloop-analytics-collector",
   cron: "30 3 * * *", // Daily at 3:30 AM UTC (off-peak)
   run: async () => {
-    logger.info("📊 PinLoop analytics collector started")
+    logger.info("📊  EcomPin analytics collector started")
 
     const supabase = createAdminClient() as any
 

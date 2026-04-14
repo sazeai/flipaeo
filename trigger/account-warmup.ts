@@ -2,7 +2,7 @@ import { schedules, logger } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 
 /**
- * PinLoop — Account Warmup Manager
+ * EcomPin — Account Warmup Manager
  * 
  * Runs daily at midnight UTC. Manages the progressive warmup protocol
  * to build Pinterest account trust and avoid shadow bans.
@@ -13,7 +13,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
  *   - Repin existing popular pins only
  *   - Do NOT publish URL pins (pins that link to external sites)
  *   - Goal: establish account as active, engage with platform
- *   - PinLoop action: generate pins but hold in queue
+ *   - EcomPin action: generate pins but hold in queue
  * 
  * Phase 2: warmup_partial (Days 15-30)
  *   - Start publishing 1-2 URL pins per day
@@ -34,7 +34,7 @@ export const accountWarmup = schedules.task({
   id: "pinloop-account-warmup",
   cron: "0 0 * * *", // Daily at midnight UTC
   run: async () => {
-    logger.info("🌡️ PinLoop warmup manager started")
+    logger.info("🌡️ EcomPin warmup manager started")
 
     const supabase = createAdminClient() as any
 

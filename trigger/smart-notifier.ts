@@ -16,7 +16,7 @@ export const smartNotifier = schedules.task({
   id: "pinloop-smart-notifier",
   cron: "0 10 * * *", // 10:00 AM UTC daily
   run: async () => {
-    logger.info("📩 PinLoop Smart Notifier started")
+    logger.info("📩 EcomPin Smart Notifier started")
 
     const supabase = createAdminClient() as any
 
@@ -69,7 +69,7 @@ export const smartNotifier = schedules.task({
           logger.info(`🚨 Triggering Approval Email for: ${brand.brand_name} (Queue is low!)`)
           
           // TODO: Actually trigger Resend/Postmark email here.
-          // e.g., await sendEmail(user.email, "Your PinLoop queue is running low! 12+ new pins await...")
+          // e.g., await sendEmail(user.email, "Your EcomPin queue is running low! 12+ new pins await...")
 
           // Update DB with timestamp
           await supabase

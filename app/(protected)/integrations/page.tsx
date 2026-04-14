@@ -234,7 +234,7 @@ export default function IntegrationsPage() {
                 Integrations
               </h1>
               <p className="text-xs text-stone-500 font-medium hidden sm:block">
-                Connect your platforms to power the PinLoop engine
+                Connect your platforms to power the EcomPin engine
               </p>
             </div>
           </div>
@@ -320,7 +320,7 @@ export default function IntegrationsPage() {
                         <p className="font-bold">Shopify Authentication Setup:</p>
                         <ol className="list-decimal pl-4 space-y-1 mt-1">
                           <li>Go to Shopify Settings → Apps and sales channels → Develop apps.</li>
-                          <li>Click "Create an app" (Name it PinLoop).</li>
+                          <li>Click "Create an app" (Name it EcomPin).</li>
                           <li>Go to <b>Configuration</b> → Admin API Scopes: Check <code className="bg-amber-100 px-1 rounded">read_products</code> and Save.</li>
                           <li>Go to <b>API Credentials</b>. Copy the <b>Client ID</b> and <b>Client Secret</b> and paste them below.</li>
                         </ol>

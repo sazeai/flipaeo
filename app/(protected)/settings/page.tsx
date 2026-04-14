@@ -160,7 +160,7 @@ export default function BrandSettingsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-950">Brand Settings</h1>
           <p className="mt-1 text-sm text-neutral-600">
-            Refine how PinLoop looks, publishes, and behaves for your brand.
+            Refine how EcomPin looks, publishes, and behaves for your brand.
           </p>
         </div>
         <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-500">
@@ -179,7 +179,7 @@ export default function BrandSettingsPage() {
                 icon={Zap}
                 eyebrow="Publishing"
                 title="Destination and safety"
-                description="Choose where approved pins go and how cautiously PinLoop should ramp up activity."
+                description="Choose where approved pins go and how cautiously EcomPin should ramp up activity."
               />
             </div>
 
@@ -224,7 +224,7 @@ export default function BrandSettingsPage() {
                   title="Warm-up profile"
                   titleTag="h3"
                   titleClassName="text-sm font-semibold text-neutral-950"
-                  description="This sets how cautiously PinLoop increases publishing volume to keep your Pinterest account healthy."
+                  description="This sets how cautiously EcomPin increases publishing volume to keep your Pinterest account healthy."
                 />
 
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
@@ -293,7 +293,7 @@ export default function BrandSettingsPage() {
                 icon={Store}
                 eyebrow="Brand identity"
                 title="Core brand profile"
-                description="Name your brand clearly so PinLoop can write, render, and label pins consistently."
+                description="Name your brand clearly so EcomPin can write, render, and label pins consistently."
               />
             </div>
 
@@ -364,7 +364,7 @@ export default function BrandSettingsPage() {
               icon={Palette}
               eyebrow="Visual style"
               title="Creative direction"
-              description="Define the visual system PinLoop should follow when composing pins for your feed."
+              description="Define the visual system EcomPin should follow when composing pins for your feed."
             />
           </div>
 

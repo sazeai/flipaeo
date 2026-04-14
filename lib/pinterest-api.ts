@@ -1,5 +1,5 @@
 /**
- * Pinterest API Client — PinLoop AI
+ * Pinterest API Client — EcomPin
  * 
  * Handles all Pinterest v5 API interactions:
  * - OAuth token management (including refresh)

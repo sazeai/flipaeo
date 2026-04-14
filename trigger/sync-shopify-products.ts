@@ -4,7 +4,7 @@ import { putR2Object } from "@/lib/r2"
 import { decrypt } from "@/utils/encryption"
 
 /**
- * PinLoop — Shopify Product Sync (No-OAuth)
+ * EcomPin — Shopify Product Sync (No-OAuth)
  * 
  * background auto-sync utilizing Custom App (Admin API) Key.
  * Fetches products, downloads images, and deduplicates by Handle.

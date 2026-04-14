@@ -7,7 +7,7 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Terms of Service',
-  description: 'Review the terms and conditions for using PinLoop AI, the AI-assisted Pinterest Marketing Tool.',
+  description: 'Review the terms and conditions for using EcomPin, the AI-assisted Pinterest Marketing Tool.',
   canonical: '/terms',
 })
 
@@ -23,7 +23,7 @@ export default function TermsOfService() {
               <span className="font-display font-bold text-xs uppercase tracking-widest">LEGAL</span>
             </div>
             <h1 className="font-display text-transparent bg-clip-text bg-gradient-to-br from-gray-600 to-black text-4xl sm:text-5xl md:text-6xl leading-tight uppercase mb-4">Terms of Service</h1>
-            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Review the terms and conditions for using PinLoop AI.</p>
+            <p className="font-sans text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">Review the terms and conditions for using EcomPin.</p>
           </div>
         </section>
 
@@ -33,8 +33,8 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. Introduction</h2>
               <p>
-                Welcome to <strong>PinLoop AI</strong> ("we," "our," "us"). By accessing or using our website at
-                <a href="https://flipaeo.vercel.app" className="text-indigo-600"> PinLoop</a>
+                Welcome to <strong>EcomPin</strong> ("we," "our," "us"). By accessing or using our website at
+                <a href="https://ecompin.com" className="text-indigo-600"> EcomPin</a>
                 ("Site"), you agree to comply with and be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Site.
               </p>
             </div>
@@ -42,7 +42,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. Use of Our Service</h2>
               <p>
-                <strong>PinLoop AI</strong> is an AI-assisted Pinterest marketing tool that helps e-commerce businesses generate, review, and schedule lifestyle imagery. You maintain full creative control and are responsible for reviewing and approving content before it is published.
+                <strong>EcomPin</strong> is an AI-assisted Pinterest marketing tool that helps e-commerce businesses generate, review, and schedule lifestyle imagery. You maintain full creative control and are responsible for reviewing and approving content before it is published.
                 Users must adhere to all applicable laws and agree not to misuse our services. Any violations of these rules can result in the termination of access to the platform.
               </p>
             </div>
@@ -58,15 +58,15 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">4. Subscription and Billing</h2>
               <p>
-                <strong>PinLoop AI</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated pins per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
-                <a href="https://flipaeo.vercel.app/refund-policy" className="text-indigo-600"> Refund Policy</a>.
+                <strong>EcomPin</strong> operates on a subscription-based model. Subscriptions are billed monthly and provide access to a set number of AI-generated pins per month. All subscription fees are charged in advance. We reserve the right to modify pricing at any time with reasonable notice. Refunds are available as specified in our
+                <a href="https://ecompin.com/refund-policy" className="text-indigo-600"> Refund Policy</a>.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">5. Content Ownership and License</h2>
               <p>
-                All images generated through PinLoop AI are owned by you upon publication. You receive a full commercial license to use, modify, and distribute the generated content for your business purposes. We retain no rights to your generated content once it is delivered to you.
+                All images generated through EcomPin are owned by you upon publication. You receive a full commercial license to use, modify, and distribute the generated content for your business purposes. We retain no rights to your generated content once it is delivered to you.
               </p>
             </div>
 
@@ -75,7 +75,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Third-Party Services</h2>
               <p>
-                <strong>PinLoop AI</strong> uses third-party services for AI image and text generation (Google GenAI, fal.ai, Tavily Search), official API publishing (Pinterest), e-commerce integrations (Shopify, Etsy), infrastructure and background processing (Supabase, Trigger.dev, Upstash, Cloudflare R2), analytics (Microsoft Clarity), and payment processing (DodoPayments). By using our service, you agree to be bound by the terms and policies of these third parties.
+                <strong>EcomPin</strong> uses third-party services for AI image and text generation (Google GenAI, fal.ai, Tavily Search), official API publishing (Pinterest), e-commerce integrations (Shopify, Etsy), infrastructure and background processing (Supabase, Trigger.dev, Upstash, Cloudflare R2), analytics (Microsoft Clarity), and payment processing (DodoPayments). By using our service, you agree to be bound by the terms and policies of these third parties.
               </p>
             </div>
 
@@ -83,7 +83,7 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">8. Limitation of Liability</h2>
               <p>
-                To the maximum extent permitted by law, <strong>PinLoop AI</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to social media reach, traffic changes, account restrictions by third-party platforms, or business outcomes.
+                To the maximum extent permitted by law, <strong>EcomPin</strong> and its affiliates shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with your use of our services. This includes but is not limited to social media reach, traffic changes, account restrictions by third-party platforms, or business outcomes.
               </p>
             </div>
 
@@ -99,14 +99,14 @@ export default function TermsOfService() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">11. Digital Delivery</h2>
               <p>
-                PinLoop AI provides a fully digital service. All generated images and content are delivered digitally through your dashboard and published directly to Pinterest. There are no physical products or shipping involved.
+                EcomPin provides a fully digital service. All generated images and content are delivered digitally through your dashboard and published directly to Pinterest. There are no physical products or shipping involved.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">12. Acceptable Use</h2>
               <p>
-                You agree not to use PinLoop AI to generate content that:
+                You agree not to use EcomPin to generate content that:
               </p>
               <ul className="list-disc list-inside pl-5 mt-2 mb-4">
                 <li>Violates any applicable laws or regulations</li>
@@ -117,7 +117,7 @@ export default function TermsOfService() {
                 <li>Engages in spam, automated bulk posting without oversight, or inauthentic behavior that violates Pinterest's Community Guidelines</li>
               </ul>
               <p className="mt-2 text-stone-800 font-medium">
-                <strong>Pinterest API Compliance:</strong> You acknowledge that you act as the publisher of all content. PinLoop AI facilitates your content creation and scheduling workflows, but you are solely responsible for ensuring that your publishing frequency, scheduling, and content quality adhere absolutely to Pinterest's Developer and API Guidelines.
+                <strong>Pinterest API Compliance:</strong> You acknowledge that you act as the publisher of all content. EcomPin facilitates your content creation and scheduling workflows, but you are solely responsible for ensuring that your publishing frequency, scheduling, and content quality adhere absolutely to Pinterest's Developer and API Guidelines.
               </p>
               <p className="mt-4">
                 We reserve the right to suspend or terminate accounts that violate these guidelines or misuse the Pinterest API.
