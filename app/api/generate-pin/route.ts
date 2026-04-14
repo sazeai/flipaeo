@@ -119,17 +119,15 @@ export async function POST(req: NextRequest) {
       const artDirectorPrompt = `You are an expert Pinterest Marketing Art Director. Generate a beautiful, purely aesthetic "Mood Board" lifestyle photo concept.
       
       1. Write a photorealistic, 8k background prompt for an image generation model to create a stunning, atmospheric scene.${aestheticGuidance}
-      2. Write an elegant, 4 to 6 word title for this mood board. Make it catchy and specific, like a magazine headline.
-      3. Select template-2 (Center text) as the text layout template.`;
+      2. Write an elegant, 4 to 6 word title for this mood board. Make it catchy and specific, like a magazine headline.`;
 
       aiContents = [{ text: artDirectorPrompt }];
     } else {
       const artDirectorPrompt = `Analyze this product image. You are an expert Pinterest Marketing Art Director.
       ${productContext}
       
-      1. Write a photorealistic, 8k background prompt for an image generation model to place this product in a fitting, highly aesthetic lifestyle environment. You MUST explicitly state where to leave negative space (e.g., "Leave negative space at the top", "Leave negative space at the bottom", "Leave negative space in the center", or "Leave negative space around the edges").
-      2. Write a punchy 3-7 word image overlay title for the product. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product. Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor". Good examples: "Clear Skin Starts Here", "The Protein Snack You Need". Do not use punctuation.
-      3. Select the best text layout template based on where you left negative space in the image prompt.${aestheticGuidance}`;
+      1. Write a photorealistic, 8k background prompt for an image generation model to place this product in a fitting, highly aesthetic lifestyle environment.
+      2. Write a punchy 3-7 word title for the product. Write it like a magazine headline or ad tagline — catchy, benefit-driven, and specific to the product. Never use generic words like "Aesthetic", "Lifestyle", "Collection", "Essential", "Home Decor". Good examples: "Clear Skin Starts Here", "The Protein Snack You Need". Do not use punctuation.${aestheticGuidance}`;
 
       aiContents = [
         { inlineData: { data: base64ImageData, mimeType: mimeType } },
@@ -148,18 +146,14 @@ export async function POST(req: NextRequest) {
           properties: {
             imagePrompt: {
               type: Type.STRING,
-              description: "The image generation prompt. e.g., 'Product resting on a rustic wooden table, dappled sunlight, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the bottom.'"
+              description: "The image generation prompt. e.g., 'Product resting on a rustic wooden table, dappled sunlight, photorealistic, 8k. Aspect ratio 2:3.'"
             },
             title: {
               type: Type.STRING,
-              description: "Punchy 3-7 word image overlay title. Like a magazine headline — catchy and product-specific."
+              description: "Punchy 3-7 word title. Like a magazine headline — catchy and product-specific."
             },
-            templateId: {
-              type: Type.STRING,
-              description: "template-1 (Top text) if negative space is at the top. template-2 (Center text) if negative space is in the center. template-3 (Bottom text) if negative space is at the bottom. template-4 (Frame) if negative space is around the edges. template-5 (Pure Aesthetic) — select this when the product image is so visually compelling that no text overlay is needed; best for luxury items, furniture, or fashion where the scene alone drives the click."
-            }
           },
-          required: ["imagePrompt", "title", "templateId"]
+          required: ["imagePrompt", "title"]
         }
       }
     });
@@ -167,9 +161,8 @@ export async function POST(req: NextRequest) {
     const planText = planResponse.text?.trim() || '{}';
     const plan = JSON.parse(planText);
 
-    const dynamicImagePrompt = plan.imagePrompt || 'Product resting on a clean marble countertop, morning sunlight, soft aesthetic shadows, photorealistic, 8k. Aspect ratio 2:3. Leave negative space at the top.';
+    const dynamicImagePrompt = plan.imagePrompt || 'Product resting on a clean marble countertop, morning sunlight, soft aesthetic shadows, photorealistic, 8k. Aspect ratio 2:3.';
     const generatedTitle = plan.title || productTitle || 'Shop Now';
-    const templateId = plan.templateId || 'template-1';
 
     // 2. Call Gemini image model to generate lifestyle background
     let imageGenContents: any = {};
@@ -227,7 +220,7 @@ export async function POST(req: NextRequest) {
 
           target_angle: targetAngle,
           angle_embedding: angleEmbedding ? `[${angleEmbedding.join(",")}]` : null, // Postgres vector representation
-          template_id: templateId,
+          template_id: 'template-5',
           pin_title: generatedTitle,
           status: 'generating',
           is_mood_board: isMoodBoard,
@@ -260,7 +253,6 @@ export async function POST(req: NextRequest) {
           pinId: pin.id,
           imageUrl: generatedImageUrl,
           title: generatedTitle,
-          templateId: templateId,
           debugPrompt: dynamicImagePrompt,
         });
       }
@@ -270,7 +262,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       imageUrl: generatedImageUrl,
       title: generatedTitle,
-      templateId: templateId,
       debugPrompt: dynamicImagePrompt,
     });
 

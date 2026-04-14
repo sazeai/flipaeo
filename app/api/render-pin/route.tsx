@@ -4,20 +4,8 @@ import { readFile } from 'node:fs/promises';
 
 export const runtime = 'nodejs';
 
-// Static font URL declarations — each `new URL()` tells Next.js file tracing
-// to include the font in the serverless bundle. Must be literal strings, not dynamic.
-const FONT_URLS: Record<string, URL> = {
-  'Playfair Display': new URL('./fonts/PlayfairDisplay.ttf', import.meta.url),
-  'Inter': new URL('./fonts/Inter.ttf', import.meta.url),
-  'Roboto': new URL('./fonts/Roboto.ttf', import.meta.url),
-  'Outfit': new URL('./fonts/Outfit.ttf', import.meta.url),
-  'Poppins': new URL('./fonts/Poppins.ttf', import.meta.url),
-  'Montserrat': new URL('./fonts/Montserrat.ttf', import.meta.url),
-  'Lora': new URL('./fonts/Lora.ttf', import.meta.url),
-  'Merriweather': new URL('./fonts/Merriweather.ttf', import.meta.url),
-  'Raleway': new URL('./fonts/Raleway.ttf', import.meta.url),
-  'DM Sans': new URL('./fonts/DMSans.ttf', import.meta.url),
-};
+// Single bundled font for CTA badge — Inter (clean sans-serif)
+const FONT_URL = new URL('./fonts/Inter.ttf', import.meta.url);
 
 const MAX_REMOTE_IMAGE_BYTES = 10 * 1024 * 1024;
 
@@ -78,24 +66,16 @@ export async function GET(req: NextRequest) {
 
 async function handleRender(req: NextRequest) {
   try {
-    let imageUrl, title, templateId, fontChoice, storeUrl, layoutMode;
+    let imageUrl, storeUrl;
 
     if (req.method === 'POST') {
       const body = await req.json();
       imageUrl = body.imageUrl;
-      title = body.title;
-      templateId = body.templateId;
-      fontChoice = body.fontChoice;
       storeUrl = body.storeUrl;
-      layoutMode = body.layoutMode;
     } else {
       const { searchParams } = new URL(req.url);
       imageUrl = searchParams.get('imageUrl');
-      title = searchParams.get('title');
-      templateId = searchParams.get('templateId');
-      fontChoice = searchParams.get('fontChoice');
       storeUrl = searchParams.get('storeUrl');
-      layoutMode = searchParams.get('layoutMode');
     }
 
     if (!imageUrl) {
@@ -106,9 +86,8 @@ async function handleRender(req: NextRequest) {
       return new Response('Unsupported imageUrl source', { status: 400 });
     }
 
-    const displayTitle = title || 'Aesthetic Collection';
-    const activeTemplate = layoutMode === 'organic' ? 'template-5' : (templateId || 'template-1');
-    const fontName = fontChoice || 'Playfair Display';
+    const displayTitle = '';
+    const fontName = 'Inter';
 
     let displayStoreUrl = '';
     try {
@@ -117,9 +96,8 @@ async function handleRender(req: NextRequest) {
       displayStoreUrl = storeUrl || '';
     }
 
-    // Load font from local bundled files (no CDN dependency)
-    const fontUrl = FONT_URLS[fontName] || FONT_URLS['Playfair Display'];
-    const fontBuffer = await readFile(fontUrl);
+    // Load single bundled font for CTA badge
+    const fontBuffer = await readFile(FONT_URL);
     const fontData = fontBuffer.buffer.slice(fontBuffer.byteOffset, fontBuffer.byteOffset + fontBuffer.byteLength);
 
     // Pre-fetch the background image and convert to base64 data URI.
@@ -158,11 +136,8 @@ async function handleRender(req: NextRequest) {
     }
 
     // ─────────────────────────────────────────────────
-    // Template rendering (Unified Logic)
+    // Simplified rendering: image + optional CTA badge
     // ─────────────────────────────────────────────────
-    
-    // Default Font Size
-    const fontSize = 64;
 
     const renderLayout = (
       <div tw="flex flex-col w-full h-full relative bg-white">
@@ -174,49 +149,7 @@ async function handleRender(req: NextRequest) {
           alt="Background"
         />
         
-        {/* Templates */}
-        {activeTemplate !== 'template-5' && (
-          <>
-            {activeTemplate === 'template-2' ? (
-              <div tw="absolute inset-0 w-full h-full bg-black/40 flex items-center justify-center text-center px-16">
-                <span style={{ color: 'white', fontSize, fontWeight: 'bold', fontFamily: `"${fontName}"`, textShadow: '0 4px 16px rgba(0,0,0,0.6)' }}>
-                  {displayTitle}
-                </span>
-              </div>
-            ) : activeTemplate === 'template-3' ? (
-              <>
-                <div tw="absolute bottom-0 left-0 w-full h-[50%]" style={{ backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }} />
-                <div tw="absolute bottom-36 left-0 w-full flex justify-center text-center px-12">
-                  <span style={{ color: 'white', fontSize, fontWeight: 'bold', fontFamily: `"${fontName}"`, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                    {displayTitle}
-                  </span>
-                </div>
-              </>
-            ) : activeTemplate === 'template-4' ? (
-              <>
-                <div tw="absolute inset-6 border-[4px] border-white/80 rounded-2xl" />
-                <div tw="absolute top-0 left-0 w-full h-[40%]" style={{ backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)' }} />
-                <div tw="absolute top-28 left-0 w-full flex justify-center text-center px-16">
-                  <span style={{ color: 'white', fontSize, fontWeight: 'bold', fontFamily: `"${fontName}"`, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                    {displayTitle}
-                  </span>
-                </div>
-              </>
-            ) : (
-              /* Template 1: Classic */
-              <>
-                <div tw="absolute top-0 left-0 w-full h-[40%]" style={{ backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)' }} />
-                <div tw="absolute top-24 left-0 w-full flex justify-center text-center px-12">
-                  <span style={{ color: 'white', fontSize, fontWeight: 'bold', fontFamily: `"${fontName}"`, textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                    {displayTitle}
-                  </span>
-                </div>
-              </>
-            )}
-          </>
-        )}
-        
-        {/* CTA Badge (Always visible if storeUrl provided) */}
+        {/* CTA Badge (visible if storeUrl provided) */}
         {displayStoreUrl && (
           <div
             tw="absolute bottom-12 left-1/2 flex text-black px-8 py-4 rounded-full text-3xl font-semibold shadow-xl"

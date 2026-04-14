@@ -30,9 +30,8 @@ export interface BrandSettingsData {
   brand_description: string
   store_url: string
   logo_url: string
-  font_choice: string
   aesthetic_boundaries: string[]
   default_board_id: string
   account_age_type: 'brand_new' | 'established' | ''
-  pin_layout_mode: 'organic' | 'editorial'
+  show_brand_url: boolean
 }

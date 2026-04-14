@@ -1,15 +1,13 @@
 'use client'
 
-import { CheckCircle2, ArrowRight, Store, Palette, Type, ShoppingBag, Image as ImageIcon } from 'lucide-react'
+import { CheckCircle2, ArrowRight, Store, Palette, ShoppingBag, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion } from 'motion/react'
 
 interface StepCompleteProps {
   data: {
     brand_name: string
-    pin_layout_mode: string
     aesthetic_boundaries: string[]
-    font_choice: string
     has_products: boolean
     has_pinterest: boolean
   }
@@ -25,24 +23,12 @@ export function StepComplete({ data, onFinish }: StepCompleteProps) {
       done: !!data.brand_name,
     },
     {
-      icon: ImageIcon,
-      label: 'Pin Style',
-      value: data.pin_layout_mode === 'editorial' ? 'Editorial Campaign' : 'Organic Lifestyle',
-      done: true,
-    },
-    {
       icon: Palette,
       label: 'Aesthetics',
       value: data.aesthetic_boundaries.length > 0
         ? data.aesthetic_boundaries.join(', ')
         : 'None selected',
       done: data.aesthetic_boundaries.length > 0,
-    },
-    {
-      icon: Type,
-      label: 'Font',
-      value: data.font_choice,
-      done: !!data.font_choice,
     },
     {
       icon: ShoppingBag,

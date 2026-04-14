@@ -47,7 +47,7 @@ export const generatePinBatch = schedules.task({
     // Get all users with brand settings
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, font_choice, store_url, aesthetic_boundaries, automation_paused, audience_profile, pin_layout_mode")
+      .select("id, user_id, brand_name, store_url, aesthetic_boundaries, automation_paused, audience_profile, show_brand_url")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No users with brand settings found")
@@ -265,9 +265,8 @@ Write the fal.ai prompt following this exact structure:
 
 Also return:
 - title: catchy 3-7 word headline naming the product (not generic words like "Aesthetic" or "Collection")
-- templateId: template-1 (top text), template-2 (center), template-3 (bottom), template-4 (framed top), template-5 (no text)
 
-Return ONLY JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
+Return ONLY JSON: { "imagePrompt": "...", "title": "..." }`
 
             // Reuse product image fetched earlier for Gemini Art Director multimodal context
             const imagePart = productImageBase64 && productImageMimeType
@@ -286,7 +285,6 @@ Return ONLY JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
             const plan = JSON.parse(planResponse.text?.trim() || '{}')
             let dynamicImagePrompt = plan.imagePrompt || `Aesthetic lifestyle shot of ${product.title}, photorealistic 8k`
             const genTitle = plan.title || product.title
-            const genTemplateId = plan.templateId || "template-5"
 
             // Prompt Critic — validate before sending to fal.ai
             const criticResult = validatePrompt(dynamicImagePrompt, showcase)
@@ -355,7 +353,7 @@ Return ONLY JSON: { "imagePrompt": "...", "title": "...", "templateId": "..." }`
               art_director_prompt: dynamicImagePrompt,
               target_angle: targetAngle,
               angle_embedding: angleEmbedding ? `[${Array.from(angleEmbedding).join(",")}]` : null,
-              template_id: genTemplateId,
+              template_id: 'template-5',
               pin_title: genTitle,
               status: 'generating',
               is_mood_board: Math.random() < 0.1
@@ -451,52 +449,61 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               // Vercel deployment URLs (e.g. flipaeo.vercel.app) come without protocol
               appUrl = `https://${appUrl}`
             }
-            const layoutMode = brand.pin_layout_mode || 'organic'
 
-            // Use the public R2 URL instead of base64 to avoid exceeding
-            // Vercel Edge Function's 4 MB request-body limit (which returns 405).
-            const renderRes = await fetch(`${appUrl}/api/render-pin`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                imageUrl: rawImageUrl,
-                title: genTitle,
-                templateId: genTemplateId,
-                fontChoice: brand.font_choice || "Playfair Display",
-                storeUrl: brand.store_url || "",
-                layoutMode,
-              }),
-            })
+            // Render bypass: skip render-pin when brand URL watermark is disabled
+            const shouldRender = brand.show_brand_url !== false && !!brand.store_url
 
-            if (!renderRes.ok) {
-              const errText = await renderRes.text().catch(() => "Unable to read error text")
-              logger.error(`Render failed for pin ${pinId}: STATUS ${renderRes.status} | MSG: ${errText} | Sent Image: ${rawImageUrl}`)
-              await supabase.from("pins").update({ status: "failed", error_message: "Render failed" }).eq("id", pinId)
-              continue
-            }
-
-            // Step 4: Validate rendered image is not blank/broken (a real 1000x1500 PNG is >50KB)
-            const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
-            if (renderedBuffer.length < 10000) {
-              logger.error(`Render returned suspiciously small image (${renderedBuffer.length} bytes) for pin ${pinId}. Likely a blank/black render. Marking as failed.`)
-              await supabase.from("pins").update({ status: "failed", error_message: `Render produced blank image (${renderedBuffer.length} bytes)` }).eq("id", pinId)
-              continue
-            }
-
-            const renderedR2Key = `pin-images/${brand.user_id}/${pinId}-final.png`
-            await putR2Object(renderedR2Key, renderedBuffer, "image/png")
-
-            const renderedImageUrl = r2Domain ? `${r2Domain}/${renderedR2Key}` : renderedR2Key
-
-            // Step 5: Update pin record with rendered image (SEO title/desc already saved above)
-            await supabase
-              .from("pins")
-              .update({
-                rendered_image_url: renderedImageUrl,
-                rendered_image_r2_key: renderedR2Key,
-                status: "pending_approval",
+            if (shouldRender) {
+              // Call render-pin to add CTA badge overlay
+              const renderRes = await fetch(`${appUrl}/api/render-pin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  imageUrl: rawImageUrl,
+                  storeUrl: brand.store_url || "",
+                }),
               })
-              .eq("id", pinId)
+
+              if (!renderRes.ok) {
+                const errText = await renderRes.text().catch(() => "Unable to read error text")
+                logger.error(`Render failed for pin ${pinId}: STATUS ${renderRes.status} | MSG: ${errText} | Sent Image: ${rawImageUrl}`)
+                await supabase.from("pins").update({ status: "failed", error_message: "Render failed" }).eq("id", pinId)
+                continue
+              }
+
+              // Validate rendered image is not blank/broken (a real 1000x1500 PNG is >50KB)
+              const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
+              if (renderedBuffer.length < 10000) {
+                logger.error(`Render returned suspiciously small image (${renderedBuffer.length} bytes) for pin ${pinId}. Likely a blank/black render. Marking as failed.`)
+                await supabase.from("pins").update({ status: "failed", error_message: `Render produced blank image (${renderedBuffer.length} bytes)` }).eq("id", pinId)
+                continue
+              }
+
+              const renderedR2Key = `pin-images/${brand.user_id}/${pinId}-final.png`
+              await putR2Object(renderedR2Key, renderedBuffer, "image/png")
+
+              const renderedImageUrl = r2Domain ? `${r2Domain}/${renderedR2Key}` : renderedR2Key
+
+              await supabase
+                .from("pins")
+                .update({
+                  rendered_image_url: renderedImageUrl,
+                  rendered_image_r2_key: renderedR2Key,
+                  status: "pending_approval",
+                })
+                .eq("id", pinId)
+            } else {
+              // No watermark — raw fal.ai image IS the final pin
+              logger.info(`Skipping render-pin for pin ${pinId} (show_brand_url=false or no store_url)`)
+              await supabase
+                .from("pins")
+                .update({
+                  rendered_image_url: rawImageUrl,
+                  rendered_image_r2_key: rawR2Key,
+                  status: "pending_approval",
+                })
+                .eq("id", pinId)
+            }
 
             // Pin now waits for user approval before entering publish queue
 

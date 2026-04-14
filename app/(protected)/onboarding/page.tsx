@@ -10,22 +10,18 @@ import { Button } from '@/components/ui/button'
 import { type BrandSettingsData } from '@/lib/constants/brand'
 
 import { StepBrand } from '@/components/onboarding/step-brand'
-import { StepPinStyle } from '@/components/onboarding/step-pin-style'
 import { StepAesthetics } from '@/components/onboarding/step-aesthetics'
-import { StepFont } from '@/components/onboarding/step-font'
 import { StepProducts } from '@/components/onboarding/step-products'
 import { StepPinterest } from '@/components/onboarding/step-pinterest'
 import { StepWarmup } from '@/components/onboarding/step-warmup'
 import { StepComplete } from '@/components/onboarding/step-complete'
 
-const TOTAL_STEPS = 8
-const SKIPPABLE_STEPS = [5, 6, 7]
+const TOTAL_STEPS = 6
+const SKIPPABLE_STEPS = [3, 4, 5]
 
 const STEP_LABELS = [
   'Brand',
-  'Pin Style',
   'Aesthetics',
-  'Font',
   'Products',
   'Pinterest',
   'Protection',
@@ -51,11 +47,10 @@ export default function OnboardingPage() {
     brand_description: '',
     store_url: '',
     logo_url: '',
-    font_choice: 'Playfair Display',
     aesthetic_boundaries: [],
     default_board_id: '',
     account_age_type: '',
-    pin_layout_mode: 'organic',
+    show_brand_url: true,
   })
 
   // Load existing brand_settings on mount
@@ -79,11 +74,10 @@ export default function OnboardingPage() {
           brand_description: settings.brand_description || '',
           store_url: settings.store_url || '',
           logo_url: settings.logo_url || '',
-          font_choice: settings.font_choice || 'Playfair Display',
           aesthetic_boundaries: (settings.aesthetic_boundaries as string[]) || [],
           default_board_id: settings.default_board_id || '',
           account_age_type: settings.account_age_type || '',
-          pin_layout_mode: (settings.pin_layout_mode as 'organic' | 'editorial') || 'organic',
+          show_brand_url: settings.show_brand_url ?? true,
         })
       }
 
@@ -143,10 +137,6 @@ export default function OnboardingPage() {
           break
         }
         case 2: {
-          await saveBrandSettings({ pin_layout_mode: form.pin_layout_mode })
-          break
-        }
-        case 3: {
           if (form.aesthetic_boundaries.length === 0) {
             toast.error('Select at least one aesthetic')
             setSaving(false)
@@ -155,19 +145,15 @@ export default function OnboardingPage() {
           await saveBrandSettings({ aesthetic_boundaries: form.aesthetic_boundaries })
           break
         }
-        case 4: {
-          await saveBrandSettings({ font_choice: form.font_choice })
-          break
-        }
-        case 5: {
+        case 3: {
           // Products step — data saved via CSV/Shopify APIs, no brand_settings update needed
           break
         }
-        case 6: {
+        case 4: {
           // Pinterest step — connection saved via OAuth callback
           break
         }
-        case 7: {
+        case 5: {
           if (form.account_age_type) {
             await saveBrandSettings({ account_age_type: form.account_age_type })
             // Also update warmup phase on pinterest_connections
@@ -296,46 +282,30 @@ export default function OnboardingPage() {
           )}
 
           {currentStep === 2 && (
-            <StepPinStyle
-              value={form.pin_layout_mode}
-              onChange={v => setForm(prev => ({ ...prev, pin_layout_mode: v }))}
-            />
-          )}
-
-          {currentStep === 3 && (
             <StepAesthetics
               value={form.aesthetic_boundaries}
               onChange={v => setForm(prev => ({ ...prev, aesthetic_boundaries: v }))}
             />
           )}
 
+          {currentStep === 3 && <StepProducts />}
+
           {currentStep === 4 && (
-            <StepFont
-              value={form.font_choice}
-              onChange={v => setForm(prev => ({ ...prev, font_choice: v }))}
-            />
-          )}
-
-          {currentStep === 5 && <StepProducts />}
-
-          {currentStep === 6 && (
             <StepPinterest onConnected={handlePinterestConnected} />
           )}
 
-          {currentStep === 7 && (
+          {currentStep === 5 && (
             <StepWarmup
               value={form.account_age_type}
               onChange={v => setForm(prev => ({ ...prev, account_age_type: v }))}
             />
           )}
 
-          {currentStep === 8 && (
+          {currentStep === 6 && (
             <StepComplete
               data={{
                 brand_name: form.brand_name,
-                pin_layout_mode: form.pin_layout_mode,
                 aesthetic_boundaries: form.aesthetic_boundaries,
-                font_choice: form.font_choice,
                 has_products: hasProducts,
                 has_pinterest: hasPinterest,
               }}
