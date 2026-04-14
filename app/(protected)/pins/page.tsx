@@ -458,7 +458,7 @@ export default function PinsPage() {
               >
                 {/* Image container — fixed height, padded, light bg */}
                 <div className="relative mx-2 mt-2 sm:mx-3 sm:mt-3 rounded-xl bg-neutral-100 overflow-hidden">
-                  <div className="aspect-[3/4] flex items-center justify-center">
+                  <div className="flex items-center justify-center">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -510,9 +510,7 @@ export default function PinsPage() {
                   <p className="text-[13px] font-semibold text-neutral-900 line-clamp-2 leading-snug mt-0.5">
                     {pin.pin_title || 'Untitled Pin'}
                   </p>
-                  <time className="text-[10px] text-neutral-400 mt-1.5 block tabular-nums">
-                    {new Date(pin.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </time>
+
                   {/* Published analytics */}
                   {isPublished && (pin.impressions > 0 || pin.outbound_clicks > 0 || pin.saves > 0) && (
                     <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-neutral-100 text-[11px] text-neutral-400">

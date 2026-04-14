@@ -104,15 +104,15 @@ const HowItWorksSection: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-8 md:gap-16 justify-between items-start md:items-end mb-16 w-full px-4 md:px-8">
           <div className="flex-1">
             <span className="font-sans text-xs font-bold tracking-widest text-brand-500 uppercase mb-4 block">
-              The Workflow
+              How It Works
             </span>
             <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-900 tracking-tight font-normal leading-[1]">
-              A closed-loop system <br /><span className='italic text-stone-500'>that works entirely in the background.</span>
+              From plain product photos <br /><span className='italic text-stone-500'>to approved Pinterest campaigns.</span>
             </h2>
           </div>
           <div className="flex-1 md:max-w-xl pb-0 md:pb-2">
             <p className="font-sans text-stone-500 text-lg leading-relaxed">
-              Automated ingestion, AI-driven aesthetic generation, and a closed-loop analytic engine that learns what drives Pinterest sales.
+              Sync your catalog, let PinLoop create editorial lifestyle pins around each product, approve the ones you want, and let the system publish safely while it learns what actually drives clicks.
             </p>
           </div>
         </div>
@@ -161,10 +161,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                The One-Click Sync
+                Connect Your Store
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                Connect your Shopify or Etsy store. We securely ingest your product catalog, titles, and URLs. Your active work ends here.
+                Connect Shopify or Etsy, set your brand direction, and link Pinterest. PinLoop pulls in your product photos, titles, URLs, and publishing setup automatically.
               </p>
             </div>
           </div>
@@ -181,10 +181,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                The Generative Engine
+                We Stage The Photoshoot
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                Our AI systematically runs your products through advanced diffusion models, creating dozens of unique, editorial-grade lifestyle variations for every single SKU.
+                PinLoop turns each plain product image into multiple lifestyle scenes, writes Pinterest-ready titles and descriptions, and assembles finished pins around every SKU.
               </p>
             </div>
           </div>
@@ -201,10 +201,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                The Drip Publisher
+                Review And Approve
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                The system safely drip-publishes your new visual assets at algorithmically optimal times, ensuring every post looks like natural, organic human behavior to keep your account health pristine.
+                Open your review queue, scan the finished pins, approve the keepers, reject anything off-brand, and send the rest into your publishing queue in minutes.
               </p>
             </div>
           </div>
@@ -221,10 +221,10 @@ const HowItWorksSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-stone-900 leading-tight">
-                The Autonomous Optimizer
+                Publish Safely And Learn
               </h3>
               <p className="font-sans text-stone-500 text-sm leading-relaxed">
-                PinLoop continuously reads your Pinterest Analytics. If the "Dark Academia" aesthetic gets clicks, and "Minimalist" gets zero, the AI learns. It automatically shifts generation to the styles that drive actual sales.
+                Approved pins drip out at an account-safe pace. Performance data and your reject reasons feed the next generation cycle, so the creative gets sharper over time.
               </p>
             </div>
           </div>
