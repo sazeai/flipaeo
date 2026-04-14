@@ -740,12 +740,33 @@ export function pickShowcaseForPin(
       sceneScope = `${c.maxSceneDepth} only; ${rules.sceneScope}`
     }
 
-    // AI scaleAnchor + supportRule enrich guidance
+    // Conflict-aware merge: AI constraints must agree with presentationMode
+    const isWorn = picked.presentationMode === "worn-on-model"
+    const isSurface = picked.presentationMode === "styled-on-surface" || picked.presentationMode === "flat-lay-arrangement"
+
+    // scaleAnchor: body-part anchors only make sense for worn/held modes
     if (c.scaleAnchor) {
-      scaleGuidance = `${rules.scaleGuidance}. Anchor with: ${c.scaleAnchor}`
+      const bodyAnchors = ["finger", "wrist", "neck", "ear", "ankle", "hand"]
+      const isBodyAnchor = bodyAnchors.some(b => c.scaleAnchor!.toLowerCase().includes(b))
+      if (isBodyAnchor && isSurface) {
+        // Drop body anchor for surface shots — it would contradict "resting on surface"
+      } else {
+        scaleGuidance = `${rules.scaleGuidance}. Anchor with: ${c.scaleAnchor}`
+      }
     }
+
+    // supportRule: filter out clauses that contradict the picked mode
     if (c.supportRule) {
-      scaleGuidance = `${scaleGuidance}. ${c.supportRule}`
+      const clauses = c.supportRule.split(";").map(s => s.trim()).filter(Boolean)
+      const filtered = clauses.filter(clause => {
+        const cl = clause.toLowerCase()
+        if (isWorn && (cl.includes("rest on") || cl.includes("flat surface") || cl.includes("lay on"))) return false
+        if (isSurface && (cl.includes("must be worn") || cl.includes("on body"))) return false
+        return true
+      })
+      if (filtered.length > 0) {
+        scaleGuidance = `${scaleGuidance}. ${filtered.join("; ")}`
+      }
     }
 
     // AI forbiddenContexts ADD to (never replace) family forbidden elements

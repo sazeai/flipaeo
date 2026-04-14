@@ -238,35 +238,38 @@ export const generatePinBatch = schedules.task({
 
             const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
 
-            // Stage 3: Art Director — writes fal.ai prompt with 3 locked sections
+            // Stage 3: Art Director — writes fal.ai prompt using two-tier architecture
+            // Tier 1: ALL constraints as reasoning context for Gemini
+            // Tier 2: Output rules demanding positive-only visual scene description
 
-            const artDirectorPrompt = `Write an image editing prompt for fal.ai. The source product image will be composited into the scene you describe.
+            const artDirectorPrompt = `You are an expert product photography Art Director. Your job is to write a single, coherent scene description for fal.ai image editing. The source product image will be composited into the scene you describe.
+
+═══ CREATIVE CONTEXT (use these to inform your choices — do NOT copy them into the output) ═══
 
 PRODUCT: ${showcase.productAppearance}
 FAMILY: ${showcase.productFamily}
+PRODUCT TYPE: ${showcase.productType}
 SHOT: ${showcase.presentationMode}, ${showcase.heroAction}
 CAMERA: ${showcase.cameraAngle}
 SETTING: ${showcase.naturalEnvironment}
 SCENE SCOPE: ${showcase.sceneScope}
 SCALE RULE: ${showcase.scaleGuidance}
-NEVER INCLUDE: ${showcase.forbiddenElements}
-SCENE: ${targetAngle}
+SCENE CONCEPT: ${targetAngle}
 STYLE: ${pickedAesthetic.tag} — ${pickedAesthetic.definition}
 
-Write the fal.ai prompt following this exact structure:
-1. "A ${showcase.productAppearance}, ${showcase.presentationMode}, ${showcase.heroAction}."
-2. "The product keeps its exact original colors, materials, and design from the source image."
-3. "Keep the product at natural real-world size and keep the scene within this scope: ${showcase.sceneScope}. ${showcase.scaleGuidance}. Do not render any human hands, fingers, or body parts unless the presentation mode is worn-on-model or held-in-hand."
-4. Describe the environment: surface material, background, and the scene concept above.
-5. Do NOT add any props, accessories, or additional objects to the scene. Show ONLY the product on the described surface/environment.
-6. Explicitly avoid these elements: ${showcase.forbiddenElements}.
-7. Apply the style's lighting and color palette to the environment only, not the product.
-8. End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
+═══ OUTPUT RULES (follow these exactly) ═══
 
-Also return:
-- title: catchy 3-7 word headline naming the product (not generic words like "Aesthetic" or "Collection")
+Write a single flowing scene description, max 80 words. Rules:
+- Start with the product: what it is, how it appears, what it's doing in the scene
+- Describe ONLY what the camera will physically see: surfaces, materials, light, atmosphere
+- The product must keep its exact original colors, materials, shape, quantity, and design from the source image
+- Apply the style's lighting and color palette to the ENVIRONMENT only, not the product itself
+- No meta-instructions ("do not", "avoid", "ensure", "make sure")
+- No lists of props to include or exclude which is not necessary to the core scene concept of the product niche itself
+- No references to "the viewer", "the camera", "the model" as abstract concepts
+- End with: "${authenticHandmadeMode ? 'authentic product photo, natural window light, slight grain, 8k' : 'editorial product photography, soft natural light, 8k'}"
 
-Return ONLY JSON: { "imagePrompt": "...", "title": "..." }`
+Return ONLY JSON: { "imagePrompt": "..." }`
 
             // Reuse product image fetched earlier for Gemini Art Director multimodal context
             const imagePart = productImageBase64 && productImageMimeType
@@ -284,7 +287,6 @@ Return ONLY JSON: { "imagePrompt": "...", "title": "..." }`
 
             const plan = JSON.parse(planResponse.text?.trim() || '{}')
             let dynamicImagePrompt = plan.imagePrompt || `Aesthetic lifestyle shot of ${product.title}, photorealistic 8k`
-            const genTitle = plan.title || product.title
 
             // Prompt Critic — validate before sending to fal.ai
             const criticResult = validatePrompt(dynamicImagePrompt, showcase)
@@ -354,7 +356,7 @@ Return ONLY JSON: { "imagePrompt": "...", "title": "..." }`
               target_angle: targetAngle,
               angle_embedding: angleEmbedding ? `[${Array.from(angleEmbedding).join(",")}]` : null,
               template_id: 'template-5',
-              pin_title: genTitle,
+              pin_title: product.title,
               status: 'generating',
               is_mood_board: Math.random() < 0.1
             }).select('id').single()
@@ -427,7 +429,7 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
               }
             })
 
-            let pinTitle = genTitle
+            let pinTitle = product.title
             let pinDescription = `Discover ${product.title}`
             try {
               const seoData = JSON.parse(copyRes.text?.trim() || '{}')

@@ -55,13 +55,56 @@ export function validatePrompt(
     }
   }
 
-  // Rule 3: Forbidden elements leaked into prompt
+  // Rule 3: Forbidden elements leaked into prompt (primary enforcer — replaces pink elephant in prompt)
   if (showcase.forbiddenElements) {
     const forbidden = showcase.forbiddenElements.split(",").map(f => f.trim().toLowerCase()).filter(Boolean)
     for (const f of forbidden) {
-      // Only check multi-word forbidden terms (single words like "wall" would false-positive on "wall art")
+      // Check each word of the forbidden phrase independently for multi-word terms
       if (f.length > 4 && lower.includes(f)) {
         issues.push(`Forbidden element "${f}" found in prompt`)
+      }
+      // Also check individual significant words from forbidden phrases
+      const words = f.split(/\s+/).filter(w => w.length > 3)
+      for (const word of words) {
+        // Use word boundary check to avoid false positives (e.g., "wall" in "wallet")
+        const wordRegex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+        if (wordRegex.test(prompt)) {
+          issues.push(`Forbidden word "${word}" (from "${f}") found in prompt`)
+          break
+        }
+      }
+    }
+  }
+
+  // Rule 3b: Meta-instructions leaked into prompt (should be context only, not output)
+  const metaPatterns = [
+    /\bdo not\b/i,
+    /\bdon'?t\b/i,
+    /\bnever\b/i,
+    /\bavoid\b/i,
+    /\bensure\b/i,
+    /\bmake sure\b/i,
+    /\bexplicitly\b/i,
+    /\bmust not\b/i,
+    /\bshould not\b/i,
+    /\bkeep the product at\b/i,
+    /\bkeep the scene\b/i,
+  ]
+  for (const pattern of metaPatterns) {
+    if (pattern.test(prompt)) {
+      issues.push(`Meta-instruction detected in prompt: "${prompt.match(pattern)?.[0]}"`)
+      break // One meta-instruction flag is enough
+    }
+  }
+
+  // Rule 3c: Unwanted body parts in non-worn/held modes
+  if (showcase.presentationMode !== "worn-on-model" && showcase.presentationMode !== "held-in-hand") {
+    const bodyParts = ["hand", "hands", "finger", "fingers", "wrist", "arm", "body part"]
+    for (const part of bodyParts) {
+      const partRegex = new RegExp(`\\b${part}\\b`, 'i')
+      if (partRegex.test(prompt)) {
+        issues.push(`Body part "${part}" referenced in ${showcase.presentationMode} mode prompt`)
+        break
       }
     }
   }
