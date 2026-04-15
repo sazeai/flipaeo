@@ -165,10 +165,11 @@ export function generateLandingPageWebApplicationJsonLd(slug: string): string {
   return generateWebApplicationJsonLd(props);
 }
 export function generateWebApplicationJsonLd(props?: { title?: string; description?: string; urlPath?: string; keywords?: string[] }): string {
-  const name = props?.title || defaultSEO.title;
+  const name = props?.title || defaultSEO.siteName;
   const description = props?.description || defaultSEO.description;
   const url = props?.urlPath ? seoUtils.generateCanonicalUrl(props.urlPath) : defaultSEO.siteUrl;
   const keywords = props?.keywords ? props.keywords.join(', ') : defaultSEO.keywords.join(', ');
+  const baseSiteUrl = defaultSEO.siteUrl;
 
   const webAppSchema = {
     "@context": "https://schema.org",
@@ -177,26 +178,26 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     "description": description,
     "url": url,
     "applicationCategory": "BusinessApplication",
-    "applicationSubCategory": "Content Marketing Software",
+    "applicationSubCategory": "Pinterest Marketing Software",
     "operatingSystem": "Web Browser",
     "browserRequirements": "Requires JavaScript. Requires HTML5.",
-    "softwareVersion": "1.0",
     "inLanguage": "en-US",
     "keywords": keywords,
 
     "screenshot": [
-      `${process.env.NEXT_PUBLIC_APP_URL}/images/screenshot.png`,
-      `${process.env.NEXT_PUBLIC_APP_URL}/images/screenshot-dashboard.png`
+      `${baseSiteUrl}/images/screenshot.png`,
+      `${baseSiteUrl}/images/screenshot-dashboard.png`
     ],
 
     "featureList": [
-      "30 AI-generated articles per month",
-      "Automated content strategy based on competitor analysis",
-      "CMS integration (WordPress, Webflow, Shopify)",
-      "On-brand AI images",
-      "Smart internal linking",
-      "Real-time research with verified citations",
-      "Answer-first content structure for AI visibility",
+      "AI lifestyle pin generation from product photos",
+      "Pinterest-ready titles and descriptions",
+      "Approval-first publishing workflow",
+      "Shopify and Etsy catalog sync",
+      "Pinterest scheduling and publishing",
+      "Creative optimization from performance data",
+      "Brand-aware fonts, colors, and layouts",
+      "Weekly performance reporting",
     ],
 
     "author": {
@@ -206,71 +207,20 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     },
     "publisher": {
       "@type": "Organization",
-      "name": "FlipAEO",
+      "name": organizationSchema.name,
       "logo": {
         "@type": "ImageObject",
-        "url": `${process.env.NEXT_PUBLIC_APP_URL}/site-logo.png`
+        "url": `${baseSiteUrl}/site-logo.png`
       }
     },
-    "offers": [
-      {
-        "@type": "Offer",
-        "name": "All-in-One Plan",
-        "price": "59",
-        "priceCurrency": "USD",
-        "description": "30 AI-generated articles per month with automated content strategy, CMS integration, and priority support.",
-        "availability": "https://schema.org/InStock"
-      }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "3"
-    },
-    "review": [
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Cichy",
-          "jobTitle": "Founder at Launchdirectories.com"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "5",
-          "bestRating": "5"
-        },
-        "reviewBody": "FlipAEO transformed my content strategy. the article quality is really satisfying, now i am using it on two of my saas, getting pretty results"
-      },
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Rishabh",
-          "jobTitle": "SaaS Entrepreneur"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "5",
-          "bestRating": "5"
-        },
-        "reviewBody": "The AI research quality is incredible. Our articles now get cited by ChatGPT and Perplexity regularly."
-      },
-      {
-        "@type": "Review",
-        "author": {
-          "@type": "Person",
-          "name": "Ben Krich",
-          "jobTitle": "SaaS Marketer"
-        },
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": "4.5",
-          "bestRating": "5"
-        },
-        "reviewBody": "The competitor analysis and content gap identification is a game-changer. Worth every penny."
-      }
-    ]
+    "offers": {
+      "@type": "Offer",
+      "name": "EcomPin Plan",
+      "price": "79",
+      "priceCurrency": "USD",
+      "description": "AI-assisted Pinterest marketing for ecommerce brands with lifestyle pin generation, approval workflows, and scheduled publishing.",
+      "availability": "https://schema.org/InStock"
+    }
   };
 
   return generateJsonLd(webAppSchema);
@@ -456,24 +406,24 @@ export const commonPageMetadata = {
 
   dashboard: () => generateMetadata({
     title: 'Dashboard',
-    description: 'Access your dashboard to train ai model and create ai images',
-    canonical: '/blog-writer',
+    description: 'Access your EcomPin dashboard to review generated pins, manage publishing, and track Pinterest growth.',
+    canonical: '/dashboard',
     noindex: true,
     nofollow: true,
   }),
 
   pricing: () => generateMetadata({
-    title: 'Pricing Plans',
-    description: 'Simple, transparent pricing for FlipAEO. One plan with 30 AI articles/month, automated content strategy, CMS integration. $79/month with 14-day money-back guarantee.',
+    title: 'Pricing',
+    description: 'Simple, transparent pricing for EcomPin. Turn product photos into Pinterest lifestyle pins, approve in one click, and grow organic traffic for $79/month.',
     canonical: '/pricing',
-    keywords: ['FlipAEO pricing', 'AI content pricing', 'GEO pricing', 'content engine cost'],
+    keywords: ['EcomPin pricing', 'Pinterest marketing pricing', 'AI pin generation pricing', 'Pinterest traffic tool pricing'],
   }),
 
   buyCredits: () => generateMetadata({
     title: 'Subscribe',
-    description: 'Start your FlipAEO subscription. 30 AI articles/month with automated strategy and 1-click CMS publishing.',
+    description: 'Start your EcomPin subscription and begin generating Pinterest-ready lifestyle pins for your store.',
     canonical: '/subscribe',
-    keywords: ['subscribe', 'FlipAEO subscription', 'content strategy'],
+    keywords: ['EcomPin subscription', 'Pinterest automation subscription', 'AI pin generation'],
     noindex: true,
   }),
 

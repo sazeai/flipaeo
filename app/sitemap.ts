@@ -5,19 +5,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = defaultSEO.siteUrl
   const currentDate = new Date()
 
-  // Static public pages only (no protected routes)
+  // Static public pages only (no protected or noindex routes)
   const staticPages = [
     {
       url: baseUrl,
       lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 1,
-    },
-    {
-      url: `${baseUrl}/login`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
-      priority: 0.8,
     },
   ]
 

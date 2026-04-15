@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/utils/supabase/admin"
-import { getGeminiClient } from "@/utils/gemini/geminiClient"
 import { generateEmbedding } from "@/lib/gemini-embedding"
 
 /**

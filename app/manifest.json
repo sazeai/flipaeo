@@ -1,6 +1,7 @@
 {
-  "name": "FlipAEO",
-  "short_name": "FlipAEO",
+  "name": "EcomPin",
+  "short_name": "EcomPin",
+  "description": "Autonomous Pinterest marketing for Shopify and Etsy brands.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

@@ -1,8 +1,8 @@
 /**
- * SEO Configuration for FlipAEO
- * 
- * This file contains all SEO-related configurations for FlipAEO,
- * the Strategic Content Engine for Generative Engine Optimization (GEO).
+ * SEO configuration for EcomPin.
+ *
+ * This file centralizes metadata, structured data, and crawl settings
+ * for the public marketing surface of ecompin.com.
  */
 
 export interface SEOConfig {
@@ -56,117 +56,126 @@ export interface OrganizationSchema {
 
 // Default SEO Configuration
 export const defaultSEO: SEOConfig = {
-  title: 'FlipAEO - Strategic Content Engine for AI Search Domination',
-  description: 'FlipAEO is your AI-powered Strategic Content Engine for Generative Engine Optimization (GEO). Generate authority-building articles that AI search engines cite and recommend. 30 articles/month with automated content strategy.',
+  title: 'EcomPin - Autonomous Pinterest Agent for Shopify & Etsy Brands',
+  description: 'EcomPin is an autonomous Pinterest marketing agent for ecommerce brands. Turn product photos into lifestyle pins, approve faster, and grow store traffic.',
   keywords: [
-    'GEO',
-    'generative engine optimization',
-    'AI search optimization',
-    'AI content engine',
-    'AI article generator',
-    'authority content',
-    'AI visibility',
-    'content strategy',
-    'SEO AI tool',
-    'ChatGPT ranking',
-    'Perplexity optimization',
-    'AI citations',
-    'B2B content marketing',
-    'automated content creation',
-    'brand authority'
+    'Pinterest marketing automation',
+    'AI Pinterest tool',
+    'Pinterest pin generator',
+    'AI pin generator',
+    'Pinterest automation for Shopify',
+    'Pinterest automation for Etsy',
+    'ecommerce Pinterest marketing',
+    'lifestyle pin generator',
+    'Pinterest traffic tool',
+    'Pinterest scheduler',
+    'Pinterest SEO tool',
+    'product photo to lifestyle pin',
+    'Pinterest marketing software',
+    'Shopify Pinterest automation',
+    'Etsy Pinterest automation',
   ],
-  author: 'FlipAEO',
-  siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://flipaeo.com',
-  siteName: 'FlipAEO',
+  author: 'EcomPin',
+  siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://ecompin.com',
+  siteName: 'EcomPin',
   locale: 'en_US',
   type: 'website',
   robots: 'index, follow',
-  // Add your verification codes here
-  googleSiteVerification: '',
-  yandexVerification: '',
+  googleSiteVerification:
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+    process.env.GOOGLE_SITE_VERIFICATION ||
+    undefined,
+  bingSiteVerification:
+    process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ||
+    process.env.BING_SITE_VERIFICATION ||
+    undefined,
+  yandexVerification:
+    process.env.NEXT_PUBLIC_YANDEX_VERIFICATION ||
+    process.env.YANDEX_VERIFICATION ||
+    undefined,
 };
 
 // Social Media Configuration
 export const socialConfig: SocialConfig = {
   twitter: {
-    handle: '@flipaeo',
-    site: '@flipaeo',
+    handle: '@EcomPin',
+    site: '@EcomPin',
     cardType: 'summary_large_image',
   },
   linkedin: {
-    handle: 'flipaeo',
+    handle: 'ecompin',
   },
 };
 
 // Organization Schema for Structured Data
 export const organizationSchema: OrganizationSchema = {
   '@type': 'Organization',
-  name: 'FlipAEO',
+  name: 'EcomPin',
   url: defaultSEO.siteUrl,
   logo: `${defaultSEO.siteUrl}/site-logo.png`,
-  description: 'Strategic Content Engine for Generative Engine Optimization. Helping businesses dominate AI search with authority-building content.',
+  description: 'Autonomous Pinterest marketing for ecommerce brands. EcomPin turns product photos into lifestyle pins and helps stores grow traffic from Pinterest.',
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer service',
-    email: 'support@flipaeo.com',
+    email: 'support@ecompin.com',
   },
   sameAs: [
-    'https://x.com/flipaeo',
+    'https://x.com/EcomPin',
   ],
 };
 
 // --- Page-specific SEO configurations ---
 export const pageSEO = {
   home: {
-    title: 'FlipAEO - Strategic Content Engine for AI Search Domination',
-    description: 'Generate authority-building articles that AI search engines cite and recommend. 30 AI-researched articles/month with automated content strategy.',
-    keywords: ['AEO', 'GEO', 'generative engine optimization', 'Answer Engine Optimization', 'AI search optimization', 'AI content engine', 'content strategy', 'AI SEO blog writer'],
+    title: 'Autonomous Pinterest Agent for Shopify & Etsy Brands',
+    description: 'Turn product photos into Pinterest-ready lifestyle pins, approve faster, and grow outbound clicks with EcomPin.',
+    keywords: ['Pinterest marketing automation', 'AI Pinterest tool', 'Pinterest pin generator', 'Shopify Pinterest automation', 'Etsy Pinterest automation', 'lifestyle pin generator'],
   },
   login: {
-    title: 'Sign In - FlipAEO',
-    description: 'Sign in to your FlipAEO account to access your content dashboard and generate AI-researched articles.',
-    keywords: ['login', 'sign in', 'FlipAEO account', 'content dashboard'],
+    title: 'Sign In',
+    description: 'Sign in to your EcomPin account to review pins, manage publishing, and track Pinterest growth.',
+    keywords: ['login', 'sign in', 'EcomPin account', 'Pinterest dashboard'],
   },
   dashboard: {
-    title: 'Content Dashboard - FlipAEO',
-    description: 'Access your FlipAEO dashboard to manage your content strategy, generate articles, and publish to your CMS.',
-    keywords: ['dashboard', 'content management', 'article generation'],
+    title: 'Dashboard',
+    description: 'Access your EcomPin dashboard to review generated pins, manage publishing, and track store traffic.',
+    keywords: ['Pinterest dashboard', 'pin management', 'Pinterest automation'],
     robots: 'noindex, nofollow',
   },
   pricing: {
-    title: 'Pricing - FlipAEO | $79/Month for dominating Google and AI search engines',
-    description: 'Simple, transparent pricing for FlipAEO. One plan with everything you need: 30 AI-generated articles/month, automated content strategy, CMS integration, and priority support. 14-day money-back guarantee.',
-    keywords: ['FlipAEO pricing', 'AI seo content generation pricing', 'AI Search visibility pricing', 'content engine cost', 'article generation pricing'],
+    title: 'Pricing',
+    description: 'Simple pricing for EcomPin. Turn product photos into Pinterest lifestyle pins, approve in one click, and grow organic traffic for $79/month.',
+    keywords: ['EcomPin pricing', 'Pinterest marketing pricing', 'AI pin generation pricing', 'Pinterest traffic tool pricing'],
   },
   about: {
-    title: 'About FlipAEO - Our Mission to Democratize AI Visibility',
-    description: 'Learn the story behind FlipAEO and our mission to help businesses of all sizes win in the age of AI search through strategic, authority-building content.',
-    keywords: ['about FlipAEO', 'AI content company', 'GEO company', 'content strategy team'],
+    title: 'About',
+    description: 'Learn how EcomPin helps ecommerce brands automate Pinterest marketing with AI-generated lifestyle pins and approval-first workflows.',
+    keywords: ['about EcomPin', 'Pinterest marketing platform', 'ecommerce growth software'],
   },
   blog: {
-    title: 'Blog - FlipAEO | AEO/GEO & AI Content Strategy Insights',
-    description: 'Expert insights on Generative Engine Optimization (GEO), AI search visibility, content strategy, and how to get cited by AI search engines like ChatGPT and Perplexity.',
-    keywords: ['AEO guides', 'GEO guides', 'AI SEO tips', 'content strategy blog', 'AI visibility insights', 'generative engine optimization guide'],
+    title: 'Blog',
+    description: 'Insights on Pinterest marketing, ecommerce growth, creative strategy, and AI-assisted pin workflows.',
+    keywords: ['Pinterest marketing blog', 'ecommerce Pinterest tips', 'AI pin strategy', 'Pinterest traffic insights'],
   },
   privacyPolicy: {
-    title: 'Privacy Policy - FlipAEO',
-    description: 'Learn how FlipAEO collects, uses, and protects your personal data. We integrate with Google services including OAuth and Google Search Console.',
-    keywords: ['FlipAEO privacy', 'data protection', 'GDPR compliance', 'Google API privacy'],
+    title: 'Privacy Policy',
+    description: 'Learn how EcomPin collects, uses, and protects your data across account, catalog, and Pinterest integrations.',
+    keywords: ['EcomPin privacy', 'Pinterest marketing privacy', 'catalog data privacy', 'GDPR compliance'],
   },
   terms: {
-    title: 'Terms of Service - FlipAEO',
-    description: 'Review the terms and conditions for using FlipAEO, the Strategic Content Engine for Generative Engine Optimization.',
-    keywords: ['FlipAEO terms', 'terms of service', 'user agreement', 'content license'],
+    title: 'Terms of Service',
+    description: 'Review the terms for using EcomPin, the AI-assisted Pinterest marketing platform for ecommerce brands.',
+    keywords: ['EcomPin terms', 'terms of service', 'user agreement', 'Pinterest marketing platform'],
   },
   refundPolicy: {
-    title: 'Refund Policy - FlipAEO | 14-Day Money-Back Guarantee',
-    description: 'FlipAEO offers a 14-day money-back guarantee. If you are not satisfied with the quality of your articles, we will refund you in full.',
-    keywords: ['FlipAEO refund', 'money-back guarantee', 'refund policy', 'cancellation'],
+    title: 'Refund Policy',
+    description: 'Read EcomPin\'s refund policy, including our 14-day money-back guarantee and eligibility requirements.',
+    keywords: ['EcomPin refund', 'money-back guarantee', 'refund policy', 'subscription cancellation'],
   },
   subscribe: {
-    title: 'Subscribe - FlipAEO | Start Your Content Strategy',
-    description: 'Subscribe to FlipAEO and start generating authority-building articles that AI search engines cite. 30 articles/month, automated strategy, 1-click CMS publishing.',
-    keywords: ['subscribe FlipAEO', 'start content strategy', 'AI content subscription'],
+    title: 'Subscribe',
+    description: 'Start your EcomPin subscription and begin generating Pinterest-ready lifestyle pins for your store.',
+    keywords: ['EcomPin subscription', 'Pinterest automation subscription', 'AI pin generation'],
     robots: 'noindex, nofollow',
   },
 };
@@ -177,13 +186,13 @@ export const openGraphImages = {
     url: `${defaultSEO.siteUrl}/og-image.png`,
     width: 1200,
     height: 630,
-    alt: 'FlipAEO - Strategic Content Engine for AI Search Domination',
+    alt: 'EcomPin - Autonomous Pinterest Agent for Shopify & Etsy Brands',
   },
   logo: {
     url: `${defaultSEO.siteUrl}/site-logo.png`,
     width: 400,
     height: 400,
-    alt: 'FlipAEO Logo',
+    alt: 'EcomPin Logo',
   },
 };
 
@@ -194,11 +203,14 @@ export const robotsConfig = {
     allow: '/',
     disallow: [
       '/api/',
-      '/blog-writer/',
-      '/account/',
-      '/settings/',
-      '/admin/',
-      '/onboarding/',
+      '/dashboard',
+      '/account',
+      '/settings',
+      '/products',
+      '/pins',
+      '/integrations',
+      '/onboarding',
+      '/subscribe',
     ],
   },
   sitemap: `${defaultSEO.siteUrl}/sitemap.xml`,
@@ -209,16 +221,18 @@ export const sitemapConfig = {
   siteUrl: defaultSEO.siteUrl,
   generateRobotsTxt: true,
   exclude: [
-    '/blog-writer/*',
+    '/dashboard/*',
     '/account/*',
-    '/reports/*',
     '/settings/*',
+    '/products/*',
+    '/pins/*',
+    '/integrations/*',
     '/api/*',
     '/auth/*',
     '/error',
-    '/admin/*',
     '/onboarding/*',
     '/subscribe/*',
+    '/login',
   ],
   additionalPaths: async () => {
     return [];
@@ -242,28 +256,27 @@ export const schemaTemplates = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: defaultSEO.siteName,
-    description: 'Strategic Content Engine for Generative Engine Optimization (GEO). Generate authority-building articles that AI search engines cite and recommend.',
+    description: 'Autonomous Pinterest marketing for ecommerce brands. Turn product photos into lifestyle pins, approve faster, and grow outbound clicks.',
     url: defaultSEO.siteUrl,
     applicationCategory: 'BusinessApplication',
-    applicationSubCategory: 'Content Marketing Software',
+    applicationSubCategory: 'Pinterest Marketing Software',
     operatingSystem: 'Web Browser',
     offers: {
       '@type': 'Offer',
-      price: '59',
+      price: '79',
       priceCurrency: 'USD',
       availability: 'https://schema.org/InStock',
-      priceValidUntil: '2026-02-29',
     },
     publisher: organizationSchema,
     featureList: [
-      '30 AI-generated articles per month',
-      'Automated content strategy based on competitor analysis',
-      'CMS integration (WordPress, Webflow, Shopify)',
-      'On-brand AI images',
-      'Smart internal linking',
-      'Real-time research with verified citations',
-      'Answer-first content structure for AI visibility',
-      'Priority support',
+      'AI lifestyle pin generation from product photos',
+      'Pinterest-ready titles and descriptions',
+      'Approval-first publishing workflow',
+      'Shopify and Etsy catalog sync',
+      'Pinterest scheduling and publishing',
+      'Creative optimization from performance data',
+      'Brand-aware fonts, colors, and layouts',
+      'Weekly performance reporting',
     ],
   },
   service: (service: { name: string, description: string, url: string, serviceType: string, provider: any }) => ({
@@ -280,7 +293,7 @@ export const schemaTemplates = {
     },
     offers: {
       '@type': 'Offer',
-      price: '59',
+      price: '79',
       priceCurrency: 'USD'
     }
   })

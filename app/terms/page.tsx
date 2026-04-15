@@ -8,6 +8,7 @@ import { seoUtils } from '@/config/seo'
 export const metadata: Metadata = generateMetadata({
   title: 'Terms of Service',
   description: 'Review the terms and conditions for using EcomPin, the AI-assisted Pinterest Marketing Tool.',
+  keywords: ['EcomPin terms of service', 'Pinterest marketing platform terms', 'user agreement', 'subscription terms'],
   canonical: '/terms',
 })
 

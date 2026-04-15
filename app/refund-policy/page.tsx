@@ -8,7 +8,8 @@ import { seoUtils } from '@/config/seo'
 export const metadata: Metadata = generateMetadata({
   title: 'Refund Policy',
   description:
-    'Read about our refund policy for FlipAEO, including our 14-day money-back guarantee and eligibility requirements.',
+    'Read about EcomPin\'s refund policy, including our 14-day money-back guarantee and eligibility requirements.',
+  keywords: ['EcomPin refund policy', 'money-back guarantee', 'subscription refund', 'Pinterest marketing refund'],
   canonical: '/refund-policy',
 })
 
@@ -34,24 +35,24 @@ export default function RefundPolicy() {
             <div className="">
               <p>
                 Thank you for choosing{' '}
-                <a href="https://www.flipaeo.com" className="text-indigo-600">FlipAEO</a>{' '}
-                for your content strategy needs. We stand behind our Strategic Content Engine with a 14-day money-back guarantee. Please review our refund policy below.
+                <a href="https://ecompin.com" className="text-indigo-600">EcomPin</a>{' '}
+                for your Pinterest marketing needs. We stand behind our platform with a 14-day money-back guarantee. Please review our refund policy below.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">1. 14-Day Money-Back Guarantee</h2>
               <p>
-                We offer a <strong>14-day money-back guarantee</strong> on all new subscriptions. If you're not satisfied with the quality of your initial articles within the first 14 days, you'll refund your subscription payment in full. No questions asked.
+                We offer a <strong>14-day money-back guarantee</strong> on all new subscriptions. If you're not satisfied with the quality of your initial pins or workflows within the first 14 days, we'll refund your subscription payment in full.
               </p>
             </div>
 
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">2. Refund Scenarios</h2>
               <ul className="list-disc list-inside pl-5">
-                <li><strong>Not Satisfied with Quality:</strong> If the generated articles don't meet your expectations within the first 14 days, you're eligible for a full refund.</li>
-                <li><strong>Technical Issues:</strong> If you encounter technical problems that prevent article generation or delivery, you may be eligible for a refund.</li>
-                <li><strong>Service Not Delivered:</strong> If you've paid for a subscription but articles weren't generated, you're entitled to a refund.</li>
+                <li><strong>Not Satisfied with Quality:</strong> If the generated pins or creative direction do not meet your expectations within the first 14 days, you're eligible for a full refund.</li>
+                <li><strong>Technical Issues:</strong> If you encounter technical problems that prevent pin generation, approval, or scheduled publishing, you may be eligible for a refund.</li>
+                <li><strong>Service Not Delivered:</strong> If you've paid for a subscription but your assets were not generated or made available, you're entitled to a refund.</li>
                 <li><strong>Duplicate Charges:</strong> If you're accidentally charged more than once for the same subscription, we'll refund the duplicate charge immediately.</li>
               </ul>
             </div>
@@ -73,8 +74,8 @@ export default function RefundPolicy() {
                   <strong>Non-Refundable Situations:</strong>
                   <ul className="list-disc list-inside pl-5 mt-2">
                     <li>Refund requests made after the 14-day guarantee period (except for documented technical issues).</li>
-                    <li>Content has already been published to your CMS and is in use.</li>
-                    <li>Dissatisfaction due to unrealistic expectations or failure to provide accurate brand/competitor information.</li>
+                    <li>Approved assets have already been published extensively or used in paid creative production.</li>
+                    <li>Dissatisfaction due to unrealistic expectations or failure to provide accurate product, catalog, or brand information.</li>
                     <li>Violation of our Terms of Service.</li>
                   </ul>
                 </li>
@@ -88,7 +89,7 @@ export default function RefundPolicy() {
               </p>
               <ul className="list-disc list-inside pl-5 mt-2">
                 <li>Your subscription will remain active until the end of your current billing period.</li>
-                <li>You'll retain access to all previously generated articles.</li>
+                <li>You'll retain access to all previously generated pins and approved assets.</li>
                 <li>No further charges will be made after the current period ends.</li>
               </ul>
             </div>
@@ -97,7 +98,7 @@ export default function RefundPolicy() {
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">6. How to Request a Refund</h2>
               <p>
                 To request a refund, please contact our support team at{' '}
-                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">support@flipaeo.com</a> with:
+                <a href="mailto:support@ecompin.com" className="text-blue-500 hover:underline">support@ecompin.com</a> with:
               </p>
               <ul className="list-disc list-inside pl-5 mt-2">
                 <li>Your account email address</li>
@@ -112,8 +113,8 @@ export default function RefundPolicy() {
             <div className="">
               <h2 className="text-2xl font-bold mb-2 font-[var(--font-inter-tight)]">7. Alternative Solutions</h2>
               <ul className="list-disc list-inside pl-5">
-                <li><strong>Article Regeneration:</strong> If you're unhappy with specific articles, we can regenerate them with adjusted parameters at no extra cost.</li>
-                <li><strong>Brand Voice Adjustment:</strong> We can refine your brand voice settings to better match your expectations.</li>
+                <li><strong>Pin Regeneration:</strong> If you're unhappy with specific creatives, we can regenerate them with adjusted visual direction at no extra cost.</li>
+                <li><strong>Brand Direction Adjustment:</strong> We can refine your brand settings to better match your preferred aesthetic and copy style.</li>
                 <li><strong>Subscription Pause:</strong> If you need a break, we can pause your subscription instead of canceling.</li>
               </ul>
             </div>
@@ -121,7 +122,7 @@ export default function RefundPolicy() {
             <div className="">
               <p>
                 If you have any questions about our refund policy, please contact us at{' '}
-                <a href="mailto:support@flipaeo.com" className="text-blue-500 hover:underline">support@flipaeo.com</a>.
+                <a href="mailto:support@ecompin.com" className="text-blue-500 hover:underline">support@ecompin.com</a>.
                 We're committed to your success and happy to help!
               </p>
             </div>

@@ -7,10 +7,11 @@ import Button from '@/components/landing/Button'
 import { Check, ShieldCheck } from 'lucide-react'
 import { FAQItem } from './FAQItem'
 import { generateMetadata as genMeta } from '@/lib/seo'
+import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = genMeta({
-  title: 'Pricing — EcomPin',
-  description: 'Your AI Art Director for Pinterest. We do 99% of the work, you retain 100% creative control. Generate lifestyle pins, approve with one click, and drive traffic to your store.',
+  title: 'Pricing',
+  description: 'Autonomous Pinterest marketing for Shopify and Etsy brands. Turn product photos into lifestyle pins, approve in one click, and drive traffic to your store.',
   keywords: ['EcomPin pricing', 'Pinterest marketing pricing', 'automated Pinterest pins', 'Pinterest traffic tool'],
   canonical: '/pricing',
 })
@@ -52,20 +53,20 @@ const faqs = [
 
 const comparisonData = {
   traditional: [
-    { aspect: "Cost", traditional: "$500–2000/mo (VA or agency)", flipaeo: "$79/month, AI-powered" },
-    { aspect: "Pin Quality", traditional: "Generic Canva templates", flipaeo: "AI lifestyle photography with brand fonts" },
-    { aspect: "Publishing", traditional: "Manual daily pinning", flipaeo: "AI-supervised drip publishing 24/7" },
-    { aspect: "Strategy", traditional: "Guesswork or paid audits", flipaeo: "Self-optimizing based on click data" },
-    { aspect: "Account Safety", traditional: "Risk of shadow ban from over-pinning", flipaeo: "3-phase warmup + auto-throttle" },
-    { aspect: "Scaling", traditional: "Hire more VAs", flipaeo: "Add products, engine scales automatically" },
+    { aspect: "Cost", traditional: "$500–2000/mo (VA or agency)", ecompin: "$79/month, AI-powered" },
+    { aspect: "Pin Quality", traditional: "Generic Canva templates", ecompin: "AI lifestyle photography with brand fonts" },
+    { aspect: "Publishing", traditional: "Manual daily pinning", ecompin: "AI-supervised drip publishing 24/7" },
+    { aspect: "Strategy", traditional: "Guesswork or paid audits", ecompin: "Self-optimizing based on click data" },
+    { aspect: "Account Safety", traditional: "Risk of shadow ban from over-pinning", ecompin: "3-phase warmup + auto-throttle" },
+    { aspect: "Scaling", traditional: "Hire more VAs", ecompin: "Add products, engine scales automatically" },
   ],
   generic: [
-    { aspect: "Purpose", generic: "Generic social media scheduler", flipaeo: "Purpose-built for Pinterest e-commerce" },
-    { aspect: "Images", generic: "Upload your own images", flipaeo: "AI generates lifestyle scenes from product photos" },
-    { aspect: "Copy", generic: "Write your own captions", flipaeo: "Pinterest SEO optimized automatically" },
-    { aspect: "Optimization", generic: "A/B test manually", flipaeo: "Closed-loop AI learns what converts" },
-    { aspect: "Account Health", generic: "No protection", flipaeo: "Shadow ban detection + warmup protocol" },
-    { aspect: "Setup", generic: "Hours of configuration", flipaeo: "Connect store → engine runs" },
+    { aspect: "Purpose", generic: "Generic social media scheduler", ecompin: "Purpose-built for Pinterest e-commerce" },
+    { aspect: "Images", generic: "Upload your own images", ecompin: "AI generates lifestyle scenes from product photos" },
+    { aspect: "Copy", generic: "Write your own captions", ecompin: "Pinterest SEO optimized automatically" },
+    { aspect: "Optimization", generic: "A/B test manually", ecompin: "Closed-loop AI learns what converts" },
+    { aspect: "Account Health", generic: "No protection", ecompin: "Shadow ban detection + warmup protocol" },
+    { aspect: "Setup", generic: "Hours of configuration", ecompin: "Connect store → engine runs" },
   ]
 }
 
@@ -231,7 +232,7 @@ export default function PricingPage() {
                   </div>
                 </div>
 
-                {/* Option C: FlipAEO */}
+                {/* Option C: EcomPin */}
                 <div className="relative p-6 rounded-xl bg-brand-50 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-4 mt-6 overflow-hidden">
 
                   <div className="flex items-center gap-4 w-full md:w-auto relative z-10">
@@ -266,7 +267,7 @@ export default function PricingPage() {
               How We Stack Up
             </h2>
             <p className="font-sans text-stone-500 text-lg max-w-2xl mx-auto">
-              See why FlipAEO beats traditional agencies and generic AI tools.
+              See why EcomPin beats traditional agencies and generic AI tools.
             </p>
           </div>
 
@@ -292,7 +293,7 @@ export default function PricingPage() {
                           <td className="p-4 pl-6 text-sm font-medium text-stone-900 border-b border-stone-50 group-last:border-0">{row.aspect}</td>
                           <td className="p-4 text-xs md:text-sm text-stone-500 border-b border-stone-50 group-last:border-0 leading-tight">{row.traditional}</td>
                           <td className="p-4 text-xs md:text-sm font-medium text-brand-900 bg-brand-50/10 border-b border-stone-50 group-last:border-0 border-l border-dashed border-stone-100 leading-tight">
-                            {row.flipaeo}
+                            {row.ecompin}
                           </td>
                         </tr>
                       ))}
@@ -323,7 +324,7 @@ export default function PricingPage() {
                           <td className="p-4 pl-6 text-sm font-medium text-stone-900 border-b border-stone-50 group-last:border-0">{row.aspect}</td>
                           <td className="p-4 text-xs md:text-sm text-stone-500 border-b border-stone-50 group-last:border-0 leading-tight">{row.generic}</td>
                           <td className="p-4 text-xs md:text-sm font-medium text-brand-900 bg-brand-50/10 border-b border-stone-50 group-last:border-0 border-l border-dashed border-stone-100 leading-tight">
-                            {row.flipaeo}
+                            {row.ecompin}
                           </td>
                         </tr>
                       ))}
@@ -385,8 +386,8 @@ export default function PricingPage() {
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
               "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://flipaeo.com/" },
-                { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://flipaeo.com/pricing" }
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": seoUtils.generateCanonicalUrl('/') },
+                { "@type": "ListItem", "position": 2, "name": "Pricing", "item": seoUtils.generateCanonicalUrl('/pricing') }
               ]
             }
           },

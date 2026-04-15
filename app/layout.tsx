@@ -99,7 +99,7 @@ export default async function RootLayout({
         {/* Apple-specific meta tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-status-bar-style" content="default" />
-        <meta name="mobile-web-app-title" content="FlipAEO" />
+        <meta name="mobile-web-app-title" content="EcomPin" />
 
         {/* Microsoft tiles */}
         <meta name="msapplication-TileColor" content="#000000" />
@@ -107,12 +107,6 @@ export default async function RootLayout({
 
         {/* Theme color */}
         <meta name="theme-color" content="#000000" />
-
-        {/* Google Search Console Verification */}
-        <meta name="google-site-verification" content="HFUei7qB8OnXJs9EK9i48sky9Van9zgfcfjZDIHOU_c" />
-
-        {/* Yandex Webmaster Verification */}
-        <meta name="yandex-verification" content="9072c035937b6e28" />
 
         {/* Organization Schema - Global */}
         <StructuredData

@@ -60,10 +60,7 @@ export function parseContent(rawContent: string): ParsedContent {
         }
 
         // 2. Load into Cheerio for extraction with proper settings
-        const $ = cheerio.load(sanitizedContent, {
-            decodeEntities: false, // Preserve HTML entities
-            // selfClosingTags: ['img', 'br', 'hr', 'input', 'meta', 'link']
-        })
+        const $ = cheerio.load(sanitizedContent)
 
         const tocEntries: TOCEntry[] = []
         const faqs: FAQEntry[] = []

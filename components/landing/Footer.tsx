@@ -57,7 +57,7 @@ export function Footer() {
                 <nav className="flex flex-col gap-3">
                   <Link href="/about" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">About Us</Link>
                   <Link href="/blog" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Blog</Link>
-                  <Link href="mailto:support@flipaeo.com" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Contact</Link>
+                  <Link href="mailto:support@ecompin.com" className="font-sans text-sm text-stone-500 hover:text-brand-600 transition-colors duration-200 w-fit">Contact</Link>
                 </nav>
               </div>
 
@@ -94,7 +94,7 @@ export function Footer() {
                 </svg>
               </Link>
               <Link
-                href="mailto:support@flipaeo.com"
+                href="mailto:support@ecompin.com"
                 aria-label="Email"
                 className="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-stone-400 hover:bg-brand-50 hover:text-brand-600 border border-stone-200 hover:border-brand-200 transition-all duration-300"
               >

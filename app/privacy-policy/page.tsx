@@ -7,7 +7,8 @@ import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Privacy Policy',
-  description: 'Learn how EcomPin collects, uses, and protects your personal data.',
+  description: 'Learn how EcomPin collects, uses, and protects your data across account, catalog, and Pinterest integrations.',
+  keywords: ['EcomPin privacy policy', 'Pinterest marketing privacy', 'catalog data privacy', 'GDPR compliance'],
   canonical: '/privacy-policy',
 })
 

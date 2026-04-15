@@ -307,7 +307,7 @@ const CMSVisual = () => (
       {/* Source Node */}
       <div className="relative z-10 bg-stone-900 text-white px-4 py-2 rounded-lg shadow-lg flex flex-col items-center">
         <span className="text-[8px] font-bold tracking-widest text-brand-400 mb-0.5">SOURCE</span>
-        <span className="font-serif font-bold text-lg leading-none">FlipAEO</span>
+        <span className="font-serif font-bold text-lg leading-none">EcomPin</span>
         {/* Output Nodes Connector */}
         <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-900"></div>
       </div>
