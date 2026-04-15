@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Plus, X } from 'lucide-react';
+import { generateFAQJsonLd } from '@/lib/seo';
 
 const FAQS = [
   {
@@ -51,20 +52,6 @@ const FAQItem = ({ item }: { item: typeof FAQS[0] }) => {
 import { CornerDot } from './CornerDot';
 
 export const FAQSection: React.FC = () => {
-  // Generate FAQ Schema for SEO
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": FAQS.map(faq => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
-
   return (
     <>
       <section id="faq" className="w-full py-24 relative z-10">
@@ -126,7 +113,7 @@ export const FAQSection: React.FC = () => {
       {/* FAQ Schema for SEO */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        dangerouslySetInnerHTML={{ __html: generateFAQJsonLd(FAQS) }}
       />
     </>
   );

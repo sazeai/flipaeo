@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { Navbar } from '@/components/landing/Navbar'
 import { Footer } from '@/components/landing/Footer'
-import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
+import { generateBreadcrumbJsonLd, generateMetadata, generateWebPageJsonLd } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 
@@ -134,6 +134,16 @@ export default function RefundPolicy() {
       {/* Structured Data */}
       <MultipleStructuredData
         schemas={[
+          {
+            id: 'webpage',
+            data: JSON.parse(
+              generateWebPageJsonLd({
+                title: 'Refund Policy',
+                description: 'Read about EcomPin\'s refund policy, including our 14-day money-back guarantee and eligibility requirements.',
+                urlPath: '/refund-policy',
+              })
+            ),
+          },
           {
             id: 'breadcrumb',
             data: JSON.parse(

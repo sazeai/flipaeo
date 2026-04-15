@@ -27,7 +27,7 @@ export default function Home() {
         <GridBackground />
       </div>
       {/* WebApplication Schema - Home Page Only */}
-      <StructuredData data={JSON.parse(generateWebApplicationJsonLd())} />
+      <StructuredData id="home-webapplication-schema" data={JSON.parse(generateWebApplicationJsonLd())} />
       <Navbar />
       <main className="flex-grow flex flex-col items-center w-full">
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { Link2, CheckCircle2, Loader2, Store, Key, Link as LinkIcon, AlertCircle } from "lucide-react"
+import { Link2, CheckCircle2, Loader2, Key, Link as LinkIcon, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GlobalCard } from "@/components/ui/global-card"
 import { CustomSpinner } from "@/components/CustomSpinner"
@@ -64,11 +64,14 @@ export default function IntegrationsPage() {
       const conns: Connection[] = []
 
       // Pinterest
-      const { data: pinterest } = await supabase
+      const { data: pinterestRows } = await supabase
         .from("pinterest_connections")
         .select("id, pinterest_user_id, warmup_phase, created_at, updated_at")
         .eq("user_id", user.id)
-        .maybeSingle()
+        .order("updated_at", { ascending: false })
+        .limit(1)
+
+      const pinterest = pinterestRows?.[0]
 
       if (pinterest) {
         conns.push({
@@ -82,11 +85,14 @@ export default function IntegrationsPage() {
       }
 
       // Shopify
-      const { data: shopify } = await supabase
+      const { data: shopifyRows } = await supabase
         .from("shopify_connections")
-        .select("id, store_name, store_domain, created_at")
+        .select("id, store_name, store_domain, created_at, updated_at")
         .eq("user_id", user.id)
-        .maybeSingle()
+        .order("updated_at", { ascending: false })
+        .limit(1)
+
+      const shopify = shopifyRows?.[0]
 
       if (shopify) {
         conns.push({
@@ -97,14 +103,19 @@ export default function IntegrationsPage() {
           connectedAt: shopify.created_at,
           meta: shopify.store_domain,
         })
+
+        setShowShopifyForm(false)
       }
 
       // Etsy
-      const { data: etsy } = await supabase
+      const { data: etsyRows } = await supabase
         .from("etsy_connections")
-        .select("id, shop_name, created_at")
+        .select("id, shop_name, created_at, updated_at")
         .eq("user_id", user.id)
-        .maybeSingle()
+        .order("updated_at", { ascending: false })
+        .limit(1)
+
+      const etsy = etsyRows?.[0]
 
       if (etsy) {
         conns.push({
@@ -126,7 +137,7 @@ export default function IntegrationsPage() {
     if (platform === "pinterest") {
       window.location.href = "/api/auth/pinterest"
     } else if (platform === "etsy") {
-      window.location.href = "/api/auth/etsy"
+      toast.info("Etsy integration is coming soon.")
     } else if (platform === "shopify") {
       setShowShopifyForm(prev => !prev)
     }
@@ -175,13 +186,13 @@ export default function IntegrationsPage() {
       toast.error("Failed to disconnect")
     } else {
       toast.success(`${platform} disconnected`)
-      setConnections(prev => prev.filter(c => c.id !== id))
       if (platform === "shopify") {
         setShowShopifyForm(false)
         setStoreUrl("")
         setClientId("")
         setClientSecret("")
       }
+      await loadConnections()
     }
   }
 
@@ -214,9 +225,10 @@ export default function IntegrationsPage() {
     {
       id: "etsy",
       name: "Etsy",
-      description: "Import your Etsy listings to generate lifestyle pins.",
+      description: "Direct Etsy connection is coming soon.",
       icon: "🧶",
       required: false,
+      comingSoon: true,
     },
   ]
 
@@ -244,6 +256,7 @@ export default function IntegrationsPage() {
           {platforms.map((platform) => {
             const connection = connections.find(c => c.platform === platform.id)
             const isConnected = !!connection
+            const isComingSoon = Boolean(platform.comingSoon) && !isConnected
 
             return (
               <div
@@ -252,6 +265,8 @@ export default function IntegrationsPage() {
                   w-full rounded-xl border transition-all duration-200 overflow-hidden
                   ${isConnected
                     ? "bg-stone-50/30 border-stone-300 ring-1 ring-stone-200"
+                    : isComingSoon
+                      ? "bg-stone-50/50 border-stone-200"
                     : "bg-white border-stone-200 hover:border-stone-300"
                   }
                 `}
@@ -271,6 +286,11 @@ export default function IntegrationsPage() {
                             Required
                           </span>
                         )}
+                        {isComingSoon && (
+                          <span className="text-[9px] font-bold text-stone-600 bg-stone-100 border border-stone-200 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                            Coming Soon
+                          </span>
+                        )}
                         {isConnected && (
                           <CheckCircle2 className="w-4 h-4 text-green-500" />
                         )}
@@ -288,15 +308,35 @@ export default function IntegrationsPage() {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="flex items-center gap-2">
                     {isConnected ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled
+                          className="h-8 text-xs font-bold border-green-200 bg-green-50 text-green-700 hover:bg-green-50 hover:text-green-700 disabled:opacity-100"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                          Connected
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs font-bold text-stone-500 hover:text-red-600 hover:border-red-200"
+                          onClick={() => handleDisconnect(platform.id, connection.id)}
+                        >
+                          Disconnect
+                        </Button>
+                      </>
+                    ) : isComingSoon ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 text-xs font-bold text-stone-500 hover:text-red-600 hover:border-red-200"
-                        onClick={() => handleDisconnect(platform.id, connection.id)}
+                        disabled
+                        className="h-8 text-xs font-bold text-stone-500 border-stone-200 bg-white disabled:opacity-100"
                       >
-                        Disconnect
+                        Coming Soon
                       </Button>
                     ) : (
                       <Button

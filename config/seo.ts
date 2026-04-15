@@ -33,6 +33,7 @@ export interface SocialConfig {
 
 export interface OrganizationSchema {
   '@type': string;
+  '@id'?: string;
   name: string;
   url: string;
   logo: string;
@@ -110,6 +111,7 @@ export const socialConfig: SocialConfig = {
 // Organization Schema for Structured Data
 export const organizationSchema: OrganizationSchema = {
   '@type': 'Organization',
+  '@id': `${defaultSEO.siteUrl}#organization`,
   name: 'EcomPin',
   url: defaultSEO.siteUrl,
   logo: `${defaultSEO.siteUrl}/site-logo.png`,
@@ -244,12 +246,12 @@ export const schemaTemplates = {
   website: {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${defaultSEO.siteUrl}#website`,
     name: defaultSEO.siteName,
     url: defaultSEO.siteUrl,
     description: defaultSEO.description,
     publisher: {
-      '@type': 'Organization',
-      name: organizationSchema.name,
+      '@id': organizationSchema['@id'],
     },
   },
   softwareApplication: {

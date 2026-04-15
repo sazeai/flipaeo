@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { Navbar } from '@/components/landing/Navbar'
 import { Footer } from '@/components/landing/Footer'
-import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
+import { generateBreadcrumbJsonLd, generateMetadata, generateWebPageJsonLd } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 
@@ -191,6 +191,17 @@ export default function PrivacyPolicy() {
       {/* Structured Data */}
       <MultipleStructuredData
         schemas={[
+          {
+            id: 'webpage',
+            data: JSON.parse(
+              generateWebPageJsonLd({
+                title: 'Privacy Policy',
+                description: 'Learn how EcomPin collects, uses, and protects your data across account, catalog, and Pinterest integrations.',
+                urlPath: '/privacy-policy',
+                dateModified: '2026-03-25',
+              })
+            ),
+          },
           {
             id: 'breadcrumb',
             data: JSON.parse(

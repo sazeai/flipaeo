@@ -6,7 +6,12 @@ import Link from 'next/link'
 import Button from '@/components/landing/Button'
 import { Check, ShieldCheck } from 'lucide-react'
 import { FAQItem } from './FAQItem'
-import { generateMetadata as genMeta } from '@/lib/seo'
+import {
+  generateBreadcrumbJsonLd,
+  generateFAQJsonLd,
+  generateMetadata as genMeta,
+  generateProductJsonLd,
+} from '@/lib/seo'
 import { seoUtils } from '@/config/seo'
 
 export const metadata: Metadata = genMeta({
@@ -377,48 +382,34 @@ export default function PricingPage() {
       </main>
       <Footer />
 
-      {/* Structured Data - Preserved EXACTLY */}
+      {/* Structured Data */}
       <MultipleStructuredData
         schemas={[
           {
             id: 'breadcrumb',
-            data: {
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "Home", "item": seoUtils.generateCanonicalUrl('/') },
-                { "@type": "ListItem", "position": 2, "name": "Pricing", "item": seoUtils.generateCanonicalUrl('/pricing') }
-              ]
-            }
+            data: JSON.parse(
+              generateBreadcrumbJsonLd([
+                { name: 'Home', url: seoUtils.generateCanonicalUrl('/') },
+                { name: 'Pricing', url: seoUtils.generateCanonicalUrl('/pricing') },
+              ])
+            ),
           },
           {
             id: 'product',
-            data: {
-              "@context": "https://schema.org",
-              "@type": "Product",
-              "name": "EcomPin Engine Plan",
-              "description": "Autonomous Pinterest Marketing Engine. Unlimited AI lifestyle pins, auto-publishing, self-optimizing prompt system, and account warmup protection.",
-              "offers": {
-                "@type": "Offer",
-                "price": 79,
-                "priceCurrency": "USD"
-              }
-            }
+            data: JSON.parse(
+              generateProductJsonLd({
+                name: 'EcomPin Engine Plan',
+                description: 'Autonomous Pinterest marketing engine with lifestyle pin generation, auto-publishing, prompt optimization, and account warmup protection.',
+                price: 79,
+                currency: 'USD',
+                features: planFeatures,
+                url: '/pricing',
+              })
+            ),
           },
           {
             id: 'faq',
-            data: {
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": faqs.map(faq => ({
-                "@type": "Question",
-                "name": faq.question,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": faq.answer
-                }
-              }))
-            }
+            data: JSON.parse(generateFAQJsonLd(faqs)),
           }
         ]}
       />

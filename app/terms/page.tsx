@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { Navbar } from '@/components/landing/Navbar'
 import { Footer } from '@/components/landing/Footer'
-import { generateBreadcrumbJsonLd, generateMetadata } from '@/lib/seo'
+import { generateBreadcrumbJsonLd, generateMetadata, generateWebPageJsonLd } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
 
@@ -132,6 +132,16 @@ export default function TermsOfService() {
       {/* Structured Data */}
       <MultipleStructuredData
         schemas={[
+          {
+            id: 'webpage',
+            data: JSON.parse(
+              generateWebPageJsonLd({
+                title: 'Terms of Service',
+                description: 'Review the terms and conditions for using EcomPin, the AI-assisted Pinterest marketing tool.',
+                urlPath: '/terms',
+              })
+            ),
+          },
           {
             id: 'breadcrumb',
             data: JSON.parse(

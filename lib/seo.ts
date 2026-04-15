@@ -32,6 +32,13 @@ export interface PageSEOProps {
   baseUrl?: string;
 }
 
+export interface WebPageJsonLdProps {
+  title: string;
+  description: string;
+  urlPath?: string;
+  dateModified?: string;
+}
+
 /**
  * Generate comprehensive metadata for a page
  */
@@ -148,6 +155,32 @@ export function generateWebsiteJsonLd(): string {
 }
 
 /**
+ * Generate generic WebPage JSON-LD
+ */
+export function generateWebPageJsonLd(props: WebPageJsonLdProps): string {
+  const url = props.urlPath ? seoUtils.generateCanonicalUrl(props.urlPath) : defaultSEO.siteUrl;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: props.title,
+    description: props.description,
+    url,
+    isPartOf: {
+      '@id': `${defaultSEO.siteUrl}#website`,
+    },
+    about: {
+      '@id': `${defaultSEO.siteUrl}#organization`,
+    },
+    ...(props.dateModified && {
+      dateModified: props.dateModified,
+    }),
+  };
+
+  return generateJsonLd(schema);
+}
+
+/**
  * Generate Software Application JSON-LD
  */
 export function generateSoftwareApplicationJsonLd(): string {
@@ -185,7 +218,7 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
     "keywords": keywords,
 
     "screenshot": [
-      `${baseSiteUrl}/images/screenshot.png`,
+      `${baseSiteUrl}/screenshot.png`,
       `${baseSiteUrl}/images/screenshot-dashboard.png`
     ],
 
@@ -212,14 +245,6 @@ export function generateWebApplicationJsonLd(props?: { title?: string; descripti
         "@type": "ImageObject",
         "url": `${baseSiteUrl}/site-logo.png`
       }
-    },
-    "offers": {
-      "@type": "Offer",
-      "name": "EcomPin Plan",
-      "price": "79",
-      "priceCurrency": "USD",
-      "description": "AI-assisted Pinterest marketing for ecommerce brands with lifestyle pin generation, approval workflows, and scheduled publishing.",
-      "availability": "https://schema.org/InStock"
     }
   };
 
@@ -279,18 +304,36 @@ export function generateProductJsonLd(product: {
   price: number;
   currency: string;
   features: string[];
+  url?: string;
+  availability?: string;
 }): string {
+  const productUrl = product.url
+    ? (product.url.startsWith('http') ? product.url : seoUtils.generateCanonicalUrl(product.url))
+    : undefined;
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     description: product.description,
+    ...(productUrl && {
+      url: productUrl,
+    }),
+    brand: {
+      '@type': 'Brand',
+      name: organizationSchema.name,
+    },
     offers: {
       '@type': 'Offer',
+      ...(productUrl && {
+        url: productUrl,
+      }),
       price: product.price.toString(),
       priceCurrency: product.currency,
-      availability: 'https://schema.org/InStock',
-      seller: organizationSchema,
+      availability: product.availability || 'https://schema.org/InStock',
+      seller: organizationSchema['@id']
+        ? { '@id': organizationSchema['@id'] }
+        : organizationSchema,
     },
     additionalProperty: product.features.map((feature) => ({
       '@type': 'PropertyValue',
