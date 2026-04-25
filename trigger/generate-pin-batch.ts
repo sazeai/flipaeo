@@ -140,7 +140,7 @@ export const generatePinBatch = schedules.task({
         // Dynamic per-product cap: distribute 100-pin quota evenly across catalog.
         // With 2 products → max 15 each. With 40 products → max 3 each. Hard ceiling of 15.
         const perProductCap = Math.min(15, Math.ceil(100 / products.length))
-        
+
         const eligibleProducts = products.filter((prod: any) => {
           const prodPins = (userPins || []).filter((p: any) => p.product_id === prod.id)
           // Check pending approval queue limit (max 10 sitting unapproved)
@@ -323,7 +323,7 @@ Return ONLY JSON: { "imagePrompt": "..." }`
 
             // Firing Fal.ai Native Polling
             logger.info(`Starting fal.ai generation for ${product.title}...`)
-            const result: any = await fal.subscribe("fal-ai/flux-2/flash/edit", {
+            const result: any = await fal.subscribe("fal-ai/flux-2/edit", {
               input: {
                 prompt: dynamicImagePrompt,
                 guidance_scale: 3.5,
