@@ -326,6 +326,7 @@ Return ONLY JSON: { "imagePrompt": "..." }`
             const result: any = await fal.subscribe("fal-ai/flux-2/edit", {
               input: {
                 prompt: dynamicImagePrompt,
+                num_inference_steps: 50,
                 guidance_scale: 3.5,
                 image_size: {
                   width: 1000,
@@ -333,6 +334,7 @@ Return ONLY JSON: { "imagePrompt": "..." }`
                 },
                 num_images: 1,
                 enable_safety_checker: true,
+                acceleration: "regular",
                 output_format: "png",
                 image_urls: [sourceImageUrl],
               },
