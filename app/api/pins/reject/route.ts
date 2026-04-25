@@ -4,9 +4,9 @@ import { createClient } from "@/utils/supabase/server"
 /**
  * Reject a Pin with Feedback
  * POST /api/pins/reject
- * Body: { pinId: string, reason: 'bad_image' | 'bad_text' | 'wrong_vibe', note?: string }
+ * Body: { pinId: string, reason: 'bad_image' | 'wrong_vibe' }
  * 
- * Marks pin as "rejected" and logs the rejection reason for AI learning.
+ * Marks pin as "rejected" and logs the rejection reason.
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -17,15 +17,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { pinId, reason, note } = await req.json()
+    const { pinId, reason } = await req.json()
 
     if (!pinId || !reason) {
       return NextResponse.json({ error: "pinId and reason required" }, { status: 400 })
     }
 
-    const validReasons = ["bad_image", "bad_text", "wrong_vibe"]
+    const validReasons = ["bad_image", "wrong_vibe"]
     if (!validReasons.includes(reason)) {
-      return NextResponse.json({ error: "Invalid reason. Must be: bad_image, bad_text, or wrong_vibe" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid reason. Must be: bad_image or wrong_vibe" }, { status: 400 })
     }
 
     // Verify pin belongs to user and is in pending_approval
@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
       pin_id: pinId,
       user_id: user.id,
       reason,
-      note: note || null,
     })
 
     return NextResponse.json({ success: true })

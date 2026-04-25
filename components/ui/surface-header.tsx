@@ -6,7 +6,7 @@ export function SurfaceHeader({
   title,
   description,
   titleTag = 'h2',
-  titleClassName = 'text-[18px] font-semibold tracking-tight text-neutral-950',
+  titleClassName = 'text-[19px] font-bold tracking-tight text-[#1a1a1a]',
 }: {
   icon: LucideIcon
   eyebrow: string
@@ -20,15 +20,15 @@ export function SurfaceHeader({
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900">
-          <Icon className="h-4.5 w-4.5" />
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border border-[#e2e4e7] bg-white text-[#1a1a1a]">
+          <Icon className="h-5 w-5" strokeWidth={2.2} />
         </div>
         <div>
-          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">{eyebrow}</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#666666]">{eyebrow}</span>
           <TitleTag className={titleClassName}>{title}</TitleTag>
         </div>
       </div>
-      <p className="text-sm leading-6 text-neutral-600">{description}</p>
+      <p className="text-[15px] leading-[1.45] text-[#666666]">{description}</p>
     </div>
   )
 }

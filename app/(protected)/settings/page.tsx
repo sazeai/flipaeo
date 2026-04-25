@@ -152,7 +152,7 @@ export default function BrandSettingsPage() {
     )
   }
 
-  const surfaceClass = 'rounded-xl border border-neutral-200/80 bg-white/95 p-4 sm:p-6'
+  const surfaceClass = 'bg-white border border-[#e2e4e7] rounded-xl p-4 relative z-10'
 
   return (
     <div className="pb-16">
@@ -185,10 +185,10 @@ export default function BrandSettingsPage() {
 
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-900">Default Pinterest Board</label>
-                <p className="text-xs text-neutral-500">Where approved pins should publish by default.</p>
+                <label className="text-[15px] font-semibold text-[#1a1a1a]">Default Pinterest Board</label>
+                <p className="text-[13px] text-[#666666]">Where approved pins should publish by default.</p>
                 {loadingBoards ? (
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <div className="flex items-center gap-2 text-[13px] text-[#666666]">
                     <Loader2 className="h-4 w-4 animate-spin" /> Fetching your boards...
                   </div>
                 ) : (
@@ -200,7 +200,7 @@ export default function BrandSettingsPage() {
                     }))}
                     disabled={!boards.length}
                   >
-                    <SelectTrigger className="h-12 w-full rounded-xl border-neutral-200 bg-white px-4 text-sm text-neutral-900 shadow-none focus:ring-2 focus:ring-neutral-900">
+                    <SelectTrigger className="h-[46px] w-full rounded-xl border border-[#e2e4e7] bg-[#f2f3f5] px-4 text-[15px] text-[#1a1a1a] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:bg-white focus:ring-2 focus:ring-[#1a1a1a]/20 transition-colors">
                       <SelectValue placeholder="Select a board" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-neutral-200 bg-white shadow-lg">
@@ -216,14 +216,13 @@ export default function BrandSettingsPage() {
                   </Select>
                 )}
               </div>
-
-              <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-5">
+              <div className="rounded-xl border border-[#e2e4e7]/80 bg-[#f2f3f5]/50 p-5 mt-2">
                 <SurfaceHeader
                   icon={ShieldCheck}
                   eyebrow="Account protection"
                   title="Warm-up profile"
                   titleTag="h3"
-                  titleClassName="text-sm font-semibold text-neutral-950"
+                  titleClassName="text-[15px] font-bold text-[#1a1a1a]"
                   description="This sets how cautiously EcomPin increases publishing volume to keep your Pinterest account healthy."
                 />
 
@@ -250,35 +249,32 @@ export default function BrandSettingsPage() {
                       <motion.button
                         key={option.id}
                         type="button"
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setForm(p => ({ ...p, account_age_type: option.id }))}
-                        className={`cursor-pointer rounded-xl border p-4 text-left transition-all ${
-                          selected
-                            ? 'border-neutral-900 bg-white'
-                            : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/40'
-                        }`}
+                        className={`cursor-pointer rounded-xl p-5 text-left transition-all outline-none focus:outline-none ${selected
+                          ? 'bg-white border-2 border-[#1a1a1a] shadow-[0_4px_12px_rgba(0,0,0,0.1)]'
+                          : 'bg-white border border-[#e2e4e7] hover:bg-[#f9fafb]'
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3">
-                            <span className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-xl border ${
-                              selected ? 'border-neutral-300 bg-neutral-50 text-neutral-900' : 'border-neutral-200 bg-neutral-50 text-neutral-700'
-                            }`}>
-                              <option.Icon className="h-4.5 w-4.5" />
+                            <span className={`mt-0.5 flex h-11 w-11 items-center justify-center rounded-[16px] border transition-colors ${selected ? 'bg-[#1a1a1a] border-[#1a1a1a] text-white' : 'bg-white border-[#e2e4e7] text-[#1a1a1a]'
+                              }`}>
+                              <option.Icon className="h-5 w-5" strokeWidth={selected ? 2.2 : 2} />
                             </span>
                             <div className="min-w-0">
-                              <div className="text-sm font-semibold text-neutral-950">{option.title}</div>
-                              <div className="mt-1 text-xs leading-5 text-neutral-500">{option.subtitle}</div>
+                              <div className={`text-[15px] font-bold ${selected ? 'text-[#1a1a1a]' : 'text-[#1a1a1a]'}`}>{option.title}</div>
+                              <div className="mt-1 text-[13px] leading-5 text-[#666666]">{option.subtitle}</div>
                             </div>
                           </div>
-                          <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all ${
-                            selected
-                              ? 'border-neutral-900 bg-neutral-900 text-white'
-                              : 'border-neutral-200 bg-white text-transparent'
-                          }`}>
-                            <Check className="h-3.5 w-3.5" />
+                          <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all ${selected
+                            ? 'border-[#1a1a1a] bg-[#1a1a1a] text-white'
+                            : 'border-[#e2e4e7] bg-[#f2f3f5] text-transparent'
+                            }`}>
+                            <Check className="h-3.5 w-3.5" strokeWidth={3} />
                           </span>
                         </div>
-                        <p className="mt-4 text-[13px] leading-6 text-neutral-600">{option.detail}</p>
+                        <p className="mt-4 text-[13px] leading-6 text-[#666666]">{option.detail}</p>
                       </motion.button>
                     )
                   })}
@@ -296,62 +292,61 @@ export default function BrandSettingsPage() {
                 description="Name your brand clearly so EcomPin can write, render, and label pins consistently."
               />
             </div>
-
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-900">Brand Name</label>
+                <label className="text-[15px] font-semibold text-[#1a1a1a]">Brand Name</label>
                 <Input
                   value={form.brand_name}
                   onChange={e => setForm(p => ({ ...p, brand_name: e.target.value }))}
                   placeholder="e.g., Artisan Home Co."
-                  className="h-11 rounded-xl border-neutral-200 bg-white px-4"
+                  className="h-[46px] rounded-xl border border-[#e2e4e7] bg-[#f2f3f5] px-4 text-[15px] text-[#1a1a1a] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:bg-white focus:ring-2 focus:ring-[#1a1a1a]/20 transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-900">Brand Description</label>
+                <label className="text-[15px] font-semibold text-[#1a1a1a]">Brand Description</label>
                 <Textarea
                   value={form.brand_description}
                   onChange={e => setForm(p => ({ ...p, brand_description: e.target.value }))}
                   placeholder="A concise description of your brand, products, and taste."
                   rows={4}
-                  className="rounded-xl border-neutral-200 bg-white px-4 py-3 resize-none"
+                  className="rounded-xl border border-[#e2e4e7] bg-[#f2f3f5] px-4 py-3 resize-none text-[15px] text-[#1a1a1a] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:bg-white focus:ring-2 focus:ring-[#1a1a1a]/20 transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-neutral-900">Store URL</label>
+                <label className="text-[15px] font-semibold text-[#1a1a1a]">Store URL</label>
                 <Input
                   type="url"
                   value={form.store_url}
                   onChange={e => setForm(p => ({ ...p, store_url: e.target.value }))}
                   placeholder="https://yourstore.com"
-                  className="h-11 rounded-xl border-neutral-200 bg-white px-4"
+                  className="h-[46px] rounded-xl border border-[#e2e4e7] bg-[#f2f3f5] px-4 text-[15px] text-[#1a1a1a] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] focus:bg-white focus:ring-2 focus:ring-[#1a1a1a]/20 transition-colors"
                 />
-                <p className="text-xs text-neutral-500">Used as the destination and CTA source across generated pins.</p>
+                <p className="text-[13px] text-[#666666]">Used as the destination and CTA source across generated pins.</p>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-neutral-900">Show Store URL on Pins</label>
-                    <p className="mt-1 text-xs text-neutral-500">Overlay your store URL as a CTA badge on generated pin images.</p>
+              <div className="pt-2">
+                <div className="flex items-center justify-between bg-[#f2f3f5] p-3 rounded-xl border border-[#e2e4e7]/80">
+                  <div className="pl-2">
+                    <label className="text-[15px] font-semibold text-[#1a1a1a]">Show Store URL on Pins</label>
+                    <p className="mt-0.5 text-[13px] text-[#666666]">Overlay your store URL as a CTA badge on generated pin images.</p>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={form.show_brand_url}
-                    onClick={() => setForm(p => ({ ...p, show_brand_url: !p.show_brand_url }))}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                      form.show_brand_url ? 'bg-neutral-900' : 'bg-neutral-200'
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${
-                        form.show_brand_url ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
+                  <div className="bg-white px-1 pt-1 rounded-xl border border-[#e2e4e7]">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={form.show_brand_url}
+                      onClick={() => setForm(p => ({ ...p, show_brand_url: !p.show_brand_url }))}
+                      className={`relative inline-flex h-6 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${form.show_brand_url ? 'bg-[#1a1a1a]' : 'bg-[#e5e7eb]'
+                        }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] ring-0 transition-transform ${form.show_brand_url ? 'translate-x-4' : 'translate-x-0'
+                          }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -372,12 +367,12 @@ export default function BrandSettingsPage() {
             <div className="space-y-3">
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <label className="text-sm font-medium text-neutral-900">Aesthetic Boundaries</label>
-                  <p className="mt-1 text-xs text-neutral-500">Tell the AI Art Director what visual styles to aim for. It will avoid anything outside these boundaries.</p>
+                  <label className="text-[15px] font-semibold text-[#1a1a1a]">Aesthetic Boundaries</label>
+                  <p className="mt-1 text-[13px] text-[#666666]">Tell the AI Art Director what visual styles to aim for. It will avoid anything outside these boundaries.</p>
                 </div>
-                <span className="text-[11px] uppercase tracking-[0.16em] text-neutral-400">Up to 3</span>
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#9ca3af]">Up to 3</span>
               </div>
-              <div className="grid gap-2.5 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {AESTHETIC_OPTIONS.map(opt => {
                   const selected = form.aesthetic_boundaries.includes(opt.name)
 
@@ -385,23 +380,22 @@ export default function BrandSettingsPage() {
                     <motion.button
                       key={opt.name}
                       type="button"
-                      whileTap={{ scale: 0.985 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => toggleAesthetic(opt.name)}
-                      className={`cursor-pointer overflow-hidden rounded-xl border text-left transition-all ${
-                        selected
-                          ? 'border-neutral-900 bg-white'
-                          : 'border-neutral-200 bg-white hover:border-neutral-300'
-                      }`}
+                      className={`cursor-pointer overflow-hidden rounded-xl text-left transition-all outline-none focus:outline-none ${selected
+                        ? 'border-2 border-[#1a1a1a] bg-white '
+                        : 'border border-[#e2e4e7] bg-white  '
+                        }`}
                     >
-                      <div className={`h-16 w-full bg-gradient-to-br ${opt.gradient}`} />
-                      <div className="px-4 py-3">
+                      <div className={`h-[72px] w-full bg-gradient-to-br ${opt.gradient} ${selected ? 'opacity-100' : 'opacity-80'}`} />
+                      <div className="px-5 py-4">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <span className="block text-sm font-semibold text-neutral-950">{opt.name}</span>
-                            <span className="mt-1 block text-xs text-neutral-500">{opt.desc}</span>
+                            <span className="block text-[15px] font-bold text-[#1a1a1a]">{opt.name}</span>
+                            <span className="mt-1 block text-[13px] text-[#666666]">{opt.desc}</span>
                           </div>
                           {selected && (
-                            <span className="rounded-full bg-neutral-900 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+                            <span className="rounded-[12px] bg-[#1a1a1a] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-white">
                               Selected
                             </span>
                           )}

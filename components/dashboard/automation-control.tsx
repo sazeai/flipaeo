@@ -118,54 +118,52 @@ export function AutomationControl({
     return (
       <div
         className={cn(
-          "rounded-xl border border-neutral-200/80 bg-gradient-to-b from-white to-neutral-50/60 p-6",
+          "bg-white border border-[#e2e4e7] rounded-xl  p-4 relative z-10",
           className
         )}
       >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="max-w-md">
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-900">
-                  {busy ? <Loader2 className="h-4.5 w-4.5 animate-spin" /> : <Zap className="h-4.5 w-4.5" />}
-                </div>
-                <div>
-                  <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500">Automation</span>
-                  <h2 className="text-[18px] font-semibold tracking-tight text-neutral-950">
-                    Publishing engine
-                  </h2>
-                </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border border-[#e2e4e7] bg-white text-[#1a1a1a]">
+                {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Zap className="h-5 w-5" strokeWidth={2.2} />}
               </div>
-              <p className="text-sm leading-6 text-neutral-600">
-              Pause all pin generation and scheduling instantly. This same control is also available in the top header from anywhere in the app.
-              </p>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#666666]">Automation</span>
+                <h2 className="text-[19px] font-bold tracking-tight text-[#1a1a1a]">
+                  Publishing engine
+                </h2>
+              </div>
+            </div>
+
+            <div className="flex items-center bg-[#f2f3f5] p-1 rounded-lg border border-[#e2e4e7]/80 shrink-0 mt-0.5">
+              <div className="flex items-center gap-3 bg-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg border border-[#e2e4e7]">
+                <div className="text-[14px] sm:text-[15px] font-bold text-[#1a1a1a] hidden sm:block">
+                  {isActive ? "Live" : "Paused"}
+                </div>
+                <Switch
+                  checked={isActive}
+                  onCheckedChange={handleCheckedChange}
+                  disabled={busy || !hasSettings}
+                  aria-label="Toggle automation"
+                  className="data-[state=checked]:bg-[#1a1a1a] data-[state=unchecked]:bg-[#e5e7eb] shadow-inner"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="rounded-full border border-neutral-200 bg-white px-3 py-2">
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-
-                <div className="text-sm font-medium text-neutral-900">
-                  {isActive ? "Live" : "Paused"}
-                </div>
-              </div>
-              <Switch
-                checked={isActive}
-                onCheckedChange={handleCheckedChange}
-                disabled={busy || !hasSettings}
-                aria-label="Toggle automation"
-                className="data-[state=checked]:bg-neutral-900 data-[state=unchecked]:bg-neutral-300"
-              />
-            </div>
+          <div className="max-w-2xl">
+            <p className="text-[15px] leading-[1.45] text-[#666666]">
+              Pause all pin generation and scheduling instantly. This same control is also available in the top header from anywhere in the app.
+            </p>
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-2 text-xs text-neutral-500">
+        <div className="mt-6 flex items-center gap-2 text-[13px] text-[#666666]">
           <span
             className={cn(
-              "inline-block h-1.5 w-1.5 rounded-full",
-              isActive ? "bg-emerald-500" : "bg-neutral-400"
+              "inline-block h-2 w-2 rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.1)]",
+              isActive ? "bg-[#1C5F4A]" : "bg-[#9ca3af]"
             )}
           />
           {hasSettings

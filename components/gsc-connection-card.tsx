@@ -48,7 +48,7 @@ export function GSCConnectionCard({ onConnect, onDismiss, className }: GSCConnec
 
             <div className="flex flex-col lg:flex-row min-h-[280px]">
                 {/* Left: Value Proposition */}
-                <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center">
+                <div className="flex-1 p-4 flex flex-col justify-center">
                     <div className="space-y-8">
                         <div className="space-y-3">
                             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-stone-100 text-stone-600 text-[11px] font-bold uppercase tracking-wider border border-stone-200 select-none">
@@ -122,7 +122,7 @@ export function GSCConnectionCard({ onConnect, onDismiss, className }: GSCConnec
                 </div>
 
                 {/* Right: CTA Section */}
-                <div className="lg:w-80 bg-stone-50/50 border-t lg:border-t-0 lg:border-l border-stone-100 p-6 sm:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div className="lg:w-80 bg-stone-50/50 border-t lg:border-t-0 lg:border-l border-stone-100 p-4 flex flex-col items-center justify-center text-center relative overflow-hidden">
                     {/* Subtle Background Pattern */}
                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
                         style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '16px 16px' }}

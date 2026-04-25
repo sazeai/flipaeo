@@ -62,7 +62,7 @@ export default function BlogCard({
             </div>
 
             {/* Content */}
-            <div className="p-6 sm:p-8 flex flex-col flex-grow">
+            <div className="p-4 flex flex-col flex-grow">
               <div className="flex items-center text-xs font-semibold text-stone-500 mb-4 uppercase tracking-wide gap-4">
                 <div className="flex items-center">
                   <Calendar className="w-3.5 h-3.5 mr-1.5 text-stone-400" />

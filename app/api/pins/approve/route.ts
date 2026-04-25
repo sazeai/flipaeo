@@ -68,7 +68,11 @@ export async function POST(req: NextRequest) {
       status: "pending",
     }))
 
-    await supabase.from("pin_queue").insert(queueEntries)
+    const { error: insertError } = await supabase.from("pin_queue").insert(queueEntries)
+    if (insertError) {
+      console.error("pin_queue insert error:", insertError)
+      throw new Error(insertError.message)
+    }
 
     return NextResponse.json({ approved: validPinIds.length })
   } catch (err: any) {

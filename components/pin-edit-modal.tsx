@@ -9,6 +9,7 @@ import {
   Trash2,
   AlertTriangle,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface PinData {
   id: string
@@ -27,7 +28,7 @@ interface PinterestBoard {
   name: string
 }
 
-type RejectReason = 'bad_image' | 'bad_text' | 'wrong_vibe'
+type RejectReason = 'bad_image' | 'wrong_vibe'
 
 interface PinEditModalProps {
   pin: PinData | null
@@ -46,7 +47,6 @@ const DESC_MAX = 500
 
 const REJECT_REASONS: { key: RejectReason; label: string; icon: string }[] = [
   { key: 'bad_image', label: 'Bad image', icon: '🖼️' },
-  { key: 'bad_text', label: 'Bad text', icon: '📝' },
   { key: 'wrong_vibe', label: 'Wrong vibe', icon: '🎨' },
 ]
 
@@ -121,6 +121,11 @@ export function PinEditModal({
   }
 
   async function handleSaveAndApprove() {
+    if (!boardId) {
+      toast.error("Please connect your Pinterest account and select a default board first.")
+      return
+    }
+
     setApproving(true)
     try {
       // Save first
@@ -167,13 +172,12 @@ export function PinEditModal({
               <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 shrink-0">
                 <div className="flex items-center gap-3">
                   <h2 className="text-base font-bold text-neutral-900">Edit Pin</h2>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                    pin.status === 'pending_approval' ? 'bg-orange-100 text-orange-700' :
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${pin.status === 'pending_approval' ? 'bg-orange-100 text-orange-700' :
                     pin.status === 'queued' ? 'bg-blue-100 text-blue-700' :
-                    pin.status === 'published' ? 'bg-emerald-100 text-emerald-700' :
-                    pin.status === 'rejected' ? 'bg-red-100 text-red-600' :
-                    'bg-neutral-100 text-neutral-600'
-                  }`}>
+                      pin.status === 'published' ? 'bg-emerald-100 text-emerald-700' :
+                        pin.status === 'rejected' ? 'bg-red-100 text-red-600' :
+                          'bg-neutral-100 text-neutral-600'
+                    }`}>
                     {pin.status === 'pending_approval' ? 'Needs Review' : pin.status}
                   </span>
                 </div>
@@ -191,9 +195,8 @@ export function PinEditModal({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-neutral-700">Title</label>
-                    <span className={`text-[10px] font-medium tabular-nums ${
-                      title.length > TITLE_MAX ? 'text-red-500' : 'text-neutral-400'
-                    }`}>
+                    <span className={`text-[10px] font-medium tabular-nums ${title.length > TITLE_MAX ? 'text-red-500' : 'text-neutral-400'
+                      }`}>
                       {title.length}/{TITLE_MAX}
                     </span>
                   </div>
@@ -202,7 +205,7 @@ export function PinEditModal({
                     value={title}
                     onChange={e => setTitle(e.target.value)}
                     placeholder="Pin title..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#f2f3f5] border border-[#e2e4e7]/80 focus:border-neutral-300 transition-all resize-none text-sm text-neutral-500"
                   />
                 </div>
 
@@ -210,9 +213,8 @@ export function PinEditModal({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-neutral-700">Description</label>
-                    <span className={`text-[10px] font-medium tabular-nums ${
-                      description.length > DESC_MAX ? 'text-red-500' : 'text-neutral-400'
-                    }`}>
+                    <span className={`text-[10px] font-medium tabular-nums ${description.length > DESC_MAX ? 'text-red-500' : 'text-neutral-400'
+                      }`}>
                       {description.length}/{DESC_MAX}
                     </span>
                   </div>
@@ -221,7 +223,7 @@ export function PinEditModal({
                     onChange={e => setDescription(e.target.value)}
                     placeholder="Pin description..."
                     rows={4}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-300 transition-all resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#f2f3f5] border border-[#e2e4e7]/80 focus:border-neutral-300 transition-all resize-none text-sm text-neutral-500"
                   />
                 </div>
 
@@ -229,7 +231,7 @@ export function PinEditModal({
                 {productUrl && (
                   <div>
                     <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Destination URL</label>
-                    <div className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-100 bg-neutral-50 text-sm text-neutral-500 truncate">
+                    <div className="w-full px-3.5 py-2.5 border bg-[#f2f3f5] rounded-xl border border-[#e2e4e7]/80 text-sm text-neutral-500 truncate">
                       {productUrl}
                     </div>
                     <p className="text-[10px] text-neutral-400 mt-1">From your product — people go here when they click this pin on Pinterest.</p>
@@ -244,7 +246,7 @@ export function PinEditModal({
                       <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading boards...
                     </div>
                   ) : boards.length === 0 ? (
-                    <div className="px-3.5 py-2.5 rounded-xl border border-neutral-100 bg-neutral-50 text-xs text-neutral-400">
+                    <div className="w-full px-3.5 py-2.5 border bg-[#f2f3f5] rounded-xl border border-[#e2e4e7]/80 text-sm text-neutral-500 truncate">
                       No Pinterest account connected
                     </div>
                   ) : (

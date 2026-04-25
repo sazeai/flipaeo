@@ -17,6 +17,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { PinEditModal } from '@/components/pin-edit-modal'
 
 interface Pin {
@@ -42,7 +43,7 @@ interface PinterestBoard {
   name: string
 }
 
-type RejectReason = 'bad_image' | 'bad_text' | 'wrong_vibe'
+type RejectReason = 'bad_image' | 'wrong_vibe'
 
 const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
@@ -192,9 +193,13 @@ export default function PinsPage() {
           pending_approval: Math.max(0, (prev.pending_approval || 0) - 1),
           queued: (prev.queued || 0) + 1,
         }))
+        toast.success("Pin approved and queued")
+      } else {
+        toast.error("Failed to approve pin")
       }
     } catch (err) {
       console.error('Approve failed:', err)
+      toast.error("An error occurred")
     }
   }
 
@@ -296,7 +301,7 @@ export default function PinsPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pinId: id, reason }),
         })
-      } catch {}
+      } catch { }
     }
 
     setPins(prev => prev.map(p => ids.includes(p.id) ? { ...p, status: 'rejected' } : p))
@@ -361,17 +366,15 @@ export default function PinsPage() {
             <button
               key={key}
               onClick={() => { setLoading(true); setFilter(key) }}
-              className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
-                isActive
+              className={`cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${isActive
                   ? 'bg-neutral-900 text-white shadow-sm'
                   : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
+                }`}
             >
               {label}
               {count > 0 && (
-                <span className={`text-[10px] font-bold min-w-[18px] text-center px-1 py-px rounded-md ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-neutral-200/60 text-neutral-500'
-                }`}>
+                <span className={`text-[10px] font-bold min-w-[18px] text-center px-1 py-px rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-neutral-200/60 text-neutral-500'
+                  }`}>
                   {count}
                 </span>
               )}
@@ -450,11 +453,10 @@ export default function PinsPage() {
             return (
               <div
                 key={pin.id}
-                className={`group relative bg-white rounded-2xl border transition-all duration-200 overflow-hidden ${
-                  isSelected
+                className={`group relative bg-[#ffffff] rounded-[24px] border transition-all duration-200 overflow-hidden ${isSelected
                     ? 'ring-2 ring-neutral-900 ring-offset-2 border-neutral-300'
-                    : 'border-neutral-200/70 hover:border-neutral-300 hover:shadow-lg hover:shadow-neutral-200/50'
-                }`}
+                    : 'border-[#e2e4e7]'
+                  }`}
               >
                 {/* Image container — fixed height, padded, light bg */}
                 <div className="relative mx-2 mt-2 sm:mx-3 sm:mt-3 rounded-xl bg-neutral-100 overflow-hidden">
@@ -472,20 +474,18 @@ export default function PinsPage() {
                   </div>
 
                   {/* Status badge */}
-                  <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm ${
-                    STATUS_STYLES[pin.status] || 'bg-neutral-100/90 text-neutral-600'
-                  }`}>
+                  <span className={`absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-sm ${STATUS_STYLES[pin.status] || 'bg-neutral-100/90 text-neutral-600'
+                    }`}>
                     {STATUS_LABELS[pin.status] || pin.status}
                   </span>
 
                   {/* Checkbox — always visible on mobile */}
                   <button
                     onClick={e => { e.stopPropagation(); toggleSelect(pin.id) }}
-                    className={`cursor-pointer absolute top-2 right-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                      isSelected
+                    className={`cursor-pointer absolute top-2 right-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isSelected
                         ? 'bg-neutral-900 border-neutral-900 text-white'
                         : 'bg-white/90 border-white/70 backdrop-blur-sm opacity-100 md:opacity-0 md:group-hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
                   </button>
@@ -531,8 +531,12 @@ export default function PinsPage() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => {
-                            const board = defaultBoardId || boards[0]?.id
-                            if (board) handleApprove(pin.id, board)
+                            const board = pin.pinterest_board_id || defaultBoardId || boards[0]?.id
+                            if (!board) {
+                              toast.error("Please connect your Pinterest account and select a default board first.")
+                              return
+                            }
+                            handleApprove(pin.id, board)
                           }}
                           className="cursor-pointer flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-2 sm:py-2 bg-emerald-600 text-white rounded-lg text-[11px] sm:text-xs font-semibold hover:bg-emerald-700 transition-colors min-w-0"
                         >
@@ -540,11 +544,10 @@ export default function PinsPage() {
                         </button>
                         <button
                           onClick={() => setRejectingPinId(rejectingPinId === pin.id ? null : pin.id)}
-                          className={`cursor-pointer flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-2 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-colors min-w-0 ${
-                            rejectingPinId === pin.id
+                          className={`cursor-pointer flex-1 flex items-center justify-center gap-1 px-1.5 py-1.5 sm:px-2 sm:py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-colors min-w-0 ${rejectingPinId === pin.id
                               ? 'bg-red-600 text-white'
                               : 'bg-red-500 text-white hover:bg-red-600'
-                          }`}
+                            }`}
                         >
                           <X className="w-3.5 h-3.5 shrink-0 hidden md:block" /> <span className="truncate">Reject</span>
                         </button>
@@ -560,7 +563,6 @@ export default function PinsPage() {
                         <div className="flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
                           {[
                             { reason: 'bad_image' as RejectReason, label: 'Image', fullLabel: 'Bad Image' },
-                            { reason: 'bad_text' as RejectReason, label: 'Text', fullLabel: 'Bad Text' },
                             { reason: 'wrong_vibe' as RejectReason, label: 'Vibe', fullLabel: 'Wrong Vibe' },
                           ].map(({ reason, label, fullLabel }) => (
                             <button

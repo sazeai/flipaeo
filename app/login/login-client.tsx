@@ -122,7 +122,7 @@ function LoginFormContent({ displayError, state, formAction }: {
             */}
             <div className="
               w-full bg-stone-100/50 backdrop-blur-sm
-              rounded-[12px] p-6 sm:p-8
+              rounded-[12px] p-4
               border border-stone-100
             ">
 

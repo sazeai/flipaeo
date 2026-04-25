@@ -11,7 +11,11 @@ import {
   Trash2,
   Package,
   UploadCloud,
-  CheckCircle2
+  CheckCircle2,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  X
 } from 'lucide-react'
 import { toast } from 'sonner'
 // @ts-ignore
@@ -37,11 +41,16 @@ export default function ProductsPage() {
   const [uploading, setUploading] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', price: '', product_url: '' })
   const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null)
 
   // CSV State
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [isCsvUploading, setIsCsvUploading] = useState(false)
   const [syncReport, setSyncReport] = useState<{ updated: number; inserted: number; errors: number; errorDetails?: string[] } | null>(null)
+
+  // Image viewer
+  const [viewingImage, setViewingImage] = useState<{ url: string; title: string } | null>(null)
+  const [zoomLevel, setZoomLevel] = useState(1)
 
   useEffect(() => {
     fetchProducts()
@@ -157,6 +166,7 @@ export default function ProductsPage() {
     const supabase = createClient()
     await supabase.from('products').delete().eq('id', productId)
     setProducts(prev => prev.filter(p => p.id !== productId))
+    setDeletingProductId(null)
   }
 
   if (loading) {
@@ -182,7 +192,7 @@ export default function ProductsPage() {
         </div>
         <button
           onClick={() => setShowUpload(!showUpload)}
-          className="bg-neutral-900 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-neutral-800 flex items-center gap-2 transition-colors"
+          className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Product
         </button>
@@ -191,7 +201,7 @@ export default function ProductsPage() {
       {/* Unified Upload Dashboard */}
       {showUpload && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 bg-white border border-neutral-200 rounded-2xl">
-          
+
           {/* Left Column: Manual Form */}
           <div className="space-y-5 lg:border-r lg:border-neutral-100 lg:pr-6">
             <div>
@@ -200,7 +210,7 @@ export default function ProductsPage() {
               </h3>
               <p className="text-xs text-muted-foreground mt-1">Add a single product to your catalog manually.</p>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">Product Name *</label>
@@ -252,7 +262,7 @@ export default function ProductsPage() {
                 />
               </div>
             </div>
-            
+
             <div className="pt-2 flex gap-3">
               <button
                 onClick={handleManualUpload}
@@ -356,10 +366,10 @@ export default function ProductsPage() {
             <div
               key={product.id}
               style={{ breakInside: 'avoid' }}
-              className="mb-4 bg-white border border-neutral-200/80 rounded-2xl overflow-hidden group hover:border-neutral-300 hover:shadow-md transition-all duration-200"
+              className="mb-4 bg-[#ffffff] border border-[#e2e4e7] rounded-[24px] overflow-hidden group hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] hover:border-[#d1d5db] transition-all duration-200"
             >
               {/* Image — natural aspect ratio */}
-              <div className="relative bg-neutral-50">
+              <div className="relative mx-2 mt-2 sm:mx-3 sm:mt-3 rounded-[16px] bg-[#f2f3f5] overflow-hidden border border-[#e2e4e7]/50">
                 {product.image_url ? (
                   <img
                     src={product.image_url}
@@ -373,46 +383,114 @@ export default function ProductsPage() {
                   />
                 ) : (
                   <div className="w-full flex items-center justify-center py-16">
-                    <ShoppingBag className="w-10 h-10 text-neutral-200" />
+                    <ShoppingBag className="w-10 h-10 text-[#d1d5db]" />
                   </div>
                 )}
                 {/* Source badge */}
-                <span className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-sm text-[10px] px-2 py-0.5 rounded-md font-semibold capitalize text-neutral-600 shadow-sm border border-neutral-100">
+                <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider text-[#1a1a1a] shadow-[0_1px_2px_rgba(0,0,0,0.03)] border border-[#e2e4e7]">
                   {product.source}
                 </span>
+                {/* Expand image — always visible on mobile */}
+                {product.image_url && (
+                  <button
+                    onClick={e => { e.stopPropagation(); setViewingImage({ url: product.image_url!, title: product.title || 'Product Image' }); setZoomLevel(1) }}
+                    className="cursor-pointer absolute bottom-2 right-2 w-7 h-7 rounded-lg bg-black/50 backdrop-blur-sm text-white/80 hover:text-white flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    title="View full image"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Info */}
-              <div className="px-3.5 py-3 border-t border-neutral-100">
-                <h3 className="font-semibold text-sm text-neutral-900 line-clamp-2 leading-snug">
+              <div className="p-3 sm:p-4">
+                <h3 className="font-bold text-[14px] text-[#1a1a1a] line-clamp-2 leading-snug">
                   {product.title}
                 </h3>
                 {product.price && (
-                  <p className="text-xs text-neutral-500 mt-1 font-medium">
+                  <p className="text-[13px] text-[#666666] mt-1 font-medium">
                     ${Number(product.price).toFixed(2)} {product.currency}
                   </p>
                 )}
-                <div className="flex items-center gap-2 mt-2.5 pt-2 border-t border-neutral-50">
-                  {product.product_url && (
-                    <a
-                      href={product.product_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-neutral-500 hover:text-neutral-800 flex items-center gap-1 font-medium transition-colors"
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#e2e4e7]/50">
+                  {deletingProductId === product.id ? (
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 mr-1">Confirm?</span>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-[10px] font-bold uppercase tracking-wider text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded-[6px] transition-colors"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={() => setDeletingProductId(null)}
+                        className="text-[10px] font-bold uppercase tracking-wider text-[#666666] hover:text-[#1a1a1a] bg-[#f2f3f5] hover:bg-[#e5e7eb] px-2 py-1 rounded-[6px] transition-colors"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setDeletingProductId(product.id)}
+                      className="text-[11px] font-bold uppercase tracking-wider text-[#9ca3af] hover:text-red-500 flex items-center gap-1 ml-auto transition-colors"
                     >
-                      <ExternalLink className="w-3 h-3" /> View
-                    </a>
+                      <Trash2 className="w-3 h-3" strokeWidth={2.2} /> Remove
+                    </button>
                   )}
-                  <button
-                    onClick={() => handleDelete(product.id)}
-                    className="text-[11px] text-neutral-400 hover:text-red-500 flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-all font-medium"
-                  >
-                    <Trash2 className="w-3 h-3" /> Remove
-                  </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Fullscreen Image Viewer */}
+      {viewingImage && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center"
+          onClick={() => setViewingImage(null)}
+        >
+          {/* Top bar */}
+          <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-3 z-10">
+            <p className="text-white/70 text-sm font-medium truncate max-w-[60%]">{viewingImage.title}</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={e => { e.stopPropagation(); setZoomLevel(z => Math.max(0.5, z - 0.5)) }}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <span className="text-white/60 text-xs font-mono min-w-[3rem] text-center">{Math.round(zoomLevel * 100)}%</span>
+              <button
+                onClick={e => { e.stopPropagation(); setZoomLevel(z => Math.min(5, z + 0.5)) }}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewingImage(null)}
+                className="cursor-pointer w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors ml-2"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Image */}
+          <div
+            className="overflow-auto max-w-full max-h-full flex items-center justify-center p-4"
+            onClick={e => e.stopPropagation()}
+            style={{ touchAction: 'pinch-zoom' }}
+          >
+            <img
+              src={viewingImage.url}
+              alt={viewingImage.title}
+              className="transition-transform duration-200 ease-out rounded-lg select-none"
+              style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center center', maxHeight: '85vh', maxWidth: '90vw', objectFit: 'contain' }}
+              draggable={false}
+              onDoubleClick={() => setZoomLevel(z => z === 1 ? 2.5 : 1)}
+            />
+          </div>
         </div>
       )}
     </div>
