@@ -223,8 +223,12 @@ export const generatePinBatch = schedules.task({
             logger.info(`Picked showcase: ${showcase.presentationMode} | ${showcase.heroAction} | ${showcase.cameraAngle}`)
 
             // Stage 2: Generate unique Context Matrix angle (Semantic De-Duplication)
-            // Showcase strategy is passed as locked constraints
-            const pastAngles = prodPins.map((p: any) => p.target_angle).filter(Boolean)
+            // Showcase strategy is passed as locked constraints.
+            // Pass recent past angles across ALL products to ensure brand-level variety
+            const pastAngles = (userPins || [])
+              .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .map((p: any) => p.target_angle)
+              .filter(Boolean)
 
             const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
               { id: product.id, title: product.title, description: product.description },
@@ -232,7 +236,7 @@ export const generatePinBatch = schedules.task({
               brand.audience_profile,
               pastAngles,
               showcase,
-              (userPins || []).length,  // Global user pin count — ensures rotation across products
+              prodPins.length,  // Per-product pin count ensures rotation for THIS product
             )
             logger.info(`Selected semantic angle: "${targetAngle}" | Aesthetic: "${pickedAesthetic.tag}"`)
 
