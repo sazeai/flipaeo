@@ -6,6 +6,7 @@ import { fal } from "@fal-ai/client"
 import { generateUniqueAngle } from "@/lib/context-matrix"
 import { resolveProductShowcase, pickShowcaseForPin, isDigitalProduct } from "@/lib/product-showcase"
 import { validatePrompt } from "@/lib/prompt-critic"
+import { adminHasCredits, adminDeductCredits } from "@/lib/credits"
 
 const ai = new GoogleGenAI({ apiKey: process.env.MYGEMINI_API_KEY })
 fal.config({ credentials: process.env.FAL_KEY || "" })
@@ -321,6 +322,13 @@ Return ONLY JSON: { "imagePrompt": "..." }`
 
             logger.info(`Art Director Prompt: ${dynamicImagePrompt}`)
 
+            // Credit gate: verify the user has at least 1 credit before spending API budget
+            const { hasCredits: hasSufficientCredits } = await adminHasCredits(brand.user_id, 1)
+            if (!hasSufficientCredits) {
+              logger.info(`User ${brand.user_id} has insufficient credits — skipping pin generation`)
+              continue
+            }
+
             // Firing Fal.ai Native Polling
             logger.info(`Starting fal.ai generation for ${product.title}...`)
             const result: any = await fal.subscribe("fal-ai/flux-2/edit", {
@@ -514,6 +522,18 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
             }
 
             // Pin now waits for user approval before entering publish queue
+
+            // Deduct 1 credit for the successfully generated pin
+            const { success: creditDeducted, error: creditError } = await adminDeductCredits(
+              brand.user_id,
+              1,
+              `Pin generated: ${pinId}`
+            )
+            if (!creditDeducted) {
+              logger.warn(`Credit deduction failed for user ${brand.user_id}: ${creditError}`)
+            } else {
+              logger.info(`💳 1 credit deducted for user ${brand.user_id} (pin ${pinId})`)
+            }
 
             totalGenerated++
             logger.info(`✅ Pin generated → pending approval: ${pinId} for "${product.title}"`)
