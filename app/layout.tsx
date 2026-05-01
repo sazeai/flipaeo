@@ -133,19 +133,6 @@ export default async function RootLayout({
             gtag('config', 'G-FFT0K6XLCB');
           `}
         </Script>
-        <Script id="crisp-chat" strategy="afterInteractive">
-          {`
-            window.$crisp=[];
-            window.CRISP_WEBSITE_ID="24e9aa78-e330-4dc3-9366-da0b3dc6f7ee";
-            (function(){
-              var d=document;
-              var s=d.createElement("script");
-              s.src="https://beta.client.crisp.chat/l.js";
-              s.async=1;
-              d.getElementsByTagName("head")[0].appendChild(s);
-            })();
-          `}
-        </Script>
       </head>
       <body className="font-sans antialiased public-headings" style={{
         backgroundImage: `url("${FINE_NOISE_SVG}")`,

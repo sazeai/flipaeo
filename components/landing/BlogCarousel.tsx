@@ -39,11 +39,11 @@ const BlogCarousel: React.FC = () => {
 
                 {/* 
                     Inner container that sits between the side strips.
-                    GridBackground strips are: w-3 (12px) on mobile, w-5 (20px) on sm.
-                    We use px-3 sm:px-5 to align ONLY the content area between these strips.
+                    GridBackground strips are: w-4 (16px) on mobile, w-6 (24px) on sm.
+                    We use matching horizontal padding to align ONLY the content area between these strips.
                 */}
 
-                <div className="px-3 sm:px-5">
+                <div className="px-4 sm:px-6">
                     {/* 
                         Mask Image: created the "envelope coming out" effect by fading
                         the edges where the strips are. 
