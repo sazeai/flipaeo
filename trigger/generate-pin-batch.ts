@@ -3,7 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { putR2Object } from "@/lib/r2"
 import { GoogleGenAI } from "@google/genai"
 import { fal } from "@fal-ai/client"
-import { generateUniqueAngle } from "@/lib/context-matrix"
+import { generateUniqueAngle, normalizeAestheticTag, AESTHETIC_DEFINITIONS } from "@/lib/context-matrix"
 import { resolveProductShowcase, pickShowcaseForPin, isDigitalProduct } from "@/lib/product-showcase"
 import { validatePrompt } from "@/lib/prompt-critic"
 import { adminHasCredits, adminDeductCredits } from "@/lib/credits"
@@ -231,6 +231,30 @@ export const generatePinBatch = schedules.task({
               .map((p: any) => p.target_angle)
               .filter(Boolean)
 
+            // Fetch learned aesthetic weights from the feedback loop (aesthetic-optimizer.ts)
+            // These weights bias selection toward aesthetics with higher CTR
+            let aestheticWeights: Record<string, number> | undefined
+            try {
+              const { data: weightRows } = await supabase
+                .from("prompt_weights")
+                .select("aesthetic_tags, weight")
+                .eq("user_id", brand.user_id)
+                .eq("brand_settings_id", brand.id)
+
+              if (weightRows && weightRows.length > 0) {
+                aestheticWeights = {}
+                for (const row of weightRows) {
+                  const tags = row.aesthetic_tags as string[]
+                  if (tags && tags.length > 0 && row.weight) {
+                    aestheticWeights[tags[0]] = Number(row.weight)
+                  }
+                }
+                logger.info(`Loaded ${Object.keys(aestheticWeights).length} aesthetic weights for optimization`)
+              }
+            } catch {
+              // No weights yet (cold start) — pickAestheticForPin falls back to round-robin
+            }
+
             const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
               { id: product.id, title: product.title, description: product.description },
               brand.aesthetic_boundaries,
@@ -238,6 +262,7 @@ export const generatePinBatch = schedules.task({
               pastAngles,
               showcase,
               prodPins.length,  // Per-product pin count ensures rotation for THIS product
+              aestheticWeights,
             )
             logger.info(`Selected semantic angle: "${targetAngle}" | Aesthetic: "${pickedAesthetic.tag}"`)
 
@@ -371,6 +396,7 @@ Return ONLY JSON: { "imagePrompt": "..." }`
               angle_embedding: angleEmbedding ? `[${Array.from(angleEmbedding).join(",")}]` : null,
               template_id: 'template-5',
               pin_title: product.title,
+              aesthetic_tag: pickedAesthetic.tag,
               status: 'generating',
               is_mood_board: Math.random() < 0.1
             }).select('id').single()
@@ -537,6 +563,222 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
 
             totalGenerated++
             logger.info(`✅ Pin generated → pending approval: ${pinId} for "${product.title}"`)
+
+            // ─── A/B Experiment Triggering ───────────────────────────────
+            // Conditions: product has ≥3 published pins, no running experiments,
+            // user has ≥2 aesthetics, and 25% random chance per eligible product.
+            // When triggered, generate a second pin with a different aesthetic.
+            try {
+              const publishedProdPins = prodPins.filter((p: any) => p.status === 'published')
+              const hasSufficientHistory = publishedProdPins.length >= 3
+              const hasMultipleAesthetics = (brand.aesthetic_boundaries || []).length >= 2
+              const randomTrigger = Math.random() < 0.25
+
+              if (hasSufficientHistory && hasMultipleAesthetics && randomTrigger) {
+                // Check for existing running experiments on this product
+                const { count: runningExperiments } = await supabase
+                  .from("ab_experiments")
+                  .select("id", { count: "exact", head: true })
+                  .eq("product_id", product.id)
+                  .eq("status", "running")
+
+                if ((runningExperiments || 0) === 0) {
+                  logger.info(`🧪 A/B experiment triggered for ${product.title}`)
+
+                  // Pick a DIFFERENT aesthetic for the B variant
+                  // Find the aesthetic with least performance data (most under-explored)
+                  const usedTag = pickedAesthetic.tag
+                  const altBoundaries = (brand.aesthetic_boundaries as string[]).filter(
+                    (b: string) => normalizeAestheticTag(b) !== usedTag
+                  )
+
+                  if (altBoundaries.length > 0) {
+                    // Pick the least-used aesthetic from weights, or random if no data
+                    let altTag: string
+                    if (aestheticWeights && Object.keys(aestheticWeights).length > 0) {
+                      // Pick the aesthetic with least total data (lowest pin count)
+                      const sorted = altBoundaries
+                        .map(b => ({ tag: normalizeAestheticTag(b), weight: aestheticWeights![normalizeAestheticTag(b)] ?? 0 }))
+                        .sort((a, b) => a.weight - b.weight)
+                      altTag = sorted[0].tag
+                    } else {
+                      altTag = normalizeAestheticTag(altBoundaries[Math.floor(Math.random() * altBoundaries.length)])
+                    }
+
+                    const altDefinition = AESTHETIC_DEFINITIONS[altTag] || altTag
+
+                    // Generate B variant with the alternate aesthetic
+                    const { angle: altAngle, embedding: altEmbedding } = await generateUniqueAngle(
+                      { id: product.id, title: product.title, description: product.description },
+                      [altTag], // Force this specific aesthetic
+                      brand.audience_profile,
+                      [...pastAngles, targetAngle], // Include the A variant to ensure B is different
+                      showcase,
+                      prodPins.length + 1,
+                    )
+
+                    // Credit gate for the B variant
+                    const { hasCredits: hasCreditForB } = await adminHasCredits(brand.user_id, 1)
+                    if (hasCreditForB) {
+                      // Art Director for B variant
+                      const artDirectorPromptB = `You are an expert product photography Art Director. Your job is to write a single, coherent scene description for fal.ai image editing. The source product image will be composited into the scene you describe.
+
+═══ CREATIVE CONTEXT ═══
+
+PRODUCT: ${showcase?.productAppearance || product.title}
+SHOT: ${showcase?.presentationMode || 'hero'}, ${showcase?.heroAction || 'displayed'}
+CAMERA: ${showcase?.cameraAngle || 'eye-level'}
+SCENE CONCEPT: ${altAngle}
+STYLE: ${altTag} — ${altDefinition}
+
+═══ OUTPUT RULES ═══
+
+Write a single flowing scene description, max 80 words. Rules:
+- Start with the product: what it is, how it appears, what it's doing in the scene
+- Describe ONLY what the camera will physically see: surfaces, materials, light, atmosphere
+- The product must keep its exact original colors, materials, shape from the source image
+- Apply the style's lighting and color palette to the ENVIRONMENT only
+- No meta-instructions, no lists, no references to "the viewer"
+- End with: "editorial product photography, soft natural light, 8k"
+
+Return ONLY JSON: { "imagePrompt": "..." }`
+
+                      const bPromptParts: any[] = [{ text: artDirectorPromptB }]
+                      if (productImageBase64 && productImageMimeType) {
+                        bPromptParts.push({ inlineData: { data: productImageBase64, mimeType: productImageMimeType } })
+                      }
+
+                      const bPlanResponse = await ai.models.generateContent({
+                        model: 'gemini-2.5-flash',
+                        contents: bPromptParts,
+                        config: { temperature: 0.7, responseMimeType: "application/json" }
+                      })
+                      const bPlan = JSON.parse(bPlanResponse.text?.trim() || '{}')
+                      const bImagePrompt = bPlan.imagePrompt || `Aesthetic lifestyle shot of ${product.title}, photorealistic 8k`
+
+                      // Generate B image via fal.ai
+                      const bResult: any = await fal.subscribe("fal-ai/flux-2/edit", {
+                        input: {
+                          prompt: bImagePrompt,
+                          num_inference_steps: 50,
+                          guidance_scale: 3.5,
+                          image_size: { width: 1000, height: 1500 },
+                          num_images: 1,
+                          enable_safety_checker: true,
+                          acceleration: "regular",
+                          output_format: "png",
+                          image_urls: [sourceImageUrl],
+                        },
+                        logs: true,
+                        onQueueUpdate: (update) => {
+                          if (update.status === "IN_PROGRESS") {
+                            update.logs.map((log) => log.message).forEach(console.log)
+                          }
+                        },
+                      })
+
+                      const bFalImageUrl = bResult.data?.images?.[0]?.url
+                      if (bFalImageUrl) {
+                        // Save B pin to DB
+                        const { data: pinB } = await supabase.from('pins').insert({
+                          user_id: brand.user_id,
+                          product_id: product.id,
+                          brand_settings_id: brand.id,
+                          art_director_prompt: bImagePrompt,
+                          target_angle: altAngle,
+                          angle_embedding: altEmbedding ? `[${Array.from(altEmbedding).join(",")}]` : null,
+                          template_id: 'template-5',
+                          pin_title: product.title,
+                          aesthetic_tag: altTag,
+                          status: 'generating',
+                          is_mood_board: false,
+                        }).select('id').single()
+
+                        if (pinB?.id) {
+                          // Upload B image to R2
+                          const bImgRes = await fetch(bFalImageUrl)
+                          const bImgBuffer = Buffer.from(await bImgRes.arrayBuffer())
+                          const bRawR2Key = `pin-images/${brand.user_id}/${pinB.id}-raw.png`
+                          await putR2Object(bRawR2Key, bImgBuffer, "image/png")
+                          const bRawImageUrl = r2Domain ? `${r2Domain}/${bRawR2Key}` : bRawR2Key
+
+                          // Handle render (same logic as main pin)
+                          const shouldRenderB = brand.show_brand_url !== false && !!brand.store_url
+                          let bFinalUrl = bRawImageUrl
+                          let bFinalKey = bRawR2Key
+
+                          if (shouldRenderB) {
+                            let appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '')
+                            if (!appUrl.startsWith('http')) appUrl = `https://${appUrl}`
+
+                            const renderRes = await fetch(`${appUrl}/api/render-pin`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ imageUrl: bRawImageUrl, storeUrl: brand.store_url || "" }),
+                            })
+                            if (renderRes.ok) {
+                              const renderedBuffer = Buffer.from(await renderRes.arrayBuffer())
+                              if (renderedBuffer.length >= 10000) {
+                                const renderedKey = `pin-images/${brand.user_id}/${pinB.id}-final.png`
+                                await putR2Object(renderedKey, renderedBuffer, "image/png")
+                                bFinalUrl = r2Domain ? `${r2Domain}/${renderedKey}` : renderedKey
+                                bFinalKey = renderedKey
+                              }
+                            }
+                          }
+
+                          await supabase.from("pins").update({
+                            generated_image_url: bRawImageUrl,
+                            generated_image_r2_key: bRawR2Key,
+                            rendered_image_url: bFinalUrl,
+                            rendered_image_r2_key: bFinalKey,
+                            status: "pending_approval",
+                          }).eq("id", pinB.id)
+
+                          // Generate SEO copy for B variant
+                          const bCopyRes = await ai.models.generateContent({
+                            model: "gemini-2.5-flash",
+                            contents: [{ text: `Write a Pinterest SEO title (max 100 chars) and description (150-300 chars) for: "${product.title}". Creative angle: "${altAngle}". Return JSON: { "seo_title": "...", "seo_description": "..." }` }],
+                            config: { temperature: 0.6, responseMimeType: "application/json" }
+                          })
+                          try {
+                            const bSeo = JSON.parse(bCopyRes.text?.trim() || '{}')
+                            if (bSeo.seo_title) {
+                              await supabase.from("pins").update({
+                                pin_title: bSeo.seo_title.slice(0, 100),
+                                pin_description: (bSeo.seo_description || '').slice(0, 500),
+                              }).eq("id", pinB.id)
+                            }
+                          } catch { /* SEO copy parse failure is non-fatal */ }
+
+                          // Create the experiment record
+                          await supabase.from("ab_experiments").insert({
+                            user_id: brand.user_id,
+                            product_id: product.id,
+                            pin_a_id: pinId,
+                            pin_b_id: pinB.id,
+                            aesthetic_a: pickedAesthetic.tag,
+                            aesthetic_b: altTag,
+                            status: "running",
+                          })
+
+                          // Deduct credit for B variant
+                          await adminDeductCredits(brand.user_id, 1, `A/B test pin: ${pinB.id}`)
+
+                          totalGenerated++
+                          logger.info(`🧪 A/B experiment created: Pin A (${pickedAesthetic.tag}) vs Pin B (${altTag}) for "${product.title}"`)
+                        }
+                      }
+                    } else {
+                      logger.info(`Skipping A/B variant — insufficient credits`)
+                    }
+                  }
+                }
+              }
+            } catch (abError: any) {
+              // A/B experiment failure should never block normal pin generation
+              logger.warn(`A/B experiment triggering failed (non-fatal): ${abError.message}`)
+            }
 
           } catch (productError: any) {
             logger.error(`Error generating pin for ${product.title}: ${productError.message}`)

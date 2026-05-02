@@ -76,6 +76,20 @@ export const analyticsCollector = schedules.task({
             })
             .eq("id", pin.id)
 
+          // Write daily time-series snapshot for analytics dashboard
+          // Uses upsert so multiple collector runs per day just update the same row
+          const today = new Date().toISOString().slice(0, 10)
+          await supabase
+            .from("pin_analytics_snapshots")
+            .upsert({
+              pin_id: pin.id,
+              user_id: conn.user_id,
+              impressions: pinAnalytics.impressions,
+              outbound_clicks: pinAnalytics.outbound_clicks,
+              saves: pinAnalytics.saves,
+              snapshot_date: today,
+            }, { onConflict: 'pin_id,snapshot_date' })
+
           totalUpdated++
         }
 

@@ -151,6 +151,58 @@ export const publishPins = schedules.task({
           continue
         }
 
+        // ─── Orphan Recovery Sweep ─────────────────────────────────
+        // Catches pins that are status='queued' in the pins table but
+        // have NO matching pin_queue row. This happens when:
+        //   1. User approved pins before connecting Pinterest
+        //   2. The pin_queue insert failed during approval
+        //   3. pin_queue table didn't exist when pins were approved
+        // Self-healing: auto-inserts them into pin_queue so the
+        // normal publisher flow picks them up.
+        try {
+          const { data: orphanedPins } = await supabase
+            .from("pins")
+            .select("id")
+            .eq("user_id", user_id)
+            .eq("status", "queued")
+
+          if (orphanedPins && orphanedPins.length > 0) {
+            const orphanIds = orphanedPins.map((p: any) => p.id)
+
+            // Check which of these are already in pin_queue
+            const { data: existingQueue } = await supabase
+              .from("pin_queue")
+              .select("pin_id")
+              .in("pin_id", orphanIds)
+
+            const existingPinIds = new Set((existingQueue || []).map((q: any) => q.pin_id))
+            const missingPinIds = orphanIds.filter((id: string) => !existingPinIds.has(id))
+
+            if (missingPinIds.length > 0) {
+              const rescueEntries = missingPinIds.map((pinId: string) => ({
+                user_id,
+                pin_id: pinId,
+                priority: 0,
+                status: "pending",
+              }))
+
+              const { error: rescueError } = await supabase
+                .from("pin_queue")
+                .insert(rescueEntries)
+
+              if (!rescueError) {
+                logger.info(`🔧 Orphan recovery: rescued ${missingPinIds.length} pins into queue for user ${user_id}`)
+              } else {
+                logger.warn(`Orphan recovery insert failed: ${rescueError.message}`)
+              }
+            }
+          }
+        } catch (orphanErr: any) {
+          // Orphan recovery is non-fatal — if it fails, normal flow continues
+          logger.warn(`Orphan recovery sweep failed (non-fatal): ${orphanErr.message}`)
+        }
+        // ───────────────────────────────────────────────────────────
+
         // Get queued pins
         const { data: queuedPins } = await supabase
           .from("pin_queue")

@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   ShoppingBag,
   ImageIcon,
+  BarChart3,
   Palette,
   Plug,
 } from "lucide-react"
@@ -102,6 +103,11 @@ export function AppSidebar({
       title: "My Pins",
       url: "/pins",
       icon: ImageIcon,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: BarChart3,
     },
     {
       title: "Brand Settings",

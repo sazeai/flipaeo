@@ -9,7 +9,7 @@ const LEGACY_AESTHETIC_ALIASES: Record<string, string> = {
   "Indie DIY Setup": AUTHENTIC_HANDMADE_TAG,
 }
 
-function normalizeAestheticTag(tag?: string | null) {
+export function normalizeAestheticTag(tag?: string | null) {
   if (!tag) return ""
   return LEGACY_AESTHETIC_ALIASES[tag] || tag
 }
@@ -42,21 +42,85 @@ export const AESTHETIC_DEFINITIONS: Record<string, string> = {
 
 /**
  * Pick ONE aesthetic from the user's selected boundaries for this specific pin.
- * Rotates based on the GLOBAL user pin count (across all products) so that
- * different products in the same batch get different aesthetics.
+ *
+ * Two modes:
+ * 1. COLD START (no weights): round-robin through boundaries (original behavior)
+ * 2. OPTIMIZED (weights available): 70% weighted random (exploit winners),
+ *    30% pure random (explore for new data). Prevents getting stuck on local maxima.
+ *
+ * @param boundaries  The user's selected aesthetic tags
+ * @param indexKey    Round-robin index (used for cold start fallback)
+ * @param weights     Optional map of { aestheticTag: weight } from prompt_weights table
  */
 export function pickAestheticForPin(
   boundaries: string[],
   indexKey: number,
+  weights?: Record<string, number>,
 ): { tag: string; definition: string } {
   if (!boundaries || boundaries.length === 0) {
     return { tag: 'Modern & Minimalist', definition: AESTHETIC_DEFINITIONS['Modern & Minimalist'] }
   }
-  // Round-robin through the user's selected aesthetics using the provided index key
-  const idx = indexKey % boundaries.length
-  const tag = normalizeAestheticTag(boundaries[idx])
+
+  // Normalize all boundary tags
+  const normalizedBoundaries = boundaries.map(b => normalizeAestheticTag(b))
+
+  // If we have learned weights, use explore/exploit selection
+  if (weights && Object.keys(weights).length > 0) {
+    // Check if any of the user's boundaries have weight data
+    const boundariesWithWeights = normalizedBoundaries.filter(b => weights[b] !== undefined)
+
+    if (boundariesWithWeights.length >= 2) {
+      const roll = Math.random()
+
+      if (roll < 0.7) {
+        // EXPLOIT (70%): Weighted random selection — favor high-CTR aesthetics
+        const tag = weightedRandomPick(normalizedBoundaries, weights)
+        const definition = AESTHETIC_DEFINITIONS[tag] || tag
+        return { tag, definition }
+      } else {
+        // EXPLORE (30%): Pure random — try any aesthetic equally
+        const randomIdx = Math.floor(Math.random() * normalizedBoundaries.length)
+        const tag = normalizedBoundaries[randomIdx]
+        const definition = AESTHETIC_DEFINITIONS[tag] || tag
+        return { tag, definition }
+      }
+    }
+  }
+
+  // COLD START: No weight data yet → original round-robin behavior
+  const idx = indexKey % normalizedBoundaries.length
+  const tag = normalizedBoundaries[idx]
   const definition = AESTHETIC_DEFINITIONS[tag] || tag
   return { tag, definition }
+}
+
+/**
+ * Weighted random selection using cumulative distribution.
+ * Aesthetics with higher weights are more likely to be picked.
+ * Aesthetics without weight data get the minimum observed weight (fair chance).
+ */
+function weightedRandomPick(tags: string[], weights: Record<string, number>): string {
+  // Assign weights — untracked aesthetics get the minimum existing weight
+  const existingWeights = Object.values(weights).filter(w => w > 0)
+  const minWeight = existingWeights.length > 0 ? Math.min(...existingWeights) : 0.01
+
+  const tagWeights = tags.map(tag => weights[tag] ?? minWeight)
+  const totalWeight = tagWeights.reduce((sum, w) => sum + w, 0)
+
+  if (totalWeight === 0) {
+    // All weights are zero — fall back to uniform random
+    return tags[Math.floor(Math.random() * tags.length)]
+  }
+
+  // Cumulative distribution sampling
+  const roll = Math.random() * totalWeight
+  let cumulative = 0
+  for (let i = 0; i < tags.length; i++) {
+    cumulative += tagWeights[i]
+    if (roll <= cumulative) return tags[i]
+  }
+
+  return tags[tags.length - 1]
 }
 
 /**
@@ -75,6 +139,7 @@ export async function generateUniqueAngle(
   pastAngles?: string[],
   showcase?: ShowcaseStrategy,
   pinCountForProduct?: number,
+  aestheticWeights?: Record<string, number>,
 ): Promise<{ angle: string; embedding: number[]; pickedAesthetic: { tag: string; definition: string } }> {
   const supabase = createAdminClient()
 
@@ -83,8 +148,8 @@ export async function generateUniqueAngle(
   const hash = product.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const offsetCount = (pinCountForProduct || 0) + hash;
 
-  // Pick ONE aesthetic using per-product count + hash
-  const pickedAesthetic = pickAestheticForPin(brandBoundaries || [], offsetCount)
+  // Pick ONE aesthetic using per-product count + hash + learned weights from optimizer
+  const pickedAesthetic = pickAestheticForPin(brandBoundaries || [], offsetCount, aestheticWeights)
   const authenticHandmadeMode = pickedAesthetic.tag === AUTHENTIC_HANDMADE_TAG
 
   // Build showcase constraint block (from Stage 1 — Product Showcase Resolver)
