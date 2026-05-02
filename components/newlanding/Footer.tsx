@@ -49,7 +49,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-[rgba(55,50,47,0.12)] p-8 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6 bg-[#F9F8F7]">
           <div className="text-[11px] font-mono text-[#AAA] tracking-tight">
-            © 2026 EcomPin BV • KVK: 97074756
+            © 2026 EcomPin
           </div>
 
           <div className="flex items-center gap-2 px-4 py-1.5 bg-white border border-[rgba(55,50,47,0.06)] rounded-full">

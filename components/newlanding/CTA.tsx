@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export default function CTA() {
   return (
@@ -24,15 +25,14 @@ export default function CTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <button className="w-full sm:w-auto px-8 py-4 bg-white text-[#111] rounded-full flex justify-center items-center gap-3 text-[16px] font-medium transition-all shadow-[0_4px_14px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] hover:bg-[#FAFAFA] hover:-translate-y-0.5 group">
-              Get Started Now
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-            <button className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 text-white rounded-full flex justify-center items-center text-[16px] font-medium hover:bg-white/5 transition-colors hover:-translate-y-0.5">
-              Book a Demo
-            </button>
+            <Link href="/pricing">
+              <button className="w-full sm:w-auto px-8 py-4 bg-white text-[#111] rounded-full flex justify-center items-center gap-3 text-[16px] font-medium transition-all shadow-[0_4px_14px_rgba(255,255,255,0.15)] hover:shadow-[0_6px_24px_rgba(255,255,255,0.25)] hover:bg-[#FAFAFA] hover:-translate-y-0.5 group">
+                Get Started Now
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </Link>
           </div>
         </div>
 
