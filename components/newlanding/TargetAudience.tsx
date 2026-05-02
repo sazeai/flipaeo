@@ -49,7 +49,7 @@ export default function TargetAudience() {
       <div className="w-full max-w-[1400px] mx-auto relative">
 
         {/* Header Section */}
-        <div className="py-20 md:py-32 px-6 md:px-12 text-center">
+        <div className="py-12 px-6 md:px-12 text-center">
           <h2 className="font-serif text-[2.5rem] md:text-[3.5rem] leading-[1.1] tracking-[-0.02em] text-[#111] mb-8 max-w-5xl mx-auto">
             Built for brands that sell physical products.
           </h2>

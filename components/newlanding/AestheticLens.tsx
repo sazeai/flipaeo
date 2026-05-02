@@ -78,17 +78,17 @@ export default function AestheticLens() {
       step: "01"
     },
     {
-      rawImage: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop",
-      lifestyleImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
-      title: "Premium Headphones",
-      board: "Tech Essentials",
+      rawImage: "/light.jpg",
+      lifestyleImage: "/lightphoto-generated.webp",
+      title: "Premium Table Lamp",
+      board: "Home Decor",
       step: "02"
     },
     {
-      rawImage: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop",
-      lifestyleImage: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop",
-      title: "Crimson Running Shoes",
-      board: "Urban Active",
+      rawImage: "/gamla.jpg",
+      lifestyleImage: "/generated-planter.webp",
+      title: "Tree Pots",
+      board: "Planters",
       step: "03"
     }
   ];

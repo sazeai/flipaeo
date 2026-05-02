@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { Navbar } from '@/components/landing/Navbar'
-import { Footer } from '@/components/landing/Footer'
+import Navbar from '@/components/newlanding/Navbar'
+import Footer from '@/components/newlanding/Footer'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import Link from 'next/link'
 import Button from '@/components/landing/Button'

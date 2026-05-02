@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { Navbar } from '@/components/landing/Navbar'
-import { Footer } from '@/components/landing/Footer'
+import Navbar from '@/components/newlanding/Navbar'
+import Footer from '@/components/newlanding/Footer'
 import { generateBreadcrumbJsonLd, generateMetadata, generateWebPageJsonLd } from '@/lib/seo'
 import { MultipleStructuredData } from '@/components/seo/StructuredData'
 import { seoUtils } from '@/config/seo'
@@ -14,9 +14,15 @@ export const metadata: Metadata = generateMetadata({
 
 export default function PrivacyPolicy() {
   return (
-    <div className=" min-h-screen w-full flex flex-col overflow-x-hidden font-sans bg-stone-50/50">
-      <Navbar />
-      <main className="flex-grow flex flex-col items-center w-full pt-12">
+    <div className="min-h-screen w-full bg-[#FAFAFA] font-sans flex flex-col items-center overflow-x-hidden selection:bg-[#111] selection:text-white relative">
+      <div className="w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-0 lg:max-w-[1000px] lg:w-[1000px] relative flex flex-col justify-start items-center min-h-screen">
+        {/* Left vertical line */}
+        <div className="w-[1px] h-full absolute left-4 sm:left-6 md:left-8 lg:left-0 top-0 bg-[rgba(55,50,47,0.12)] shadow-[1px_0px_0px_white] z-0"></div>
+        {/* Right vertical line */}
+        <div className="w-[1px] h-full absolute right-4 sm:right-6 md:right-8 lg:right-0 top-0 bg-[rgba(55,50,47,0.12)] shadow-[1px_0px_0px_white] z-0"></div>
+
+        <Navbar />
+        <main className="flex-grow flex flex-col items-center w-full pt-32 z-10 relative">
         {/* Hero */}
         <section className="w-full py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
@@ -187,6 +193,7 @@ export default function PrivacyPolicy() {
         </section>
       </main>
       <Footer />
+      </div>
 
       {/* Structured Data */}
       <MultipleStructuredData

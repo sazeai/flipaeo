@@ -13,6 +13,7 @@ import TargetAudience from '@/components/newlanding/TargetAudience';
 import Pricing from '@/components/newlanding/Pricing';
 import CTA from '@/components/newlanding/CTA';
 import StaggerReveal from '@/components/newlanding/StaggerReveal';
+import Navbar from '@/components/newlanding/Navbar';
 
 
 export const metadata: Metadata = commonPageMetadata.home()
@@ -37,7 +38,7 @@ const SparkleIcon = () => (
 );
 
 const SectionContainer = ({ children, className = "" }: { children: ReactNode, className?: string }) => (
-  <div className="self-stretch border-b border-[rgba(55,50,47,0.12)] flex justify-center items-stretch relative z-10 -mt-[1px]">
+  <div className="self-stretch flex justify-center items-stretch relative z-10 -mt-[1px]">
     <div className="w-4 sm:w-6 md:w-8 lg:w-12 self-stretch relative overflow-hidden shrink-0">
       {/* Left decorative pattern */}
       <div className="w-[120px] sm:w-[140px] md:w-[162px] left-[-40px] sm:left-[-50px] md:left-[-58px] top-[-120px] absolute flex flex-col justify-start items-start">
@@ -50,7 +51,7 @@ const SectionContainer = ({ children, className = "" }: { children: ReactNode, c
       </div>
     </div>
 
-    <div className={`flex-1 flex flex-col items-center py-24 px-4 sm:px-8 md:px-12 border-l border-r border-[rgba(55,50,47,0.12)] ${className}`}>
+    <div className={`flex-1 flex flex-col items-center px-4 sm:px-8 md:px-12 border-l border-r border-[rgba(55,50,47,0.12)] pt-12 ${className}`}>
       {children}
     </div>
 
@@ -86,16 +87,7 @@ export default function Home() {
           <div className="w-[1px] h-full absolute right-4 sm:right-6 md:right-8 lg:right-0 top-0 bg-[rgba(55,50,47,0.12)] shadow-[1px_0px_0px_white] z-0"></div>
 
           {/* Navbar */}
-          <nav className="absolute top-8 z-50 flex items-center gap-6 bg-[#EFEFEF]/80 backdrop-blur-md px-4 py-2 rounded-full border border-black/5">
-            <div className="flex items-center justify-center w-8 h-8">
-              <LogoIcon />
-            </div>
-            <div className="flex items-center gap-5 pr-2 text-[13px] font-medium text-[#4A4A4A]">
-              <a href="#" className="hover:text-black transition-colors">About</a>
-              <a href="#" className="hover:text-black transition-colors">Pricing</a>
-              <a href="#" className="hover:text-black transition-colors">News</a>
-            </div>
-          </nav>
+          <Navbar />
 
           {/* Hero Section */}
           <main className="flex flex-col items-center w-full relative z-10 mt-40">
@@ -106,7 +98,7 @@ export default function Home() {
                   Pinterest Automation for E-Commerce Brands.
                 </h1>
                 <p className="text-[1.1rem] text-[#555] font-normal tracking-tight mt-3 max-w-2xl">
-                  It is a visual asset generator and scheduling tool for Shopify and Etsy merchants. It helps e-commerce owners organize their product catalogs, format lifestyle imagery, and schedule organic Pinterest Pins via a content calendar to maintain consistent, high-quality brand presence.              </p>
+                  EcomPin helps e-commerce owners organize their product catalogs, generate aesthetic lifestyle imagery, and schedule organic Pinterest Pins via a content calendar to maintain consistent, high-quality brand presence.              </p>
               </div>
 
               <div className="absolute bottom-0 translate-y-1/2 flex justify-center w-full z-20">
@@ -124,7 +116,7 @@ export default function Home() {
 
           <SectionContainer>
             {/* Case Study Section */}
-            <section className="w-full max-w-[640px] mx-auto flex flex-col items-center">
+            <section className="w-full max-w-[640px] mx-auto flex flex-col items-center pb-12">
 
               <div className="w-10 h-10 bg-[#EFEFEF] rounded-xl flex items-center justify-center mb-16">
                 <LogoIcon />

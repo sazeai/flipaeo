@@ -25,7 +25,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center border-t border-[rgba(55,50,47,0.12)] pt-12">
       <div className="text-center mb-16 px-6">
         <h2 className="font-serif text-[2.5rem] md:text-[3.5rem] leading-[1.1] tracking-[-0.02em] text-[#111] mb-4">
           A complete organic publishing workflow.
@@ -37,7 +37,7 @@ export default function HowItWorks() {
 
       <div className="w-full border-t border-b border-[rgba(55,50,47,0.12)] flex flex-col">
         {steps.map((step, index) => (
-          <div 
+          <div
             key={step.num}
             className={`w-full flex flex-col md:flex-row group bg-[#FAFAFA] hover:bg-white transition-colors duration-500 ${index !== steps.length - 1 ? 'border-b border-[rgba(55,50,47,0.12)]' : ''}`}
           >

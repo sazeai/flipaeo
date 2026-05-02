@@ -9,8 +9,8 @@ import Button from "@/components/landing/Button"
 import { Input } from "@/components/ui/input"
 import { Loader2, ArrowRight } from "lucide-react"
 import { signInWithMagicLink, signInWithGoogle } from "./actions"
-import { Navbar } from '@/components/landing/Navbar';
-import { Footer } from '@/components/landing/Footer';
+import Navbar from '@/components/newlanding/Navbar'
+import Footer from '@/components/newlanding/Footer'
 import { CSRFProvider, CSRFInput, useCSRF } from "@/components/csrf-provider"
 
 type AuthState = {
