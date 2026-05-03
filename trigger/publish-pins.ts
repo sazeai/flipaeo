@@ -274,6 +274,13 @@ export const publishPins = schedules.task({
             // API pushes are randomly offset by up to 45 minutes to completely mask bot footprints.
             const jitterMs = Math.floor(Math.random() * (45 * 60 * 1000))
             logger.info(`🛡️ Anti-Ban: Applying chronological jitter of ${Math.round(jitterMs / 60000)} minutes...`)
+            
+            // Lock the pin in the queue before waiting so overlapping cron runs don't pick it up
+            await supabase
+              .from("pin_queue")
+              .update({ status: "processing" })
+              .eq("id", queueItem.id)
+
             await wait.for({ seconds: Math.max(1, Math.floor(jitterMs / 1000)) })
 
             // Publish to Pinterest — mood boards have NO outbound link
