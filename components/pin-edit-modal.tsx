@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 
 interface PinData {
   id: string
+  product_id?: string | null
   pin_title: string | null
   pin_description: string | null
   rendered_image_url: string | null
@@ -64,6 +65,7 @@ export function PinEditModal({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [boardId, setBoardId] = useState('')
+  const [destinationUrl, setDestinationUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [approving, setApproving] = useState(false)
   const [showRejectMenu, setShowRejectMenu] = useState(false)
@@ -75,6 +77,7 @@ export function PinEditModal({
       setTitle(pin.pin_title || '')
       setDescription(pin.pin_description || '')
       setBoardId(pin.pinterest_board_id || defaultBoardId || boards[0]?.id || '')
+      setDestinationUrl(pin.products?.product_url || '')
       setShowRejectMenu(false)
       setShowDeleteConfirm(false)
     }
@@ -92,16 +95,17 @@ export function PinEditModal({
   if (!pin) return null
 
   const isPending = pin.status === 'pending_approval'
-  const productUrl = pin.products?.product_url || null
 
   const hasChanges =
     title !== (pin.pin_title || '') ||
     description !== (pin.pin_description || '') ||
-    boardId !== (pin.pinterest_board_id || defaultBoardId || boards[0]?.id || '')
+    boardId !== (pin.pinterest_board_id || defaultBoardId || boards[0]?.id || '') ||
+    destinationUrl !== (pin.products?.product_url || '')
 
   async function handleSave() {
     setSaving(true)
     try {
+      // Save pin metadata
       const res = await fetch(`/api/pins/${pin!.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -111,6 +115,16 @@ export function PinEditModal({
           pinterest_board_id: boardId || undefined,
         }),
       })
+
+      // If destination URL changed, also update the product
+      if (pin!.product_id && destinationUrl !== (pin!.products?.product_url || '')) {
+        await fetch(`/api/products/${pin!.product_id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_url: destinationUrl || null }),
+        })
+      }
+
       if (res.ok) {
         onSaved({ id: pin!.id, pin_title: title, pin_description: description, pinterest_board_id: boardId })
       }
@@ -227,16 +241,26 @@ export function PinEditModal({
                   />
                 </div>
 
-                {/* Destination URL (read-only context) */}
-                {productUrl && (
-                  <div>
-                    <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Destination URL</label>
-                    <div className="w-full px-3.5 py-2.5 border bg-[#f2f3f5] rounded-xl border border-[#e2e4e7]/80 text-sm text-neutral-500 truncate">
-                      {productUrl}
-                    </div>
-                    <p className="text-[10px] text-neutral-400 mt-1">From your product — people go here when they click this pin on Pinterest.</p>
-                  </div>
-                )}
+                {/* Destination URL (editable) */}
+                <div>
+                  <label className="text-xs font-semibold text-neutral-700 mb-1.5 block">Destination URL</label>
+                  <input
+                    type="url"
+                    value={destinationUrl}
+                    onChange={e => setDestinationUrl(e.target.value)}
+                    placeholder="https://your-store.com/product/..."
+                    className={`w-full px-3.5 py-2.5 rounded-xl border transition-all text-sm ${
+                      destinationUrl && !/^https?:\/\/.+/.test(destinationUrl)
+                        ? 'bg-red-50 border-red-200 text-red-600 focus:border-red-300'
+                        : 'bg-[#f2f3f5] border-[#e2e4e7]/80 text-neutral-700 focus:border-neutral-300'
+                    }`}
+                  />
+                  <p className="text-[10px] text-neutral-400 mt-1">
+                    {destinationUrl && !/^https?:\/\/.+/.test(destinationUrl)
+                      ? '⚠️ Invalid URL — must start with https:// to publish successfully.'
+                      : 'From your product — people go here when they click this pin on Pinterest.'}
+                  </p>
+                </div>
 
                 {/* Board */}
                 <div>

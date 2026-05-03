@@ -22,6 +22,7 @@ import { PinEditModal } from '@/components/pin-edit-modal'
 
 interface Pin {
   id: string
+  product_id?: string | null
   pin_title: string | null
   pin_description: string | null
   rendered_image_url: string | null

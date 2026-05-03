@@ -261,16 +261,20 @@ export async function createPin(
     altText?: string
   }
 ): Promise<{ id: string }> {
-  const body = {
+  const body: Record<string, any> = {
     board_id: params.boardId,
     title: params.title,
     description: params.description,
-    link: params.link,
     alt_text: params.altText || params.title,
     media_source: {
       source_type: 'image_url',
       url: params.imageUrl,
     },
+  }
+
+  // Only include link if it's a valid URL — Pinterest rejects empty or invalid links
+  if (params.link && params.link.length > 0) {
+    body.link = params.link
   }
 
   return pinterestFetch(accessToken, '/pins', {

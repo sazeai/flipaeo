@@ -15,7 +15,10 @@ import {
   Maximize2,
   ZoomIn,
   ZoomOut,
-  X
+  X,
+  Pencil,
+  Save,
+  AlertTriangle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 // @ts-ignore
@@ -51,6 +54,11 @@ export default function ProductsPage() {
   // Image viewer
   const [viewingImage, setViewingImage] = useState<{ url: string; title: string } | null>(null)
   const [zoomLevel, setZoomLevel] = useState(1)
+
+  // Inline editing
+  const [editingProductId, setEditingProductId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({ title: '', price: '', product_url: '' })
+  const [editSaving, setEditSaving] = useState(false)
 
   useEffect(() => {
     fetchProducts()
@@ -167,6 +175,48 @@ export default function ProductsPage() {
     await supabase.from('products').delete().eq('id', productId)
     setProducts(prev => prev.filter(p => p.id !== productId))
     setDeletingProductId(null)
+  }
+
+  function startEditing(product: Product) {
+    setEditingProductId(product.id)
+    setEditForm({
+      title: product.title || '',
+      price: product.price ? String(product.price) : '',
+      product_url: product.product_url || '',
+    })
+  }
+
+  async function handleSaveEdit(productId: string) {
+    setEditSaving(true)
+    try {
+      const res = await fetch(`/api/products/${productId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editForm.title,
+          price: editForm.price ? parseFloat(editForm.price) : null,
+          product_url: editForm.product_url || null,
+        }),
+      })
+      if (res.ok) {
+        setProducts(prev => prev.map(p => {
+          if (p.id !== productId) return p
+          return {
+            ...p,
+            title: editForm.title,
+            price: editForm.price ? parseFloat(editForm.price) : null,
+            product_url: editForm.product_url || null,
+          }
+        }))
+        toast.success('Product updated')
+      } else {
+        toast.error('Failed to update product')
+      }
+    } catch (err) {
+      toast.error('Update failed')
+    }
+    setEditSaving(false)
+    setEditingProductId(null)
   }
 
   if (loading) {
@@ -404,40 +454,105 @@ export default function ProductsPage() {
 
               {/* Info */}
               <div className="p-3 sm:p-4">
-                <h3 className="font-bold text-[14px] text-[#1a1a1a] line-clamp-2 leading-snug">
-                  {product.title}
-                </h3>
-                {product.price && (
-                  <p className="text-[13px] text-[#666666] mt-1 font-medium">
-                    ${Number(product.price).toFixed(2)} {product.currency}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#e2e4e7]/50">
-                  {deletingProductId === product.id ? (
-                    <div className="flex items-center gap-1.5 ml-auto">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 mr-1">Confirm?</span>
+                {editingProductId === product.id ? (
+                  /* Inline Edit Form */
+                  <div className="space-y-2.5">
+                    <input
+                      type="text"
+                      value={editForm.title}
+                      onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
+                      placeholder="Product name"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                    />
+                    <input
+                      type="number"
+                      value={editForm.price}
+                      onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
+                      placeholder="Price"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                    />
+                    <input
+                      type="url"
+                      value={editForm.product_url}
+                      onChange={e => setEditForm(f => ({ ...f, product_url: e.target.value }))}
+                      placeholder="https://your-store.com/product/..."
+                      className={`w-full px-2.5 py-1.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10 ${
+                        editForm.product_url && !/^https?:\/\/.+/.test(editForm.product_url)
+                          ? 'border-red-300 bg-red-50 text-red-600'
+                          : 'border-neutral-200'
+                      }`}
+                    />
+                    <div className="flex gap-1.5 pt-1">
                       <button
-                        onClick={() => handleDelete(product.id)}
-                        className="text-[10px] font-bold uppercase tracking-wider text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded-[6px] transition-colors"
+                        onClick={() => handleSaveEdit(product.id)}
+                        disabled={editSaving || !editForm.title}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-neutral-900 text-white text-xs font-medium hover:bg-neutral-800 disabled:opacity-50"
                       >
-                        Yes
+                        {editSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                        Save
                       </button>
                       <button
-                        onClick={() => setDeletingProductId(null)}
-                        className="text-[10px] font-bold uppercase tracking-wider text-[#666666] hover:text-[#1a1a1a] bg-[#f2f3f5] hover:bg-[#e5e7eb] px-2 py-1 rounded-[6px] transition-colors"
+                        onClick={() => setEditingProductId(null)}
+                        className="px-2 py-1.5 rounded-lg border border-neutral-200 text-xs text-neutral-500 hover:bg-neutral-50"
                       >
-                        No
+                        Cancel
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => setDeletingProductId(product.id)}
-                      className="text-[11px] font-bold uppercase tracking-wider text-[#9ca3af] hover:text-red-500 flex items-center gap-1 ml-auto transition-colors"
-                    >
-                      <Trash2 className="w-3 h-3" strokeWidth={2.2} /> Remove
-                    </button>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  /* Normal View */
+                  <>
+                    <h3 className="font-bold text-[14px] text-[#1a1a1a] line-clamp-2 leading-snug">
+                      {product.title}
+                    </h3>
+                    {product.price && (
+                      <p className="text-[13px] text-[#666666] mt-1 font-medium">
+                        ${Number(product.price).toFixed(2)} {product.currency}
+                      </p>
+                    )}
+                    {/* URL indicator */}
+                    {(!product.product_url || product.product_url === '#' || !/^https?:\/\/.+/.test(product.product_url)) && (
+                      <div className="flex items-center gap-1 mt-1.5 text-amber-600">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span className="text-[10px] font-semibold">Missing valid URL</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#e2e4e7]/50">
+                      {/* Edit button */}
+                      <button
+                        onClick={() => startEditing(product)}
+                        className="text-[11px] font-bold uppercase tracking-wider text-[#9ca3af] hover:text-neutral-700 flex items-center gap-1 transition-colors"
+                      >
+                        <Pencil className="w-3 h-3" strokeWidth={2.2} /> Edit
+                      </button>
+                      <span className="flex-1" />
+                      {deletingProductId === product.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 mr-1">Confirm?</span>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="text-[10px] font-bold uppercase tracking-wider text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded-[6px] transition-colors"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => setDeletingProductId(null)}
+                            className="text-[10px] font-bold uppercase tracking-wider text-[#666666] hover:text-[#1a1a1a] bg-[#f2f3f5] hover:bg-[#e5e7eb] px-2 py-1 rounded-[6px] transition-colors"
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeletingProductId(product.id)}
+                          className="text-[11px] font-bold uppercase tracking-wider text-[#9ca3af] hover:text-red-500 flex items-center gap-1 transition-colors"
+                        >
+                          <Trash2 className="w-3 h-3" strokeWidth={2.2} /> Remove
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ))}

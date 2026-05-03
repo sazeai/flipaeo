@@ -277,11 +277,15 @@ export const publishPins = schedules.task({
             await new Promise(resolve => setTimeout(resolve, jitterMs))
 
             // Publish to Pinterest — mood boards have NO outbound link
+            // Sanitize URL: reject '#', empty, or non-http(s) URLs
+            const rawLink = pin.is_mood_board ? '' : (pin.products?.product_url || '')
+            const sanitizedLink = rawLink && /^https?:\/\/.+/.test(rawLink) ? rawLink : ''
+
             const pinterestResult = await createPin(accessToken, {
               boardId: targetBoard.id,
               title: pin.pin_title || '',
               description: pin.pin_description || '',
-              link: pin.is_mood_board ? '' : (pin.products?.product_url || ''),
+              link: sanitizedLink,
               imageUrl: pin.rendered_image_url,
             })
 
