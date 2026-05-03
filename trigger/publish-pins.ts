@@ -19,7 +19,7 @@ import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
  */
 export const publishPins = schedules.task({
   id: "pinloop-drip-publisher",
-  cron: "15 */6 * * *", // Every 6 hours at :15 (offset from generator)
+  cron: "*/5 * * * *", // Every 6 hours at :15 (offset from generator)
   run: async () => {
     logger.info("📌 EcomPin publisher started")
 
@@ -56,12 +56,12 @@ export const publishPins = schedules.task({
         // -------------------------------------------------------------
         // The Human Entropy Publisher Logic
         // -------------------------------------------------------------
-        
+
         // 1. Calculate Account Age
         const createdAt = brandCheck.created_at ? new Date(brandCheck.created_at) : new Date()
         const daysSinceSignup = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
         const weekIndex = Math.floor(daysSinceSignup / 7)
-        
+
         let powIdx = weekIndex % 4
         let wrmIdx = Math.min(weekIndex, 3)
 
@@ -97,7 +97,7 @@ export const publishPins = schedules.task({
         // Count pins already published today
         const todayStart = new Date()
         todayStart.setUTCHours(0, 0, 0, 0)
-        
+
         const { count: pinsToday } = await supabase
           .from("pins")
           .select("id", { count: "exact", head: true })
@@ -118,7 +118,7 @@ export const publishPins = schedules.task({
         const chunkDurationHours = 24 / targetToday
         const currentHour = new Date().getUTCHours()
         const requiredHour = published * chunkDurationHours
-        
+
         if (currentHour < requiredHour) {
           logger.info(`User ${user_id}: Jitter chunk not reached (hour ${currentHour} < ${requiredHour.toFixed(1)})`)
           continue
