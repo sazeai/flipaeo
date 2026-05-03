@@ -10,9 +10,9 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const PINTEREST_API_BASE = 'https://api.pinterest.com/v5'
+const PINTEREST_API_BASE = 'https://api-sandbox.pinterest.com/v5'
 const PINTEREST_OAUTH_BASE = 'https://www.pinterest.com/oauth'
-const PINTEREST_TOKEN_URL = 'https://api.pinterest.com/v5/oauth/token'
+const PINTEREST_TOKEN_URL = 'https://api-sandbox.pinterest.com/v5/oauth/token'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -203,13 +203,13 @@ export async function getTrendingKeywords(
 ): Promise<string[]> {
   try {
     const data = await pinterestFetch(accessToken, `/trends/keywords/${region}/top/${trendType}?limit=15`)
-    
+
     // Check if the response matches what we expect from the API
     if (data && data.trends && Array.isArray(data.trends)) {
       // Map to just the keyword strings
       return data.trends.map((t: any) => t.keyword || t.term || '').filter(Boolean)
     }
-    
+
     return []
   } catch (err) {
     console.error('Failed to fetch Pinterest trends:', err)
@@ -296,7 +296,7 @@ export async function getBatchPinAnalytics(
   pinIds: string[]
 ): Promise<PinterestAnalytics[]> {
   const results: PinterestAnalytics[] = []
-  
+
   // Pinterest API doesn't have a true batch analytics endpoint,
   // so we fetch sequentially with a small delay to avoid rate limiting
   for (const pinId of pinIds) {
