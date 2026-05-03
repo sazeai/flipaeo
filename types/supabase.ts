@@ -323,7 +323,6 @@ export type Database = {
           aesthetic_boundaries: Json | null
           account_age_type: string | null
           automation_paused: boolean
-          audience_profile: Json | null
           brand_description: string | null
           brand_name: string
           created_at: string
@@ -341,7 +340,6 @@ export type Database = {
           aesthetic_boundaries?: Json | null
           account_age_type?: string | null
           automation_paused?: boolean
-          audience_profile?: Json | null
           brand_description?: string | null
           brand_name: string
           created_at?: string
@@ -359,7 +357,6 @@ export type Database = {
           aesthetic_boundaries?: Json | null
           account_age_type?: string | null
           automation_paused?: boolean
-          audience_profile?: Json | null
           brand_description?: string | null
           brand_name?: string
           created_at?: string

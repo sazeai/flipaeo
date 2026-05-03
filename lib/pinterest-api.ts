@@ -191,33 +191,6 @@ export async function getAccountInfo(accessToken: string): Promise<PinterestUser
   return pinterestFetch(accessToken, '/user_account')
 }
 
-/**
- * Feature 10: Fetch audience demographic insights for the authenticated user.
- * Uses /v5/user_account/analytics — requires Pinterest Business Account (free).
- * Returns aggregated engagement data for the last 30 days.
- */
-export async function getAudienceInsights(accessToken: string): Promise<{
-  topPinMetrics: any
-  demographics: any
-} | null> {
-  try {
-    const endDate = new Date().toISOString().split('T')[0]
-    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
-    const data = await pinterestFetch(
-      accessToken,
-      `/user_account/analytics?start_date=${startDate}&end_date=${endDate}&metric_types=IMPRESSION,SAVE,OUTBOUND_CLICK,PIN_CLICK&from_claimed_content=BOTH&pin_format=ALL&app_types=ALL&split_field=PIN_FORMAT`
-    )
-
-    return {
-      topPinMetrics: data,
-      demographics: data,
-    }
-  } catch (err) {
-    console.error('Failed to fetch audience insights:', err)
-    return null
-  }
-}
 
 /**
  * Fetch top trending keywords from Pinterest.

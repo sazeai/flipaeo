@@ -135,7 +135,6 @@ function weightedRandomPick(tags: string[], weights: Record<string, number>): st
 export async function generateUniqueAngle(
   product: { id: string; title: string; description?: string },
   brandBoundaries?: string[],
-  audienceProfile?: Record<string, any> | null,
   pastAngles?: string[],
   showcase?: ShowcaseStrategy,
   pinCountForProduct?: number,

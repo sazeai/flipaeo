@@ -48,7 +48,7 @@ export const generatePinBatch = schedules.task({
     // Get all users with brand settings
     const { data: brands, error } = await supabase
       .from("brand_settings")
-      .select("id, user_id, brand_name, store_url, aesthetic_boundaries, automation_paused, audience_profile, show_brand_url")
+      .select("id, user_id, brand_name, store_url, aesthetic_boundaries, automation_paused, show_brand_url")
 
     if (error || !brands || brands.length === 0) {
       logger.info("No users with brand settings found")
@@ -258,7 +258,6 @@ export const generatePinBatch = schedules.task({
             const { angle: targetAngle, embedding: angleEmbedding, pickedAesthetic } = await generateUniqueAngle(
               { id: product.id, title: product.title, description: product.description },
               brand.aesthetic_boundaries,
-              brand.audience_profile,
               pastAngles,
               showcase,
               prodPins.length,  // Per-product pin count ensures rotation for THIS product
@@ -611,7 +610,6 @@ Return ONLY valid JSON: { "seo_title": "...", "seo_description": "..." }`
                     const { angle: altAngle, embedding: altEmbedding } = await generateUniqueAngle(
                       { id: product.id, title: product.title, description: product.description },
                       [altTag], // Force this specific aesthetic
-                      brand.audience_profile,
                       [...pastAngles, targetAngle], // Include the A variant to ensure B is different
                       showcase,
                       prodPins.length + 1,
