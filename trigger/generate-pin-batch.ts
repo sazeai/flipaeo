@@ -37,7 +37,7 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 export const generatePinBatch = schedules.task({
   id: "pinloop-generate-batch",
-  cron: "*/5 * * * *",
+  cron: "0 */6 * * *",
   run: async () => {
     logger.info("🎨 EcomPin batch generator started")
 

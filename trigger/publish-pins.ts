@@ -19,7 +19,7 @@ import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
  */
 export const publishPins = schedules.task({
   id: "pinloop-drip-publisher",
-  cron: "*/5 * * * *", // Every 6 hours at :15 (offset from generator)
+  cron: "15 */6 * * *", // Every 6 hours at :15 (offset from generator)
   run: async () => {
     logger.info("📌 EcomPin publisher started")
 
