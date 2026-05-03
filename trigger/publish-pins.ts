@@ -1,4 +1,4 @@
-import { schedules, logger } from "@trigger.dev/sdk/v3"
+import { schedules, logger, wait } from "@trigger.dev/sdk/v3"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
 
@@ -274,7 +274,7 @@ export const publishPins = schedules.task({
             // API pushes are randomly offset by up to 45 minutes to completely mask bot footprints.
             const jitterMs = Math.floor(Math.random() * (45 * 60 * 1000))
             logger.info(`🛡️ Anti-Ban: Applying chronological jitter of ${Math.round(jitterMs / 60000)} minutes...`)
-            await new Promise(resolve => setTimeout(resolve, jitterMs))
+            await wait.for({ seconds: Math.max(1, Math.floor(jitterMs / 1000)) })
 
             // Publish to Pinterest — mood boards have NO outbound link
             // Sanitize URL: reject '#', empty, or non-http(s) URLs
