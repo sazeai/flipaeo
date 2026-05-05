@@ -19,7 +19,7 @@ import { getValidAccessToken, createPin, getBoards } from "@/lib/pinterest-api"
  */
 export const publishPins = schedules.task({
   id: "pinloop-drip-publisher",
-  cron: "*/5 * * * *", // Every 6 hours at :15 (offset from generator)
+  cron: "0 */6 * * *", // Every 6 hours
   run: async () => {
     logger.info("📌 EcomPin publisher started")
 
@@ -220,6 +220,22 @@ export const publishPins = schedules.task({
 
         for (const queueItem of queuedPins) {
           try {
+            // Atomic claim: lock the queue item IMMEDIATELY using optimistic locking.
+            // The .eq("status", "pending") in the WHERE clause acts as a guard —
+            // if a concurrent run already claimed this item, 0 rows are updated
+            // and we skip it. This eliminates the race window entirely.
+            const { data: claimed } = await supabase
+              .from("pin_queue")
+              .update({ status: "processing" })
+              .eq("id", queueItem.id)
+              .eq("status", "pending") // Guard: only claim if still pending
+              .select("id")
+
+            if (!claimed || claimed.length === 0) {
+              logger.info(`Pin ${queueItem.pin_id}: already claimed by a concurrent run, skipping`)
+              continue
+            }
+
             // Fetch the pin details
             const { data: pin } = await supabase
               .from("pins")
@@ -274,14 +290,23 @@ export const publishPins = schedules.task({
             // API pushes are randomly offset by up to 45 minutes to completely mask bot footprints.
             const jitterMs = Math.floor(Math.random() * (45 * 60 * 1000))
             logger.info(`🛡️ Anti-Ban: Applying chronological jitter of ${Math.round(jitterMs / 60000)} minutes...`)
-            
-            // Lock the pin in the queue before waiting so overlapping cron runs don't pick it up
-            await supabase
-              .from("pin_queue")
-              .update({ status: "processing" })
-              .eq("id", queueItem.id)
 
             await wait.for({ seconds: Math.max(1, Math.floor(jitterMs / 1000)) })
+
+            // Pre-publish guard: after the jitter wait (up to 45 min), a concurrent
+            // run that somehow held the same queue item could have published this pin.
+            // Re-verify the pin's current status before hitting the Pinterest API.
+            const { data: pinCheck } = await supabase
+              .from("pins")
+              .select("status")
+              .eq("id", pin.id)
+              .single()
+
+            if (pinCheck?.status === 'published') {
+              logger.warn(`Pin ${pin.id}: already published by a concurrent run during jitter wait. Marking queue entry resolved.`)
+              await supabase.from("pin_queue").update({ status: "published" }).eq("id", queueItem.id)
+              continue
+            }
 
             // Publish to Pinterest — mood boards have NO outbound link
             // Sanitize URL: reject '#', empty, or non-http(s) URLs
